@@ -3,9 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
-  const [isDark, setIsDark] = useState(
-    () => window.matchMedia('(prefers-color-scheme: dark)').matches
-  )
+  const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
@@ -22,8 +20,10 @@ export function ThemeProvider({ children }) {
     }
   }, [isDark])
 
+  const toggleTheme = () => setIsDark(prev => !prev)
+
   return (
-    <ThemeContext.Provider value={{ isDark }}>
+    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   )

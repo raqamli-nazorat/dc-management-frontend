@@ -587,7 +587,7 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
 /* ── DetailModal ── */
 function DetailModal({ project, onClose }) {
   const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white'
-  const tagCls = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
+  const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -627,7 +627,7 @@ function DetailModal({ project, onClose }) {
           <div>
             <label className={labelCls}>Tavsifi</label>
             <div className="relative">
-              <div className={fCls + ' min-h-[80px] pr-8 whitespace-pre-wrap'}>
+              <div className={fCls + ' min-h-[80px] pr-8 whitespace-pre-wrap leading-relaxed'}>
                 {project.description || '—'}
               </div>
               {project.description && (
@@ -636,7 +636,7 @@ function DetailModal({ project, onClose }) {
             </div>
           </div>
 
-          {/* Menejer + Bonus */}
+          {/* Menejer + Menejer bonusi */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Menejer</label>
@@ -646,7 +646,7 @@ function DetailModal({ project, onClose }) {
               </div>
             </div>
             <div>
-              <label className={labelCls}>Menejer bonusi (UZS)</label>
+              <label className={labelCls}>Menejer bonusi</label>
               <div className={fCls + ' text-right'}>{project.bonus || '0,0'}</div>
             </div>
           </div>
@@ -654,12 +654,12 @@ function DetailModal({ project, onClose }) {
           {/* Xodimlar */}
           <div>
             <label className={labelCls}>Xodimlar</label>
-            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[42px]'}>
+            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.employees?.length > 0
                 ? project.employees.map(e => (
                     <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
                   ))
-                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm">—</span>
+                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
           </div>
@@ -667,12 +667,12 @@ function DetailModal({ project, onClose }) {
           {/* Sinovchilar */}
           <div>
             <label className={labelCls}>Sinovchilar</label>
-            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[42px]'}>
+            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.testers?.length > 0
                 ? project.testers.map(e => (
                     <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
                   ))
-                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm">—</span>
+                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
           </div>
