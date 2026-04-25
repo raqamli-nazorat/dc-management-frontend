@@ -33,6 +33,7 @@ const EMPTY_FILTER = {
   dateFromD: '', dateFromT: '', dateToD: '', dateToT: '',
   approvedFromD: '', approvedFromT: '', approvedToD: '', approvedToT: '',
   completedFromD: '', completedFromT: '', completedToD: '', completedToT: '',
+  myTasks: false,
 }
 
 function fmt(n) {
@@ -515,21 +516,31 @@ function FilterModal({ onClose, onApply, initial }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 flex items-center justify-end gap-3">
-          <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[15px] font-extrabold transition-colors cursor-pointer
-              text-[#1A1D2E] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
-            <FaXmark size={14} />
-            Tozalash
-          </button>
-          <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
-              bg-[#3F57B3] text-white hover:bg-[#526ED3]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            Qidirish
-          </button>
+        <div className="px-6 py-4 flex items-center justify-between gap-3">
+          {/* Mening vazifalarim toggle */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Mening vazifalarim</span>
+            <button type="button" onClick={() => set('myTasks', !f.myTasks)}
+              className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${f.myTasks ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${f.myTasks ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setF(EMPTY_FILTER)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[15px] font-extrabold transition-colors cursor-pointer
+                text-[#1A1D2E] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+              <FaXmark size={14} />
+              Tozalash
+            </button>
+            <button onClick={() => onApply(f)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+              Qidirish
+            </button>
+          </div>
         </div>
       </div>
     </div>
