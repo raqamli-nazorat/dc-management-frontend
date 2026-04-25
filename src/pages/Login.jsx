@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getRouteRole } from '../components/ProtectedRoute'
 import { LuEye, LuEyeClosed } from 'react-icons/lu'
 
 export default function Login() {
@@ -13,15 +14,16 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     if (!loginVal || !parolVal) { setError("Login va parolni to'ldiring."); return }
     setLoading(true)
-    setTimeout(() => {
-      const result = login(loginVal, parolVal)
+    setTimeout(async () => {
+      const result = await login(loginVal, parolVal)
       setLoading(false)
-      if (result.success) navigate(`/${result.role}/dashboard`)
+      console.log(result)
+      if (result.success) navigate(`/${getRouteRole({ roles: result.roles })}/dashboard`)
       else setError("Login yoki parol noto'g'ri kiritilgan.")
     }, 600)
   }

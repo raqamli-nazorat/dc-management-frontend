@@ -3,6 +3,7 @@ import { MdExpandMore, MdExpandLess, MdSettings } from 'react-icons/md'
 import { useState } from 'react'
 
 import { useAuth } from '../context/AuthContext'
+import { getRouteRole } from './ProtectedRoute'
 import {
   IconUserGroup, IconFolder, IconBriefcaseDollar,
   IconAnalytics, IconSidebarLeft,
@@ -101,11 +102,12 @@ export default function Sidebar() {
   const [collapsed, setCollapsed]   = useState(false)
   const [openGroups, setOpenGroups] = useState({ 0: true })
 
-  const menu          = menuByRole[user?.role] || []
+  const routeRole = getRouteRole(user)
+  const menu = menuByRole[routeRole] || []
   // Accordion: faqat 1 ta ochiq
   const toggleGroup   = (i) => setOpenGroups(prev => ({ [i]: !prev[i] }))
   const isGroupActive = (group) => group.children?.some(c => location.pathname === c.path)
-  const handleDashboard = () => navigate(`/${user?.role}/dashboard`)
+  const handleDashboard = () => navigate(`/${routeRole}/dashboard`)
 
   /* collapsed ikonka style — active/inactive */
   const iconBtn = (active) => [
@@ -282,10 +284,10 @@ export default function Sidebar() {
         {collapsed ? (
           <button
             onClick={handleDashboard}
-            title={`${user?.name} (${user?.role})`}
+            title={`${user?.username} (${user?.roles?.[0]})`}
             className="w-9 h-9 rounded-xl bg-[#3A3B3B] flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity shrink-0"
           >
-            {user?.name?.[0]}
+            {user?.username?.[0]?.toUpperCase()}
           </button>
         ) : (
           <div
@@ -294,13 +296,13 @@ export default function Sidebar() {
               hover:bg-[#E2E6F2] dark:hover:bg-[#303131]"
           >
             <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-medium bg-[#3A3B3B] dark:bg-[#3A3B3B]">
-              {user?.name?.[0]}
+              {user?.username?.[0]?.toUpperCase()}
             </div>
             <div className="min-w-0">
               <p className="text-[13px] font-medium truncate leading-tight text-[#1A1D2E] dark:text-white">
-                {user?.name}
+                {user?.username}
               </p>
-              <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{user?.role}</p>
+              <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{user?.roles?.[0]}</p>
             </div>
           </div>
         )}

@@ -1,32 +1,36 @@
 import { createContext, useContext, useState } from 'react'
+import { axiosAPI } from '../service/axiosAPI'
 
 const AuthContext = createContext(null)
 
-const USERS = [
-  { login: 'admin', parol: 'admin', role: 'admin', name: 'Administrator' },
-  { login: 'menager', parol: 'menager', role: 'menager', name: 'Menejer' },
-  { login: 'xodim', parol: 'xodim', role: 'xodim', name: 'Xodim' },
-]
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('rn_user')
+    const saved = localStorage.getItem('user')
     return saved ? JSON.parse(saved) : null
   })
 
-  const login = (login, parol) => {
-    const found = USERS.find(u => u.login === login && u.parol === parol)
-    if (found) {
-      setUser(found)
-      localStorage.setItem('rn_user', JSON.stringify(found))
-      return { success: true, role: found.role }
+  const login = async (login, parol) => {
+    try {
+      const response = await axiosAPI.post('/auth/login/', { username: login, password: parol })
+      console.log('🔍 API response:', response.data)
+      const { data } = response.data
+      const userData = data.user
+      setUser(userData)
+      localStorage.setItem('access', data.access ?? '')
+      localStorage.setItem('refresh', data.refresh ?? '')
+      localStorage.setItem('user', JSON.stringify(userData))
+      return { success: true, roles: userData.roles }
+    } catch (error) {
+      console.log('Login error:', error)
+      return { success: false, error: error?.response?.data?.detail || "Xato yuz berdi"}
     }
-    return { success: false }
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('rn_user')
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    localStorage.removeItem('user')
   }
 
   return (

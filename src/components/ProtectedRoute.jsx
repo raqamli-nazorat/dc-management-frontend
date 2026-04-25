@@ -1,12 +1,29 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+const ROLE_MAP = {
+  superadmin: 'admin',
+  admin: 'admin',
+  menager: 'menager',
+  xodim: 'xodim',
+}
+
+export function getRouteRole(user) {
+  const rawRole = Array.isArray(user?.roles) ? user?.roles[0] : user?.roles[0]
+  return ROLE_MAP[rawRole] || rawRole
+}
+
 export default function ProtectedRoute({ children, allowedRole }) {
   const { user } = useAuth()
 
+  console.log("ProtectedRoute", user)
+
   if (!user) return <Navigate to="/login" replace />
-  if (allowedRole && user.role !== allowedRole) {
-    return <Navigate to={`/${user.role}/dashboard`} replace />
+
+  const routeRole = getRouteRole(user)
+
+  if (allowedRole && routeRole !== allowedRole) {
+    return <Navigate to={`/${routeRole}/dashboard`} replace />
   }
 
   return children
