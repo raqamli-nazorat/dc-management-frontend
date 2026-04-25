@@ -15,6 +15,7 @@ const labelMap = {
   reports: 'Hisobotlar', messages: 'Xabarlar', settings: 'Sozlamalar',
   team: 'Jamoam', tasks: 'Vazifalar', calendar: 'Kalendar',
   salary: 'Maosh', archive: 'Arxiv', staff: 'Xodimlar', done: 'Bajarilgan',
+  applications: 'Arizalar', positions: 'Lavozimlar', regions: 'Viloyatlar', districts: 'Tumanlar',
 }
 
 const NOTIFS_DATA = [
