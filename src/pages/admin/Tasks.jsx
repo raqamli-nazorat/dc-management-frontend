@@ -387,8 +387,143 @@ function AddTaskModal({ onClose, onAdd }) {
   )
 }
 
+/* ── EditTaskModal ── */
+function EditTaskModal({ task, onClose, onSave }) {
+  const dateRef = useRef(null)
+  const timeRef = useRef(null)
+
+  const [form, setForm] = useState({
+    project:     task.project  || '',
+    name:        task.name     || '',
+    description: task.description || '',
+    level:       task.level    || '',
+    type:        task.type     || '',
+    status:      task.status   || '',
+    assignee:    task.assignee || '',
+    price:       task.price    || '',
+    fine:        task.fine     || '',
+    deadline:    task.deadline || '',
+    time:        task.time     || '',
+  })
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const fmtNum = raw => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+
+  const inputCls = `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+    bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
+    dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]`
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+
+        <div className="px-7 pt-7 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity"><FaArrowLeft size={17} /></button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Vazifa tahrirlash</h2>
+          </div>
+          <p className="text-sm text-[#8F95A8] ml-8">Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
+        </div>
+
+        <div className="px-7 pb-4 flex flex-col gap-4">
+
+          {/* Loyiha + Nomi */}
+          <div className="grid grid-cols-2 gap-4">
+            <ProjectDropdown value={form.project} onChange={v => set('project', v)} />
+            <div>
+              <label className={labelCls}>Nomi</label>
+              <input value={form.name} onChange={e => set('name', e.target.value)}
+                placeholder="Nomi yozing" className={inputCls} />
+            </div>
+          </div>
+
+          {/* Tavsifi */}
+          <div>
+            <label className={labelCls}>Tavsifi</label>
+            <div className="relative">
+              <textarea value={form.description} onChange={e => set('description', e.target.value)}
+                placeholder="Tavsifni yozing" rows={3}
+                className={inputCls + ' resize-none pr-8'} />
+              {form.description && (
+                <button type="button" onClick={() => set('description', '')}
+                  className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                  <FaXmark size={12} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Holati + Darajasi + Turi */}
+          <div className="grid grid-cols-3 gap-4">
+            <SimpleSelect label="Holati"   value={form.status} onChange={v => set('status', v)} options={STATUSES} placeholder="Holati tanlang" />
+            <SimpleSelect label="Darajasi" value={form.level}  onChange={v => set('level', v)}  options={LEVELS}   placeholder="Darajasi tanlang" />
+            <SimpleSelect label="Turi"     value={form.type}   onChange={v => set('type', v)}   options={TYPES}    placeholder="Turi tanlang" />
+          </div>
+
+          {/* Topshiruvchi */}
+          <AssigneeDropdown value={form.assignee} onChange={v => set('assignee', v)} />
+
+          {/* Vazifa narxi + Jarima foizi */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Vazifa narxi (UZS)</label>
+              <input value={form.price} onChange={e => set('price', fmtNum(e.target.value))}
+                placeholder="100 000.00" className={inputCls + ' text-right'} />
+            </div>
+            <div>
+              <label className={labelCls}>Jarima foizi (%)</label>
+              <input value={form.fine} onChange={e => set('fine', e.target.value.replace(/\D/g, ''))}
+                placeholder="2" className={inputCls} />
+            </div>
+          </div>
+
+          {/* Muddati + Taxminiy vaqt */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Muddati</label>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
+                  className="flex-1 min-w-0 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
+                <button type="button" onClick={() => dateRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Taxminiy vaqt</label>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
+                  className="flex-1 min-w-0 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
+                <button type="button" onClick={() => timeRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="px-7 py-5 flex items-center justify-end gap-3">
+          <button onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            <FaXmark size={13} /> Yopish
+          </button>
+          <button onClick={() => { onSave({ ...task, ...form }); onClose() }}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Tahrirlash
+          </button>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 /* ── RowMenu ── */
-function TaskRowMenu({ onDelete }) {
+function TaskRowMenu({ onDelete, onEdit }) {
   const [open, setOpen] = useState(false)
 
   const [dropUp, setDropUp] = useState(false)
@@ -419,7 +554,7 @@ function TaskRowMenu({ onDelete }) {
         <div className={`absolute right-0 z-50 w-40 rounded-2xl shadow-2xl border overflow-hidden
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]
           ${dropUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
-          <button onClick={() => setOpen(false)}
+          <button onClick={() => { onEdit?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
             Tahrirlash
@@ -444,6 +579,7 @@ export default function TasksPage() {
   const [filters, setFilters]   = useState(EMPTY_FILTER)
   const [data, setData]         = useState(TASKS_DATA)
   const [toast, setToast]       = useState(null)
+  const [editTask, setEditTask] = useState(null)
 
   const showToast = (title, msg) => { setToast({ title, msg }); setTimeout(() => setToast(null), 3000) }
 
@@ -549,7 +685,10 @@ export default function TasksPage() {
                 <td className="px-4 py-3 text-right font-medium text-[#1A1D2E] dark:text-white">{t.status}</td>
                 <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{t.deadline}</td>
                 <td className="px-4 py-3">
-                  <TaskRowMenu onDelete={() => setData(prev => prev.filter(x => x.id !== t.id))} />
+                  <TaskRowMenu
+                    onEdit={() => setEditTask(t)}
+                    onDelete={() => setData(prev => prev.filter(x => x.id !== t.id))}
+                  />
                 </td>
               </tr>
             ))}
@@ -568,6 +707,14 @@ export default function TasksPage() {
       {showAdd && (
         <AddTaskModal onClose={() => setShowAdd(false)}
           onAdd={t => { setData(prev => [...prev, t]); showToast("Vazifa yaratildi", "Yangi vazifa muvaffaqiyatli qo'shildi") }} />
+      )}
+
+      {editTask && (
+        <EditTaskModal
+          task={editTask}
+          onClose={() => setEditTask(null)}
+          onSave={updated => { setData(prev => prev.map(t => t.id === updated.id ? updated : t)); showToast("Vazifa yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi") }}
+        />
       )}
 
     </div>
