@@ -87,8 +87,8 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
 function Toggle({ checked, onChange }) {
   return (
     <button type="button" onClick={()=>onChange(!checked)}
-      className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${checked?'bg-[#3F57B3]':'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked?'translate-x-5':'translate-x-0.5'}`}/>
+      className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${checked?'bg-[#000000]':'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+      <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked?'translate-x-5':'translate-x-0.5'}`}/>
     </button>
   )
 }
@@ -99,12 +99,12 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
   const inputCls =
-    'w-full px-4 py-3 rounded-2xl text-sm outline-none border transition-colors ' +
+    'w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors ' +
     'bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] ' +
     'dark:bg-[#1C1D1D] dark:border-[#2A2B2B] dark:text-[#FFFFFF] dark:placeholder-[#5B6078]'
 
   const fineCls =
-    'w-full px-4 py-3 rounded-2xl text-sm outline-none border transition-colors ' +
+    'w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors ' +
     'bg-white border-[#E2E6F2] text-[#E02D2D] placeholder-[#E02D2D]/50 focus:border-[#526ED3] ' +
     'dark:bg-[#1C1D1D] dark:border-[#2A2B2B] dark:text-[#FA5252] dark:placeholder-[#FA5252]/50'
 
@@ -117,17 +117,68 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
         <div className="px-7 pt-7 pb-3">
           <div className="flex items-center gap-3 mb-1.5">
             <button onClick={onClose}
-              className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+              className="text-[#1A1D2E] dark:text-[#C2C8E0] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[22px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#C2C8E0]">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#8F95A8] ml-8">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ">
             Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
 
-        
+        {/* Body */}
+        <div className="px-7 pb-5 pt-2 flex flex-col gap-4">
+
+          {/* Oy */}
+          <div>
+            <label className={labelCls}>Oy</label>
+            <MonthDropdownFull value={f.month} onChange={v => set('month', v)} />
+          </div>
+
+          {/* Yaratilgan vaqti oralig'i */}
+          <div>
+            <label className={labelCls}>Yaratilgan vaqti oralig'i</label>
+            <div className="grid grid-cols-4 gap-2">
+              <DateBox type="date" value={f.dateFromD} onChange={v => set('dateFromD', v)} placeholder="dan"   icon={<FaCalendarDays size={12}/>} />
+              <DateBox type="time" value={f.dateFromT} onChange={v => set('dateFromT', v)}                     icon={<FaClock size={12}/>} />
+              <DateBox type="date" value={f.dateToD}   onChange={v => set('dateToD', v)}   placeholder="gacha" icon={<FaCalendarDays size={12}/>} />
+              <DateBox type="time" value={f.dateToT}   onChange={v => set('dateToT', v)}                       icon={<FaClock size={12}/>} />
+            </div>
+          </div>
+
+          {/* Jami miqdori + Jarima miqdori */}
+          <div className="grid grid-cols-2 gap-5 ">
+            {/* Jami */}
+            <div>
+              <label className={`${labelCls } mb-3`}>Jami miqdori</label>
+              <div className="flex gap-2">
+                <input className={inputCls} placeholder="dan: 0"   value={f.sumFrom} onChange={e => set('sumFrom', fmtMoney(e.target.value))} />
+                <input className={inputCls} placeholder="gacha: 0" value={f.sumTo}   onChange={e => set('sumTo',   fmtMoney(e.target.value))} />
+              </div>
+            </div>
+            {/* Jarima */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className={labelCls + ' mb-0'}>Jarima miqdori</label>
+                <Toggle checked={f.showFine} onChange={v => set('showFine', v)} />
+              </div>
+              <div className="flex gap-2">
+                {f.showFine ? (
+                  <>
+                    <input className={fineCls} placeholder="-100 000" value={f.fineFrom} onChange={e => set('fineFrom', fmtMoney(e.target.value))} />
+                    <input className={fineCls} placeholder="-1 000 000" value={f.fineTo} onChange={e => set('fineTo',   fmtMoney(e.target.value))} />
+                  </>
+                ) : (
+                  <>
+                   
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
 
         {/* Footer */}
         <div className="px-7 py-5 flex items-center justify-end gap-3">
@@ -511,8 +562,15 @@ export default function SalaryPage() {
                 <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.created}</td>
                 <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]"
                   onClick={e => e.stopPropagation()}>
-                  <input type="checkbox" checked={u.approved} onChange={() => toggleApprove(u.id)}
-                    className="w-4 h-4 cursor-pointer accent-[#3F57B3]"/>
+                  {u.approved ? (
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
+                      <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#E9ECF5] dark:bg-[#292A2A]" />
+                  )}
                 </td>
               </tr>
             ))}
