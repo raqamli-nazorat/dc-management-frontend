@@ -230,7 +230,7 @@ function SorovModal({ onClose, onSubmit }) {
              
               <div className='flex items-center gap-3 mb-2'>
                  <button onClick={onClose} className="text-[#5B6078] dark:text-[#C2C8E0] hover:opacity-70 cursor-pointer shrink-0">
-                <FaArrowLeft color='#1A1D2E' size={16} />
+                <FaArrowLeft  size={16} className='dark:text-white text-[#1A1D2E]' />
               </button>
                 <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">So'rov yuborish</h2>
               
@@ -446,7 +446,7 @@ function FilterModal({ onClose, onApply, initial }) {
            
              <div className="flex px-2 items-center gap-3 mb-2">
               <button onClick={onClose} className="text-[#5B6078] dark:text-[#C2C8E0] hover:opacity-70 cursor-pointer shrink-0">
-                <FaArrowLeft fontWeight={800} color='#1A1D2E' size={16} />
+                <FaArrowLeft className='dark:text-white text-[#1A1D2E]' fontWeight={800} size={16} />
               </button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
 
@@ -589,14 +589,12 @@ export default function PaymentsPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-5 right-5 z-50 flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg w-[320px]
+        <div className="fixed top-5 right-5 z-50 flex items-start gap-3 p-4 rounded-2xl shadow-xl w-[340px]
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
-          <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-            <MdCheck size={16} className="text-green-600 dark:text-green-400" />
-          </div>
+          <img src="/imgs/Union.svg" alt="" className="w-6 h-6 shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{toast.title}</p>
-            <p className="text-sm text-[#8F95A8] dark:text-[#8E95B5] mt-0.5">{toast.msg}</p>
+            <p className="text-[15px] font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{toast.title}</p>
+            <p className="text-[13px] text-[#8F95A8] dark:text-[#8E95B5] mt-1 leading-snug">{toast.msg}</p>
           </div>
           <button onClick={() => setToast(null)} className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer shrink-0">
             <FaXmark size={14} />
@@ -671,7 +669,7 @@ export default function PaymentsPage() {
               <tr key={p.id} onClick={() => selecting && toggleOne(p.id)}
                 className={`border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0
                   ${selecting ? 'cursor-pointer' : ''}
-                  ${selected.has(p.id) ? 'bg-[#E9EEFF]/60 dark:bg-[#2A2D3E]/60' : 'hover:bg-black/3 dark:hover:bg-white/3'}`}>
+                  ${'hover:bg-black/3 dark:hover:bg-white/3'}`}>
                 {selecting && (
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                     <div className={`transition-transform duration-200 ${selected.has(p.id) ? 'translate-x-2' : ''}`}>
@@ -733,7 +731,7 @@ export default function PaymentsPage() {
           onClose={() => setShowSorov(false)}
           onSubmit={(data) => {
             setShowSorov(false)
-            showToast("Yuborildi", "So'rov muvaffaqiyatli yuborildi")
+            showToast("So‘rov yuborildi", "So'So‘rovingiz muvaffaqiyatli yuborildi va ko‘rib chiqish uchun qabul qilindi")
           }}
         />
       )}

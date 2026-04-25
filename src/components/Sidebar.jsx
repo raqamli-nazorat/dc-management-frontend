@@ -17,10 +17,11 @@ const menuByRole = {
       ],
     },
     {
-      label: 'Loyihalar', icon: IconFolder,
+      label: 'Vazifalar boshqaruvi', icon: IconFolder,
       children: [
-        { label: 'Barcha loyihalar', path: '/admin/projects' },
-        { label: 'Arxiv', path: '/admin/projects/archive' },
+        { label: 'Loyihalar', path: '/admin/projects' },
+        { label: 'Vazifalar', path: '/admin/tasks' },
+        { label: "Yig'ilishlar", path: '/admin/meetings' },
       ],
     },
     {

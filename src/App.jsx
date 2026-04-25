@@ -10,6 +10,8 @@ import AdminUsers from './pages/admin/Users'
 import AdminPayments from './pages/admin/Payments'
 import AdminSalary from './pages/admin/Salary'
 import AdminFinanceHistory from './pages/admin/FinanceHistory'
+import AdminProjects from './pages/admin/Projects'
+import AdminTasks from './pages/admin/Tasks'
 import MenagerDashboard from './pages/menager/Dashboard'
 import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
@@ -31,8 +33,10 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={PH('Rollar')} />
-              <Route path="projects" element={PH('Loyihalar')} />
+              <Route path="projects" element={<AdminProjects />} />
               <Route path="projects/archive" element={PH('Arxiv')} />
+              <Route path="tasks" element={<AdminTasks />} />
+              <Route path="meetings" element={PH("Yig'ilishlar")} />
               <Route path="payments" element={<AdminPayments />} />
               <Route path="finance" element={<AdminSalary />} />
               <Route path="finance/history" element={<AdminFinanceHistory />} />
