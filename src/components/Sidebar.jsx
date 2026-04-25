@@ -9,6 +9,15 @@ import {
   IconAnalytics, IconSidebarLeft,
 } from './icons'
 
+function IconApplications({ size = 20, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M5.83334 2.5H14.1667C15.0871 2.5 15.8333 3.24619 15.8333 4.16667V17.5L10 15L4.16667 17.5V4.16667C4.16667 3.24619 4.91286 2.5 5.83334 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M7.5 7.5H12.5M7.5 10.8333H10.8333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 const menuByRole = {
   admin: [
     {
@@ -38,6 +47,15 @@ const menuByRole = {
       children: [
         { label: 'Umumiy', path: '/admin/reports' },
         { label: 'Xodimlar', path: '/admin/reports/staff' },
+      ],
+    },
+    {
+      label: 'Arizalar', icon: IconApplications,
+      children: [
+        { label: 'Arizalar',   path: '/admin/applications' },
+        { label: 'Lavozimlar', path: '/admin/applications/positions' },
+        { label: 'Viloyatlar', path: '/admin/applications/regions' },
+        { label: 'Tumanlar',   path: '/admin/applications/districts' },
       ],
     },
   ],

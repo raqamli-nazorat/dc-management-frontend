@@ -12,6 +12,10 @@ import AdminSalary from './pages/admin/Salary'
 import AdminFinanceHistory from './pages/admin/FinanceHistory'
 import AdminProjects from './pages/admin/Projects'
 import AdminTasks from './pages/admin/Tasks'
+import AdminApplications from './pages/admin/applications/Applications'
+import AdminPositions from './pages/admin/applications/Positions'
+import AdminRegions from './pages/admin/applications/Regions'
+import AdminDistricts from './pages/admin/applications/Districts'
 import MenagerDashboard from './pages/menager/Dashboard'
 import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
@@ -42,6 +46,10 @@ function App() {
               <Route path="finance/history" element={<AdminFinanceHistory />} />
               <Route path="reports" element={PH('Hisobotlar')} />
               <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
+              <Route path="applications" element={<AdminApplications />} />
+              <Route path="applications/positions" element={<AdminPositions />} />
+              <Route path="applications/regions" element={<AdminRegions />} />
+              <Route path="applications/districts" element={<AdminDistricts />} />
               <Route path="messages" element={PH('Xabarlar')} />
               <Route path="settings" element={PH('Sozlamalar')} />
             </Route>
