@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
       return { success: true, roles: userData.roles }
     } catch (error) {
       console.log('Login error:', error)
-      return { success: false, error: error?.response?.data?.detail || "Xato yuz berdi"}
+      return { success: false, error: error?.response?.data?.detail || "Xato yuz berdi" }
     }
   }
 
