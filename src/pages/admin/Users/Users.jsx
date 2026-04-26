@@ -196,6 +196,7 @@ export default function UsersPage() {
             options={['Barcha lavozimlar', ...positions.map(pos => pos.name)]}
             value={positions.find(pos => pos.id === position)?.name || 'Barcha lavozimlar'}
             onChange={e => setPosition(positions.find(pos => pos.name === e)?.id || '')}
+            width='160px'
           />
           <FilterSelect
             options={['Barcha rollar', ...Object.values(Roles)]}
@@ -205,8 +206,9 @@ export default function UsersPage() {
               console.log(foundKey);
               setRole(foundKey || 'Barcha rollar');
             }}
+            width='130px'
           />
-          <FilterSelect options={SORTS} value={sort} onChange={setSort} />
+          <FilterSelect options={SORTS} value={sort} width='140px' onChange={setSort} />
         </div>
 
         {/* Table */}

@@ -124,7 +124,22 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
 
 function Breadcrumb() {
   const location = useLocation()
-  const parts = location.pathname.split('/').filter(Boolean)
+
+  const isId = (part) => {
+    if (!isNaN(Number(part))) return true
+    if (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(part)) return true
+    return false
+  }
+
+  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create']
+
+  const parts = location.pathname.split('/').filter(part => {
+    if (!part) return false
+    if (hiddenParts.includes(part.toLowerCase())) return false
+    if (isId(part)) return false
+    return true
+  })
+
   return (
     <>
       {parts.map((part, i) => {
