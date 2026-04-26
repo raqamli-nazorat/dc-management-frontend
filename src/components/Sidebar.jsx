@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MdExpandMore, MdExpandLess, MdSettings } from 'react-icons/md'
 import { useState } from 'react'
 
@@ -112,13 +112,16 @@ const menuByRole = {
   ],
 }
 
-export default function Sidebar() {
+export default function Sidebar({ forceCollapsed = false }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   const [collapsed, setCollapsed]   = useState(false)
   const [openGroups, setOpenGroups] = useState({ 0: true })
+
+  // kanban sahifasida sidebar yopiq
+  const isCollapsed = forceCollapsed || collapsed
 
   const routeRole = getRouteRole(user)
   const menu = menuByRole[routeRole] || []
@@ -127,7 +130,7 @@ export default function Sidebar() {
   const isGroupActive = (group) => group.children?.some(c => location.pathname === c.path)
   const handleDashboard = () => navigate(`/${routeRole}/dashboard`)
 
-  /* collapsed ikonka style — active/inactive */
+  /* isCollapsed ikonka style — active/inactive */
   const iconBtn = (active) => [
     'w-9 h-9 flex items-center justify-center rounded-xl transition-colors cursor-pointer border',
     active
@@ -140,19 +143,19 @@ export default function Sidebar() {
       className={[
         'hidden md:flex flex-col h-screen sticky top-0 shrink-0 overflow-hidden transition-[width] duration-300',
         'bg-[#F1F3F9] dark:bg-[#1C1D1D]',
-        collapsed ? 'w-[64px] cursor-pointer' : 'w-[280px]',
+        isCollapsed ? 'w-[64px] cursor-pointer' : 'w-[280px]',
       ].join(' ')}
-      onClick={() => { if (collapsed) setCollapsed(false) }}
+      onClick={() => { if (isCollapsed && !forceCollapsed) setCollapsed(false) }}
     >
 
       {/* ── Logo ── */}
       <div
         className={[
           'flex items-center shrink-0 mb-4',
-          collapsed ? 'justify-center h-20 px-3' : 'h-20 px-3',
+          isCollapsed ? 'justify-center h-20 px-3' : 'h-20 px-3',
         ].join(' ')}
       >
-        {collapsed ? (
+        {isCollapsed ? (
           /* Yopilgan: logo shakli o'zgarmaydi — rounded-lg kvadrat */
           <button
             onClick={handleDashboard}
@@ -191,7 +194,7 @@ export default function Sidebar() {
       <nav
         className={[
           'flex-1 overflow-y-auto flex flex-col gap-2',
-          collapsed ? 'px-[10px]' : 'px-3 py-3',
+          isCollapsed ? 'px-[10px]' : 'px-3 py-3',
         ].join(' ')}
       >
         {menu.map((group, i) => {
@@ -202,7 +205,7 @@ export default function Sidebar() {
           return (
             <div key={i} className="flex flex-col gap-1.5">
               {/* Group header */}
-              {collapsed ? (
+              {isCollapsed ? (
                 /* Yopilgan: faqat ikonka, kvadrat */
                 <button
                   onClick={() => setCollapsed(false)}
@@ -232,7 +235,7 @@ export default function Sidebar() {
               )}
 
               {/* Children — smooth accordion */}
-              {!collapsed && (
+              {!isCollapsed && (
                 <div
                   className="ml-3 flex flex-col gap-1 overflow-hidden transition-all duration-200 ease-in-out"
                   style={{
@@ -268,10 +271,10 @@ export default function Sidebar() {
       <div
         className={[
           'flex flex-col gap-1 shrink-0',
-          collapsed ? 'px-[10px] py-3 items-center' : 'px-3 py-3',
+          isCollapsed ? 'px-[10px] py-3 items-center' : 'px-3 py-3',
         ].join(' ')}
       >
-        {collapsed ? (
+        {isCollapsed ? (
           /* Yopilgan: Sozlamalar ikonka */
           <button
             onClick={() => navigate(`/${user?.role}/settings`)}
@@ -299,7 +302,7 @@ export default function Sidebar() {
         <div className="border-t border-[#E2E6F2] dark:border-[#474848] mx-1 min-w-10" />
 
         {/* Account */}
-        {collapsed ? (
+        {isCollapsed ? (
           <button
             onClick={handleDashboard}
             title={`${user?.username} (${user?.roles?.[0]})`}

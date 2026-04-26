@@ -679,7 +679,7 @@ export default function PaymentsPage() {
 
   const handleDelete = () => {
     setPayments(prev => prev.filter(p => !selected.has(p.id)))
-    showToast("O'chirildi", "Tanlangan so'rovlar o'chirildi")
+    showToast("O'chirildi", "Tanlangan so'rovlar o'chirildi.")
     setSelecting(false); setSelected(new Set())
   }
 
@@ -830,7 +830,7 @@ export default function PaymentsPage() {
           onClose={() => setShowSorov(false)}
           onSubmit={(data) => {
             setShowSorov(false)
-            showToast("Soâ€˜rov yuborildi", "So'Soâ€˜rovingiz muvaffaqiyatli yuborildi va koâ€˜rib chiqish uchun qabul qilindi")
+            showToast("So'rov yuborildi", "So'rovingiz muvaffaqiyatli yuborildi va ko'rib chiqish uchun qabul qilindi.")
           }}
         />
       )}
@@ -841,7 +841,7 @@ export default function PaymentsPage() {
           onClose={() => setDetailPayment(null)}
           onPaid={(id) => {
             setPayments(prev => prev.map(p => p.id === id ? { ...p, active: true } : p))
-            showToast("To'lov qilindi", "Xarajat so'rovi muvaffaqiyatli to'landi")
+            showToast("To'lov qilindi", "Xarajat so'rovi muvaffaqiyatli to'landi.")
           }}
         />
       )}

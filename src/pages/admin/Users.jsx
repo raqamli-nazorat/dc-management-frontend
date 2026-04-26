@@ -599,16 +599,16 @@ export default function UsersPage() {
 
   const handleDelete = () => {
     setUsers(prev => prev.filter(u => !selected.has(u.id)))
-    showToast("Foydalanuvchi o'chirildi", "Tanlangan foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
+    showToast("Foydalanuvchi o'chirildi", "Tanlangan foydalanuvchi tizimdan muvaffaqiyatli o'chirildi.")
     cancelSelecting()
   }
-  const handleMove = () => { showToast("Ko'chirildi", "Tanlangan foydalanuvchi muvaffaqiyatli ko'chirildi"); cancelSelecting() }
-  const handleAdd = (newUser) => { setUsers(prev => [newUser, ...prev]); showToast("Yangi xodim qo'shildi", "Ma'lumotlar muvaffaqiyatli saqlandi") }
+  const handleMove = () => { showToast("Ko'chirildi", "Tanlangan foydalanuvchi muvaffaqiyatli ko'chirildi."); cancelSelecting() }
+  const handleAdd = (newUser) => { setUsers(prev => [newUser, ...prev]); showToast("Yangi xodim qo'shildi", "Ma'lumotlar muvaffaqiyatli saqlandi.") }
 
   const handleDeleteUser = (id) => {
     setUsers(prev => prev.filter(u => u.id !== id))
     setActiveUser(null)
-    showToast("Foydalanuvchi o'chirildi", "Foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
+    showToast("Foydalanuvchi o'chirildi", "Foydalanuvchi tizimdan muvaffaqiyatli o'chirildi.")
   }
 
   const handleRowClick = (u) => {
