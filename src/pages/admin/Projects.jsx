@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { FaFilter, FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
+import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../context/PageActionContext'
 
 const PROJECTS_DATA = [
@@ -171,7 +172,7 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
             </button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#8F95A8] ml-8">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+          <p className="text-sm text-[#5B6078] ">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
 
         {/* Body */}
@@ -360,7 +361,7 @@ function AddProjectModal({ onClose, onAdd }) {
             </button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha qo'shish</h2>
           </div>
-          <p className="text-sm text-[#8F95A8] ml-8">Loyiha nomi va asosiy ma'lumotlarni to'ldiring.</p>
+          <p className="text-sm text-[#5B6078] ">Loyiha nomi va asosiy ma'lumotlarni to'ldiring.</p>
         </div>
 
         {/* Body */}
@@ -526,8 +527,8 @@ function AddProjectModal({ onClose, onAdd }) {
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
             <button type="button" onClick={() => set('active', !form.active)}
-              className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.active ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.active ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </button>
           </div>
           <div className="flex items-center gap-3">
@@ -1061,7 +1062,7 @@ export default function ProjectsPage() {
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
             dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <FaFilter size={13} />
+          <LuFilter size={13} />
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
         </button>

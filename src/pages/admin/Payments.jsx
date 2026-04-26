@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import { FaFilter, FaXmark, FaArrowLeft, FaCalendarDays, FaChevronDown, FaClock } from 'react-icons/fa6'
+﻿import { useState, useEffect, useRef } from 'react'
+import { FaXmark, FaArrowLeft, FaCalendarDays, FaChevronDown, FaClock } from 'react-icons/fa6'
+import { LuFilter } from 'react-icons/lu'
 import { MdCheck } from 'react-icons/md'
 import { usePageAction } from '../../context/PageActionContext'
 
@@ -50,7 +51,7 @@ const dropdownTriggerCls = (hasVal) =>
    bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
    ${hasVal ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`
 
-/* ── useDropdown hook ── */
+/* â”€â”€ useDropdown hook â”€â”€ */
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -62,7 +63,7 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-/* ── DropdownShell ── */
+/* â”€â”€ DropdownShell â”€â”€ */
 function DropdownShell({ label, value, onChange, placeholder, open, setOpen, dropRef, children }) {
   return (
     <div ref={dropRef}>
@@ -91,7 +92,7 @@ function DropdownShell({ label, value, onChange, placeholder, open, setOpen, dro
   )
 }
 
-/* ── SelectField ── */
+/* â”€â”€ SelectField â”€â”€ */
 function SelectField({ label, value, onChange, options, placeholder }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -111,7 +112,7 @@ function SelectField({ label, value, onChange, options, placeholder }) {
   )
 }
 
-/* ── LoyihaDropdown ── */
+/* â”€â”€ LoyihaDropdown â”€â”€ */
 function LoyihaDropdown({ value, onChange }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -134,7 +135,7 @@ function LoyihaDropdown({ value, onChange }) {
   )
 }
 
-/* ── DateBox — bitta input qutisi (sana yoki vaqt) ── */
+/* â”€â”€ DateBox â€” bitta input qutisi (sana yoki vaqt) â”€â”€ */
 function DateBox({ type, value, onChange, icon, placeholder }) {
   const ref = useRef(null)
   return (
@@ -163,7 +164,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
   )
 }
 
-/* ── DateTimeRangeRow — 4 ta alohida input ── */
+/* â”€â”€ DateTimeRangeRow â€” 4 ta alohida input â”€â”€ */
 function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT, onDateFromD, onTimeFromD, onDateToD, onTimeToD }) {
   return (
     <div>
@@ -178,16 +179,16 @@ function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT, onDat
   )
 }
 
-/* ── To'lov turlari ── */
+/* â”€â”€ To'lov turlari â”€â”€ */
 const TOLOV_TURLARI = ["Naqd pulda", "Karta orqali", "Bank o'tkazmasi", "Elektron to'lov"]
 
-/* ── Karta raqam formatlash: 0000 0000 0000 0000 ── */
+/* â”€â”€ Karta raqam formatlash: 0000 0000 0000 0000 â”€â”€ */
 function fmtCard(raw) {
   const digits = raw.replace(/\D/g, '').slice(0, 16)
   return digits.replace(/(.{4})/g, '$1 ').trim()
 }
 
-/* ── SorovModal ── */
+/* â”€â”€ SorovModal â”€â”€ */
 function SorovModal({ onClose, onSubmit }) {
   const [form, setForm] = useState({
     loyiha: '', type: '', toifa: '', amount: '', sabab: '', tolovTuri: '', karta: ''
@@ -327,7 +328,7 @@ function SorovModal({ onClose, onSubmit }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-end gap-3">
+        <div className="px-6 py-4 flex items-center justify-end gap-3">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
@@ -346,7 +347,7 @@ function SorovModal({ onClose, onSubmit }) {
   )
 }
 
-/* ── SelectFieldForm — error support bilan ── */
+/* â”€â”€ SelectFieldForm â€” error support bilan â”€â”€ */
 function SelectFieldForm({ value, onChange, options, placeholder, error }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -388,7 +389,7 @@ function SelectFieldForm({ value, onChange, options, placeholder, error }) {
   )
 }
 
-/* ── LoyihaDropdownForm — error support bilan ── */
+/* â”€â”€ LoyihaDropdownForm â€” error support bilan â”€â”€ */
 function LoyihaDropdownForm({ value, onChange, error }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -432,6 +433,92 @@ function LoyihaDropdownForm({ value, onChange, error }) {
     </div>
   )
 }
+/* â”€â”€ XarajatDetailModal â”€â”€ */
+function XarajatDetailModal({ payment, onClose, onPaid }) {
+  const fieldCls = `w-full px-3 py-2.5 rounded-xl text-sm border
+    bg-[#F8F9FC] border-[#E2E6F2] text-[#1A1D2E]
+    dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white`
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-[560px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+
+        {/* Header */}
+        <div className="px-6 pt-7 pb-2">
+          <div className="flex items-center gap-3 mb-1">
+            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-70 cursor-pointer shrink-0">
+              <FaArrowLeft size={16} />
+            </button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Xarajat so'rovi</h2>
+          </div>
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
+            Ma'lumotlarni tekshirib, so'rov bo'yicha qaror qabul qiling
+          </p>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 flex flex-col gap-4">
+
+          {/* Xarajat turi + Toifa */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Xarajat turi</label>
+              <div className={fieldCls}>{payment.type || 'â€”'}</div>
+            </div>
+            <div>
+              <label className={labelCls}>Toifa</label>
+              <div className={fieldCls}>{payment.toifa || 'â€”'}</div>
+            </div>
+          </div>
+
+          {/* Miqdor */}
+          <div>
+            <label className={labelCls}>Miqdori (UZS)</label>
+            <div className={fieldCls + ' text-right font-semibold'}>{fmt(payment.amount)}</div>
+          </div>
+
+          {/* Sababi */}
+          <div>
+            <label className={labelCls}>Sababi</label>
+            <div className={fieldCls + ' min-h-[72px] whitespace-pre-wrap leading-relaxed'}>
+              {payment.sabab || "Uyga ketishga pulim yo'qligi uchun, so'rov yubormoqdaman iltimos tezroq hal qilib beringlar"}
+            </div>
+          </div>
+
+          {/* To'lov turi + Karta raqam */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>To'lov turi</label>
+              <div className={fieldCls}>{payment.tolovTuri || 'Karta raqam orqali'}</div>
+            </div>
+            <div>
+              <label className={labelCls}>Karta raqami</label>
+              <div className={fieldCls + ' font-mono tracking-wider'}>{payment.karta || '8600 0000 0000 0001'}</div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 flex items-center justify-end gap-3">
+          <button onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+            <FaXmark size={14} /> Yopish
+          </button>
+          <button onClick={() => { onPaid(payment.id); onClose() }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+              bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            <MdCheck size={16} /> To'lov qildim
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* â”€â”€ FilterModal â”€â”€ */
 function FilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }))
@@ -547,7 +634,7 @@ function FilterModal({ onClose, onApply, initial }) {
   )
 }
 
-/* ── Main Page ── */
+/* â”€â”€ Main Page â”€â”€ */
 export default function PaymentsPage() {
   const { registerAction, clearAction } = usePageAction()
 
@@ -559,6 +646,7 @@ export default function PaymentsPage() {
   const [selecting, setSelecting] = useState(false)
   const [selected, setSelected] = useState(new Set())
   const [toast, setToast] = useState(null)
+  const [detailPayment, setDetailPayment] = useState(null)
 
   const hasFilter = Object.values(filters).some(v => v)
 
@@ -650,7 +738,7 @@ export default function PaymentsPage() {
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
             dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <FaFilter size={13} />
+          <LuFilter size={13} />
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
         </button>
@@ -662,7 +750,7 @@ export default function PaymentsPage() {
           <thead>
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
               {selecting && <th className="w-10 px-4 py-3 text-left"><input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]" /></th>}
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">â„–</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism Sharifi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Xarajat turi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Toifa</th>
@@ -677,9 +765,9 @@ export default function PaymentsPage() {
           </thead>
           <tbody>
             {filtered.map((p, idx) => (
-              <tr key={p.id} onClick={() => selecting && toggleOne(p.id)}
+              <tr key={p.id} onClick={() => selecting ? toggleOne(p.id) : setDetailPayment(p)}
                 className={`border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0
-                  ${selecting ? 'cursor-pointer' : ''}
+                  cursor-pointer
                   ${'hover:bg-black/3 dark:hover:bg-white/3'}`}>
                 {selecting && (
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
@@ -742,7 +830,18 @@ export default function PaymentsPage() {
           onClose={() => setShowSorov(false)}
           onSubmit={(data) => {
             setShowSorov(false)
-            showToast("So‘rov yuborildi", "So'So‘rovingiz muvaffaqiyatli yuborildi va ko‘rib chiqish uchun qabul qilindi")
+            showToast("Soâ€˜rov yuborildi", "So'Soâ€˜rovingiz muvaffaqiyatli yuborildi va koâ€˜rib chiqish uchun qabul qilindi")
+          }}
+        />
+      )}
+
+      {detailPayment && (
+        <XarajatDetailModal
+          payment={detailPayment}
+          onClose={() => setDetailPayment(null)}
+          onPaid={(id) => {
+            setPayments(prev => prev.map(p => p.id === id ? { ...p, active: true } : p))
+            showToast("To'lov qilindi", "Xarajat so'rovi muvaffaqiyatli to'landi")
           }}
         />
       )}

@@ -13,6 +13,7 @@ import AdminSalary from './pages/admin/Salary'
 import AdminFinanceHistory from './pages/admin/FinanceHistory'
 import AdminProjects from './pages/admin/Projects'
 import AdminTasks from './pages/admin/Tasks'
+import AdminMeetings from './pages/admin/Meetings'
 import AdminApplications from './pages/admin/applications/Applications'
 import AdminPositions from './pages/admin/applications/Positions'
 import AdminRegions from './pages/admin/applications/Regions'
@@ -43,7 +44,7 @@ function App() {
               <Route path="projects" element={<AdminProjects />} />
               <Route path="projects/archive" element={PH('Arxiv')} />
               <Route path="tasks" element={<AdminTasks />} />
-              <Route path="meetings" element={PH("Yig'ilishlar")} />
+              <Route path="meetings" element={<AdminMeetings />} />
               <Route path="payments" element={<AdminPayments />} />
               <Route path="finance" element={<AdminSalary />} />
               <Route path="finance/history" element={<AdminFinanceHistory />} />
