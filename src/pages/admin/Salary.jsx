@@ -444,12 +444,12 @@ export default function SalaryPage() {
     setShowConfirm(false)
     setSelecting(false)
     setSelected(new Set())
-    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi")
+    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
   }
 
   const toggleApprove = (id) => {
     setData(prev => prev.map(u => u.id === id ? { ...u, approved: !u.approved } : u))
-    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi")
+    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
   }
 
   const handleRowClick = (u) => {
