@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react"
+﻿import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaFileLines, FaCamera } from "react-icons/fa6"
 import { MdCheck } from "react-icons/md"
 import { FiGithub } from "react-icons/fi"
@@ -112,7 +112,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto modal-scroll py-8 px-4">
-            <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+            <div className="fixed inset-0 bg-black/60" />
             <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
                 <FaXmark size={16} />
             </button>

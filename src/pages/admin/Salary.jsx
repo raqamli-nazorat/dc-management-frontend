@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 
@@ -111,8 +111,12 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[620px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="fixed inset-0 bg-black/60" />
+       <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+       
 
         {/* Header */}
         <div className="px-7 pt-7 pb-3">
@@ -266,17 +270,18 @@ function UserDetailModal({ user, onClose, onApprove }) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-        <div className="fixed inset-0 bg-black/60" onClick={onClose}/>
+        <div className="fixed inset-0 bg-black/60" />
 
-        <div className="relative w-full max-w-[600px] mt-8">
-
-          {/* X button — ekran yuqori o'ng burchagida */}
+   {/* X button — ekran yuqori o'ng burchagida */}
           <button onClick={onClose}
             className="fixed top-4 right-4 z-[60] w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
               bg-white/20 text-white hover:bg-white/30">
             <FaXmark size={14}/>
           </button>
 
+        <div className="relative w-full max-w-[600px] mt-8">
+
+       
           <div className="rounded-2xl shadow-2xl bg-[#FFFFFF] dark:bg-[#111111]">
 
             {/* Header */}
@@ -382,8 +387,12 @@ function Field({ label, value, right, red }) {
 function ConfirmModal({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onCancel}/>
-      <div className="relative w-full max-w-[420px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+      <div className="fixed inset-0 bg-black/60" />
+       <button onClick={onCancel} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+       
         <div className="px-6 pt-5 dark:border-[#292A2A] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={onCancel} className="text-[#5B6078] dark:text-[#C2C8E0] hover:opacity-70 cursor-pointer shrink-0"><FaArrowLeft size={16}/></button>

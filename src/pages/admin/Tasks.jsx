@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../context/PageActionContext'
@@ -91,8 +91,12 @@ function TaskFilterModal({ onClose, onApply, initial }) {
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[560px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="fixed inset-0 bg-black/60" />
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      
         <div className="px-7 pt-7 pb-3">
           <div className="flex items-center gap-3 mb-1.5">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -238,7 +242,13 @@ function AddTaskModal({ onClose, onAdd }) {
   const [errors, setErrors] = useState({})
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
-  const fmtNum = raw => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  const fmtNum = raw => {
+    // nuqtadan oldingi va keyingi qismni ajratib formatlash
+    const clean = raw.replace(/[^\d.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1')
+    const [int, dec] = clean.split('.')
+    const formatted = (int || '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return dec !== undefined ? `${formatted}.${dec}` : formatted
+  }
 
   const validate = () => {
     const e = {}
@@ -261,8 +271,12 @@ function AddTaskModal({ onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      
 
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-1">
@@ -407,7 +421,12 @@ function EditTaskModal({ task, onClose, onSave }) {
     time:        task.time     || '',
   })
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
-  const fmtNum = raw => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  const fmtNum = raw => {
+    const clean = raw.replace(/[^\d.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1')
+    const [int, dec] = clean.split('.')
+    const formatted = (int || '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return dec !== undefined ? `${formatted}.${dec}` : formatted
+  }
 
   const inputCls = `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
     bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
@@ -415,8 +434,12 @@ function EditTaskModal({ task, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />
+       <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+       
 
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-1">

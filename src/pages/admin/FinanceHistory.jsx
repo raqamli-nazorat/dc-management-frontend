@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 
@@ -94,8 +94,11 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[520px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+      <div className="fixed inset-0 bg-black/60" /> <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+       
         {/* Header */}
         <div className="px-6 pt-5 ">
           <div className="flex items-center gap-3">
@@ -156,9 +159,11 @@ function HistoryDetailModal({ item, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />      <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+          <FaXmark size={14} />
+        </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-
+  
         {/* Header */}
         <div className="px-7 pt-7 pb-4 flex items-center gap-3">
           <button onClick={onClose}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { MdArrowForward, MdDelete, MdExpandMore, MdCheck } from 'react-icons/md'
 import { FaCamera, FaArrowLeft } from 'react-icons/fa'
 import { FaXmark, FaTrash, FaFileLines } from 'react-icons/fa6'
@@ -164,7 +164,7 @@ function AddUserModal({ onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto modal-scroll py-8 px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />
       <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
         <FaXmark size={16} />
       </button>
@@ -355,8 +355,11 @@ function UserDetail({ user, onBack, onDelete }) {
       {/* Confirm Delete Modal */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="fixed inset-0 bg-black/60" onClick={() => setConfirmDelete(false)} />
-          <div className="relative w-full max-w-[480px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
+          <div className="fixed inset-0 bg-black/60" />
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
+            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+              <FaXmark size={14} />
+            </button>
             <div className="flex items-center gap-3 mb-3">
               <button onClick={() => setConfirmDelete(false)} className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer">
                 <FaArrowLeft size={16} />
