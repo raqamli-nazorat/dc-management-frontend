@@ -6,6 +6,8 @@ const ROLE_MAP = {
   admin: 'admin',
   menager: 'menager',
   xodim: 'xodim',
+  au: 'xodim',
+  auditor: 'nazoratchi',
 }
 
 export function getRouteRole(user) {
@@ -15,8 +17,6 @@ export function getRouteRole(user) {
 
 export default function ProtectedRoute({ children, allowedRole }) {
   const { user } = useAuth()
-
-  console.log("ProtectedRoute", user)
 
   if (!user) return <Navigate to="/login" replace />
 

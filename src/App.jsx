@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { PageActionProvider } from './context/PageActionContext'
@@ -6,7 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import AdminDashboard from './pages/admin/Dashboard'
-import AdminUsers from './pages/admin/Users'
+import AdminUsers from './pages/admin/Users/Users'
+import AdminUserDetail from './pages/admin/Users/UserDetail'
 import AdminPayments from './pages/admin/Payments'
 import AdminSalary from './pages/admin/Salary'
 import AdminFinanceHistory from './pages/admin/FinanceHistory'
@@ -20,12 +21,13 @@ import AdminDistricts from './pages/admin/applications/Districts'
 import MenagerDashboard from './pages/menager/Dashboard'
 import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
+import { ToastProvider } from './Toast/ToastProvider'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
 function App() {
   return (
-    <BrowserRouter>
+    <ToastProvider>
       <ThemeProvider>
         <AuthProvider>
           <PageActionProvider>
@@ -37,6 +39,7 @@ function App() {
             <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="users/detail/:id" element={<AdminUserDetail />} />
               <Route path="roles" element={PH('Rollar')} />
               <Route path="projects" element={<AdminProjects />} />
               <Route path="projects/archive" element={PH('Arxiv')} />
@@ -88,7 +91,7 @@ function App() {
           </PageActionProvider>
         </AuthProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </ToastProvider>
   )
 }
 
