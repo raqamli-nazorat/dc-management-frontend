@@ -8,7 +8,7 @@ import { FaFolder } from 'react-icons/fa'
 import { MdCheck } from 'react-icons/md'
 
 const labelMap = {
-  admin: 'Autentifikatsiya', menager: 'Menager', xodim: 'Xodim',
+  menager: 'Menager', xodim: 'Xodim',
   dashboard: 'Dashboard', users: 'Foydalanuvchilar', roles: 'Rollar',
   projects: 'Loyihalar', payments: "Xarajat so'rovlari", finance: 'Ish haqi',
   history: 'Tarix',
@@ -131,7 +131,7 @@ function Breadcrumb() {
     return false
   }
 
-  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create']
+  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create', 'admin', 'manager', 'employee']
 
   const parts = location.pathname.split('/').filter(part => {
     if (!part) return false

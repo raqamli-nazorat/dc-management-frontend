@@ -2,19 +2,20 @@
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../context/PageActionContext'
+import { DateTimeBox } from './Components/DateTimeBox'
 
 const PROJECTS_DATA = [
-  { id: 1, name: 'CRM sistema',  manager: "Dudan Turg'unov",  status: 'Rejalashtirilmoqda', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 2, name: 'Dashboard',    manager: "To'raqul Fozilov", status: 'Yakunlangan',         startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 3, name: 'SaaS loyiha',  manager: 'Davron Turdiyev',  status: 'Faol',                startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 4, name: 'Mobile App',   manager: 'Jasur Karimov',    status: 'Faol',                startDate: '15.02.2024 09:00', deadline: '15.08.2024 18:00' },
-  { id: 5, name: 'ERP tizimi',   manager: 'Nilufar Yusupova', status: 'Rejalashtirilmoqda',  startDate: '01.03.2024 10:00', deadline: '01.09.2024 18:00' },
-  { id: 6, name: 'HR platforma', manager: 'Bobur Rahimov',    status: 'Yakunlangan',         startDate: '10.01.2024 08:00', deadline: '10.06.2024 18:00' },
+  { id: 1, name: 'CRM sistema', manager: "Dudan Turg'unov", status: 'Rejalashtirilmoqda', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
+  { id: 2, name: 'Dashboard', manager: "To'raqul Fozilov", status: 'Yakunlangan', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
+  { id: 3, name: 'SaaS loyiha', manager: 'Davron Turdiyev', status: 'Faol', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
+  { id: 4, name: 'Mobile App', manager: 'Jasur Karimov', status: 'Faol', startDate: '15.02.2024 09:00', deadline: '15.08.2024 18:00' },
+  { id: 5, name: 'ERP tizimi', manager: 'Nilufar Yusupova', status: 'Rejalashtirilmoqda', startDate: '01.03.2024 10:00', deadline: '01.09.2024 18:00' },
+  { id: 6, name: 'HR platforma', manager: 'Bobur Rahimov', status: 'Yakunlangan', startDate: '10.01.2024 08:00', deadline: '10.06.2024 18:00' },
 ]
 
-const STATUSES    = ['Faol', 'Rejalashtirilmoqda', 'Yakunlangan']
+const STATUSES = ['Faol', 'Rejalashtirilmoqda', 'Yakunlangan']
 const EMPTY_FILTER = { manager: '', status: '', employee: '', startFromD: '', startFromT: '', startToD: '', startToT: '', deadFromD: '', deadFromT: '', deadToD: '', deadToT: '' }
-const labelCls     = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 
 const MANAGERS = [
   'Mira Patel', 'Liam Johnson', 'Sofia Martinez', 'Aisha Khatun', 'Rajiv Menon',
@@ -22,20 +23,20 @@ const MANAGERS = [
 ]
 
 const EMPLOYEES = [
-  { name: 'Nodira Xodjayeva',   role: 'Frontend dasturchi' },
-  { name: 'Olimjon Isayev',     role: 'UI/UX dizayner' },
+  { name: 'Nodira Xodjayeva', role: 'Frontend dasturchi' },
+  { name: 'Olimjon Isayev', role: 'UI/UX dizayner' },
   { name: 'Malika Tashkentova', role: 'Mahsulot menejeri' },
-  { name: 'Lazizbek Rahimov',   role: 'Mobil dasturchi' },
-  { name: 'Марк Леонидов',      role: 'Dizayner' },
-  { name: 'Марина Иванова',     role: 'Dasturchi' },
-  { name: 'Jasur Karimov',      role: 'PM' },
-  { name: 'Nilufar Yusupova',   role: 'Dasturchi' },
+  { name: 'Lazizbek Rahimov', role: 'Mobil dasturchi' },
+  { name: 'Марк Леонидов', role: 'Dizayner' },
+  { name: 'Марина Иванова', role: 'Dasturchi' },
+  { name: 'Jasur Karimov', role: 'PM' },
+  { name: 'Nilufar Yusupova', role: 'Dasturchi' },
 ]
 
 const statusStyle = {
-  'Faol':               { dot: 'bg-green-500',  text: 'text-green-600 dark:text-green-400' },
-  'Rejalashtirilmoqda': { dot: 'bg-[#8F95A8]',  text: 'text-[#5B6078] dark:text-[#C2C8E0]' },
-  'Yakunlangan':        { dot: 'bg-[#526ED3]',  text: 'text-[#526ED3] dark:text-[#7F95E6]' },
+  'Faol': { dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
+  'Rejalashtirilmoqda': { dot: 'bg-[#8F95A8]', text: 'text-[#5B6078] dark:text-[#C2C8E0]' },
+  'Yakunlangan': { dot: 'bg-[#526ED3]', text: 'text-[#526ED3] dark:text-[#7F95E6]' },
 }
 
 function useDropdown() {
@@ -47,60 +48,6 @@ function useDropdown() {
     return () => document.removeEventListener('mousedown', h)
   }, [])
   return { open, setOpen, ref }
-}
-
-/* ── StatusDropdown ── */
-function StatusDropdown({ value, onChange }) {
-  const { open, setOpen, ref } = useDropdown()
-  return (
-    <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm border transition-colors cursor-pointer
-          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]
-          ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
-        <span className="flex-1 text-left truncate">{value || 'Holatni tanlang'}</span>
-        <div className="flex items-center gap-2 shrink-0 ml-2">
-          {value
-            ? <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={12} /></span>
-            : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
-          }
-        </div>
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden
-          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-          {STATUSES.map((s, i) => (
-            <button key={s} type="button" onClick={() => { onChange(s); setOpen(false) }}
-              className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer
-                ${i < STATUSES.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                ${value === s
-                  ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
-                  : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ── DateBox ── */
-function DateBox({ value, onChange }) {
-  const ref = useRef(null)
-  return (
-    <div className="flex items-center gap-2 px-3 py-3 rounded-2xl border border-[#E2E6F2] dark:border-[#2A2B2B]
-      bg-white dark:bg-[#1C1D1D] focus-within:border-[#526ED3] transition-colors">
-      <input ref={ref} type="date" value={value} onChange={e => onChange(e.target.value)}
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
-      <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#5B6078] hover:text-[#526ED3] transition-colors">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-        </svg>
-      </button>
-    </div>
-  )
 }
 
 /* ── SimpleSelect (filter uchun) ── */
@@ -131,24 +78,6 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
           ))}
         </div>
       )}
-    </div>
-  )
-}
-
-/* ── FilterDateTimeBox ── */
-function FilterDateTimeBox({ type, value, onChange, placeholder }) {
-  const ref = useRef(null)
-  const icon = type === 'date'
-    ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-    : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-  return (
-    <div className="flex items-center gap-1.5 px-2.5 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
-      {placeholder && <span className="text-xs text-[#8F95A8] shrink-0 select-none">{placeholder}:</span>}
-      <input ref={ref} type={type} value={value} onChange={e => onChange(e.target.value)}
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
-      <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">{icon}</button>
     </div>
   )
 }
@@ -199,10 +128,10 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
           <div>
             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
             <div className="grid grid-cols-4 gap-2">
-              <FilterDateTimeBox type="date" value={f.startFromD} onChange={v => set('startFromD', v)} placeholder="dan" />
-              <FilterDateTimeBox type="time" value={f.startFromT} onChange={v => set('startFromT', v)} />
-              <FilterDateTimeBox type="date" value={f.startToD}   onChange={v => set('startToD', v)}   placeholder="gacha" />
-              <FilterDateTimeBox type="time" value={f.startToT}   onChange={v => set('startToT', v)} />
+              <DateTimeBox type="date" value={f.startFromD} onChange={v => set('startFromD', v)} placeholder="dan" />
+              <DateTimeBox type="time" value={f.startFromT} onChange={v => set('startFromT', v)} />
+              <DateTimeBox type="date" value={f.startToD} onChange={v => set('startToD', v)} placeholder="gacha" />
+              <DateTimeBox type="time" value={f.startToT} onChange={v => set('startToT', v)} />
             </div>
           </div>
 
@@ -210,10 +139,10 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
           <div>
             <label className={labelCls}>Muddat oralig'i</label>
             <div className="grid grid-cols-4 gap-2">
-              <FilterDateTimeBox type="date" value={f.deadFromD} onChange={v => set('deadFromD', v)} placeholder="dan" />
-              <FilterDateTimeBox type="time" value={f.deadFromT} onChange={v => set('deadFromT', v)} />
-              <FilterDateTimeBox type="date" value={f.deadToD}   onChange={v => set('deadToD', v)}   placeholder="gacha" />
-              <FilterDateTimeBox type="time" value={f.deadToT}   onChange={v => set('deadToT', v)} />
+              <DateTimeBox type="date" value={f.deadFromD} onChange={v => set('deadFromD', v)} placeholder="dan" />
+              <DateTimeBox type="time" value={f.deadFromT} onChange={v => set('deadFromT', v)} />
+              <DateTimeBox type="date" value={f.deadToD} onChange={v => set('deadToD', v)} placeholder="gacha" />
+              <DateTimeBox type="time" value={f.deadToT} onChange={v => set('deadToT', v)} />
             </div>
           </div>
         </div>
@@ -228,7 +157,7 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
           <button onClick={() => onApply(f)}
             className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             Qidirish
           </button>
@@ -241,7 +170,7 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
 /* ── MultiSelect ── */
 function MultiSelect({ placeholder, options, selected, onChange }) {
   const [query, setQuery] = useState('')
-  const [open, setOpen]   = useState(false)
+  const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
   useEffect(() => {
@@ -256,7 +185,7 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
   )
 
   const remove = (name) => onChange(selected.filter(s => s.name !== name))
-  const add    = (item) => { onChange([...selected, item]); setQuery(''); }
+  const add = (item) => { onChange([...selected, item]); setQuery(''); }
 
   const iCls = 'w-full px-3 py-2 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078]'
 
@@ -312,7 +241,7 @@ function AddProjectModal({ onClose, onAdd }) {
   const dateRef = useRef(null)
   const timeRef = useRef(null)
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
-  const { open: mgrOpen,    setOpen: setMgrOpen,    ref: mgrRef    } = useDropdown()
+  const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
   const [form, setForm] = useState({
     name: '', status: '', description: '', manager: '',
@@ -329,8 +258,8 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const validate = () => {
     const e = {}
-    if (!form.name.trim())   e.name   = true
-    if (!form.status)        e.status = true
+    if (!form.name.trim()) e.name = true
+    if (!form.status) e.status = true
     if (!form.description.trim()) e.description = true
     setErrors(e)
     return Object.keys(e).length === 0
@@ -499,7 +428,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <button type="button" onClick={() => dateRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                   </svg>
                 </button>
               </div>
@@ -513,7 +442,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <button type="button" onClick={() => timeRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                   </svg>
                 </button>
               </div>
@@ -540,7 +469,7 @@ function AddProjectModal({ onClose, onAdd }) {
             <button onClick={handleSubmit}
               className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Qo'shish
             </button>
@@ -658,8 +587,8 @@ function DetailModal({ project, onClose }) {
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.employees?.length > 0
                 ? project.employees.map(e => (
-                    <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
-                  ))
+                  <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
+                ))
                 : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
@@ -671,8 +600,8 @@ function DetailModal({ project, onClose }) {
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.testers?.length > 0
                 ? project.testers.map(e => (
-                    <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
-                  ))
+                  <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
+                ))
                 : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
@@ -685,7 +614,7 @@ function DetailModal({ project, onClose }) {
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
                 <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{project.deadline || '—'}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                  <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
               </div>
             </div>
@@ -694,7 +623,7 @@ function DetailModal({ project, onClose }) {
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
                 <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{project.time || '—'}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                  <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                 </svg>
               </div>
             </div>
@@ -726,21 +655,21 @@ function EditProjectModal({ project, onClose, onSave }) {
   const dateRef = useRef(null)
   const timeRef = useRef(null)
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
-  const { open: mgrOpen,    setOpen: setMgrOpen,    ref: mgrRef    } = useDropdown()
+  const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
   const fmtBonus = (raw) => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 
   const [form, setForm] = useState({
-    name:        project.name        || '',
-    status:      project.status      || '',
+    name: project.name || '',
+    status: project.status || '',
     description: project.description || '',
-    manager:     project.manager     || '',
-    bonus:       project.bonus       || '',
-    employees:   project.employees   || [],
-    testers:     project.testers     || [],
-    deadline:    project.deadline    || '',
-    time:        project.time        || '',
-    active:      project.active !== undefined ? project.active : true,
+    manager: project.manager || '',
+    bonus: project.bonus || '',
+    employees: project.employees || [],
+    testers: project.testers || [],
+    deadline: project.deadline || '',
+    time: project.time || '',
+    active: project.active !== undefined ? project.active : true,
   })
   const [errors, setErrors] = useState({})
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -748,7 +677,7 @@ function EditProjectModal({ project, onClose, onSave }) {
   const validate = () => {
     const e = {}
     if (!form.name.trim()) e.name = true
-    if (!form.status)      e.status = true
+    if (!form.status) e.status = true
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -890,7 +819,7 @@ function EditProjectModal({ project, onClose, onSave }) {
                   className="flex-1 min-w-0 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
                 <button type="button" onClick={() => dateRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
             </div>
@@ -902,7 +831,7 @@ function EditProjectModal({ project, onClose, onSave }) {
                   className="flex-1 min-w-0 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
                 <button type="button" onClick={() => timeRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
             </div>
@@ -927,7 +856,7 @@ function EditProjectModal({ project, onClose, onSave }) {
             <button onClick={() => { if (validate()) { onSave({ ...project, ...form }); onClose() } }}
               className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Tahrirlash
             </button>
@@ -956,7 +885,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
               hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
-              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+              <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
             </svg>
             Tahrirlash
           </button>
@@ -965,7 +894,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
               hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             Batafsil
           </button>
@@ -974,7 +903,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E02D2D]
               hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
             </svg>
             O'chirish
           </button>
@@ -987,21 +916,21 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
 /* ── Main Page ── */
 export default function ProjectsPage() {
   const { registerAction, clearAction } = usePageAction()
-  const [search, setSearch]         = useState('')
+  const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
-  const [showAdd, setShowAdd]           = useState(false)
-  const [editProject, setEditProject]   = useState(null)
+  const [showAdd, setShowAdd] = useState(false)
+  const [editProject, setEditProject] = useState(null)
   const [detailProject, setDetailProject] = useState(null)
   const [deleteProject, setDeleteProject] = useState(null)
-  const [toast, setToast]               = useState(null)
+  const [toast, setToast] = useState(null)
 
   const showToast = (title, msg) => {
     setToast({ title, msg })
     setTimeout(() => setToast(null), 3000)
   }
-  const [filters, setFilters]       = useState(EMPTY_FILTER)
-  const [viewMode, setViewMode]     = useState('table')
-  const [data, setData]             = useState(PROJECTS_DATA)
+  const [filters, setFilters] = useState(EMPTY_FILTER)
+  const [viewMode, setViewMode] = useState('table')
+  const [data, setData] = useState(PROJECTS_DATA)
 
   useEffect(() => {
     registerAction({
@@ -1029,8 +958,8 @@ export default function ProjectsPage() {
         <div className="fixed top-5 right-5 z-[100] flex items-start gap-3 p-4 rounded-2xl shadow-xl w-[340px]
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5">
-            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
-            <path d="M8 12l3 3 5-5" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
+            <path d="M8 12l3 3 5-5" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <div className="flex-1 min-w-0">
             <p className="text-[15px] font-bold text-[#1A1D2E] dark:text-white">{toast.title}</p>
@@ -1049,7 +978,7 @@ export default function ProjectsPage() {
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
             onChange={e => setSearch(e.target.value)}
@@ -1073,15 +1002,15 @@ export default function ProjectsPage() {
             className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer
               ${viewMode === 'table' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>
+              <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18" />
             </svg>
           </button>
           <button onClick={() => setViewMode('grid')}
             className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer
               ${viewMode === 'grid' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/>
-              <rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>
+              <rect x="3" y="3" width="8" height="8" rx="1" /><rect x="13" y="3" width="8" height="8" rx="1" />
+              <rect x="3" y="13" width="8" height="8" rx="1" /><rect x="13" y="13" width="8" height="8" rx="1" />
             </svg>
           </button>
         </div>
