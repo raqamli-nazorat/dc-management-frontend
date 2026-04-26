@@ -36,7 +36,7 @@ export default function Login() {
       style={{ fontFamily: '"Manrope", sans-serif' }}
     >
       {/* wrapper — 1200px asosida markazlashtirilgan */}
-      <div className="flex items-center gap-10">
+      <div className="flex  w-[1200px] items-center justify-between  gap-10">
 
         {/* ── Chap panel: 600 × 680 ── */}
         <div
