@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { FaFilter, FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
+import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../context/PageActionContext'
 
 const TASKS_DATA = [
@@ -97,7 +98,7 @@ function TaskFilterModal({ onClose, onApply, initial }) {
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#8F95A8] ml-8">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+          <p className="text-sm text-[#5B6078] ">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
         <div className="px-7 pb-5 pt-2 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
@@ -644,7 +645,7 @@ export default function TasksPage() {
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <FaFilter size={13} /> Filtrlash
+          <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
         </button>
       </div>

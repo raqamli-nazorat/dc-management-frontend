@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { FaFilter, FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { LuFilter } from 'react-icons/lu'
 
 const HISTORY_DATA = [
   { id: 1, name: 'Doston Dostonov Dostonovich', position: 'Backend dasturchi', region: 'Toshkent viloyati', district: 'Toshkent tumani', passport: 'AA 142505', expense: 'Ishlab chiqarish', amount: 10000000, type: 'Chiqim', date: '01.01.2000 20:00', approved: true },
@@ -296,7 +297,7 @@ export default function FinanceHistoryPage() {
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
             dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <FaFilter size={13} />
+          <LuFilter size={13} />
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
         </button>

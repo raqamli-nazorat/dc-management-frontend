@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { FaFilter, FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { LuFilter } from 'react-icons/lu'
 
 const SALARY_DATA = [
   { id: 1, name: 'Maria Martinez',  position: 'Backend dasturchi',  region: 'Toshkent viloyati', district: 'Toshkent tumani', passport: 'AA 142505', month: 'Yanvar', salary: 15500000, kpi: 250000,  fine: -150000, total: 250000000, created: '15.02.2026  20:00', approved: false },
@@ -510,7 +511,7 @@ export default function SalaryPage() {
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
             dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <FaFilter size={13}/>
+          <LuFilter size={13}/>
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]"/>}
         </button>
