@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react"
-import { MdCheck, MdExpandMore } from "react-icons/md"
+import { MdCancel, MdCheck, MdExpandMore } from "react-icons/md"
 
 const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, error = false }) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
     const [dropPos, setDropPos] = useState({ top: 0, left: 0, dropUp: false })
     const ref = useRef(null)
+
+    // Asosiy tugma uchun hover holati
+    const [isBtnHovered, setIsBtnHovered] = useState(false)
 
     useEffect(() => {
         const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
@@ -14,11 +17,11 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
     }, [])
 
     const handleToggle = () => {
+        if (disabled) return
         if (!open && ref.current) {
             const rect = ref.current.getBoundingClientRect()
             const spaceBelow = window.innerHeight - rect.bottom
             const isDropUp = spaceBelow < 220
-            // dropdown kengligi: container kengligidan kam bo'lmasin, lekin min 200px
             const dropWidth = Math.max(rect.width, 200)
             const leftPos = rect.left + dropWidth > window.innerWidth - 8
                 ? window.innerWidth - dropWidth - 8
@@ -28,9 +31,19 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
         setOpen(o => !o)
     }
 
+    // Qiymatni tozalash funksiyasi
+    const handleClear = (e) => {
+        e.stopPropagation()
+        onChange(multiple ? [] : null)
+    }
+
+    // Qiymat mavjudligini tekshirish
+    const hasValue = multiple ? (Array.isArray(value) && value.length > 0) : (value && value !== options[0])
+
     const display = multiple
         ? (Array.isArray(value) && value.length > 0 ? value.join(', ') : label || options[0])
         : (value || label || options[0])
+
     const isDark = document.documentElement.classList.contains('dark')
 
     return (
@@ -38,16 +51,31 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
             <button
                 type="button"
                 onClick={handleToggle}
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
+                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
                 <span className="flex-1 text-left truncate">{display}</span>
-                <MdExpandMore
-                    size={16}
-                    className={`shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-                    style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
-                />
+
+                {/* Ant Design uslubidagi krestik logikasi */}
+                <div className="flex items-center justify-center w-4 h-4 shrink-0">
+                    <MdExpandMore
+                        size={16}
+                        className={`absolute transition-all duration-300 ease-in-out ${(hasValue && isBtnHovered) ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
+                            } ${open ? 'rotate-180' : ''}`}
+                        style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
+                    />
+
+                    <MdCancel
+                        size={16}
+                        onClick={handleClear}
+                        className={`absolute cursor-pointer transition-all duration-300 ease-in-out hover:text-red-500 ${(hasValue && isBtnHovered) ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+                            }`}
+                        style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
+                    />
+                </div>
             </button>
 
             {open && (

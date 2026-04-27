@@ -158,6 +158,12 @@ const UserDetail = () => {
             const roleKeys = form.roles.map(r => Object.keys(Roles).find(k => Roles[k] === r));
             roleKeys.forEach(role => formData.append('roles', role));
 
+            formData.append('social_links', JSON.stringify({
+                github: form.github,
+                linkedin: form.linkedin,
+                telegram: form.telegram,
+            }));
+
             formData.append('position', positions.find(item => item.name === form.position)?.id || '');
             formData.append('passport_series', form.passportSeria + form.passportRaqam);
 
@@ -171,7 +177,7 @@ const UserDetail = () => {
             const errData = error?.response?.data?.error;
 
             // Field-level detail xatolarini chiqarish (masalan: password, name ...)
-            let errMsg = "Xatolik yuz berdi";
+            let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
             if (errData?.details && typeof errData.details === 'object') {
                 const detailMsgs = Object.values(errData.details).flat().join(' ');
                 if (detailMsgs) errMsg = detailMsgs;
@@ -194,6 +200,21 @@ const UserDetail = () => {
             console.error(error)
             toast.error("Foydalanuvchi o'chirilmadi");
         }
+    }
+
+    const formatNum = (val) => {
+        if (!val && val !== 0) return '';
+
+        let cleanVal = val.toString().replace(/[^\d.]/g, '');
+
+        let [integerPart, decimalPart] = cleanVal.split('.');
+
+        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+        if (decimalPart !== undefined) {
+            return `${integerPart}.${decimalPart.slice(0, 2)}`;
+        }
+        return integerPart;
     }
 
     if (loading) return <span>Loading...</span>
@@ -249,14 +270,6 @@ const UserDetail = () => {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Foydalanuvchining ma'lumotlari</h1>
                     <div className="flex items-center gap-2">
-                        {isDirty && (
-                            <button
-                                onClick={handleCancel}
-                                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer bg-white border-[#E2E6F2] text-[#1A1D2E] hover:bg-[#F1F3F9] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#292A2A]"
-                            >
-                                <FaArrowLeft size={13} /> Bekor qilish
-                            </button>
-                        )}
                         <button
                             onClick={() => setConfirmDelete(true)}
                             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#E02D2D] bg-[#FFF2F2] hover:bg-[#fdcaca] dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/6 dark:bg-[#E02D2D]/10"
@@ -328,11 +341,8 @@ const UserDetail = () => {
                                 className={inputCls + ' text-right'}
                                 type="text"
                                 inputMode="numeric"
-                                value={form.fixed_salary === '' ? '' : Number(form.fixed_salary).toLocaleString('ru-RU')}
-                                onChange={e => {
-                                    const raw = e.target.value.replace(/\D/g, '')
-                                    set('fixed_salary', raw === '' ? '' : Number(raw))
-                                }}
+                                value={formatNum(form.fixed_salary)}
+                                onChange={e => set('fixed_salary', formatNum(e.target.value))}
                             />
                         </div>
                         <div>
@@ -341,11 +351,8 @@ const UserDetail = () => {
                                 className={inputCls + ' text-right'}
                                 type="text"
                                 inputMode="numeric"
-                                value={form.balance === '' ? '' : Number(form.balance).toLocaleString('ru-RU')}
-                                onChange={e => {
-                                    const raw = e.target.value.replace(/\D/g, '')
-                                    set('balance', raw === '' ? '' : Number(raw))
-                                }}
+                                value={form.balance ? formatNum(form.balance) : ''}
+                                onChange={e => set('balance', formatNum(e.target.value))}
                             />
                         </div>
                     </div>
@@ -357,7 +364,11 @@ const UserDetail = () => {
                             <FilterSelect
                                 options={['Viloyatni tanlang', ...regions.map(r => r.name)]}
                                 value={regions.find(r => r.id === form.region)?.name || 'Viloyatni tanlang'}
-                                onChange={v => set('region', v === 'Viloyatni tanlang' ? '' : regions.find(r => r.name === v).id)}
+                                onChange={v => {
+                                    const id = regions.find(r => r.name === v)?.id ?? '';
+                                    set('region', id);
+                                    if (!id) set('district', '');
+                                }}
                             />
                         </div>
                         <div>
@@ -365,7 +376,7 @@ const UserDetail = () => {
                             <FilterSelect
                                 options={['Tuman tanlang', ...districts.map(d => d.name)]}
                                 value={districts.find(d => d.id === form.district)?.name || 'Tuman tanlang'}
-                                onChange={v => set('district', v === 'Tuman tanlang' ? '' : districts.find(d => d.name === v).id)}
+                                onChange={v => set('district', districts.find(d => d.name === v)?.id ?? '')}
                                 disabled={!form.region}
                             />
                         </div>
@@ -451,7 +462,7 @@ const UserDetail = () => {
                                 label="Tanlash"
                                 options={positions.map(p => p.name)}
                                 value={positions.find(item => item.id === form.position)?.name || ''}
-                                onChange={v => set('position', positions.find(p => p.name === v)?.id || v)}
+                                onChange={v => set('position', positions.find(p => p.name === v)?.id ?? '')}
                             />
                         </div>
                         <div className="flex items-center gap-2 justify-between w-[50%]">

@@ -76,7 +76,7 @@ const ApplicationDetail = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         <h1
           className="text-[#1A1D2E] dark:text-white"
           style={{ fontSize: 24, fontWeight: 800 }}
@@ -88,11 +88,20 @@ const ApplicationDetail = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Ism Sharifi</label>
-            <input
-              disabled
-              className={inputCls}
-              value={application.full_name || ''}
-            />
+            <div className="relative">
+              <input
+                disabled
+                className={inputCls}
+                value={application.full_name || ''}
+              />
+              <button
+                onClick={() => { navigator.clipboard.writeText(application.full_name); setCopyText(true) }}
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]'
+                title="Nusxa olish"
+              >
+                <CopyIcon />
+              </button>
+            </div>
           </div>
           <div>
             <label className={labelCls}>Tug'ilgan sana</label>
@@ -206,7 +215,7 @@ const ApplicationDetail = () => {
         </div>
 
         {user?.roles?.map((role) => (role.includes('admin') || role.includes('manager'))) && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 mt-0!">
             <span className="text-[20px] font-bold">Xodim hulosasi</span>
             <textarea
               className={`${inputCls} h-[120px]`}

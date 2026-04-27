@@ -64,6 +64,12 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
         }
     }, [form.region])
 
+    const handlePassportUpload = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        set('passport_image', file)
+    }
+
     const handleAvatar = (e) => {
         const file = e.target.files[0]
         if (!file) return
@@ -72,20 +78,27 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     }
 
     const formatNum = (val) => {
-        if (!val) return ''
-        const parts = val.toString().split('.')
-        if (parts.length > 1) {
-            return `${parts[0]}.${parts[1].slice(0, 2)}`
+        if (!val && val !== 0) return '';
+
+        let cleanVal = val.toString().replace(/[^\d.]/g, '');
+
+        let [integerPart, decimalPart] = cleanVal.split('.');
+
+        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+        if (decimalPart !== undefined) {
+            return `${integerPart}.${decimalPart.slice(0, 2)}`;
         }
-        return val
+        return integerPart;
     }
 
     const handleSubmit = async () => {
         try {
             const newErrs = {}
-            if (!form.username || !form.username.trim()) newErrs.username = true
-            if (!form.password || !form.password.trim()) newErrs.password = true
-            if (!form.salary || parseFloat(form.salary) <= 0) newErrs.salary = true
+            if (!form.username?.trim()) newErrs.username = true
+            if (!form.password?.trim()) newErrs.password = true
+            const cleanSalary = form.salary.toString().replace(/\s/g, '')
+            if (!cleanSalary || parseFloat(cleanSalary) <= 0) newErrs.salary = true
             if (!form.position) newErrs.position = true
             if (!form.roles || form.roles.length === 0) newErrs.roles = true
 
@@ -94,14 +107,36 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                 return
             }
 
-            const res = await axiosAPI.post('users/', form)
+            // --- FormData yaratish ---
+            const formData = new FormData()
+
+            // Hamma oddiy maydonlarni qo'shamiz
+            Object.keys(form).forEach(key => {
+                if (key === 'roles') {
+                    form.roles.forEach(role => formData.append('roles', role))
+                } else if (key === 'salary') {
+                    formData.append('salary', form.salary.toString().replace(/\s/g, ''))
+                } else if (form[key] !== null && form[key] !== '') {
+                    formData.append(key, form[key])
+                }
+            })
+
+            formData.append("social_links", JSON.stringify({
+                "github": form.github,
+                "linkedin": form.linkedin,
+                "telegram": form.telegram,
+            }))
+
+            formData.append('is_active', true)
+
+            const res = await axiosAPI.post('users/', formData)
+
             setUsers(prev => [res.data.data, ...prev])
             toast.success("Ma'lumotlar muvaffaqiyatli qo'shildi")
-
             onClose()
         } catch (error) {
             console.error('Error adding user:', error)
-            const msg = error.response?.data?.message || 'Foydalanuvchi qo\'shishda xatolik yuz berdi'
+            const msg = error.response?.data?.message || 'Xatolik yuz berdi'
             toast.error(msg)
         }
     }
@@ -153,12 +188,23 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className={labelCls}>Parol</label>
-                            <input className={getInputCls(errors.password)} type="password" placeholder="Parol" value={form.password} onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }} />
+                            <input
+                                className={getInputCls(errors.password)}
+                                type="password"
+                                placeholder="Parol"
+                                value={form.password}
+                                onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }}
+                            />
                             {errors.password && <p className="text-[13px] text-[#FF5B5B] mt-1.5">*Bu maydon majburiy</p>}
                         </div>
                         <div>
                             <label className={labelCls}>Oylik maosh (UZS)</label>
-                            <input className={getInputCls(errors.salary)} type="number" placeholder="0.0" value={form.salary} onChange={e => set('salary', formatNum(e.target.value))} />
+                            <input
+                                className={getInputCls(errors.salary)}
+                                placeholder="0.0"
+                                value={form.salary}
+                                onChange={e => set('salary', formatNum(e.target.value))}
+                            />
                             {errors.salary && <p className="text-[13px] text-[#FF5B5B] mt-1.5">*Bu maydon majburiy</p>}
                         </div>
                     </div>
@@ -206,12 +252,15 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             <label className={labelCls}>Passport rasmi</label>
                             <button
                                 type="button"
-                                onClick={() => fileRef.current?.click()}
-                                className="w-full h-[42px] rounded-lg border border-dashed flex items-center justify-center gap-2 cursor-pointer transition-colors text-sm border-[#D0D5E2] bg-white text-[#8F95A8] hover:bg-[#F8F9FC] dark:border-[#292A2A] dark:bg-[#191A1A] dark:text-[#8E95B5] dark:hover:bg-[#292A2A]"
+                                onClick={() => document.getElementById('pasport').click()}
+                                className={`w-full h-[42px] px-3 rounded-lg border flex items-center justify-center gap-2 cursor-pointer transition-all text-sm border-[#D0D5E2] bg-white text-[#8F95A8] hover:bg-[#F8F9FC] dark:border-[#292A2A] dark:bg-[#191A1A] dark:text-[#8E95B5] dark:hover:bg-[#292A2A] ${form.passport_image ? 'border-solid text-gray-800 dark:text-gray-100 font-medium' : 'border-dashed'}`}
                             >
                                 <FaFileLines size={14} />
-                                Fayl yuklash
+                                <span className="truncate">
+                                    {form.passport_image ? form.passport_image.name : "Fayl yuklash"}
+                                </span>
                             </button>
+                            <input type="file" id="pasport" className="hidden" onChange={handlePassportUpload} accept="image/*" />
                         </div>
                     </div>
                     <div>
@@ -241,7 +290,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             label="Tanlash"
                                             options={positions.map(pos => pos.name)}
                                             value={positions.find(p => p.id === form.position)?.name || 'Tanlash'}
-                                            onChange={v => { set('position', positions.find(p => p.name === v)?.id); setErrors(prev => ({...prev, position: false})) }}
+                                            onChange={v => { set('position', positions.find(p => p.name === v)?.id); setErrors(prev => ({ ...prev, position: false })) }}
                                             width={130}
                                             error={errors.position}
                                         />
@@ -260,7 +309,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             onChange={v => {
                                                 const newRoles = v.map(label => Object.keys(Roles).find(k => Roles[k] === label)).filter(Boolean);
                                                 set('roles', newRoles);
-                                                setErrors(prev => ({...prev, roles: false}));
+                                                setErrors(prev => ({ ...prev, roles: false }));
                                             }}
                                             width={130}
                                             error={errors.roles}
