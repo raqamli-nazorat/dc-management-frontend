@@ -112,7 +112,7 @@ const menuByRole = {
   ],
 }
 
-export default function Sidebar({ forceCollapsed = false }) {
+export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -120,12 +120,10 @@ export default function Sidebar({ forceCollapsed = false }) {
   const [collapsed, setCollapsed]   = useState(false)
   const [openGroups, setOpenGroups] = useState({ 0: true })
 
-  // kanban sahifasida sidebar yopiq
   const isCollapsed = forceCollapsed || collapsed
 
   const routeRole = getRouteRole(user)
   const menu = menuByRole[routeRole] || []
-  // Accordion: faqat 1 ta ochiq
   const toggleGroup   = (i) => setOpenGroups(prev => ({ [i]: !prev[i] }))
   const isGroupActive = (group) => group.children?.some(c => location.pathname === c.path)
   const handleDashboard = () => navigate(`/${routeRole}/dashboard`)
@@ -145,7 +143,10 @@ export default function Sidebar({ forceCollapsed = false }) {
         'bg-[#F1F3F9] dark:bg-[#1C1D1D]',
         isCollapsed ? 'w-[64px] cursor-pointer' : 'w-[280px]',
       ].join(' ')}
-      onClick={() => { if (isCollapsed && !forceCollapsed) setCollapsed(false) }}
+      onClick={() => {
+        if (forceCollapsed && onForceClick) { onForceClick(); return }
+        if (isCollapsed && !forceCollapsed) setCollapsed(false)
+      }}
     >
 
       {/* ── Logo ── */}
