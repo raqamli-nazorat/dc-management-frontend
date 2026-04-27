@@ -4,8 +4,14 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
 import { FilterModal } from './Modals/FilterModal'
+import { useNavigate } from 'react-router-dom'
+import { FaCheck } from 'react-icons/fa6'
+import FilterSelect from '../Components/FilterSelect'
+import { Status } from '../../../MostUsesDates'
 
 const ApplicationsPage = () => {
+  const navigate = useNavigate()
+
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
   const [applicationsNextURL, setApplicationsNextURL] = useState(null)
@@ -36,14 +42,75 @@ const ApplicationsPage = () => {
     return () => clearTimeout(timeout)
   }, [search, activeFilters])
 
+  const loadMoreApplications = () => {
+    if (applicationsNextURL) {
+      axiosAPI.get(applicationsNextURL)
+        .then(({ data }) => {
+          setApplications(prev => [...prev, ...data.data.results])
+          setApplicationsNextURL(data.data.next)
+        })
+        .catch(error => {
+          console.error('Error fetching more applications:', error)
+          toast.error(error.data.error.errorMsg || 'Arizalar yuklanmadi')
+        })
+    }
+  }
+
+  const handleMoreApplications = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target
+    if (scrollHeight - (scrollTop + clientHeight) < 10) {
+      loadMoreApplications()
+    }
+  }
 
   useEffect(() => {
     fetchApplications()
   }, [])
 
+  const handleStatusChange = async (application, status) => {
+    try {
+      if (statuses(application.status) == status) {
+        toast.error("Holat o'zgarishi", 'Holat allaqachon o\'zgartirilgan')
+        return
+      }
+      let new_status = null
+      switch (status) {
+        case 'Qabul qilindi':
+          new_status = "accepted"
+          break
+        case 'Kutilmoqda':
+          new_status = "pending"
+          break
+        case 'Rad etildi':
+          new_status = "rejected"
+          break
+        default:
+          return;
+      }
+      await axiosAPI.patch(`applications/${application.id}/`, { status: new_status })
+      toast.success("Holat o'zgarishi", 'Holat muvaffaqiyatli o\'zgartirildi')
+      setApplications(prev => prev.map(app => app.id === application.id ? { ...app, status: new_status } : app))
+    } catch (error) {
+      console.error(error)
+      const errData = error?.response?.data?.error;
+
+      let errMsg = "Xatolik yuz berdi";
+      if (errData?.details && typeof errData.details === 'object') {
+        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        if (detailMsgs) errMsg = detailMsgs;
+      } else if (errData?.errorMsg) {
+        errMsg = errData.errorMsg;
+      } else if (typeof error?.response?.data === 'string') {
+        errMsg = error.response.data;
+      }
+
+      toast.error('Holat o\'zgartirilmadi', errMsg);
+    }
+  }
+
   const statuses = (status) => {
     switch (status) {
-      case 'appected':
+      case 'accepted':
         return 'Qabul qilindi'
       case 'pending':
         return 'Kutilmoqda'
@@ -80,14 +147,17 @@ const ApplicationsPage = () => {
             </div>
             <button
               onClick={() => setFilterModal(true)}
-              className="flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 rounded-xl text-slate-600 text-sm font-semibold cursor-pointer"
+              className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-slate-700 ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
             >
               <LuFilter size={16} />
               Filtrlash
             </button>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto rounded-xl">
+          <div
+            className="max-h-[80vh] overflow-y-auto rounded-xl"
+            onScroll={handleMoreApplications}
+          >
             <table className="w-full" style={{ fontSize: 13 }}>
               <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 shadow-xs">
                 <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
@@ -101,37 +171,47 @@ const ApplicationsPage = () => {
                       Lavozim
                     </span>
                   </th>
-                  <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>
+                  <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>
                     Viloyat
                   </th>
-                  <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>Holati</th>
-                  <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>Yaratilgan vaqt</th>
+                  <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Holati</th>
+                  <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Yaratilgan vaqt</th>
+                  <th className="px-4 py-3 text-center" style={{ fontWeight: 500, color: '#5B6078' }}>Ko'rilgan</th>
                 </tr>
               </thead>
               <tbody>
                 {applications?.map((application, idx) => (
                   <tr
                     key={application.id}
-                    // onClick={() => navigate(`/admin/users/detail/${application.id}`)}
+                    onClick={() => navigate(`/admin/applications/detail/${application.id}`)}
                     className="transition-colors cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                   >
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{application?.full_name || '—'}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>{application?.position_info.name || '—'}</td>
-                    <td className="px-4 py-3 text-left text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white font-medium">
+                      {application?.position_info.name || '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white font-medium">
                       {application?.region_info.name || '—'}
                     </td>
                     <td
-                      className="px-4 py-3 text-left text-[#1A1D2E] dark:text-white"
-                      style={{ fontWeight: 800 }}
+                      className="px-4 py-3 flex justify-end text-[#1A1D2E] dark:text-white font-bold"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {statuses(application?.status)}
+                      <FilterSelect
+                        options={Object.values(Status)}
+                        value={statuses(application.status)}
+                        onChange={(value) => handleStatusChange(application, value)}
+                        width='130px'
+                      />
                     </td>
-                    <td
-                      className="px-4 py-3 text-left text-[#1A1D2E] dark:text-white"
-                      style={{ fontWeight: 500 }}
-                    >
-                      {dayjs(application?.birth_date).format('DD.MM.YYYY')}
+                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white font-medium">
+                      {dayjs(application?.created_at).format('DD.MM.YYYY HH:mm') || '—'}
+                    </td>
+                    <td className='px-4 py-3 flex justify-center'>
+                      <span className={`${application.reviewed_by.length !== null ? 'bg-green-500' : 'bg-slate-200'} w-6 h-6 flex items-center justify-center rounded-md text-center`}>
+                        {application.reviewed_by.length !== null ? (<FaCheck size={15} color='white' />) : ""}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -149,6 +229,19 @@ const ApplicationsPage = () => {
         onClose={() => setFilterModal(false)}
         onSubmit={handleFilterSubmit}
       />
+
+      <style>{`
+        .filter-notif::after {
+          content: '';
+          position: absolute;
+          top: 2px;
+          right: 2px;
+          width: 8px;
+          height: 8px;
+          background-color: #2196F3;
+          border-radius: 50%;
+        }
+      `}</style>
 
     </>
   )

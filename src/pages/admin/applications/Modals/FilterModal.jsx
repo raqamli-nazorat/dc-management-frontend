@@ -83,8 +83,8 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                             <div>
                                 <label className={labelCls}>Holati</label>
                                 <FilterSelect
-                                    value={f.manager}
-                                    onChange={v => set('manager', v)}
+                                    value={f.status}
+                                    onChange={v => set('status', v)}
                                     options={["Holati", ...Object.values(Status)]}
                                     placeholder="Holatini tanlang"
                                 />

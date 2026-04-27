@@ -316,7 +316,7 @@ const UserDetail = () => {
                                 type="password"
                                 placeholder="Yangi parol"
                                 value={form.password}
-                                onChange={e => set('password', e.target.value)}
+                                onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }}
                             />
                         </div>
                         <div>
