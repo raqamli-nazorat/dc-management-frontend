@@ -5,7 +5,8 @@ const PageActionContext = createContext(null)
 export function PageActionProvider({ children }) {
   const [action, setAction] = useState(null)
   const [breadcrumbExtra, setBreadcrumbExtra] = useState(null)
-  const [navbarExtra, setNavbarExtra] = useState(null)   // search+filter for kanban
+  const [navbarExtra, setNavbarExtra] = useState(null)
+  const [sidebarClickHandler, setSidebarClickHandler] = useState(null)
 
   const registerAction = useCallback((a) => setAction(a), [])
   const clearAction = useCallback(() => setAction(null), [])
@@ -13,12 +14,15 @@ export function PageActionProvider({ children }) {
   const clearBreadcrumb = useCallback(() => setBreadcrumbExtra(null), [])
   const registerNavbarExtra = useCallback((node) => setNavbarExtra(node), [])
   const clearNavbarExtra = useCallback(() => setNavbarExtra(null), [])
+  const registerSidebarClick = useCallback((fn) => setSidebarClickHandler(() => fn), [])
+  const clearSidebarClick = useCallback(() => setSidebarClickHandler(null), [])
 
   return (
     <PageActionContext.Provider value={{
       action, registerAction, clearAction,
       breadcrumbExtra, registerBreadcrumb, clearBreadcrumb,
       navbarExtra, registerNavbarExtra, clearNavbarExtra,
+      sidebarClickHandler, registerSidebarClick, clearSidebarClick,
     }}>
       {children}
     </PageActionContext.Provider>

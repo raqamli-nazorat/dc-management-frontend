@@ -164,17 +164,17 @@ function Breadcrumb() {
 }
 
 export default function Layout() {
-  const { action, breadcrumbExtra } = usePageAction()
+  const { action, breadcrumbExtra, navbarExtra, sidebarClickHandler } = usePageAction()
   const { isDark, toggleTheme } = useTheme()
   const [notifOpen, setNotifOpen] = useState(false)
-
-
   const [notifs, setNotifs] = useState(NOTIFS_DATA)
-  const unreadCount = notifs.filter(n => !n.read).length
+
+  // navbarExtra mavjud bo'lsa sidebar collapsed holda ko'rsatiladi (kanban mode)
+  const isKanban = !!navbarExtra
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FC] dark:bg-[#191A1A]">
-      <Sidebar />
+      <Sidebar forceCollapsed={isKanban} onForceClick={sidebarClickHandler} />
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* ── Navbar ── */}
@@ -182,21 +182,27 @@ export default function Layout() {
           bg-[#F8F9FC] border-[#EEF1F7]
           dark:bg-[#191A1A] dark:border-[#292A2A]">
 
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1 text-sm">
-            <Breadcrumb />
-            {breadcrumbExtra && (
-              <>
-                <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
-                <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0]">
-                  {breadcrumbExtra}
-                </span>
-              </>
+          {/* Left: Breadcrumb OR navbarExtra */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {navbarExtra ? (
+              <div className="flex items-center gap-2 w-full">{navbarExtra}</div>
+            ) : (
+              <div className="flex items-center gap-1 text-sm">
+                <Breadcrumb />
+                {breadcrumbExtra && (
+                  <>
+                    <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
+                    <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0]">
+                      {breadcrumbExtra}
+                    </span>
+                  </>
+                )}
+              </div>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {action && (
               <button
                 onClick={action.onClick}
@@ -219,13 +225,11 @@ export default function Layout() {
                 text-[#5B6078] dark:text-[#C2C8E0]"
             >
               {isDark ? (
-                /* Sun icon */
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="4"/>
                   <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
                 </svg>
               ) : (
-                /* Moon icon */
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
@@ -253,7 +257,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 p-6 bg-[#F8F9FC] dark:bg-[#191A1A]">
+        <main className={`flex-1 bg-[#F8F9FC] dark:bg-[#191A1A] ${isKanban ? 'p-0 overflow-hidden' : 'p-6'}`}>
           <Outlet />
         </main>
       </div>
