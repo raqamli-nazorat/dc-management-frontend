@@ -3,9 +3,9 @@ import { FaXmark } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
-import { TASKS_DATA, EMPTY_FILTER } from './components/constants'
+import { TASKS_DATA } from './components/constants'
 import TaskRowMenu     from './components/TaskRowMenu'
-import TaskFilterModal from './modals/TaskFilterModal'
+import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
 import AddTaskModal    from './modals/AddTaskModal'
 import EditTaskModal   from './modals/EditTaskModal'
 
@@ -43,7 +43,8 @@ const INITIAL_CARDS = [
 ]
 
 /* ── KanbanCard ── */
-function KanbanCard({ card, index }) {
+function KanbanCard({ card, index, colColor }) {
+  const bgAlpha = colColor + '18' // ~10% opacity hex
   return (
     <Draggable draggableId={card.id} index={index}>
       {(provided, snapshot) => (
@@ -58,12 +59,12 @@ function KanbanCard({ card, index }) {
               ? `${provided.draggableProps.style?.transform} scale(1.02)`
               : provided.draggableProps.style?.transform,
             boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.14)' : undefined,
+            backgroundColor: snapshot.isDragging ? '#fff' : bgAlpha,
           }}
-          className={`rounded-2xl border p-3 flex flex-col gap-2 cursor-grab active:cursor-grabbing select-none
-            bg-white dark:bg-[#1C1D1D]
+          className={`rounded-2xl bg-red-500 border p-3 flex flex-col gap-2 cursor-grab active:cursor-grabbing select-none
             ${snapshot.isDragging
               ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
-              : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}
+              : 'border-transparent'}`}
         >
           {/* Title */}
           <p className="text-[12px] font-bold text-[#1A1D2E] dark:text-white leading-snug">{card.title}</p>
@@ -103,7 +104,7 @@ function KanbanCard({ card, index }) {
           </div>
 
           {/* Assignee */}
-          <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+          <div className="flex  items-center gap-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.06]">
             <div className="w-5 h-5 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[9px] font-bold text-[#526ED3] shrink-0">
               {card.assignee.slice(0, 2).toUpperCase()}
             </div>
@@ -119,85 +120,39 @@ function KanbanCard({ card, index }) {
 }
 
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onAddCard }) {
-  const [adding, setAdding] = useState(false)
-  const [newTitle, setNewTitle] = useState('')
-
-  const handleAdd = () => {
-    const t = newTitle.trim()
-    if (t) onAddCard(col.id, t)
-    setNewTitle('')
-    setAdding(false)
-  }
-
+function KanbanColumn({ col, cards }) {
   return (
-    <div className="flex flex-col shrink-0 w-[200px] h-full">
-      {/* Header — fixed at top */}
-      <div className="flex items-center gap-2 mb-3 shrink-0">
-        <span className="text-[13px] font-bold text-[#1A1D2E] dark:text-white truncate flex-1">{col.id}</span>
-        <span className="shrink-0 min-w-[22px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center text-white"
-          style={{ backgroundColor: col.color }}>
+    <div className="flex flex-col shrink-0 w-[200px] ">
+      {/* Header: Nom + badge yonma-yon, chapda */}
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <span className="text-[13px] font-bold text-[#1A1D2E] dark:text-white truncate">{col.id}</span>
+        <span
+          className="shrink-0 min-w-[22px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center text-white"
+          style={{ backgroundColor: col.color }}
+        >
           {cards.length}
         </span>
       </div>
 
-      {/* Scrollable droppable area */}
+      {/* Droppable area */}
       <Droppable droppableId={col.id}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`flex-1 overflow-y-auto flex flex-col gap-2 rounded-2xl p-1.5 transition-all duration-150
+            className={`flex flex-col gap-[10px] rounded-2xl p-1.5 transition-all duration-150
               ${snapshot.isDraggingOver
-                ? 'bg-[#526ED3]/10 border-2 border-dashed border-[#526ED3]'
-                : 'border-2 border-transparent'}`}
+                ? 'ring-2 ring-dashed ring-[#526ED3] bg-[#526ED3]/5'
+                : ''}`}
             style={{ minHeight: 60 }}
           >
             {cards.map((card, index) => (
-              <KanbanCard key={card.id} card={card} index={index} />
+              <KanbanCard key={card.id} card={card} index={index} colColor={col.color} />
             ))}
             {provided.placeholder}
           </div>
         )}
       </Droppable>
-
-      {/* Add button — fixed at bottom */}
-      <div className="mt-2 shrink-0">
-        {adding ? (
-          <div className="flex flex-col gap-1.5">
-            <input
-              autoFocus
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleAdd()
-                if (e.key === 'Escape') { setAdding(false); setNewTitle('') }
-              }}
-              placeholder="Sarlavha yozing..."
-              className="w-full px-2.5 py-2 rounded-xl text-xs outline-none border border-[#526ED3]
-                bg-white dark:bg-[#1C1D1D] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] shadow-sm"
-            />
-            <div className="flex gap-1.5">
-              <button onClick={handleAdd}
-                className="flex-1 py-1.5 rounded-lg text-xs font-semibold bg-[#526ED3] text-white hover:bg-[#3F57B3] cursor-pointer transition-colors">
-                Qo'shish
-              </button>
-              <button onClick={() => { setAdding(false); setNewTitle('') }}
-                className="px-2.5 py-1.5 rounded-lg text-xs text-[#5B6078] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] cursor-pointer transition-colors">
-                <FaXmark size={11} />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button onClick={() => setAdding(true)}
-            className="w-full flex items-center justify-center py-2 rounded-xl
-              text-[#8F95A8] hover:text-[#526ED3] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] cursor-pointer transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-          </button>
-        )}
-      </div>
     </div>
   )
 }
@@ -210,14 +165,16 @@ export default function TasksPage() {
   const [search, setSearch]         = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd]       = useState(false)
-  const [filters, setFilters]       = useState(EMPTY_FILTER)
+  const [filters, setFilters]       = useState(TASK_EMPTY_FILTER)
   const [data, setData]             = useState(TASKS_DATA)
   const [toast, setToast]           = useState(null)
   const [editTask, setEditTask]     = useState(null)
   const [cards, setCards]           = useState(INITIAL_CARDS)
 
   const showToast = (title, msg) => { setToast({ title, msg }); setTimeout(() => setToast(null), 3000) }
-  const hasFilter = Object.values(filters).some(v => v)
+  const hasFilter = filters.projects.length > 0 || filters.authors.length > 0 ||
+    !!filters.holat || !!filters.daraja || !!filters.turi ||
+    !!filters.deadFromD || !!filters.deadToD || filters.myTasks
   const switchToKanban = () => setViewMode('kanban')
   const switchToTable  = () => setViewMode('table')
 
@@ -288,11 +245,11 @@ export default function TasksPage() {
   const filtered = data.filter(t => {
     const q = search.toLowerCase()
     if (q && !t.name.toLowerCase().includes(q) && !t.assignee.toLowerCase().includes(q)) return false
-    if (filters.project  && t.project  !== filters.project)  return false
-    if (filters.status   && t.status   !== filters.status)   return false
-    if (filters.level    && t.level    !== filters.level)     return false
-    if (filters.type     && t.type     !== filters.type)      return false
-    if (filters.assignee && t.assignee !== filters.assignee)  return false
+    if (filters.projects.length > 0 && !filters.projects.find(p => p.name === t.project)) return false
+    if (filters.authors.length > 0  && !filters.authors.find(a => a.name === t.creator))  return false
+    if (filters.holat  && t.status !== filters.holat)  return false
+    if (filters.daraja && t.level  !== filters.daraja)  return false
+    if (filters.turi   && t.type   !== filters.turi)    return false
     return true
   })
 
@@ -301,13 +258,12 @@ export default function TasksPage() {
     return (
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]" style={{ height: 'calc(100vh - 57px)' }}>
-          <div className="flex  gap-3 px-4 pt-4 pb-4 overflow-x-auto h-full">
+          <div className="flex gap-[10px] px-4 pt-4 pb-4 overflow-x-auto h-full items-start">
             {COLUMNS.map(col => (
               <KanbanColumn
                 key={col.id}
                 col={col}
                 cards={cards.filter(c => c.columnId === col.id)}
-                onAddCard={handleAddCard}
               />
             ))}
           </div>
