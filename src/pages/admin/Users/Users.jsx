@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, use } from 'react'
 import { MdArrowForward, MdDelete } from 'react-icons/md'
-import { FaXmark } from 'react-icons/fa6'
+import { FaArrowLeft, FaXmark } from 'react-icons/fa6'
 import { usePageAction } from '../../../context/PageActionContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import CreateUser from './Modal/CreateUser'
 import FilterSelect from '../Components/FilterSelect'
 import { useNavigate } from 'react-router-dom'
+import { toast } from "../../../Toast/ToastProvider";
 
 const Roles = {
   superadmin: 'Bosh administrator',
@@ -24,7 +25,7 @@ function fmt(n) {
 /* ── Main Page ── */
 export default function UsersPage() {
   const navigate = useNavigate()
-  
+
   const { registerAction, clearAction } = usePageAction()
 
   const [users, setUsers] = useState([])
@@ -36,9 +37,8 @@ export default function UsersPage() {
   const [sort, setSort] = useState("")
   const [selecting, setSelecting] = useState(false)
   const [selected, setSelected] = useState(new Set())
-  const [toast, setToast] = useState(null)
   const [showModal, setShowModal] = useState(false)
-  const [activeUser, setActiveUser] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const getUsers = async (params) => {
     try {
@@ -78,17 +78,12 @@ export default function UsersPage() {
 
 
   useEffect(() => {
-    if (activeUser) {
-      clearAction()
-    } else {
-      registerAction({
-        label: "Qo'shish",
-        icon: <img src="/imgs/add-team.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
-        onClick: () => setShowModal(true),
-      })
-    }
-    return () => clearAction()
-  }, [activeUser, registerAction, clearAction])
+    registerAction({
+      label: "Qo'shish",
+      icon: <img src="/imgs/add-team.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
+      onClick: () => setShowModal(true),
+    })
+  }, [])
 
   const allSelected = users.length > 0 && users.every(u => selected.has(u.id))
   const toggleAll = () => {
@@ -99,9 +94,6 @@ export default function UsersPage() {
   const startSelecting = () => { setSelecting(true); setSelected(new Set()) }
   const cancelSelecting = () => { setSelecting(false); setSelected(new Set()) }
 
-  const showToast = useCallback((title, msg, type = 'success') => { setToast({ title, msg, type }); setTimeout(() => setToast(null), 3000) }, [])
-
-
   const statuses = (roles) => {
     if (!roles || roles.length === 0) return '—';
 
@@ -111,33 +103,70 @@ export default function UsersPage() {
     return `${role.slice(0, 2).join(', ')} (+${roles.length - 2})`;
   }
 
-  const handleDelete = () => {
-    setUsers(prev => prev.filter(u => !selected.has(u.id)))
-    showToast("Foydalanuvchi o'chirildi", "Tanlangan foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
-    cancelSelecting()
-  }
-  const handleMove = () => { showToast("Ko'chirildi", "Tanlangan foydalanuvchi muvaffaqiyatli ko'chirildi"); cancelSelecting() }
+  const handleDelete = async () => {
 
-  const handleDeleteUser = (id) => {
-    setUsers(prev => prev.filter(u => u.id !== id))
-    setActiveUser(null)
-    showToast("Foydalanuvchi o'chirildi", "Foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
+    try {
+      selected.forEach(async (id) => {
+        const user = users.find(user => user.id === id)
+        console.log(user.roles.includes('superadmin'));
+        if (user.roles.includes('superadmin')) {
+          toast.error("Foydalanuvchilarni o'chirish", "Superadmin o'chirib bo'lmaydi")
+          setConfirmDelete(false)
+          return;
+        } else {
+          await axiosAPI.delete(`users/${id}/`)
+          toast.success("Foydalanuvchilarni o'chirish", "Tanlangan foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
+          setUsers(prev => prev.filter(u => !selected.has(u.id)))
+        }
+      })
+      cancelSelecting()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  // ── Detail view ──
-  if (activeUser) {
-    return (
-      <UserDetail
-        user={activeUser}
-        onBack={() => setActiveUser(null)}
-        onDelete={handleDeleteUser}
-      />
-    )
-  }
+  const handleMove = () => { toast.success("Ko'chirildi", "Tanlangan foydalanuvchi muvaffaqiyatli ko'chirildi"); cancelSelecting() }
 
   // ── List view ──
   return (
     <>
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="fixed inset-0 bg-black/60" />
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
+            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+              <FaXmark size={14} />
+            </button>
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
+              >
+                <FaArrowLeft size={16} />
+              </button>
+              <h2 className="text-lg font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Foydalanuvchini o'chirmoqchimisiz?</h2>
+            </div>
+            <p className="text-sm text-[#8F95A8] dark:text-[#C2C8E0] mb-6">
+              Bu foydalanuvchi tizimdan o'chiriladi va unga tegishli ma'lumotlar o'chirish mumkin.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+              >
+                <FaXmark size={14} /> Bekor qilish
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
+              >
+                O'chirish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -209,8 +238,8 @@ export default function UsersPage() {
 
         {/* Table */}
         <div className="max-h-[70vh] overflow-y-auto">
-          <table className="w-full" style={{ fontSize: 13 }}>
-            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 shadow-xs">
+          <table className="w-full rounded-2xl" style={{ fontSize: 13 }}>
+            <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[#222323] shadow-xs">
               <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
                 <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: '#5B6078' }}>
                   {selecting ? (
@@ -235,20 +264,22 @@ export default function UsersPage() {
                 </th>
                 <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Oylik maosh (UZS)</th>
                 <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Balans (UZS)</th>
-                <th className="px-4 py-3 text-center" style={{ fontWeight: 500, color: '#5B6078' }}>Active</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u, idx) => (
                 <tr
                   key={u.id}
-                  onClick={() => navigate(`/admin/users/detail/${u.id}`)}
+                  onClick={() => {
+                    if (selecting) {
+                      toggleOne(u.id);
+                    } else {
+                      navigate(`/admin/users/detail/${u.id}`)
+                    }
+                  }}
                   className="transition-colors cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                 >
-                  <td
-                    className="px-4 py-3 w-14"
-                    onClick={e => e.stopPropagation()}
-                  >
+                  <td className="px-4 py-3 w-14" >
                     {selecting ? (
                       <span
                         className="flex items-center gap-2 transition-all duration-150"
@@ -258,6 +289,7 @@ export default function UsersPage() {
                           type="checkbox"
                           checked={selected.has(u.id)}
                           onChange={() => toggleOne(u.id)}
+                          onClick={(e) => e.stopPropagation()}
                           className="cursor-pointer accent-[#3F57B3] shrink-0"
                         />
                         <span className="text-[#8F95A8]" style={{ fontWeight: 500 }}>{idx + 1}</span>
@@ -273,12 +305,6 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>{fmt(u.balance)}</td>
-                  <td className="px-4 py-3 text-center">
-                    {u.is_active
-                      ? <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-green-500"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
-                      : <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-[#E02D2D]"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" /></svg></span>
-                    }
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -297,7 +323,7 @@ export default function UsersPage() {
               <MdArrowForward size={16} />
               Ko'chirish
             </button>
-            <button onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
+            <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
               <MdDelete size={16} />
               O'chirish
             </button>
