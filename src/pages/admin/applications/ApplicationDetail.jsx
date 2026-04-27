@@ -216,7 +216,7 @@ const ApplicationDetail = () => {
 
         {user?.roles?.map((role) => (role.includes('admin') || role.includes('manager'))) && (
           <div className="flex flex-col gap-2 mt-0!">
-            <span className="text-[20px] font-bold">Xodim hulosasi</span>
+            <span className="text-[20px] font-bold dark:text-white">Xodim hulosasi</span>
             <textarea
               className={`${inputCls} h-[120px]`}
               placeholder='Xodim hulosasini kiriting'

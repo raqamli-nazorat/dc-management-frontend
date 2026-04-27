@@ -83,6 +83,8 @@ export default function UsersPage() {
       icon: <img src="/imgs/add-team.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
       onClick: () => setShowModal(true),
     })
+
+    return clearAction
   }, [])
 
   const allSelected = users.length > 0 && users.every(u => selected.has(u.id))

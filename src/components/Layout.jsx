@@ -51,11 +51,9 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-[#EEF1F7] dark:border-[#292A2A] shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2>
-         
+          <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2> 
         </div>
         <div className="flex items-center gap-2">
-    
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
