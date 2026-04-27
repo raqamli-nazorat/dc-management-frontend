@@ -323,7 +323,7 @@ export default function Sidebar({ forceCollapsed = false }) {
               <p className="text-[13px] font-medium truncate leading-tight text-[#1A1D2E] dark:text-white">
                 {user?.username}
               </p>
-              <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{user?.roles?.[0]}</p>
+              <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{getRouteRole(user)}</p>
             </div>
           </div>
         )}

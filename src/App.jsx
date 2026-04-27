@@ -15,6 +15,7 @@ import AdminProjects from './pages/admin/tasks/Projects'
 import AdminTasks from './pages/admin/tasks/Tasks'
 import AdminMeetings from './pages/admin/tasks/Meetings'
 import AdminApplications from './pages/admin/applications/Applications'
+import AdminApplicationDetail from './pages/admin/applications/ApplicationDetail'
 import AdminPositions from './pages/admin/applications/Positions'
 import AdminRegions from './pages/admin/applications/Regions'
 import AdminDistricts from './pages/admin/applications/Districts'
@@ -51,6 +52,7 @@ function App() {
               <Route path="reports" element={PH('Hisobotlar')} />
               <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
               <Route path="applications" element={<AdminApplications />} />
+              <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
               <Route path="applications/positions" element={<AdminPositions />} />
               <Route path="applications/regions" element={<AdminRegions />} />
               <Route path="applications/districts" element={<AdminDistricts />} />

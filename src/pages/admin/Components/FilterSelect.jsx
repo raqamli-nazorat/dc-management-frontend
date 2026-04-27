@@ -45,7 +45,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 <span className="flex-1 text-left truncate">{display}</span>
                 <MdExpandMore
                     size={16}
-                    className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                    className={`shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
                     style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
                 />
             </button>
