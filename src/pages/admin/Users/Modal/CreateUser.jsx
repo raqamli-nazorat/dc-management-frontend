@@ -118,7 +118,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             </button>
             <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
                 <div className="px-7 pt-7 pb-5">
-                    <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-start gap-3">
                         <div className='flex gap-3'>
                             <button
                                 onClick={onClose}
