@@ -2,7 +2,7 @@
 import { FaXmark, FaArrowLeft, FaCalendarDays, FaChevronDown, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { MdCheck } from 'react-icons/md'
-import { usePageAction } from '../../context/PageActionContext'
+import { usePageAction } from '../../../context/PageActionContext'
 
 const PAYMENTS_DATA = [
   { id: 1, name: 'Doston Dostonov Dostonovich', type: 'Kompaniya xarajatlari', toifa: 'Sayohat uchun', loyiha: 'Ishlab chiqarish', amount: 10000000, created: '01.01.2026', approved: '01.01.2026', completed: '01.01.2026', active: true },
