@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { MdCancel, MdCheck, MdExpandMore } from "react-icons/md"
 
-const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, error = false }) => {
+const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, title, error = false }) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
     const [dropPos, setDropPos] = useState({ top: 0, left: 0, dropUp: false })
@@ -54,8 +54,9 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
+                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#191a1a] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
+                title={title}
             >
                 <span className="flex-1 text-left truncate">{display}</span>
 

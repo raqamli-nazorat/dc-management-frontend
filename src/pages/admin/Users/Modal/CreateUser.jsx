@@ -224,6 +224,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={districts.find(d => d.id === form.district)?.name || 'Tuman tanlang'}
                                 onChange={v => set('district', v === 'Tuman tanlang' ? '' : districts.find(d => d.name === v)?.id)}
                                 disabled={!form.region}
+                                title={!form.region && 'Viloyatni tanlang'}
                             />
                         </div>
                     </div>
@@ -289,7 +290,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                         <Dropdown
                                             label="Tanlash"
                                             options={positions.map(pos => pos.name)}
-                                            value={positions.find(p => p.id === form.position)?.name || 'Tanlash'}
+                                            value={positions.find(p => p.id === form.position)?.name || ''}
                                             onChange={v => { set('position', positions.find(p => p.name === v)?.id); setErrors(prev => ({ ...prev, position: false })) }}
                                             width={130}
                                             error={errors.position}

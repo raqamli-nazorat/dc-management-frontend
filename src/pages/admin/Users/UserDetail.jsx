@@ -227,7 +227,7 @@ const UserDetail = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
                 {/* Confirm Delete Modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">

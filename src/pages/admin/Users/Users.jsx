@@ -239,7 +239,7 @@ export default function UsersPage() {
         {/* Table */}
         <div className="max-h-[70vh] overflow-y-auto">
           <table className="w-full rounded-2xl" style={{ fontSize: 13 }}>
-            <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[#222323] shadow-xs">
+            <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[#191a1a] shadow-xs">
               <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
                 <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: '#5B6078' }}>
                   {selecting ? (
