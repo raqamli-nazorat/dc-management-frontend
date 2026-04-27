@@ -202,7 +202,7 @@ export default function Layout() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className={`flex items-center gap-2 shrink-0 ${isKanban ? 'ml-3' : ''}`}>
             {action && (
               <button
                 onClick={action.onClick}
