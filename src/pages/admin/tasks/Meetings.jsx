@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
-import { usePageAction } from '../../context/PageActionContext'
+import { usePageAction } from '../../../context/PageActionContext'
 
 const PROJECTS_LIST = [
   { id: 1, name: 'Marketing Platform',  desc: 'Marketing platformasi reklama',  date: '15.04.2026' },
