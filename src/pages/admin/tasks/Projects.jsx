@@ -1,12 +1,8 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
-<<<<<<< HEAD:src/pages/admin/tasks/Projects.jsx
 import { usePageAction } from '../../../context/PageActionContext'
-=======
-import { usePageAction } from '../../context/PageActionContext'
-import { DateTimeBox } from './Components/DateTimeBox'
->>>>>>> 014f45cb57cbe64a75c2d450226380206c59316e:src/pages/admin/Projects.jsx
+import { DateTimeBox } from '../Components/DateTimeBox'
 
 const PROJECTS_DATA = [
   { id: 1, name: 'CRM sistema', manager: "Dudan Turg'unov", status: 'Rejalashtirilmoqda', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
