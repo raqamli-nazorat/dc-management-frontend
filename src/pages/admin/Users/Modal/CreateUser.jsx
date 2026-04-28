@@ -114,6 +114,12 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             Object.keys(form).forEach(key => {
                 if (key === 'roles') {
                     form.roles.forEach(role => formData.append('roles', role))
+                }
+                else if ((key === 'avatar' || key === 'passport_image')) {
+                    // Agar rasm tanlangan bo'lsa (null bo'lmasa) qo'shadi
+                    if (form[key]) {
+                        formData.append(key, form[key])
+                    }
                 } else if (key === 'salary') {
                     formData.append('salary', form.salary.toString().replace(/\s/g, ''))
                 } else if (form[key] !== null && form[key] !== '') {
@@ -126,8 +132,6 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                 "linkedin": form.linkedin,
                 "telegram": form.telegram,
             }))
-
-            formData.append('is_active', true)
 
             const res = await axiosAPI.post('users/', formData)
 
