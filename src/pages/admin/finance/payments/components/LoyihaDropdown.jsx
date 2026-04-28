@@ -53,7 +53,7 @@ export function LoyihaDropdown({ value, onChange, projects = [] }) {
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
             ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
           <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
@@ -86,7 +86,7 @@ export function LoyihaDropdownForm({ value, onChange, error, projects = [] }) {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+        className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
           bg-white dark:bg-[#191A1A]
           ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
           ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`}>

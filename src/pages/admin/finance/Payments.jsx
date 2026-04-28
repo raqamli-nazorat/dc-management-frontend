@@ -298,13 +298,7 @@ export default function PaymentsPage() {
       <div className="flex-1 overflow-y-auto overflow-x-auto border-t border-b border-[#E2E6F2] dark:border-[#292A2A]">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
-        ) : payments.length === 0 ? (
-          <EmptyState
-            icon="/imgs/xarajatlarIcon.svg"
-            title="So'rovlar mavjud emas"
-            description="Yangi xarajat so'rovi yuborish uchun tugmadan foydalaning"
-          />
-        ) : (
+        ) : payments.length === 0 ? null : (
           <table className="w-full text-sm whitespace-nowrap">
             <thead className="sticky top-0 z-10 bg-[#F8F9FC] dark:bg-[#191A1A]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
@@ -333,15 +327,15 @@ export default function PaymentsPage() {
                   )}
                   <td className="px-4 py-3 w-10 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">
-                    {p.user_info?.username ?? '—'}
+                    {p.user_info?.username ?? ''}
                   </td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(p.type)}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.expense_category_info?.title ?? '—'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.expense_category_info?.title ?? ''}</td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(p.amount)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.created_at)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.paid_at)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.confirmed_at)}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.project_info?.title ?? '—'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.project_info?.title ?? ''}</td>
                   <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">
                     <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(p.status)}`}>
                       {statusLabel(p.status)}

@@ -2,7 +2,7 @@ import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
 import { fmt, fmtDate, typeLabel, methodLabel, statusLabel, statusColor, labelCls } from '../constants'
 
-const fieldCls = `w-full px-3 py-2.5 rounded-xl text-sm border
+const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
   bg-[#F8F9FC] border-[#E2E6F2] text-[#1A1D2E]
   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white`
 
@@ -46,7 +46,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             </div>
             <div>
               <label className={labelCls}>Toifa</label>
-              <div className={fieldCls}>{c.title || '—'}</div>
+              <div className={fieldCls}>{c.title || ''}</div>
             </div>
           </div>
 
@@ -59,8 +59,8 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
           {/* Sababi */}
           <div>
             <label className={labelCls}>Sababi</label>
-            <div className={`${fieldCls} min-h-[80px] whitespace-pre-wrap leading-relaxed`}>
-              {payment.reason || '—'}
+            <div className={`${fieldCls} !h-auto min-h-[80px] items-start whitespace-pre-wrap leading-relaxed`}>
+              {payment.reason || ''}
             </div>
           </div>
 

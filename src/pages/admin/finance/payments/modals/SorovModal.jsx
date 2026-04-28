@@ -63,7 +63,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
     onSubmit(body)
   }
 
-  const iCls = (k) => `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+  const iCls = (k) => `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
     bg-white text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
     dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]
     ${errors[k] ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`
@@ -71,7 +71,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
   const categoryOptions = categories.map(c => ({ label: c.title, value: String(c.id) }))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" />
         <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer transition-colors
               bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
@@ -148,7 +148,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
             <div className="relative">
               <textarea
                 rows={3}
-                className={iCls('reason') + ' resize-none pr-8'}
+                className={iCls('reason') + ' !h-auto resize-none pr-8'}
                 placeholder="Sababni yozing..."
                 value={form.reason}
                 onChange={e => setF('reason', e.target.value)}
