@@ -24,7 +24,7 @@ export default function Login() {
       setLoading(false)
       console.log(result)
       if (result.success) navigate(`/${getRouteRole({ roles: result.roles })}/dashboard`)
-      else setError("Login yoki parol noto'g'ri kiritilgan.")
+      else setError("Login yo‘li yoki parol noto‘g‘ri kiritilgan. Iltimos, to‘g‘ri kiritilganiga ishonch hosil qiling.")
     }, 600)
   }
 

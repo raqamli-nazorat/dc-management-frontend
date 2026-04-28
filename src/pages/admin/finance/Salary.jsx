@@ -1,27 +1,48 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
-
-const SALARY_DATA = [
-  { id: 1, name: 'Maria Martinez',  position: 'Backend dasturchi',  region: 'Toshkent viloyati', district: 'Toshkent tumani', passport: 'AA 142505', month: 'Yanvar', salary: 15500000, kpi: 250000,  fine: -150000, total: 250000000, created: '15.02.2026  20:00', approved: false },
-  { id: 2, name: 'Jing Wei',        position: 'Frontend dasturchi', region: 'Samarqand viloyati', district: 'Samarqand tumani', passport: 'BB 234567', month: 'Fevral', salary: 7250000,  kpi: 75000,   fine: -50000,  total: 100000000, created: '20.03.2026  09:00', approved: false },
-  { id: 3, name: 'Alex Chen',       position: 'Dizayner',           region: 'Buxoro viloyati',    district: 'Buxoro tumani',    passport: 'CC 345678', month: 'Mart',   salary: 5500000,  kpi: 60000,   fine: -30000,  total: 90000000,  created: '21.03.2026  10:00', approved: false },
-  { id: 4, name: 'Maria Garcia',    position: 'Menejer',            region: 'Andijon viloyati',   district: 'Andijon tumani',   passport: 'DD 456789', month: 'Aprel',  salary: 8200000,  kpi: 85000,   fine: -45000,  total: 110000000, created: '22.03.2026  11:00', approved: false },
-  { id: 5, name: 'Maria Gonzalez',  position: 'Tahlilchi',          region: 'Namangan viloyati',  district: 'Namangan tumani',  passport: 'EE 567890', month: 'Avgust', salary: 7800000,  kpi: 90000,   fine: -10000,  total: 105000000, created: '23.03.2026  12:00', approved: false },
-  { id: 6, name: 'Samuel Patel',    position: 'DevOps',             region: 'Farg\'ona viloyati', district: 'Farg\'ona tumani', passport: 'FF 678901', month: 'Avgust', salary: 6100000,  kpi: 70000,   fine: -25000,  total: 60000000,  created: '24.03.2026  13:00', approved: false },
-  { id: 7, name: 'Emily Johnson',   position: 'QA muhandis',        region: 'Xorazm viloyati',    district: 'Urganch tumani',   passport: 'GG 789012', month: 'Avgust', salary: 4500000,  kpi: 50000,   fine: -15000,  total: 80000000,  created: '25.03.2026  14:00', approved: false },
-  { id: 8, name: 'Doston Dostonov', position: 'Loyiha rahbari',     region: 'Toshkent viloyati',  district: 'Toshkent tumani',  passport: 'AA 142505', month: 'Yanvar', salary: 10000000, kpi: 1000000, fine: -500000, total: 150000000, created: '01.01.2026  20:00', approved: true  },
-]
+import { axiosAPI } from '../../../service/axiosAPI'
+import { toast } from '../../../Toast/ToastProvider'
 
 const MONTHS = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr']
 
 const EMPTY_FILTER = { month: '', dateFromD: '', dateFromT: '', dateToD: '', dateToT: '', sumFrom: '', sumTo: '', fineFrom: '', fineTo: '', showFine: false }
 
-function fmt(n) { return Math.abs(n).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+function fmt(n) { 
+  const num = parseFloat(n)
+  if (isNaN(num)) return '—'
+  return Math.abs(num).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('ru-RU', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+}
+
 function fmtMoney(raw) { const d = raw.replace(/\D/g,''); return d.replace(/\B(?=(\d{3})+(?!\d))/g,' ') }
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const iCls = 'w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
+
+// ── API ──────────────────────────────────────────────────────
+async function apiGetPayrolls(params = {}) {
+  const res = await axiosAPI.get('/payroll/', { params })
+  const payload = res.data?.data ?? res.data
+  return Array.isArray(payload) ? payload : (payload.results ?? [])
+}
+
+async function apiGetPayrollDetail(id) {
+  const res = await axiosAPI.get(`/payroll/${id}/`)
+  return res.data?.data ?? res.data
+}
+
+async function apiConfirmPayrolls(payroll_ids) {
+  const res = await axiosAPI.post('/payroll/confirm/', { payroll_ids })
+  return res.data?.data ?? res.data
+}
 
 /* ── useDropdown ── */
 function useDropdown() {
@@ -267,100 +288,98 @@ function MonthDropdownFull({ value, onChange }) {
 /* ── UserDetailModal ── */
 function UserDetailModal({ user, onClose, onApprove }) {
   const [showConfirm, setShowConfirm] = useState(false)
+  const u = user.user_info ?? {}
+
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-        <div className="fixed inset-0 bg-black/60" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 bg-black/60" onClick={onClose} />
 
-   {/* X button — ekran yuqori o'ng burchagida */}
-          <button onClick={onClose}
-            className="fixed top-4 right-4 z-[60] w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
-              bg-white/20 text-white hover:bg-white/30">
-            <FaXmark size={14}/>
-          </button>
+        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
-        <div className="relative w-full max-w-[600px] mt-8">
+          {/* Header */}
+          <div className="px-6 pt-6 pb-4 flex items-center gap-3">
+            <button onClick={onClose} className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0">
+              <FaArrowLeft size={16}/>
+            </button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi ma'lumotlari</h2>
+          </div>
 
-       
-          <div className="rounded-2xl shadow-2xl bg-[#FFFFFF] dark:bg-[#111111]">
-
-            {/* Header */}
-            <div className="px-6 pt-5 pb-4 flex items-center gap-3">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0">
-                <FaArrowLeft size={16}/>
-              </button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi ma'lumotlari</h2>
+          {/* User info */}
+          <div className="px-6 pb-5 flex items-center gap-4">
+            {u.avatar
+              ? <img src={u.avatar} alt="avatar" className="w-[80px] h-[80px] rounded-[20px] object-cover shrink-0"/>
+              : <div className="w-[80px] h-[80px] rounded-[20px] bg-[#526ED3] flex items-center justify-center text-white text-3xl font-bold shrink-0">
+                  {u.username?.[0]?.toUpperCase() ?? '?'}
+                </div>
+            }
+            <div>
+              <p className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? '—'}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
+                  Viloyat: <span className="font-bold">{u.region ?? '—'}</span>
+                </span>
+                <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
+                  Tuman: <span className="font-bold">{u.district ?? '—'}</span>
+                </span>
+              </div>
             </div>
+          </div>
 
-            {/* User info */}
-            <div className="px-6 pb-4 flex items-center gap-4">
-              <img src="/imgs/userImg.png" alt="avatar"
-                className="w-[85px] h-[85px] rounded-[24px] object-cover shrink-0"/>
-              <div>
-                <p className="text-[20px] font-[800] text-[#1A1D2E] dark:text-[#FFFFFF]">{user.name}</p>
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <span className="text-xs px-3 py-1 rounded-[8px] font-medium
-                    bg-[#F1F3F9] text-[#1A1D2E]
-                    dark:bg-[#222323] dark:text-[#FFFFFF] dark:border dark:border-[#474848]">
-                    Viloyat: <span className="font-bold">{user.region}</span>
-                  </span>
-                  <span className="text-xs px-3 py-1 rounded-[8px] font-medium
-                    bg-[#F1F3F9] text-[#1A1D2E]
-                    dark:bg-[#222323] dark:text-[#FFFFFF] dark:border dark:border-[#474848]">
-                    Tuman: <span className="font-bold">{user.district}</span>
-                  </span>
+          {/* Fields */}
+          <div className="px-6 pb-4 grid grid-cols-2 gap-3">
+
+            {/* Lavozimi + Passport */}
+            <Field label="Lavozimi" value={u.position ?? '—'}/>
+            <div>
+              <label className="block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5">Passport ma'lumotlari</label>
+              <div className="flex gap-2">
+                <div className="w-16 shrink-0 px-3 py-2.5 rounded-xl text-sm text-center border
+                  bg-white border-[#E2E6F2] text-[#1A1D2E]
+                  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                  {u.passport_series ?? ''}
+                </div>
+                <div className="flex-1 px-3 py-2.5 rounded-xl text-sm border
+                  bg-white border-[#E2E6F2] text-[#1A1D2E]
+                  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                  {u.passport_number ?? ''}
                 </div>
               </div>
             </div>
 
-            {/* Fields */}
-            <div className="px-6 pb-4 grid grid-cols-2 gap-3">
-              <Field label="Lavozimi" value={user.position}/>
-              <div>
-                <label className="block text-[11px] font-[500] text-[#C2C8E0] mb-1.5">Passport ma'lumotlari</label>
-                <div className="flex gap-2">
-                  <div className="w-16 shrink-0 px-3 py-2.5 rounded-xl text-sm text-center border
-                    bg-[#FFFFFF] border-[#E2E6F2] text-[#1A1D2E]
-                    dark:bg-[#111111] dark:border-[#292A2A] dark:text-[#FFFFFF]">
-                    {user.passport.split(' ')[0]}
-                  </div>
-                  <div className="flex-1 px-3 py-2.5 rounded-xl text-sm border
-                    bg-[#FFFFFF] border-[#E2E6F2] text-[#1A1D2E]
-                    dark:bg-[#111111] dark:border-[#292A2A] dark:text-[#FFFFFF]">
-                    {user.passport.split(' ')[1]}
-                  </div>
-                </div>
-              </div>
-              <Field label="Oylik maosh"      value={fmt(user.salary)}/>
-              <Field label="KPI bonus"        value={fmt(user.kpi)}/>
-              <Field label="Yaratilgan vaqti" value={user.created}/>
-              <Field label="Oy"               value={user.month}/>
-              <Field label="Jarima miqdori (UZS)" value={`-${fmt(user.fine)}`} red right/>
-              <Field label="Jami miqdori (UZS)"   value={fmt(user.total)} right/>
-            </div>
+            <Field label="Oylik maosh" value={fmt(user.fixed_salary)}/>
+            <Field label="KPI bonus" value={fmt(user.kpi_bonus)}/>
+            <Field label="Yaratilgan vaqti" value={fmtDate(user.created_at)}/>
+            <Field label="Oy" value={user.month_display ?? '—'}/>
+            <Field label="Jarima miqdori (UZS)" value={`-${fmt(user.penalty_amount)}`} red right/>
+            <Field label="Jami miqdori (UZS)" value={fmt(user.total_amount)} right/>
+          </div>
 
-            {/* Footer */}
-            <div className="px-6 py-4 flex items-center justify-end gap-3">
-              <button onClick={onClose}
-                className="px-6 py-2.5 rounded-xl text-[15px] font-semibold transition-colors cursor-pointer
-                  text-[#1A1D2E] hover:bg-[#F1F3F9] dark:text-[#FFFFFF] dark:hover:bg-[#222323]">
-                Yopish
+          {/* Footer */}
+          <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
+            <button onClick={onClose}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+              <FaXmark size={13}/> Bekor qilish
+            </button>
+            {!user.is_confirmed && (
+              <button onClick={() => setShowConfirm(true)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer
+                  bg-green-500 text-white hover:bg-green-600">
+                <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Tasdiqlash
               </button>
-              {!user.approved && (
-                <button onClick={() => setShowConfirm(true)}
-                  className="px-6 py-2.5 rounded-xl text-[15px] font-bold transition-colors cursor-pointer
-                    bg-green-500 text-white hover:bg-green-600">
-                  Tasdiqlash
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
+
       {showConfirm && (
         <ConfirmModal
-          onCancel={()=>setShowConfirm(false)}
-          onConfirm={()=>{ onApprove(user.id); setShowConfirm(false); onClose() }}
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={() => { onApprove(user.id); setShowConfirm(false); onClose() }}
         />
       )}
     </>
@@ -371,12 +390,12 @@ function UserDetailModal({ user, onClose, onApprove }) {
 function Field({ label, value, right, red }) {
   return (
     <div>
-      <label className="block text-[11px] font-[500] text-[#C2C8E0] mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5">{label}</label>
       <div className={`w-full px-3 py-2.5 rounded-xl text-sm border
-        bg-[#FFFFFF] border-[#E2E6F2] text-[#1A1D2E]
-        dark:bg-[#111111] dark:border-[#292A2A] dark:text-[#FFFFFF]
+        bg-white border-[#E2E6F2] text-[#1A1D2E]
+        dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]
         ${right ? 'text-right' : ''}
-        ${red ? '!text-[#E02D2D]' : ''}`}>
+        ${red ? '!text-[#E02D2D] dark:!text-[#FA5252]' : ''}`}>
         {value}
       </div>
     </div>
@@ -420,69 +439,84 @@ function ConfirmModal({ onCancel, onConfirm }) {
 /* ── Main Page ── */
 export default function SalaryPage() {
   const [search, setSearch]           = useState('')
-  const [data, setData]               = useState(SALARY_DATA)
+  const [data, setData]               = useState([])
+  const [loading, setLoading]         = useState(false)
   const [selecting, setSelecting]     = useState(false)
   const [selected, setSelected]       = useState(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
   const [showFilter, setShowFilter]   = useState(false)
   const [filters, setFilters]         = useState(EMPTY_FILTER)
   const [detailUser, setDetailUser]   = useState(null)
-  const [toast, setToast]             = useState(null)
-
-  const showToast = (title, msg) => { setToast({ title, msg }); setTimeout(() => setToast(null), 3000) }
 
   const hasFilter = Object.values(filters).some(v => v && v !== false)
 
-  const filtered = data.filter(u => {
-    const q = search.toLowerCase()
-    if (q && !u.name.toLowerCase().includes(q)) return false
-    if (filters.month && u.month !== filters.month) return false
-    return true
-  })
+  const loadPayrolls = async () => {
+    setLoading(true)
+    try {
+      const params = {}
+      if (search) params.search = search
+      if (filters.month) params.month = filters.month
+      const result = await apiGetPayrolls(params)
+      setData(result)
+    } catch (err) {
+      console.error(err)
+      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const allSelected = filtered.length > 0 && filtered.every(u => selected.has(u.id))
+  useEffect(() => {
+    loadPayrolls()
+  }, [])
+
+  const allSelected = data.length > 0 && data.every(u => selected.has(u.id))
   const toggleAll   = () => {
-    if (allSelected) setSelected(prev => { const s = new Set(prev); filtered.forEach(u => s.delete(u.id)); return s })
-    else             setSelected(prev => { const s = new Set(prev); filtered.forEach(u => s.add(u.id));    return s })
+    if (allSelected) setSelected(prev => { const s = new Set(prev); data.forEach(u => s.delete(u.id)); return s })
+    else             setSelected(prev => { const s = new Set(prev); data.forEach(u => s.add(u.id));    return s })
   }
   const toggleOne = (id) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
 
-  const handleApprove = (ids) => {
-    const idSet = ids instanceof Set ? ids : new Set([ids])
-    setData(prev => prev.map(u => idSet.has(u.id) ? { ...u, approved: true } : u))
-    setShowConfirm(false)
-    setSelecting(false)
-    setSelected(new Set())
-    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
+  const handleApprove = async (ids) => {
+    const idArray = ids instanceof Set ? Array.from(ids) : [ids]
+    try {
+      await apiConfirmPayrolls(idArray)
+      setData(prev => prev.map(u => idArray.includes(u.id) ? { ...u, is_confirmed: true } : u))
+      setShowConfirm(false)
+      setSelecting(false)
+      setSelected(new Set())
+      toast.success("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
+    } catch (err) {
+      console.error(err)
+      toast.error("Tasdiqlashda xatolik yuz berdi.")
+    }
   }
 
-  const toggleApprove = (id) => {
-    setData(prev => prev.map(u => u.id === id ? { ...u, approved: !u.approved } : u))
-    showToast("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
-  }
-
-  const handleRowClick = (u) => {
+  const handleRowClick = async (u) => {
     if (selecting) { toggleOne(u.id); return }
-    setDetailUser(u)
+    try {
+      const detail = await apiGetPayrollDetail(u.id)
+      console.log('Payroll detail:', detail)
+      setDetailUser(detail)
+    } catch (err) {
+      console.error(err)
+      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+    }
+  }
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') loadPayrolls()
+  }
+
+  const handleApplyFilter = (f) => {
+    setFilters(f)
+    setShowFilter(false)
+    loadPayrolls()
   }
 
   return (
     <div className="flex flex-col gap-4">
 
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-5 right-5 z-50 flex items-start gap-3 p-4 rounded-2xl shadow-xl w-[340px]
-          bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
-          <img src="/imgs/Union.svg" alt="" className="w-6 h-6 shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{toast.title}</p>
-            <p className="text-[13px] text-[#8F95A8] dark:text-[#8E95B5] mt-1 leading-snug">{toast.msg}</p>
-          </div>
-          <button onClick={() => setToast(null)} className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer shrink-0">
-            <FaXmark size={14} />
-          </button>
-        </div>
-      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
@@ -511,8 +545,8 @@ export default function SalaryPage() {
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-          <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
+          <input type="text" placeholder="Ism Sharifi bo'yicha izlash (Enter)" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleSearch}
+            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[280px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]"/>
         </div>
@@ -528,66 +562,64 @@ export default function SalaryPage() {
 
       {/* Table */}
       <div className="border-y border-[#E2E6F2] dark:border-[#292A2A] overflow-x-auto">
-        <table className="w-full text-sm whitespace-nowrap">
-          <thead>
-            <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-              {selecting && (
-                <th className="w-10 px-4 py-3 text-left">
-                  <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]"/>
-                </th>
-              )}
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism sharifi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oy</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oylik maosh (UZS)</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">KPI bonus (UZS)</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jarima miqdori (UZS)</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jami miqdori (UZS)</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan vaqt</th>
-              <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]">Tasdiqlanish</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((u, idx) => (
-              <tr key={u.id}
-                onClick={() => handleRowClick(u)}
-                className={`border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer
-                  ${'hover:bg-black/3 dark:hover:bg-white/3'}`}>
-                {selecting && (
-                  <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                    <div className={`transition-transform duration-200 ${selected.has(u.id) ? 'translate-x-2' : ''}`}>
-                      <input type="checkbox" checked={selected.has(u.id)} onChange={() => toggleOne(u.id)} className="cursor-pointer accent-[#3F57B3]"/>
-                    </div>
-                  </td>
-                )}
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">
-                  <span className={`inline-block transition-transform duration-200 ${selected.has(u.id) ? 'translate-x-2' : ''}`}>{idx + 1}</span>
-                </td>
-                <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u.name}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.month}</td>
-                <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.salary)}</td>
-                <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.kpi)}</td>
-                <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.fine)}</td>
-                <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.total)}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.created}</td>
-                <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]"
-                  onClick={e => e.stopPropagation()}>
-                  {u.approved ? (
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
-                      <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#E9ECF5] dark:bg-[#292A2A]" />
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {filtered.length === 0 && (
+        {loading ? (
+          <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
+        ) : data.length === 0 ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Ma'lumot topilmadi</div>
+        ) : (
+          <table className="w-full text-sm whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
+                {selecting && (
+                  <th className="w-10 px-4 py-3 text-left">
+                    <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]"/>
+                  </th>
+                )}
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism sharifi</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oy</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oylik maosh (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">KPI bonus (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jarima miqdori (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jami miqdori (UZS)</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan vaqt</th>
+                <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]">Tasdiqlanish</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((u, idx) => (
+                <tr key={u.id}
+                  onClick={() => handleRowClick(u)}
+                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  {selecting && (
+                    <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                      <input type="checkbox" checked={selected.has(u.id)} onChange={() => toggleOne(u.id)} className="cursor-pointer accent-[#3F57B3]"/>
+                    </td>
+                  )}
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
+                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u.user_info?.username ?? '—'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.month_display ?? '—'}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.fixed_salary)}</td>
+                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.kpi_bonus)}</td>
+                  <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.penalty_amount)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.total_amount)}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(u.created_at)}</td>
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]"
+                    onClick={e => e.stopPropagation()}>
+                    {u.is_confirmed ? (
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
+                        <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#E9ECF5] dark:bg-[#292A2A]" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
@@ -616,7 +648,7 @@ export default function SalaryPage() {
         <SalaryFilterModal
           initial={filters}
           onClose={() => setShowFilter(false)}
-          onApply={f => { setFilters(f); setShowFilter(false) }}
+          onApply={handleApplyFilter}
         />
       )}
 
@@ -624,10 +656,7 @@ export default function SalaryPage() {
         <UserDetailModal
           user={detailUser}
           onClose={() => setDetailUser(null)}
-          onApprove={id => {
-            setData(prev => prev.map(u => u.id === id ? { ...u, approved: true } : u))
-            setDetailUser(null)
-          }}
+          onApprove={handleApprove}
         />
       )}
     </div>

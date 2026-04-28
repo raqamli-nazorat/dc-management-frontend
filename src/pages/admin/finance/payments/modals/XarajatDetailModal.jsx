@@ -1,11 +1,14 @@
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
-import { fmt, labelCls } from '../constants'
+import { fmt, fmtDate, typeLabel, methodLabel, statusLabel, statusColor, labelCls } from '../constants'
 
-export default function XarajatDetailModal({ payment, onClose, onPaid }) {
-  const fieldCls = `w-full px-3 py-2.5 rounded-xl text-sm border
-    bg-[#F8F9FC] border-[#E2E6F2] text-[#1A1D2E]
-    dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white`
+const fieldCls = `w-full px-3 py-2.5 rounded-xl text-sm border
+  bg-[#F8F9FC] border-[#E2E6F2] text-[#1A1D2E]
+  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white`
+
+export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm, onCancel }) {
+  const c = payment.expense_category_info ?? {}
+  const isCard = payment.payment_method === 'card'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -13,7 +16,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid }) {
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
 
         {/* Header */}
-        <div className="px-6 pt-7 pb-2">
+        <div className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-70 cursor-pointer shrink-0">
               <FaArrowLeft size={16} />
@@ -26,44 +29,46 @@ export default function XarajatDetailModal({ payment, onClose, onPaid }) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-4">
+        <div className="px-6 pb-4 flex flex-col gap-4">
 
           {/* Xarajat turi + Toifa */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Xarajat turi</label>
-              <div className={fieldCls}>{payment.type || '—'}</div>
+              <div className={fieldCls}>{typeLabel(payment.type)}</div>
             </div>
             <div>
               <label className={labelCls}>Toifa</label>
-              <div className={fieldCls}>{payment.toifa || '—'}</div>
+              <div className={fieldCls}>{c.title || '—'}</div>
             </div>
           </div>
 
           {/* Miqdor */}
           <div>
             <label className={labelCls}>Miqdori (UZS)</label>
-            <div className={fieldCls + ' text-right font-semibold'}>{fmt(payment.amount)}</div>
+            <div className={`${fieldCls} text-right font-semibold`}>{fmt(payment.amount)}</div>
           </div>
 
           {/* Sababi */}
           <div>
             <label className={labelCls}>Sababi</label>
-            <div className={fieldCls + ' min-h-[72px] whitespace-pre-wrap leading-relaxed'}>
-              {payment.sabab || "Uyga ketishga pulim yo'qligi uchun, so'rov yubormoqdaman iltimos tezroq hal qilib beringlar"}
+            <div className={`${fieldCls} min-h-[80px] whitespace-pre-wrap leading-relaxed`}>
+              {payment.reason || '—'}
             </div>
           </div>
 
-          {/* To'lov turi + Karta */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* To'lov turi + Karta (faqat card bo'lsa) */}
+          <div className={isCard ? 'grid grid-cols-2 gap-4' : ''}>
             <div>
               <label className={labelCls}>To'lov turi</label>
-              <div className={fieldCls}>{payment.tolovTuri || 'Karta raqam orqali'}</div>
+              <div className={fieldCls}>{methodLabel(payment.payment_method)}</div>
             </div>
-            <div>
-              <label className={labelCls}>Karta raqami</label>
-              <div className={fieldCls + ' font-mono tracking-wider'}>{payment.karta || '8600 0000 0000 0001'}</div>
-            </div>
+            {isCard && payment.card_number && (
+              <div>
+                <label className={labelCls}>Karta raqam</label>
+                <div className={`${fieldCls} font-mono tracking-wider`}>{payment.card_number}</div>
+              </div>
+            )}
           </div>
 
         </div>
@@ -73,13 +78,35 @@ export default function XarajatDetailModal({ payment, onClose, onPaid }) {
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
-            <FaXmark size={14} /> Yopish
+            <FaXmark size={13} /> Yopish
           </button>
-          <button onClick={() => { onPaid(payment.id); onClose() }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
-              bg-[#3F57B3] text-white hover:bg-[#526ED3]">
-            <MdCheck size={16} /> To'lov qildim
-          </button>
+          
+          {/* Bekor qilish tugmasi - pending yoki paid holatida */}
+          {(payment.status === 'pending' || payment.status === 'paid') && onCancel && (
+            <button onClick={() => { onCancel(payment.id); onClose() }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                bg-red-500 text-white hover:bg-red-600">
+              <FaXmark size={13} /> Bekor qilish
+            </button>
+          )}
+          
+          {/* To'lov qildim tugmasi - faqat pending holatida */}
+          {payment.status === 'pending' && onPaid && (
+            <button onClick={() => { onPaid(payment.id); onClose() }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                bg-blue-500 text-white hover:bg-blue-600">
+              <MdCheck size={15} /> To'lov qildim
+            </button>
+          )}
+          
+          {/* Tasdiqlash tugmasi - faqat paid holatida */}
+          {payment.status === 'paid' && onConfirm && (
+            <button onClick={() => { onConfirm(payment.id); onClose() }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                bg-green-500 text-white hover:bg-green-600">
+              <MdCheck size={15} /> Tasdiqlash
+            </button>
+          )}
         </div>
       </div>
     </div>
