@@ -1,0 +1,45 @@
+import { useRef } from 'react'
+import { FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { labelCls } from '../constants'
+
+export function DateBox({ type, value, onChange, icon, placeholder }) {
+  const ref = useRef(null)
+  return (
+    <div className="flex items-center gap-2 px-3 py-2.5 border border-[#E2E6F2] dark:border-[#292A2A]
+      rounded-xl bg-transparent focus-within:border-[#526ED3] transition-colors cursor-text">
+      {placeholder && (
+        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">{placeholder}:</span>
+      )}
+      <input
+        ref={ref}
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="flex-1 min-w-0 text-xs outline-none bg-transparent
+          text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
+          [&::-webkit-calendar-picker-indicator]:hidden"
+      />
+      <button
+        type="button"
+        onClick={() => ref.current?.showPicker?.()}
+        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] transition-colors"
+      >
+        {icon}
+      </button>
+    </div>
+  )
+}
+
+export function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT, onDateFromD, onTimeFromD, onDateToD, onTimeToD }) {
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      <div className="grid grid-cols-4 gap-2">
+        <DateBox type="date" value={dateFromD} onChange={onDateFromD} placeholder="dan" icon={<FaCalendarDays size={12} />} />
+        <DateBox type="time" value={dateFromT} onChange={onTimeFromD} icon={<FaClock size={12} />} />
+        <DateBox type="date" value={dateToD} onChange={onDateToD} placeholder="gacha" icon={<FaCalendarDays size={12} />} />
+        <DateBox type="time" value={dateToT} onChange={onTimeToD} icon={<FaClock size={12} />} />
+      </div>
+    </div>
+  )
+}
