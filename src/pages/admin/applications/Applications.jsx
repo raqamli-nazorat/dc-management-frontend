@@ -270,8 +270,8 @@ const ApplicationsPage = () => {
                       {dayjs(application?.created_at).format('DD.MM.YYYY HH:mm') || '—'}
                     </td>
                     <td className='px-4 py-3 flex justify-center'>
-                      <span className={`${application.reviewed_by.length !== null ? 'bg-green-500' : 'bg-slate-200'} w-6 h-6 flex items-center justify-center rounded-md text-center`}>
-                        {application.reviewed_by.length !== null ? (<FaCheck size={15} color='white' />) : ""}
+                      <span className={`${application?.reviewed_by !== null ? 'bg-green-500' : 'bg-slate-200'} w-6 h-6 flex items-center justify-center rounded-md text-center`}>
+                        {application.reviewed_by !== null ? (<FaCheck size={15} color='white' />) : ""}
                       </span>
                     </td>
                   </tr>
