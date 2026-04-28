@@ -39,8 +39,8 @@ const UserDetail = () => {
         const getUser = async () => {
             try {
                 setLoading(true)
-                const res = await axiosAPI.get(`users/${id}`)
-                setUser(res.data)
+                const { data } = await axiosAPI.get(`users/${id}`)
+                setUser(data.data)
                 setLoading(false)
             } catch (error) {
                 console.error(error)
@@ -90,11 +90,11 @@ const UserDetail = () => {
                 password: '',
                 fixed_salary: userData.fixed_salary ?? '',
                 balance: userData.balance ?? '',
-                region: userData.region || '',
-                district: userData.district || '',
+                region_info: userData.region_info || null,
+                district_info: userData.district_info || null,
+                position_info: userData.position_info || null,
                 passportSeria: pSeries,
                 passportRaqam: pRaqam,
-                position: userData.position || '',
                 roles: (userData.roles || []).map(r => Roles[r] || r),
                 github: userData.social_links?.github || '',
                 linkedin: userData.social_links?.linkedin || '',
@@ -125,11 +125,11 @@ const UserDetail = () => {
             password: '',
             fixed_salary: userData.fixed_salary ?? '',
             balance: userData.balance ?? '',
-            region: userData.region || '',
-            district: userData.district || '',
+            region_info: userData.region_info || null,
+            district_info: userData.district_info || null,
+            position_info: userData.position_info || null,
             passportSeria: pSeries,
             passportRaqam: pRaqam,
-            position: userData.position || '',
             roles: (userData.roles || []).map(r => Roles[r] || r),
             github: userData.social_links?.github || '',
             linkedin: userData.social_links?.linkedin || '',
@@ -141,31 +141,38 @@ const UserDetail = () => {
 
     const handleCancel = () => { setForm(initial); setIsDirty(false) }
 
+    console.log(user);
+
     const handleSave = async () => {
         try {
-            const formData = new FormData();
 
+            // --- FormData yaratish ---
+            const formData = new FormData()
+
+            // Hamma oddiy maydonlarni qo'shamiz faqat o'zgargan maydonlar yuboriladi
             Object.keys(form).forEach(key => {
-                const value = form[key];
-                if (!(value instanceof File) && key !== 'roles' && key !== 'avatar' && key !== 'passport_image') {
-                    formData.append(key, value || '');
+                if (form[key] !== user[key]) { // Faqat o'zgargan maydonlarni tekshiramiz
+                    if (key === 'roles') {
+                        form.roles.map(r => Object.keys(Roles).find(k => Roles[k] === r)).forEach(role => formData.append('roles', role))
+                    } else if (key === 'avatar' && form.avatar instanceof File) {
+                        formData.append('avatar', form.avatar)
+                    } else if (key === 'passport_image' && form.passport_image instanceof File) {
+                        formData.append('passport_image', form.passport_image)
+                    } else if (key === 'fixed_salary') {
+                        formData.append('fixed_salary', form.fixed_salary.toString().replace(/\s/g, ''))
+                    } else if (key === 'balance') {
+                        formData.append('balance', form.balance.toString().replace(/\s/g, ''))
+                    } else if (form[key] !== null && form[key] !== '') {
+                        formData.append(key, form[key])
+                    }
                 }
             });
 
-            if (form.avatar instanceof File) formData.append('avatar', form.avatar);
-            if (form.passport_image instanceof File) formData.append('passport_image', form.passport_image);
-
-            const roleKeys = form.roles.map(r => Object.keys(Roles).find(k => Roles[k] === r));
-            roleKeys.forEach(role => formData.append('roles', role));
-
-            formData.append('social_links', JSON.stringify({
-                github: form.github,
-                linkedin: form.linkedin,
-                telegram: form.telegram,
-            }));
-
-            formData.append('position', positions.find(item => item.name === form.position)?.id || '');
-            formData.append('passport_series', form.passportSeria + form.passportRaqam);
+            formData.append("social_links", JSON.stringify({
+                "github": form.github,
+                "linkedin": form.linkedin,
+                "telegram": form.telegram,
+            }))
 
             const { data } = await axiosAPI.patch(`users/${id}/`, formData);
 
@@ -352,7 +359,7 @@ const UserDetail = () => {
                                 type="text"
                                 inputMode="numeric"
                                 value={form.balance ? formatNum(form.balance) : ''}
-                                onChange={e => set('balance', formatNum(e.target.value))}
+                                disabled
                             />
                         </div>
                     </div>
@@ -363,11 +370,11 @@ const UserDetail = () => {
                             <label className={labelCls}>Viloyat</label>
                             <FilterSelect
                                 options={['Viloyatni tanlang', ...regions.map(r => r.name)]}
-                                value={regions.find(r => r.id === form.region)?.name || 'Viloyatni tanlang'}
+                                value={form.region_info?.name || 'Viloyatni tanlang'}
                                 onChange={v => {
-                                    const id = regions.find(r => r.name === v)?.id ?? '';
-                                    set('region', id);
-                                    if (!id) set('district', '');
+                                    const selectedRegion = regions.find(r => r.name === v);
+                                    set('region_info', selectedRegion || null);
+                                    if (!selectedRegion) set('district_info', null);
                                 }}
                             />
                         </div>
@@ -375,9 +382,12 @@ const UserDetail = () => {
                             <label className={labelCls}>Tuman</label>
                             <FilterSelect
                                 options={['Tuman tanlang', ...districts.map(d => d.name)]}
-                                value={districts.find(d => d.id === form.district)?.name || 'Tuman tanlang'}
-                                onChange={v => set('district', districts.find(d => d.name === v)?.id ?? '')}
-                                disabled={!form.region}
+                                value={form.district_info?.name || 'Tuman tanlang'}
+                                onChange={v => {
+                                    const selectedDistrict = districts.find(d => d.name === v);
+                                    set('district_info', selectedDistrict || null);
+                                }}
+                                disabled={!form.region_info}
                             />
                         </div>
                     </div>
@@ -461,8 +471,11 @@ const UserDetail = () => {
                                 width={200}
                                 label="Tanlash"
                                 options={positions.map(p => p.name)}
-                                value={positions.find(item => item.id === form.position)?.name || ''}
-                                onChange={v => set('position', positions.find(p => p.name === v)?.id ?? '')}
+                                value={form.position_info?.name || ''}
+                                onChange={v => {
+                                    const selectedPosition = positions.find(p => p.name === v);
+                                    set('position_info', selectedPosition || null);
+                                }}
                             />
                         </div>
                         <div className="flex items-center gap-2 justify-between w-[50%]">
