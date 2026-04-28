@@ -44,41 +44,19 @@ export function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT
         {/* Dan */}
         <div className="flex gap-1.5">
           <div className="flex-1">
-            <DateBox
-              type="date"
-              value={dateFromD}
-              onChange={onDateFromD}
-              placeholder="dan"
-              icon={<FaCalendarDays size={11} />}
-            />
+            <DateBox type="date" value={dateFromD} onChange={onDateFromD} placeholder="dan" icon={<FaCalendarDays size={11} />} />
           </div>
           <div className="w-[90px]">
-            <DateBox
-              type="time"
-              value={dateFromT}
-              onChange={onTimeFromD}
-              icon={<FaClock size={11} />}
-            />
+            <DateBox type="time" value={dateFromT || '00:00'} onChange={onTimeFromD} icon={<FaClock size={11} />} />
           </div>
         </div>
         {/* Gacha */}
         <div className="flex gap-1.5">
           <div className="flex-1">
-            <DateBox
-              type="date"
-              value={dateToD}
-              onChange={onDateToD}
-              placeholder="gacha"
-              icon={<FaCalendarDays size={11} />}
-            />
+            <DateBox type="date" value={dateToD} onChange={onDateToD} placeholder="gacha" icon={<FaCalendarDays size={11} />} />
           </div>
           <div className="w-[90px]">
-            <DateBox
-              type="time"
-              value={dateToT}
-              onChange={onTimeToD}
-              icon={<FaClock size={11} />}
-            />
+            <DateBox type="time" value={dateToT || '00:00'} onChange={onTimeToD} icon={<FaClock size={11} />} />
           </div>
         </div>
       </div>
