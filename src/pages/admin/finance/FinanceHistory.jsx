@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays } from 'react-icons
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
+import EmptyState from '../../../components/EmptyState'
 
 // ── Constants ────────────────────────────────────────────────
 const TRANSACTION_TYPE_OPTIONS = [
@@ -347,8 +348,9 @@ export default function FinanceHistoryPage() {
 
   useEffect(() => { loadData() }, [])
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') loadData(filters, e.target.value)
+  const handleSearch = (val) => {
+    setSearch(val)
+    loadData(filters, val)
   }
 
   const handleApplyFilter = (f) => {
@@ -375,47 +377,55 @@ export default function FinanceHistoryPage() {
   const typeLabel = (t) => t === 'debit' ? 'Chiqim' : t === 'credit' ? 'Kirim' : t ?? '—'
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-[calc(100vh-120px)]">
 
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Tarix</h1>
+      {/* Sticky yuqori qism */}
+      <div className="shrink-0 bg-[#F8F9FC] dark:bg-[#191A1A] pb-3">
+        <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF] mb-3">Tarix</h1>
 
-      <div className="flex items-center gap-2">
-        <div className="relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
-            width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-          </svg>
-          <input type="text" placeholder="Qidirish (Enter)" value={search}
-            onChange={e => setSearch(e.target.value)} onKeyDown={handleSearch}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
-              bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]" />
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
+              width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" placeholder="Qidirish" value={search}
+              onChange={e => handleSearch(e.target.value)}
+              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
+                bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
+                dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]" />
+          </div>
+          <button onClick={() => setShowFilter(true)}
+            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+              bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
+              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+            <LuFilter size={13} />
+            Filtrlash
+            {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
+          </button>
         </div>
-        <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
-            bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
-            dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <LuFilter size={13} />
-          Filtrlash
-          {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
-        </button>
       </div>
 
-      <div className="border-y border-[#E2E6F2] dark:border-[#292A2A] overflow-x-auto">
+      {/* Scroll bo'ladigan qism */}
+      <div className="flex-1 overflow-y-auto overflow-x-auto border-t border-b border-[#E2E6F2] dark:border-[#292A2A]">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : data.length === 0 ? (
-          <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Ma'lumot topilmadi</div>
+          <EmptyState
+            icon="/imgs/tarixIcon.svg"
+            title="Tarix bo'sh"
+            description="Hozircha hech qanday operatsiya amalga oshirilmagan"
+          />
         ) : (
           <table className="w-full text-sm whitespace-nowrap">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-[#F8F9FC] dark:bg-[#191A1A]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism sharifi</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Xarajat</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Miqdor (UZS)</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Turi</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Sana</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10 bg-[#F8F9FC] dark:bg-[#191A1A]">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Ism sharifi</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Xarajat</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Miqdor (UZS)</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Turi</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Sana</th>
                 <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">Tasdiqlanish</th>
               </tr>
             </thead>

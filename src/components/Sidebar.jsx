@@ -229,8 +229,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   <Icon size={18} className="shrink-0" />
                   <span className="flex-1 text-left truncate">{group.label}</span>
                   {open
-                    ? <MdExpandLess size={15} className="shrink-0 opacity-50" />
-                    : <MdExpandMore size={15} className="shrink-0 opacity-50" />
+                    ? <MdExpandLess size={20} className="shrink-0 opacity-50" />
+                    : <MdExpandMore size={20} className="shrink-0 opacity-50" />
                   }
                 </button>
               )}

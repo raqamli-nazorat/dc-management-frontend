@@ -8,6 +8,7 @@ import TaskRowMenu     from './components/TaskRowMenu'
 import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
 import AddTaskModal    from './modals/AddTaskModal'
 import EditTaskModal   from './modals/EditTaskModal'
+import EmptyState from '../../../components/EmptyState'
 
 /* ── Columns ── */
 const COLUMNS = [
@@ -377,10 +378,11 @@ export default function TasksPage() {
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="flex items-center justify-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]"
-            style={{ minHeight: 'calc(100vh - 280px)' }}>
-            Ma'lumot topilmadi
-          </div>
+          <EmptyState
+            icon="/imgs/vazifalarIcon.svg"
+            title="Vazifalar topilmadi"
+            description="Yangi vazifa yarating yoki filtrlarni tekshiring"
+          />
         )}
       </div>
 

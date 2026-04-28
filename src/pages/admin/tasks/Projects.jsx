@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical } from 'react-i
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { DateTimeBox } from '../Components/DateTimeBox'
+import EmptyState from '../../../components/EmptyState'
 
 const PROJECTS_DATA = [
   { id: 1, name: 'CRM sistema', manager: "Dudan Turg'unov", status: 'Rejalashtirilmoqda', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
@@ -1074,7 +1075,11 @@ export default function ProjectsPage() {
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Ma'lumot topilmadi</div>
+            <EmptyState
+              icon="/imgs/loyhalarIcon.svg"
+              title="Hozircha loyihalar yo'q"
+              description="Yangi loyiha qo'shish orqali ishni boshlang"
+            />
           )}
         </div>
       )}
@@ -1110,7 +1115,13 @@ export default function ProjectsPage() {
             )
           })}
           {filtered.length === 0 && (
-            <div className="col-span-3 py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Ma'lumot topilmadi</div>
+            <div className="col-span-3">
+              <EmptyState
+                icon="/imgs/loyhalarIcon.svg"
+                title="Hozircha loyihalar yo'q"
+                description="Yangi loyiha qo'shish orqali ishni boshlang"
+              />
+            </div>
           )}
         </div>
       )}

@@ -8,6 +8,7 @@ import { fmt, fmtDate, typeLabel, statusLabel, statusColor, EMPTY_FILTER } from 
 import SorovModal from './payments/modals/SorovModal'
 import XarajatDetailModal from './payments/modals/XarajatDetailModal'
 import FilterModal from './payments/modals/FilterModal'
+import EmptyState from '../../../components/EmptyState'
 
 // ── API ──────────────────────────────────────────────────────
 function buildParams(filters, search) {
@@ -164,7 +165,9 @@ export default function PaymentsPage() {
   })
 
   const handleSearch = (e) => {
-    if (e.key === 'Enter') loadPayments(filters, e.target.value)
+    const val = e.target.value
+    setSearch(val)
+    loadPayments(filters, val)
   }
 
   const handleApplyFilter = async (f) => {
@@ -272,10 +275,9 @@ export default function PaymentsPage() {
             </svg>
             <input
               type="text"
-              placeholder="Qidirish (Enter)"
+              placeholder="Qidirish"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={handleSearch}
+              onChange={e => handleSearch(e)}
               className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]"
@@ -297,7 +299,11 @@ export default function PaymentsPage() {
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : payments.length === 0 ? (
-          <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Ma'lumot topilmadi</div>
+          <EmptyState
+            icon="/imgs/xarajatlarIcon.svg"
+            title="So'rovlar mavjud emas"
+            description="Yangi xarajat so'rovi yuborish uchun tugmadan foydalaning"
+          />
         ) : (
           <table className="w-full text-sm whitespace-nowrap">
             <thead className="sticky top-0 z-10 bg-[#F8F9FC] dark:bg-[#191A1A]">

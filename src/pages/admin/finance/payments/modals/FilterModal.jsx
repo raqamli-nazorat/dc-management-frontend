@@ -13,16 +13,28 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      
+      <div className="fixed inset-0 bg-black/60" />
+       <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
+              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+              <FaXmark size={14} />
+            </button>
+      
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+        
+        
 
         {/* Header */}
         <div className="px-6 pt-6 pb-3">
-          <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-              <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
-            </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+          
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+                <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
+              </button>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+            </div>
+           
           </div>
           <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
