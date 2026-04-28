@@ -157,7 +157,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
             </div>
 
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ">
             Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
