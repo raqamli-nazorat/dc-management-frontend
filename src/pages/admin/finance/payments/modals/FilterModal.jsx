@@ -36,7 +36,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
             </div>
            
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mb-5">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
