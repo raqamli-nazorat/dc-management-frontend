@@ -46,12 +46,12 @@ export const EMPTY_FILTER = {
 // ── Formatters ───────────────────────────────────────────────
 export function fmt(n) {
   const num = parseFloat(n)
-  if (isNaN(num)) return '—'
+  if (isNaN(num)) return ''
   return Math.abs(num).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 export function fmtDate(iso) {
-  if (!iso) return '—'
+  if (!iso) return ''
   return new Date(iso).toLocaleString('ru-RU', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',

@@ -18,12 +18,12 @@ const EMPTY_FILTER = {
 
 function fmt(n) {
   const num = parseFloat(n)
-  if (isNaN(num)) return '—'
+  if (isNaN(num)) return ''
   return Math.abs(num).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function fmtDate(iso) {
-  if (!iso) return '—'
+  if (!iso) return ''
   return new Date(iso).toLocaleString('ru-RU', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
@@ -31,7 +31,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
-const iCls = 'w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
 
 // ── API ──────────────────────────────────────────────────────
 async function apiGetPayrolls(params = {}) {
@@ -76,8 +76,12 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
       )}
       <input ref={ref} type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={type === 'time' ? '00:00' : ''}
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
-          placeholder-[#B6BCCB] dark:placeholder-[#474848] [&::-webkit-calendar-picker-indicator]:hidden" />
+        className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
+          placeholder-[#B6BCCB] dark:placeholder-[#474848]
+          [&::-webkit-calendar-picker-indicator]:hidden
+          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : '[&::-webkit-datetime-edit]:opacity-0'}
+        `}
+      />
       <button type="button" onClick={() => ref.current?.showPicker?.()}
         className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] transition-colors">
         {icon}
@@ -134,7 +138,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60 " />
       <button onClick={onClose} className="w-8 absolute top-5 right-5 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
               bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
@@ -247,10 +251,10 @@ function Field({ label, value, right, red }) {
   return (
     <div>
       <label className="block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5">{label}</label>
-      <div className={`w-full px-3 py-2.5 rounded-xl text-sm border
+      <div className={`w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
         bg-white border-[#E2E6F2] text-[#1A1D2E]
         dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]
-        ${right ? 'text-right' : ''}
+        ${right ? 'justify-end' : ''}
         ${red ? 'text-[#E02D2D]! dark:text-[#FA5252]!' : ''}`}>
         {value}
       </div>
@@ -303,15 +307,22 @@ function UserDetailModal({ user, onClose, onApprove }) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/60" />
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+              bg-[#F1F3F9] absolute top-7 right-7 hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+              <FaXmark size={14}/>
+            </button>
         <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 flex items-center gap-3">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0">
-              <FaArrowLeft size={16} />
-            </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi ma'lumotlari</h2>
+          <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0">
+                <FaArrowLeft size={16} />
+              </button>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi ma'lumotlari</h2>
+            </div>
+          
           </div>
 
           {/* User info */}
@@ -323,13 +334,13 @@ function UserDetailModal({ user, onClose, onApprove }) {
               </div>
             }
             <div>
-              <p className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? '—'}</p>
+              <p className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? ''}</p>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                  Viloyat: <span className="font-bold">{u.region ?? '—'}</span>
+                  Viloyat: <span className="font-bold">{u.region ?? ''}</span>
                 </span>
                 <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                  Tuman: <span className="font-bold">{u.district ?? '—'}</span>
+                  Tuman: <span className="font-bold">{u.district ?? ''}</span>
                 </span>
               </div>
             </div>
@@ -337,14 +348,14 @@ function UserDetailModal({ user, onClose, onApprove }) {
 
           {/* Fields */}
           <div className="px-6 pb-4 grid grid-cols-2 gap-3">
-            <Field label="Lavozimi" value={u.position ?? '—'} />
+            <Field label="Lavozimi" value={u.position ?? ''} />
             <div>
               <label className="block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5">Passport ma'lumotlari</label>
               <div className="flex gap-2">
-                <div className="w-16 shrink-0 px-3 py-2.5 rounded-xl text-sm text-center border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
                   {u.passport_series?.slice(0, 2) ?? ''}
                 </div>
-                <div className="flex-1 px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
                   {u.passport_series?.slice(2)?.trim() ?? ''}
                 </div>
               </div>
@@ -352,7 +363,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <Field label="Oylik maosh" value={fmt(user.fixed_salary)} />
             <Field label="KPI bonus" value={fmt(user.kpi_bonus)} />
             <Field label="Yaratilgan vaqti" value={fmtDate(user.created_at)} />
-            <Field label="Oy" value={user.month_display ?? '—'} />
+            <Field label="Oy" value={user.month_display ?? ''} />
             <Field label="Jarima miqdori (UZS)" value={`-${fmt(user.penalty_amount)}`} red right />
             <Field label="Jami miqdori (UZS)" value={fmt(user.total_amount)} right />
           </div>
@@ -524,7 +535,7 @@ export default function SalaryPage() {
 
         {/* Info tooltip */}
         <div className="relative group flex items-center gap-2">
-          <div className="absolute right-9 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
+          <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
             bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A]
             opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
             Ish haqi har oyning 4-sanasidan boshlab tasdiqlanadi.
@@ -576,8 +587,8 @@ export default function SalaryPage() {
                     </td>
                   )}
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u.user_info?.username ?? '—'}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.month_display ?? '—'}</td>
+                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u.user_info?.username ?? ''}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.month_display ?? ''}</td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.fixed_salary)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.kpi_bonus)}</td>
                   <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.penalty_amount)}</td>

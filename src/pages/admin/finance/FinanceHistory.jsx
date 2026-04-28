@@ -34,7 +34,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
-const iCls = 'w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
 const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]'
 
 // ── API ──────────────────────────────────────────────────────
@@ -136,7 +136,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
         <div className="px-6 pt-6 pb-3">

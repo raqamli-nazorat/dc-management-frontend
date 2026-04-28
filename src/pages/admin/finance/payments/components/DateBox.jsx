@@ -20,10 +20,11 @@ export function DateBox({ type, value, onChange, icon, placeholder }) {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={type === 'time' ? '00:00' : ''}
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent
-          text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
+        className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
           placeholder-[#B6BCCB] dark:placeholder-[#474848]
-          [&::-webkit-calendar-picker-indicator]:hidden"
+          [&::-webkit-calendar-picker-indicator]:hidden
+          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : '[&::-webkit-datetime-edit]:opacity-0'}
+        `}
       />
       <button
         type="button"

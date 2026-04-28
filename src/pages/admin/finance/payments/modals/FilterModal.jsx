@@ -12,7 +12,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
   const categoryOptions = categories.map(c => ({ label: c.title, value: String(c.id) }))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       
       <div className="fixed inset-0 bg-black/60" />
        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
@@ -78,7 +78,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
             <div className=" grid-cols-2 gap-4 flex">
               <input
                 inputMode="decimal"
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="dan: 0"
@@ -87,7 +87,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               />
               <input
                 inputMode="decimal"
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="gacha: 0"

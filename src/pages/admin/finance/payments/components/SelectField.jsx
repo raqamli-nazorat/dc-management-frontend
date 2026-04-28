@@ -3,7 +3,7 @@ import { useDropdown } from '../useDropdown'
 import { labelCls } from '../constants'
 
 const triggerCls = (hasVal, error) =>
-  `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+  `w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
    bg-white dark:bg-[#191A1A]
    ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
    ${hasVal ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`
