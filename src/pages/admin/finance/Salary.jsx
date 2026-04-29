@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -310,10 +310,10 @@ function UserDetailModal({ user, onClose, onApprove }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
               bg-[#F1F3F9] absolute top-7 right-7 hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
-              <FaXmark size={14}/>
-            </button>
+          <FaXmark size={14} />
+        </button>
         <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
@@ -324,7 +324,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
               </button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi ma'lumotlari</h2>
             </div>
-          
+
           </div>
 
           {/* User info */}
@@ -375,7 +375,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
-              <FaXmark size={13} /> Bekor qilish
+              <FaXmark size={13} /> {user.is_confirmed ? 'Yopish' : 'Bekor qilish'}
             </button>
             {!user.is_confirmed && (
               <button onClick={() => setShowConfirm(true)}
@@ -490,67 +490,72 @@ export default function SalaryPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-[calc(100vh-120px)]">
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
-        {selecting ? (
-          <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
-              bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
-            <FaXmark size={13} /> Bekor qilish
-          </button>
-        ) : (
-          <button onClick={() => setSelecting(true)}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
-              bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
-            <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
-            Tanlash
-          </button>
-        )}
-      </div>
+      {/* Yuqori qism — qotib turadi */}
+      <div className="shrink-0 bg-[#F8F9FC] dark:bg-[#191A1A]">
 
-      {/* Filters + Tooltip */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
-              width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
-              onChange={e => handleSearch(e.target.value)}
-              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[280px]
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
+          {selecting ? (
+            <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+              bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
+              <FaXmark size={13} /> Bekor qilish
+            </button>
+          ) : (
+            <button onClick={() => setSelecting(true)}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+              bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
+              <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
+              Tanlash
+            </button>
+          )}
+        </div>
+
+        {/* Filters + Tooltip */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
+                width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
+                onChange={e => handleSearch(e.target.value)}
+                className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[280px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]"/>
-          </div>
-          <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+            </div>
+            <button onClick={() => setShowFilter(true)}
+              className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-            <LuFilter size={13} />
-            Filtrlash
-            {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
-          </button>
-        </div>
+              <LuFilter size={13} />
+              Filtrlash
+              {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
+            </button>
+          </div>
 
-        {/* Info tooltip */}
-        <div className="relative group flex items-center gap-2">
-          <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
+          {/* Info tooltip */}
+          <div className="relative group flex items-center gap-2">
+            <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
             bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A]
             opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-            Ish haqi har oyning 4-sanasidan boshlab tasdiqlanadi.
+              Ish haqi har oyning 4-sanasidan boshlab tasdiqlanadi.
+            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
+              <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
+            </button>
           </div>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-          <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
-            <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
-          </button>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="  overflow-x-auto">
+      </div>{/* /shrink-0 */}
+
+      {/* Table — scroll bo'ladigan qism */}
+      <div className="flex-1 overflow-y-auto overflow-x-auto">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : data.length === 0 ? (
@@ -561,28 +566,28 @@ export default function SalaryPage() {
           />
         ) : (
           <table className="w-full text-sm whitespace-nowrap">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-[#F8F9FC] dark:bg-[#191A1A]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
                 {selecting && (
-                  <th className="w-10 px-4 py-3 text-left">
+                  <th className="w-10 px-4 py-3 text-left bg-[#F8F9FC] dark:bg-[#191A1A]">
                     <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]" />
                   </th>
                 )}
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№	</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism sharifi</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oy</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oylik maosh (UZS)</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">KPI bonus (UZS)</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jarima miqdori (UZS)</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Jami miqdori (UZS)</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan vaqt</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10 bg-[#F8F9FC] dark:bg-[#191A1A]">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Ism sharifi</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Oy</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Oylik maosh (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">KPI bonus (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Jarima miqdori (UZS)</th>
+                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Jami miqdori (UZS)</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Yaratilgan vaqt</th>
                 <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">Tasdiqlanish</th>
-              </tr>
+              </tr> 
             </thead>
             <tbody>
               {data.map((u, idx) => (
                 <tr key={u.id} onClick={() => handleRowClick(u)}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   {selecting && (
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <input type="checkbox" checked={selected.has(u.id)} onChange={() => toggleOne(u.id)} className="cursor-pointer accent-[#3F57B3]" />
@@ -596,7 +601,7 @@ export default function SalaryPage() {
                   <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.penalty_amount)}</td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.total_amount)}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(u.created_at)}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]" onClick={e => e.stopPropagation()}>
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] transition-colors" onClick={e => e.stopPropagation()}>
                     {u.is_confirmed
                       ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
                         <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>

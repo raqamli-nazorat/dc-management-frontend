@@ -339,9 +339,9 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end ">
           <button onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
               text-[#3F57B3] hover:bg-[#EEF1FB] dark:text-[#7F95E6] dark:hover:bg-[#292A2A]">
-            Yopish
+            <FaXmark size={13} /> Yopish
           </button>
         </div>
       </div>
