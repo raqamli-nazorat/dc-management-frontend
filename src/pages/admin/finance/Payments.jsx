@@ -15,13 +15,13 @@ import { getErrorMessage } from '../../../service/getErrorMessage'
 // ── API ──────────────────────────────────────────────────────
 function buildParams(filters, search, forceMyRequests) {
   const p = {}
-  if (search)                          p.search           = search
-  if (filters.type)                    p.type             = filters.type
-  if (filters.status)                  p.status           = filters.status
-  if (filters.expense_category)        p.expense_category = filters.expense_category
-  if (filters.project)                 p.project          = filters.project
-  if (filters.amount__gte)             p.amount__gte      = filters.amount__gte
-  if (filters.amount__lte)             p.amount__lte      = filters.amount__lte
+  if (search) p.search = search
+  if (filters.type) p.type = filters.type
+  if (filters.status) p.status = filters.status
+  if (filters.expense_category) p.expense_category = filters.expense_category
+  if (filters.project) p.project = filters.project
+  if (filters.amount__gte) p.amount__gte = filters.amount__gte
+  if (filters.amount__lte) p.amount__lte = filters.amount__lte
 
   if (filters.created_at__date__gte) {
     p.created_at__gte = filters.created_at__time__gte
@@ -114,10 +114,10 @@ export default function PaymentsPage() {
   const { user } = useAuth()
 
   // ── Rol aniqlash ──
-  const roles        = user?.roles ?? []
-  const isEmployee   = roles.includes('employee')
-  const isManager    = roles.includes('manager')
-  const isAdmin      = roles.includes('admin') || roles.includes('superadmin')
+  const roles = user?.roles ?? []
+  const isEmployee = roles.includes('employee')
+  const isManager = roles.includes('manager')
+  const isAdmin = roles.includes('admin') || roles.includes('superadmin')
   const isAccountant = roles.includes('accountant')
 
   // employee → my_requests=true majburiy; qolganlar → false (hammasi ko'rinadi)
@@ -130,16 +130,16 @@ export default function PaymentsPage() {
   // (admin ham o'z so'rovlarini o'chira oladi, lekin boshqalarnikini emas — backend hal qiladi)
   const canSelect = isAdmin || isManager || isEmployee
 
-  const [payments, setPayments]           = useState([])
-  const [categories, setCategories]       = useState([])
-  const [projects, setProjects]           = useState([])
-  const [loading, setLoading]             = useState(false)
-  const [search, setSearch]               = useState('')
-  const [filters, setFilters]             = useState(EMPTY_FILTER)
-  const [showFilter, setShowFilter]       = useState(false)
-  const [showSorov, setShowSorov]         = useState(false)
-  const [selecting, setSelecting]         = useState(false)
-  const [selected, setSelected]           = useState(new Set())
+  const [payments, setPayments] = useState([])
+  const [categories, setCategories] = useState([])
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+  const [filters, setFilters] = useState(EMPTY_FILTER)
+  const [showFilter, setShowFilter] = useState(false)
+  const [showSorov, setShowSorov] = useState(false)
+  const [selecting, setSelecting] = useState(false)
+  const [selected, setSelected] = useState(new Set())
   const [detailPayment, setDetailPayment] = useState(null)
 
   const hasFilter = Object.entries(filters).some(([, v]) => v && v !== false)
@@ -176,7 +176,7 @@ export default function PaymentsPage() {
   const allSelected = payments.length > 0 && payments.every(p => selected.has(p.id))
   const toggleAll = () => {
     if (allSelected) setSelected(prev => { const s = new Set(prev); payments.forEach(p => s.delete(p.id)); return s })
-    else             setSelected(prev => { const s = new Set(prev); payments.forEach(p => s.add(p.id)); return s })
+    else setSelected(prev => { const s = new Set(prev); payments.forEach(p => s.add(p.id)); return s })
   }
   const toggleOne = (id) => setSelected(prev => {
     const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s
@@ -338,7 +338,7 @@ export default function PaymentsPage() {
               {payments.map((p, idx) => (
                 <tr key={p.id}
                   onClick={() => canSelect && selecting ? toggleOne(p.id) : setDetailPayment(p)}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   {canSelect && selecting && (
                     <td className="px-4 py-3 w-10" onClick={e => e.stopPropagation()}>
                       <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} className="cursor-pointer accent-[#3F57B3]" />
@@ -353,7 +353,8 @@ export default function PaymentsPage() {
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.paid_at)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.confirmed_at)}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.project_info?.title ?? ''}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] 
+                  group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] transition-colors">
                     <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(p.status)}`}>
                       {statusLabel(p.status)}
                     </span>

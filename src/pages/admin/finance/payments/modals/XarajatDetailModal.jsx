@@ -1,6 +1,6 @@
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
-import { fmt, typeLabel, methodLabel, labelCls } from '../constants'
+import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
 
 const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
   bg-[#F8F9FC] border-[#E2E6F2] text-[#1A1D2E]
@@ -85,7 +85,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {isCard && payment.card_number && (
               <div>
                 <label className={labelCls}>Karta raqam</label>
-                <div className={`${fieldCls} font-mono tracking-wider`}>{payment.card_number}</div>
+                <div className={`${fieldCls} font-mono tracking-wider`}>{fmtCard(payment.card_number)}</div>
               </div>
             )}
           </div>
