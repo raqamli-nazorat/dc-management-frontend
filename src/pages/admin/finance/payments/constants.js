@@ -52,10 +52,10 @@ export function fmt(n) {
 
 export function fmtDate(iso) {
   if (!iso) return ''
-  return new Date(iso).toLocaleString('ru-RU', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  return `${date} ${time}`
 }
 
 export function fmtMoney(raw) {
