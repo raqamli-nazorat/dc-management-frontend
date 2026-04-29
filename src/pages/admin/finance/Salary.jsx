@@ -1,9 +1,10 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
+import { getErrorMessage } from '../../../service/getErrorMessage'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
@@ -33,7 +34,7 @@ function fmtDate(iso) {
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
 
-// ── API ──────────────────────────────────────────────────────
+// -- API ------------------------------------------------------
 async function apiGetPayrolls(params = {}) {
   const res = await axiosAPI.get('/payroll/', { params })
   const payload = res.data?.data ?? res.data
@@ -50,7 +51,7 @@ async function apiConfirmPayrolls(payroll_ids) {
   return res.data?.data ?? res.data
 }
 
-// ── useDropdown ──────────────────────────────────────────────
+// -- useDropdown ----------------------------------------------
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -62,7 +63,7 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-// ── DateBox ──────────────────────────────────────────────────
+// -- DateBox --------------------------------------------------
 function DateBox({ type, value, onChange, icon, placeholder }) {
   const ref = useRef(null)
   const isEmpty = !value
@@ -90,7 +91,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
   )
 }
 
-// ── Toggle ───────────────────────────────────────────────────
+// -- Toggle ---------------------------------------------------
 function Toggle({ checked, onChange }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
@@ -100,7 +101,7 @@ function Toggle({ checked, onChange }) {
   )
 }
 
-// ── MonthDropdownFull ─────────────────────────────────────────
+// -- MonthDropdownFull -----------------------------------------
 function MonthDropdownFull({ value, onChange }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -132,7 +133,7 @@ function MonthDropdownFull({ value, onChange }) {
   )
 }
 
-// ── SalaryFilterModal ─────────────────────────────────────────
+// -- SalaryFilterModal -----------------------------------------
 function SalaryFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
@@ -226,7 +227,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
+        <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
@@ -246,7 +247,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
   )
 }
 
-// ── Field helper ──────────────────────────────────────────────
+// -- Field helper ----------------------------------------------
 function Field({ label, value, right, red }) {
   return (
     <div>
@@ -262,7 +263,7 @@ function Field({ label, value, right, red }) {
   )
 }
 
-// ── ConfirmModal ──────────────────────────────────────────────
+// -- ConfirmModal ----------------------------------------------
 function ConfirmModal({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
@@ -299,7 +300,7 @@ function ConfirmModal({ onCancel, onConfirm }) {
   )
 }
 
-// ── UserDetailModal ───────────────────────────────────────────
+// -- UserDetailModal -------------------------------------------
 function UserDetailModal({ user, onClose, onApprove }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const u = user.user_info ?? {}
@@ -369,7 +370,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
+          <div className="px-6 py-4 flex items-center justify-end gap-3 ">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
@@ -398,7 +399,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
   )
 }
 
-// ── Main Page ─────────────────────────────────────────────────
+// -- Main Page -------------------------------------------------
 export default function SalaryPage() {
   const [search, setSearch] = useState('')
   const [data, setData] = useState([])
@@ -434,7 +435,7 @@ export default function SalaryPage() {
       setData(result)
     } catch (err) {
       console.error(err)
-      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     } finally {
       setLoading(false)
     }
@@ -460,7 +461,7 @@ export default function SalaryPage() {
       toast.success("Tasdiqlandi", "Ish haqi muvaffaqiyatli tasdiqlandi.")
     } catch (err) {
       console.error(err)
-      toast.error("Tasdiqlashda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "Tasdiqlashda xatolik yuz berdi."))
     }
   }
 
@@ -472,7 +473,7 @@ export default function SalaryPage() {
       setDetailUser(detail)
     } catch (err) {
       console.error(err)
-      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     }
   }
 
@@ -548,7 +549,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Table */}
-      <div className="border-y border-[#E2E6F2] dark:border-[#292A2A] overflow-x-auto">
+      <div className="  overflow-x-auto">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : data.length === 0 ? (
@@ -566,7 +567,7 @@ export default function SalaryPage() {
                     <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]" />
                   </th>
                 )}
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№	</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Ism sharifi</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oy</th>
                 <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Oylik maosh (UZS)</th>
