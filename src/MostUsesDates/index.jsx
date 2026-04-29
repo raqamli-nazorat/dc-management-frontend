@@ -33,7 +33,6 @@ export const usePositions = () => {
 }
 
 export const Roles = {
-    superadmin: 'Bosh administrator',
     admin: 'Admin',
     manager: 'Menejer',
     employee: 'Xodim',
