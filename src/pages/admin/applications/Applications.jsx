@@ -263,7 +263,7 @@ const ApplicationsPage = () => {
                         options={Object.values(Status)}
                         value={statuses(application.status)}
                         onChange={(value) => openConfirmModal(application, value)}
-                        width='130px'
+                        width='150px'
                       />
                     </td>
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white font-medium">

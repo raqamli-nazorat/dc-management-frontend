@@ -55,7 +55,6 @@ const menuByRole = {
         { label: 'Arizalar',   path: '/admin/applications' },
         { label: 'Lavozimlar', path: '/admin/applications/positions' },
         { label: 'Viloyatlar', path: '/admin/applications/regions' },
-        { label: 'Tumanlar',   path: '/admin/applications/districts' },
       ],
     },
   ],

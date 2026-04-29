@@ -16,6 +16,8 @@ const ApplicationDetail = () => {
   const [copyText, setCopyText] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  const [conclusion, setConclusion] = useState(null)
+
   useEffect(() => {
     const fetchApplication = async () => {
       try {
@@ -220,8 +222,32 @@ const ApplicationDetail = () => {
             <textarea
               className={`${inputCls} h-[120px]`}
               placeholder='Xodim hulosasini kiriting'
-              value={application.conclusion || ''}
+              value={conclusion || application.conclusion}
+              onChange={(e) => setConclusion(e.target.value)}
             />
+            {/* <div className="flex gap-4 mt-3">
+              <button
+                onClick={() => handleStatusChange("pending")}
+                className="flex-1 px-4 py-2 rounded-xl font-semibold transition-colors hover:opacity-80"
+                style={{ fontSize: 14, backgroundColor: '#F1F3F9', color: '#5B6078' }}
+              >
+                Kutilmoqda
+              </button>
+              <button
+                onClick={() => handleStatusChange("accepted")}
+                className="flex-1 px-4 py-2 rounded-xl font-semibold transition-colors hover:opacity-80"
+                style={{ fontSize: 14, backgroundColor: '#526ED3', color: '#FFFFFF' }}
+              >
+                Qabul qilish
+              </button>
+              <button
+                onClick={() => handleStatusChange("rejected")}
+                className="flex-1 px-4 py-2 rounded-xl font-semibold transition-colors hover:opacity-80"
+                style={{ fontSize: 14, backgroundColor: '#F5F5F5', color: '#8F95A8' }}
+              >
+                Rad etish
+              </button>
+            </div> */}
           </div>
         )}
       </div>
