@@ -139,6 +139,7 @@ function TimeBox({ value, onChange }) {
     <div className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
       bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text w-[90px]">
       <input ref={ref} type="time" value={value || '00:00'} onChange={e => onChange(e.target.value)}
+        step="60"
         className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
           [&::-webkit-calendar-picker-indicator]:hidden"
       />

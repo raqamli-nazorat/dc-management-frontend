@@ -77,6 +77,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
       )}
       <input ref={ref} type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={type === 'time' ? '00:00' : ''}
+        step={type === 'time' ? '60' : undefined}
         className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
           placeholder-[#B6BCCB] dark:placeholder-[#474848]
           [&::-webkit-calendar-picker-indicator]:hidden
