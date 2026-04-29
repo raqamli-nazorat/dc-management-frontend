@@ -38,14 +38,14 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/admin/payments' },
-        { label: 'Ish haqi', path: '/admin/finance' },
-        { label: 'Tarix', path: '/admin/finance/history' },
+        { label: 'Ish haqi',           path: '/admin/finance' },
+        { label: 'Tarix',              path: '/admin/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
-        { label: 'Umumiy', path: '/admin/reports' },
+        { label: 'Umumiy',   path: '/admin/reports' },
         { label: 'Xodimlar', path: '/admin/reports/staff' },
       ],
     },
@@ -70,13 +70,17 @@ const menuByRole = {
     {
       label: 'Loyihalar', icon: IconFolder,
       children: [
-        { label: 'Faol', path: '/menager/projects' },
+        { label: 'Faol',  path: '/menager/projects' },
         { label: 'Arxiv', path: '/menager/projects/archive' },
       ],
     },
     {
       label: 'Moliya', icon: IconBriefcaseDollar,
-      children: [{ label: 'Byudjet', path: '/menager/finance' }],
+      children: [
+        { label: "Xarajat so'rovlari", path: '/menager/payments' },
+        { label: 'Ish haqi',           path: '/menager/finance' },
+        { label: 'Tarix',              path: '/menager/finance/history' },
+      ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
@@ -90,7 +94,7 @@ const menuByRole = {
     {
       label: 'Vazifalarim', icon: IconUserGroup,
       children: [
-        { label: 'Joriy', path: '/xodim/tasks' },
+        { label: 'Joriy',      path: '/xodim/tasks' },
         { label: 'Bajarilgan', path: '/xodim/tasks/done' },
       ],
     },
@@ -100,13 +104,27 @@ const menuByRole = {
     },
     {
       label: 'Moliya', icon: IconBriefcaseDollar,
-      children: [{ label: 'Maosh', path: '/xodim/salary' }],
+      children: [
+        { label: "Xarajat so'rovlari", path: '/xodim/payments' },
+        { label: 'Ish haqi',           path: '/xodim/finance' },
+        { label: 'Tarix',              path: '/xodim/finance/history' },
+      ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
         { label: 'Faoliyat', path: '/xodim/reports' },
         { label: 'Kalendar', path: '/xodim/calendar' },
+      ],
+    },
+  ],
+  hisobchi: [
+    {
+      label: 'Moliya', icon: IconBriefcaseDollar,
+      children: [
+        { label: "Xarajat so'rovlari", path: '/hisobchi/payments' },
+        { label: 'Ish haqi',           path: '/hisobchi/finance' },
+        { label: 'Tarix',              path: '/hisobchi/finance/history' },
       ],
     },
   ],

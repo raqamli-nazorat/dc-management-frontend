@@ -32,64 +32,81 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <PageActionProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Admin */}
-            <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="users/detail/:id" element={<AdminUserDetail />} />
-              <Route path="roles" element={PH('Rollar')} />
-              <Route path="projects" element={<AdminProjects />} />
-              <Route path="projects/archive" element={PH('Arxiv')} />
-              <Route path="tasks" element={<AdminTasks />} />
-              <Route path="meetings" element={<AdminMeetings />} />
-              <Route path="payments" element={<AdminPayments />} />
-              <Route path="finance" element={<AdminSalary />} />
-              <Route path="finance/history" element={<AdminFinanceHistory />} />
-              <Route path="reports" element={PH('Hisobotlar')} />
-              <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
-              <Route path="applications" element={<AdminApplications />} />
-              <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
-              <Route path="applications/positions" element={<AdminPositions />} />
-              <Route path="applications/regions" element={<AdminRegions />} />
-              <Route path="applications/districts" element={<AdminDistricts />} />
-              <Route path="messages" element={PH('Xabarlar')} />
-              <Route path="settings" element={PH('Sozlamalar')} />
-            </Route>
+              {/* ── Admin ── */}
+              <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="users/detail/:id" element={<AdminUserDetail />} />
+                <Route path="roles" element={PH('Rollar')} />
+                <Route path="projects" element={<AdminProjects />} />
+                <Route path="projects/archive" element={PH('Arxiv')} />
+                <Route path="tasks" element={<AdminTasks />} />
+                <Route path="meetings" element={<AdminMeetings />} />
+                {/* Moliya — 3 sahifa */}
+                <Route path="payments" element={<AdminPayments />} />
+                <Route path="finance" element={<AdminSalary />} />
+                <Route path="finance/history" element={<AdminFinanceHistory />} />
+                <Route path="reports" element={PH('Hisobotlar')} />
+                <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
+                <Route path="applications" element={<AdminApplications />} />
+                <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
+                <Route path="applications/positions" element={<AdminPositions />} />
+                <Route path="applications/regions" element={<AdminRegions />} />
+                <Route path="applications/districts" element={<AdminDistricts />} />
+                <Route path="messages" element={PH('Xabarlar')} />
+                <Route path="settings" element={PH('Sozlamalar')} />
+              </Route>
 
-            {/* Menager */}
-            <Route path="/menager" element={<ProtectedRoute allowedRole="menager"><Layout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<MenagerDashboard />} />
-              <Route path="team" element={PH('Xodimlar')} />
-              <Route path="tasks" element={PH('Vazifalar')} />
-              <Route path="projects" element={PH('Loyihalar')} />
-              <Route path="projects/archive" element={PH('Arxiv')} />
-              <Route path="finance" element={PH('Byudjet')} />
-              <Route path="calendar" element={PH('Kalendar')} />
-              <Route path="messages" element={PH('Xabarlar')} />
-              <Route path="settings" element={PH('Sozlamalar')} />
-            </Route>
+              {/* ── Menager ── */}
+              <Route path="/menager" element={<ProtectedRoute allowedRole="menager"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<MenagerDashboard />} />
+                <Route path="team" element={PH('Xodimlar')} />
+                <Route path="tasks" element={PH('Vazifalar')} />
+                <Route path="projects" element={PH('Loyihalar')} />
+                <Route path="projects/archive" element={PH('Arxiv')} />
+                {/* Moliya — 3 sahifa */}
+                <Route path="payments" element={<AdminPayments />} />
+                <Route path="finance" element={<AdminSalary />} />
+                <Route path="finance/history" element={<AdminFinanceHistory />} />
+                <Route path="calendar" element={PH('Kalendar')} />
+                <Route path="messages" element={PH('Xabarlar')} />
+                <Route path="settings" element={PH('Sozlamalar')} />
+              </Route>
 
-            {/* Xodim */}
-            <Route path="/xodim" element={<ProtectedRoute allowedRole="xodim"><Layout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<XodimDashboard />} />
-              <Route path="tasks" element={PH('Joriy vazifalar')} />
-              <Route path="tasks/done" element={PH('Bajarilgan vazifalar')} />
-              <Route path="projects" element={PH('Loyihalar')} />
-              <Route path="salary" element={PH('Maosh')} />
-              <Route path="reports" element={PH('Faoliyat')} />
-              <Route path="calendar" element={PH('Kalendar')} />
-              <Route path="messages" element={PH('Xabarlar')} />
-              <Route path="profile" element={PH('Profilim')} />
-              <Route path="support" element={PH("Qo'llab-quvvatlash")} />
-              <Route path="settings" element={PH('Sozlamalar')} />
-            </Route>
+              {/* ── Xodim ── */}
+              <Route path="/xodim" element={<ProtectedRoute allowedRole="xodim"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<XodimDashboard />} />
+                <Route path="tasks" element={PH('Joriy vazifalar')} />
+                <Route path="tasks/done" element={PH('Bajarilgan vazifalar')} />
+                <Route path="projects" element={PH('Loyihalar')} />
+                {/* Moliya — 3 sahifa */}
+                <Route path="payments" element={<AdminPayments />} />
+                <Route path="finance" element={<AdminSalary />} />
+                <Route path="finance/history" element={<AdminFinanceHistory />} />
+                <Route path="reports" element={PH('Faoliyat')} />
+                <Route path="calendar" element={PH('Kalendar')} />
+                <Route path="messages" element={PH('Xabarlar')} />
+                <Route path="profile" element={PH('Profilim')} />
+                <Route path="support" element={PH("Qo'llab-quvvatlash")} />
+                <Route path="settings" element={PH('Sozlamalar')} />
+              </Route>
 
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
+              {/* ── Hisobchi ── */}
+              <Route path="/hisobchi" element={<ProtectedRoute allowedRole="hisobchi"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<AdminPayments />} />
+                {/* Moliya — 3 sahifa */}
+                <Route path="payments" element={<AdminPayments />} />
+                <Route path="finance" element={<AdminSalary />} />
+                <Route path="finance/history" element={<AdminFinanceHistory />} />
+                <Route path="settings" element={PH('Sozlamalar')} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
           </PageActionProvider>
         </AuthProvider>
       </ThemeProvider>
