@@ -30,7 +30,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             </div>
           
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ">
             Ma'lumotlarni tekshirib, so'rov bo'yicha qaror qabul qiling
           </p>
         </div>
