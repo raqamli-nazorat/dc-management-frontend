@@ -9,6 +9,7 @@ import SorovModal from './payments/modals/SorovModal'
 import XarajatDetailModal from './payments/modals/XarajatDetailModal'
 import FilterModal from './payments/modals/FilterModal'
 import EmptyState from '../../../components/EmptyState'
+import { getErrorMessage } from '../../../service/getErrorMessage'
 
 // ── API ──────────────────────────────────────────────────────
 function buildParams(filters, search) {
@@ -134,7 +135,7 @@ export default function PaymentsPage() {
       setPayments(data)
     } catch (err) {
       console.error(err)
-      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     } finally {
       setLoading(false)
     }
@@ -183,8 +184,12 @@ export default function PaymentsPage() {
       setShowSorov(false)
       toast.success("So'rov yuborildi", "So'rovingiz muvaffaqiyatli yuborildi.")
     } catch (err) {
-      console.error(err)
-      toast.error("So'rov yuborishda xatolik yuz berdi.")
+      console.error('=== SO\'ROV XATOLIK ===')
+      console.error('Status:', err?.response?.status)
+      console.error('Data:', err?.response?.data)
+      console.error('Error detail:', err?.response?.data?.error)
+      console.error('Full error:', err)
+      toast.error(getErrorMessage(err, "So'rov yuborishda xatolik yuz berdi."))
     }
   }
 
@@ -195,7 +200,7 @@ export default function PaymentsPage() {
       toast.delete(`${selected.size} ta so'rov o'chirildi.`)
     } catch (err) {
       console.error(err)
-      toast.error("O'chirishda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "O'chirishda xatolik yuz berdi."))
     } finally {
       setSelecting(false)
       setSelected(new Set())
@@ -208,9 +213,9 @@ export default function PaymentsPage() {
       setPayments(prev => prev.map(p => p.id === id ? { ...p, ...updated, status: 'paid' } : p))
       toast.success("To'lov qilindi", "Xarajat so'rovi muvaffaqiyatli to'landi.")
     } catch (err) {
-      console.error('Pay error:', err)
-      const errorMsg = err.response?.data?.message || err.response?.data?.detail || err.message || "To'lovda xatolik yuz berdi."
-      toast.error(errorMsg)
+      console.error('=== TO\'LOV XATOLIK ===', err?.response?.status)
+      console.error('Response data:', JSON.stringify(err?.response?.data, null, 2))
+      toast.error(getErrorMessage(err, "To'lovda xatolik yuz berdi."))
     }
   }
 
@@ -220,9 +225,9 @@ export default function PaymentsPage() {
       setPayments(prev => prev.map(p => p.id === id ? { ...p, ...updated, status: 'confirmed' } : p))
       toast.success("Tasdiqlandi", "Xarajat so'rovi muvaffaqiyatli tasdiqlandi.")
     } catch (err) {
-      console.error('Confirm error:', err)
-      const errorMsg = err.response?.data?.message || err.response?.data?.detail || err.message || "Tasdiqlashda xatolik yuz berdi."
-      toast.error(errorMsg)
+      console.error('=== TASDIQLASH XATOLIK ===', err?.response?.status)
+      console.error('Response data:', JSON.stringify(err?.response?.data, null, 2))
+      toast.error(getErrorMessage(err, "Tasdiqlashda xatolik yuz berdi."))
     }
   }
 
@@ -232,9 +237,9 @@ export default function PaymentsPage() {
       setPayments(prev => prev.map(p => p.id === id ? { ...p, ...updated, status: 'cancelled' } : p))
       toast.success("Bekor qilindi", "Xarajat so'rovi bekor qilindi.")
     } catch (err) {
-      console.error('Cancel error:', err)
-      const errorMsg = err.response?.data?.message || err.response?.data?.detail || err.message || "Bekor qilishda xatolik yuz berdi."
-      toast.error(errorMsg)
+      console.error('=== BEKOR QILISH XATOLIK ===', err?.response?.status)
+      console.error('Response data:', JSON.stringify(err?.response?.data, null, 2))
+      toast.error(getErrorMessage(err, "Bekor qilishda xatolik yuz berdi."))
     }
   }
 
@@ -295,7 +300,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* ── Scroll bo'ladigan qism (thead + tbody birga) ── */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto border-t border-b border-[#E2E6F2] dark:border-[#292A2A]">
+      <div className="flex-1 overflow-y-auto overflow-x-auto  ">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : payments.length === 0 ? null : (

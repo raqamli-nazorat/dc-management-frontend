@@ -4,6 +4,7 @@ import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
+import { getErrorMessage } from '../../../service/getErrorMessage'
 
 // ── Constants ────────────────────────────────────────────────
 const TRANSACTION_TYPE_OPTIONS = [
@@ -44,16 +45,6 @@ async function apiGetLedger(params = {}) {
   const res = await axiosAPI.get('/ledger/', { params })
   const payload = res.data?.data ?? res.data
   return Array.isArray(payload) ? payload : (payload.results ?? [])
-}
-
-async function apiGetLedgerDetail(id) {
-  const res = await axiosAPI.get(`/ledger/${id}/`)
-  return res.data?.data ?? res.data
-}
-
-async function apiGetUser(id) {
-  const res = await axiosAPI.get(`/users/${id}/`)
-  return res.data?.data ?? res.data
 }
 
 function buildParams(filters, search) {
@@ -275,10 +266,10 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
             <p className="text-[18px] h-6 font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? ''}</p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="text-xs  px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                Viloyat: <span className="font-bold">{u.region_info?.name ?? ''}</span>
+                Viloyat: <span className="font-bold">{u.region ?? ''}</span>
               </span>
               <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                Tuman: <span className="font-bold">{u.district_info?.name ?? ''}</span>
+                Tuman: <span className="font-bold">{u.district ?? ''}</span>
               </span>
             </div>
           </div>
@@ -291,7 +282,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Lavozimi</label>
-              <div className={fieldCls}>{u.position_info?.name ?? ''}</div>
+              <div className={fieldCls}>{u.position ?? ''}</div>
             </div>
             <div>
               <label className={labelCls}>Passport ma'lumotlari</label>
@@ -361,36 +352,21 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
 export default function FinanceHistoryPage() {
   const [search, setSearch] = useState('')
   const [data, setData] = useState([])
-  const [userCache, setUserCache] = useState({})
   const [loading, setLoading] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [detailItem, setDetailItem] = useState(null)
-  const [detailUser, setDetailUser] = useState(null)
 
   const hasFilter = Object.values(filters).some(v => v)
-
-  const fetchUsers = async (items) => {
-    const ids = [...new Set(items.map(i => i.user).filter(Boolean))]
-    const missing = ids.filter(id => !userCache[id])
-    if (!missing.length) return
-    const results = await Promise.allSettled(missing.map(id => apiGetUser(id)))
-    const newCache = {}
-    results.forEach((r, i) => {
-      if (r.status === 'fulfilled') newCache[missing[i]] = r.value
-    })
-    setUserCache(prev => ({ ...prev, ...newCache }))
-  }
 
   const loadData = async (f = filters, q = search) => {
     setLoading(true)
     try {
       const result = await apiGetLedger(buildParams(f, q))
       setData(result)
-      fetchUsers(result)
     } catch (err) {
       console.error(err)
-      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
+      toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     } finally {
       setLoading(false)
     }
@@ -409,19 +385,8 @@ export default function FinanceHistoryPage() {
     loadData(f, search)
   }
 
-  const handleRowClick = async (item) => {
-    try {
-      const cachedUser = item.user ? userCache[item.user] : null
-      const [detail, user] = await Promise.all([
-        apiGetLedgerDetail(item.id),
-        item.user && !cachedUser ? apiGetUser(item.user) : Promise.resolve(cachedUser),
-      ])
-      setDetailItem(detail)
-      setDetailUser(user)
-    } catch (err) {
-      console.error(err)
-      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi.")
-    }
+  const handleRowClick = (item) => {
+    setDetailItem(item)
   }
 
   const typeLabel = (t) => t === 'debit' ? 'Chiqim' : t === 'credit' ? 'Kirim' : t ?? ''
@@ -476,32 +441,22 @@ export default function FinanceHistoryPage() {
                 <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Miqdor (UZS)</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Turi</th>
                 <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Sana</th>
-                <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">Tasdiqlanish</th>
+
               </tr>
             </thead>
             <tbody>
-              {data.map((h, idx) => {
-                const u = userCache[h.user]
-                return (
+              {data.map((h, idx) => (
                   <tr key={h.id} onClick={() => handleRowClick(h)}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u?.username ?? ''}</td>
+                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{h.user_info?.username ?? ''}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || ''}</td>
                     <td className="px-4 py-3 text-right font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(h.amount)}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(h.transaction_type)}</td>
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(h.created_at)}</td>
-                    <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">
-                      {h.is_active
-                        ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
-                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        </span>
-                        : <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#E9ECF5] dark:bg-[#292A2A]" />
-                      }
-                    </td>
+
                   </tr>
-                )
-              })}
+              ))}
             </tbody>
           </table>
         )}
@@ -518,8 +473,8 @@ export default function FinanceHistoryPage() {
       {detailItem && (
         <HistoryDetailModal
           item={detailItem}
-          userInfo={detailUser}
-          onClose={() => { setDetailItem(null); setDetailUser(null) }}
+          userInfo={detailItem.user_info}
+          onClose={() => setDetailItem(null)}
         />
       )}
     </div>
