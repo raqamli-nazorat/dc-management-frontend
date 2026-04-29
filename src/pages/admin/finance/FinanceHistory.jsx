@@ -8,25 +8,27 @@ import EmptyState from '../../../components/EmptyState'
 // ── Constants ────────────────────────────────────────────────
 const TRANSACTION_TYPE_OPTIONS = [
   { label: 'Chiqim', value: 'debit' },
-  { label: 'Kirim',  value: 'credit' },
+  { label: 'Kirim', value: 'credit' },
 ]
 
 const EMPTY_FILTER = {
   transaction_type: '',
   created_at__date__gte: '',
+  created_at__time__gte: '',
   created_at__date__lte: '',
+  created_at__time__lte: '',
   amount__gte: '',
   amount__lte: '',
 }
 
 function fmt(n) {
   const num = parseFloat(n)
-  if (isNaN(num)) return '—'
+  if (isNaN(num)) return ''
   return Math.abs(num).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function fmtDate(iso) {
-  if (!iso) return '—'
+  if (!iso) return ''
   return new Date(iso).toLocaleString('ru-RU', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
@@ -56,10 +58,10 @@ async function apiGetUser(id) {
 
 function buildParams(filters, search) {
   const p = {}
-  if (search)                        p.search                = search
-  if (filters.transaction_type)      p.transaction_type      = filters.transaction_type
-  if (filters.amount__gte)           p.amount__gte           = filters.amount__gte
-  if (filters.amount__lte)           p.amount__lte           = filters.amount__lte
+  if (search) p.search = search
+  if (filters.transaction_type) p.transaction_type = filters.transaction_type
+  if (filters.amount__gte) p.amount__gte = filters.amount__gte
+  if (filters.amount__lte) p.amount__lte = filters.amount__lte
   if (filters.created_at__date__gte) p.created_at__date__gte = filters.created_at__date__gte
   if (filters.created_at__date__lte) p.created_at__date__lte = filters.created_at__date__lte
   return p
@@ -116,12 +118,21 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
 // ── DateBox ──────────────────────────────────────────────────
 function DateBox({ value, onChange, placeholder }) {
   const ref = useRef(null)
+  const isEmpty = !value
   return (
     <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
       bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text">
-      {placeholder && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">{placeholder}:</span>}
+      {placeholder && (
+        <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
+          {placeholder}:
+        </span>
+      )}
       <input ref={ref} type="date" value={value} onChange={e => onChange(e.target.value)}
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden" />
+        className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
+          [&::-webkit-calendar-picker-indicator]:hidden
+          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : '[&::-webkit-datetime-edit]:opacity-0'}
+        `}
+      />
       <button type="button" onClick={() => ref.current?.showPicker?.()}
         className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] transition-colors">
         <FaCalendarDays size={12} />
@@ -130,23 +141,48 @@ function DateBox({ value, onChange, placeholder }) {
   )
 }
 
-// ── HistoryFilterModal ───────────────────────────────────────
+// ── TimeBox ──────────────────────────────────────────────────
+function TimeBox({ value, onChange }) {
+  const ref = useRef(null)
+  return (
+    <div className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
+      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text w-[90px]">
+      <input ref={ref} type="time" value={value || '00:00'} onChange={e => onChange(e.target.value)}
+        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
+          [&::-webkit-calendar-picker-indicator]:hidden"
+      />
+      <button type="button" onClick={() => ref.current?.showPicker?.()}
+        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] transition-colors">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+      </button>
+    </div>
+  )
+}
 function HistoryFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />
+        <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+              <FaXmark size={14} />
+            </button>
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
         <div className="px-6 pt-6 pb-3">
-          <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-              <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
-            </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+                <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
+              </button>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+            </div>
+          
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ml-7">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
@@ -161,8 +197,14 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
           <div>
             <label className={labelCls}>Sana oralig'i</label>
             <div className="grid grid-cols-2 gap-2">
-              <DateBox value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} placeholder="dan" />
-              <DateBox value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} placeholder="gacha" />
+              <div className="flex gap-1.5">
+                <DateBox value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} placeholder="dan" />
+                <TimeBox value={f.created_at__time__gte} onChange={v => set('created_at__time__gte', v)} />
+              </div>
+              <div className="flex gap-1.5">
+                <DateBox value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} placeholder="gacha" />
+                <TimeBox value={f.created_at__time__lte} onChange={v => set('created_at__time__lte', v)} />
+              </div>
             </div>
           </div>
           <div>
@@ -198,19 +240,27 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
 // ── HistoryDetailModal ───────────────────────────────────────
 function HistoryDetailModal({ item, userInfo, onClose }) {
   const u = userInfo ?? {}
-  const typeLabel = item.transaction_type === 'debit' ? 'Chiqim' : item.transaction_type === 'credit' ? 'Kirim' : item.transaction_type ?? '—'
+  const typeLabel = item.transaction_type === 'debit' ? 'Chiqim' : item.transaction_type === 'credit' ? 'Kirim' : item.transaction_type ?? ''
+  const fieldCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60" />
+      <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+            bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-center gap-3">
-          <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-            <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
-          </button>
-          <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Tarix ma'lumotlari</h2>
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+              <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
+            </button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Tarix ma'lumotlari</h2>
+          </div>
+
         </div>
 
         {/* User info */}
@@ -218,17 +268,17 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           {u.avatar
             ? <img src={u.avatar} alt="avatar" className="w-[80px] h-[80px] rounded-[20px] object-cover shrink-0" />
             : <div className="w-[80px] h-[80px] rounded-[20px] bg-[#526ED3] flex items-center justify-center text-white text-3xl font-bold shrink-0">
-                {u.username?.[0]?.toUpperCase() ?? '?'}
-              </div>
+              {u.username?.[0]?.toUpperCase() ?? ''}
+            </div>
           }
           <div>
-            <p className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? '—'}</p>
+            <p className="text-[18px] h-6 font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF] leading-tight">{u.username ?? ''}</p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                Viloyat: <span className="font-bold">{u.region_info?.name ?? '—'}</span>
+              <span className="text-xs  px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
+                Viloyat: <span className="font-bold">{u.region_info?.name ?? ''}</span>
               </span>
               <span className="text-xs px-3 py-1 rounded-lg font-medium bg-[#F1F3F9] text-[#1A1D2E] dark:bg-[#292A2A] dark:text-[#FFFFFF]">
-                Tuman: <span className="font-bold">{u.district_info?.name ?? '—'}</span>
+                Tuman: <span className="font-bold">{u.district_info?.name ?? ''}</span>
               </span>
             </div>
           </div>
@@ -241,15 +291,15 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Lavozimi</label>
-              <div className={fCls}>{u.position_info?.name ?? '—'}</div>
+              <div className={fieldCls}>{u.position_info?.name ?? ''}</div>
             </div>
             <div>
               <label className={labelCls}>Passport ma'lumotlari</label>
               <div className="flex gap-2">
-                <div className="w-16 shrink-0 px-3 py-2.5 rounded-xl text-sm text-center border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
                   {u.passport_series?.slice(0, 2) ?? ''}
                 </div>
-                <div className="flex-1 px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
+                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]">
                   {u.passport_series?.slice(2)?.trim() ?? ''}
                 </div>
               </div>
@@ -260,16 +310,16 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Xarajat</label>
-              <div className={`${fCls} flex items-center justify-between`}>
-                <span>{item.description || '—'}</span>
-                <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" />
+              <div className={`${fieldCls} justify-between`}>
+                <span>{item.description || ''}</span>
+                {/* <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" /> */}
               </div>
             </div>
             <div>
               <label className={labelCls}>Turi</label>
-              <div className={`${fCls} flex items-center justify-between`}>
+              <div className={`${fieldCls} justify-between`}>
                 <span>{typeLabel}</span>
-                <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" />
+                {/* <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" /> */}
               </div>
             </div>
           </div>
@@ -277,25 +327,25 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           {/* Oylik maosh */}
           <div>
             <label className={labelCls}>Oylik maosh (UZS)</label>
-            <div className={`${fCls} text-right font-semibold`}>{fmt(u.fixed_salary)}</div>
+            <div className={`${fieldCls} justify-end font-semibold`}>{fmt(u.fixed_salary)}</div>
           </div>
 
           {/* Sana + Miqdor */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Sana</label>
-              <div className={fCls}>{fmtDate(item.created_at)}</div>
+              <div className={fieldCls}>{fmtDate(item.created_at)}</div>
             </div>
             <div>
               <label className={labelCls}>Miqdor (UZS)</label>
-              <div className={`${fCls} text-right font-semibold`}>{fmt(item.amount)}</div>
+              <div className={`${fieldCls} justify-end font-semibold`}>{fmt(item.amount)}</div>
             </div>
           </div>
 
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 flex items-center justify-end border-t border-[#EEF1F7] dark:border-[#292A2A]">
+        <div className="px-6 py-4 flex items-center justify-end ">
           <button onClick={onClose}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
               text-[#3F57B3] hover:bg-[#EEF1FB] dark:text-[#7F95E6] dark:hover:bg-[#292A2A]">
@@ -309,12 +359,12 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
 
 // ── Main Page ────────────────────────────────────────────────
 export default function FinanceHistoryPage() {
-  const [search, setSearch]         = useState('')
-  const [data, setData]             = useState([])
-  const [userCache, setUserCache]   = useState({})
-  const [loading, setLoading]       = useState(false)
+  const [search, setSearch] = useState('')
+  const [data, setData] = useState([])
+  const [userCache, setUserCache] = useState({})
+  const [loading, setLoading] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
-  const [filters, setFilters]       = useState(EMPTY_FILTER)
+  const [filters, setFilters] = useState(EMPTY_FILTER)
   const [detailItem, setDetailItem] = useState(null)
   const [detailUser, setDetailUser] = useState(null)
 
@@ -374,7 +424,7 @@ export default function FinanceHistoryPage() {
     }
   }
 
-  const typeLabel = (t) => t === 'debit' ? 'Chiqim' : t === 'credit' ? 'Kirim' : t ?? '—'
+  const typeLabel = (t) => t === 'debit' ? 'Chiqim' : t === 'credit' ? 'Kirim' : t ?? ''
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)]">
@@ -407,7 +457,7 @@ export default function FinanceHistoryPage() {
       </div>
 
       {/* Scroll bo'ladigan qism */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto border-t border-b border-[#E2E6F2] dark:border-[#292A2A]">
+      <div className="flex-1 overflow-y-auto overflow-x-auto  dark:border-[#292A2A]">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : data.length === 0 ? (
@@ -436,16 +486,16 @@ export default function FinanceHistoryPage() {
                   <tr key={h.id} onClick={() => handleRowClick(h)}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u?.username ?? '—'}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || '—'}</td>
+                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{u?.username ?? ''}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || ''}</td>
                     <td className="px-4 py-3 text-right font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(h.amount)}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(h.transaction_type)}</td>
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(h.created_at)}</td>
                     <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">
                       {h.is_active
                         ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                          </span>
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
                         : <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#E9ECF5] dark:bg-[#292A2A]" />
                       }
                     </td>
