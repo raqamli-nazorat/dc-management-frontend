@@ -96,6 +96,7 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
 export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm, onCancel }) {
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaidModal, setShowPaidModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const user = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null } })()
   const c = payment.expense_category_info ?? {}
@@ -214,7 +215,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {/* Tasdiqlash — so'rov egasi + paid */}
             {showConfirm && onConfirm && (
               <button
-                onClick={() => { onConfirm(payment.id); onClose() }}
+                onClick={() => setShowConfirmModal(true)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white transition-colors"
                 style={{ backgroundColor: '#3F57B3' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#526ED3'}
@@ -245,6 +246,18 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
           onConfirm={() => {
             setShowPaidModal(false)
             onPaid(payment.id)
+            onClose()
+          }}
+        />
+      )}
+
+      {/* Tasdiqlash modali */}
+      {showConfirmModal && (
+        <PaidConfirmModal
+          onCancel={() => setShowConfirmModal(false)}
+          onConfirm={() => {
+            setShowConfirmModal(false)
+            onConfirm(payment.id)
             onClose()
           }}
         />
