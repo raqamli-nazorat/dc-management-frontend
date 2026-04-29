@@ -91,8 +91,8 @@ async function apiConfirm(id) {
   return res.data?.data ?? res.data
 }
 
-async function apiCancel(id) {
-  const res = await axiosAPI.post(`/expense-request/${id}/cancel/`, {})
+async function apiCancel(id, cancelReason) {
+  const res = await axiosAPI.post(`/expense-request/${id}/cancel/`, { cancel_reason: cancelReason })
   return res.data?.data ?? res.data
 }
 
@@ -224,7 +224,7 @@ export default function PaymentsPage() {
     try {
       const updated = await apiMarkPaid(id)
       setPayments(prev => prev.map(p => p.id === id ? { ...p, ...updated, status: 'paid' } : p))
-      toast.success("To'lov qilindi", "Xarajat so'rovi muvaffaqiyatli to'landi.")
+      toast.success("To'lov qayd etildi", "Mablag' berilgani tizimda belgilandi.")
     } catch (err) {
       toast.error(getErrorMessage(err, "To'lovda xatolik yuz berdi."))
     }
@@ -240,13 +240,13 @@ export default function PaymentsPage() {
     }
   }
 
-  const handleCancel = async (id) => {
+  const handleCancel = async (id, cancelReason) => {
     try {
-      const updated = await apiCancel(id)
+      const updated = await apiCancel(id, cancelReason)
       setPayments(prev => prev.map(p => p.id === id ? { ...p, ...updated, status: 'cancelled' } : p))
-      toast.success("Bekor qilindi", "Xarajat so'rovi bekor qilindi.")
+      toast.error("So'rov rad etildi", "So'rov bo'yicha rad etish sababi saqlandi.")
     } catch (err) {
-      toast.error(getErrorMessage(err, "Bekor qilishda xatolik yuz berdi."))
+      toast.error(getErrorMessage(err, "Rad etishda xatolik yuz berdi."))
     }
   }
 
