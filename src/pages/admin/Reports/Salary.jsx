@@ -368,12 +368,6 @@ const Employee = () => {
       return;
     }
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Pop-up oynalarni ochishga ruxsat bering');
-      return;
-    }
-
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -382,17 +376,20 @@ const Employee = () => {
           <style>
             @page { 
               size: landscape; 
-              margin: 10mm; 
+              margin: 0; 
             }
             body { 
               font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-              font-size: 11px; 
+              font-size: 8px; 
               color: #333;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              zoom: 50%;
             }
             h2 { 
               text-align: center; 
-              margin-bottom: 20px; 
-              font-size: 16px;
+              margin-bottom: 15px; 
+              font-size: 14px;
             }
             table { 
               width: 100%; 
@@ -401,8 +398,9 @@ const Employee = () => {
             }
             th, td { 
               border: 1px solid #e2e8f0; 
-              padding: 6px 8px; 
-              text-align: left; 
+              padding: 3px 4px; 
+              text-align: left;
+              white-space: nowrap;
             }
             th { 
               background-color: #f8fafc; 
@@ -473,19 +471,29 @@ const Employee = () => {
               `).join('')}
             </tbody>
           </table>
-          <script>
-            window.onload = function() {
-              window.print();
-              setTimeout(function() { window.close(); }, 500);
-            };
-          </script>
         </body>
       </html>
     `;
 
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 100);
   }
 
   // Initialize page actions on mount

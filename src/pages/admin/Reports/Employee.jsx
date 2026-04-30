@@ -451,23 +451,17 @@ const Employee = () => {
       return;
     }
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Pop-up oynalarni ochishga ruxsat bering');
-      return;
-    }
-
     const htmlContent = `
         <!DOCTYPE html>
         <html>
           <head>
             <title>Xodimlar hisoboti</title>
             <style>
-              @page { size: landscape; margin: 10mm; }
-              body { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; font-size: 8px; color: #333; }
-              h2 { text-align: center; margin-bottom: 20px; font-size: 14px; }
+              @page { size: landscape; margin: 0; }
+              body { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; font-size: 7px; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; zoom: 50%; }
+              h2 { text-align: center; margin-bottom: 15px; font-size: 12px; }
               table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-              th, td { border: 1px solid #e2e8f0; padding: 4px; text-align: left; }
+              th, td { border: 1px solid #e2e8f0; padding: 2px 3px; text-align: left; white-space: nowrap; }
               th { background-color: #f8fafc; font-weight: bold; color: #475569; text-align: center; }
               th.main-group { background-color: #7186ED; color: white; }
               th.sub-group { background-color: #8999EF; color: white; font-size: 7px; }
@@ -545,19 +539,29 @@ const Employee = () => {
                 \`).join('')}
               </tbody>
             </table>
-            <script>
-              window.onload = function() {
-                window.print();
-                setTimeout(function() { window.close(); }, 500);
-              };
-            </script>
           </body>
         </html>
       `;
 
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 100);
   }
 
   // Initialize page actions on mount

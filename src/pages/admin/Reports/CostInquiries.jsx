@@ -13,6 +13,11 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import dayjs from 'dayjs'
 import { PiUsersThreeBold } from 'react-icons/pi'
 import ProjectsStep from './Modals/ProjectsStep'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import Papa from 'papaparse'
+import ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
 
 const payment_type = [
   { label: "Naqd pul orqali", value: "cash" },
@@ -158,20 +163,377 @@ const Employee = () => {
     }
   }
 
-  const handleExcelDownload = () => {
-    console.log('excel')
+  const handleExcelDownload = async () => {
+    if (!UserReports || UserReports.length === 0) {
+      toast.info("Yuklab olish uchun ma'lumot yo'q");
+      return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Xarajat so'rovlari");
+
+    worksheet.columns = [
+      { header: '№', key: 'id', width: 5 },
+      { header: 'Ism Sharifi', key: 'name', width: 25 },
+      { header: 'Loyiha nomi', key: 'project', width: 20 },
+      { header: 'Xarajat turi', key: 'expense_category', width: 20 },
+      { header: 'Toifa', key: 'type', width: 20 },
+      { header: 'Miqdori (UZS)', key: 'amount', width: 20 },
+      { header: "To'lov turi", key: 'payment_method', width: 15 },
+      { header: 'Holati', key: 'status', width: 15 },
+      { header: "So'rov sababi", key: 'reason', width: 25 },
+      { header: "So'ralgan vaqti", key: 'created_at', width: 20 },
+      { header: "To'langan vaqti", key: 'paid_at', width: 20 },
+      { header: 'Tasdiqlangan vaqti', key: 'confirmed_at', width: 20 },
+      { header: 'Hisobchi', key: 'accountant', width: 25 },
+      { header: 'Bekor qilingan vaqti', key: 'cancelled_at', width: 20 },
+      { header: 'Bekor sababi', key: 'cancel_reason', width: 25 },
+      { header: 'Karta raqami', key: 'card_number', width: 25 },
+    ];
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF7186ED' }
+      };
+      cell.font = {
+        color: { argb: 'FFFFFFFF' },
+        bold: true,
+        size: 11
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        left: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        bottom: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        right: { style: 'thin', color: { argb: 'FFE2E6F2' } }
+      };
+    });
+    headerRow.height = 30;
+
+    UserReports.forEach((item, index) => {
+      const rowData = {
+        id: index + 1,
+        name: item.user || '-',
+        project: item.project || '-',
+        expense_category: item.expense_category || '-',
+        type: cost_type.find((t) => t.value === item.type)?.label || '-',
+        amount: item.amount || 0,
+        payment_method: item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+        status: item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
+        reason: item.reason || '-',
+        created_at: item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
+        paid_at: item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
+        confirmed_at: item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
+        accountant: item.accountant || '-',
+        cancelled_at: item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
+        cancel_reason: item.cancel_reason || '-',
+        card_number: item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+      };
+      const row = worksheet.addRow(rowData);
+
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          left: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          bottom: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          right: { style: 'thin', color: { argb: 'FFE2E6F2' } }
+        };
+
+        let fontColor = 'FF475569';
+        let isBold = false;
+
+        if (colNumber === 1) {
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          fontColor = 'FF64748B';
+        } else if ([2, 3, 4, 5].includes(colNumber)) {
+          cell.alignment = { vertical: 'middle', horizontal: 'left' };
+          fontColor = 'FF334155';
+          isBold = colNumber === 2;
+        } else if (colNumber === 6) {
+          cell.alignment = { vertical: 'middle', horizontal: 'right' };
+          fontColor = 'FF0F172A';
+          isBold = true;
+          cell.numFmt = '#,##0.00';
+        } else {
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          fontColor = 'FF475569';
+        }
+
+        cell.font = {
+          color: { argb: fontColor },
+          bold: isBold,
+          size: 10
+        };
+
+        if (colNumber === 1 || colNumber === 2) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF8FAFC' }
+          };
+        }
+      });
+      row.height = 25;
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `Xarajat_sorovlari_${dayjs().format('DD_MM_YYYY')}.xlsx`);
   }
 
   const handlePdfDownload = () => {
-    console.log('pdf')
+    if (!UserReports || UserReports.length === 0) {
+      toast.info("Yuklab olish uchun ma'lumot yo'q");
+      return;
+    }
+
+    const doc = new jsPDF({ orientation: 'landscape', format: 'a3' });
+
+    autoTable(doc, {
+      head: [['№', 'Ism Sharifi', 'Loyiha nomi', 'Xarajat turi', 'Toifa', 'Miqdori (UZS)', "To'lov turi", 'Holati', "So'rov sababi", "So'ralgan vaqti", "To'langan vaqti", 'Tasdiqlangan vaqti', 'Hisobchi', 'Bekor qilingan vaqti', 'Bekor sababi', 'Karta raqami']],
+      body: UserReports.map((item, index) => [
+        index + 1,
+        item.user || '-',
+        item.project || '-',
+        item.expense_category || '-',
+        cost_type.find((t) => t.value === item.type)?.label || '-',
+        formatNum(item.amount || 0),
+        item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+        item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
+        item.reason || '-',
+        item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
+        item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
+        item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
+        item.accountant || '-',
+        item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
+        item.cancel_reason || '-',
+        item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+      ]),
+      headStyles: {
+        fillColor: [113, 134, 237],
+        textColor: [255, 255, 255],
+        halign: 'center',
+        valign: 'middle',
+        fontStyle: 'bold'
+      },
+      styles: {
+        fontSize: 7,
+        lineColor: [226, 230, 242],
+        lineWidth: 0.1,
+      },
+      columnStyles: {
+        0: { halign: 'center', textColor: [100, 116, 139] },
+        1: { halign: 'left', fontStyle: 'bold', textColor: [51, 65, 85] },
+        5: { halign: 'right', fontStyle: 'bold', textColor: [15, 23, 42] },
+      },
+      theme: 'grid',
+      margin: { top: 15 },
+      didDrawPage: function () {
+        doc.setFontSize(14);
+        doc.text("Xarajat so'rovlari", 14, 10);
+      }
+    });
+
+    doc.save(`Xarajat_sorovlari_${dayjs().format('DD_MM_YYYY')}.pdf`);
   }
 
   const handleCsvDownload = () => {
-    console.log('csv')
+    if (!UserReports || UserReports.length === 0) {
+      toast.info("Yuklab olish uchun ma'lumot yo'q");
+      return;
+    }
+
+    const csvData = UserReports.map((item, index) => ({
+      '№': index + 1,
+      'Ism Sharifi': item.user || '-',
+      'Loyiha nomi': item.project || '-',
+      'Xarajat turi': item.expense_category || '-',
+      'Toifa': cost_type.find((t) => t.value === item.type)?.label || '-',
+      'Miqdori (UZS)': item.amount || 0,
+      "To'lov turi": item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+      'Holati': item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
+      "So'rov sababi": item.reason || '-',
+      "So'ralgan vaqti": item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
+      "To'langan vaqti": item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
+      'Tasdiqlangan vaqti': item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
+      'Hisobchi': item.accountant || '-',
+      'Bekor qilingan vaqti': item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
+      'Bekor sababi': item.cancel_reason || '-',
+      'Karta raqami': item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+    }));
+
+    const csvContent = "\uFEFF" + Papa.unparse(csvData);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, `Xarajat_sorovlari_${dayjs().format('DD_MM_YYYY')}.csv`);
   }
 
   const handlePrint = () => {
-    console.log('print')
+    if (!UserReports || UserReports.length === 0) {
+      toast.info("Chop etish uchun ma'lumot yo'q");
+      return;
+    }
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Xarajat so'rovlari</title>
+            <style>
+              @page { 
+                size: landscape; 
+                margin: 0; 
+              }
+              body { 
+                font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+                font-size: 8px; 
+                color: #333;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                zoom: 50%;
+              }
+              h2 { 
+                text-align: center; 
+                margin-bottom: 15px; 
+                font-size: 14px;
+              }
+              table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-bottom: 20px;
+              }
+              th, td { 
+                border: 1px solid #e2e8f0; 
+                padding: 3px 4px; 
+                text-align: left; 
+                white-space: nowrap;
+              }
+              th { 
+                background-color: #f8fafc; 
+                font-weight: bold; 
+                color: #475569;
+                text-align: center;
+              }
+              td.number { 
+                text-align: right; 
+                font-weight: bold;
+              }
+              td.center { 
+                text-align: center; 
+              }
+              .status-badge {
+                padding: 2px 4px;
+                border-radius: 4px;
+                font-size: 8px;
+                font-weight: bold;
+              }
+              .status-tasdiqlangan {
+                background-color: #dcfce7;
+                color: #16a34a;
+              }
+              .status-tolangan {
+                background-color: #dbeafe;
+                color: #1d4ed8;
+              }
+              .status-bekor {
+                background-color: #fee2e2;
+                color: #ef4444;
+              }
+              .status-boshqa {
+                background-color: #fef3c7;
+                color: #d97706;
+              }
+            </style>
+          </head>
+          <body>
+            <h2>Xarajat so'rovlari</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Ism Sharifi</th>
+                  <th>Loyiha nomi</th>
+                  <th>Xarajat turi</th>
+                  <th>Toifa</th>
+                  <th>Miqdori (UZS)</th>
+                  <th>To'lov turi</th>
+                  <th>Holati</th>
+                  <th>So'rov sababi</th>
+                  <th>So'ralgan vaqti</th>
+                  <th>To'langan vaqti</th>
+                  <th>Tasdiqlangan vaqti</th>
+                  <th>Hisobchi</th>
+                  <th>Bekor qilingan vaqti</th>
+                  <th>Bekor sababi</th>
+                  <th>Karta raqami</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${UserReports.map((item, index) => {
+                  let statusClass = 'status-boshqa';
+                  let statusText = item.status;
+                  if (item.status === 'confirmed') {
+                    statusClass = 'status-tasdiqlangan';
+                    statusText = 'Tasdiqlangan';
+                  } else if (item.status === 'paid') {
+                    statusClass = 'status-tolangan';
+                    statusText = "To'langan";
+                  } else if (item.status === 'cancelled') {
+                    statusClass = 'status-bekor';
+                    statusText = 'Bekor qilingan';
+                  }
+
+                  return `
+                  <tr>
+                    <td class="center">${index + 1}</td>
+                    <td><b>${item.user || '-'}</b></td>
+                    <td class="center">${item.project || '-'}</td>
+                    <td class="center">${item.expense_category || '-'}</td>
+                    <td class="center">${cost_type.find((t) => t.value === item.type)?.label || '-'}</td>
+                    <td class="number">${formatNum(item.amount || 0)}</td>
+                    <td class="center">${item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-'}</td>
+                    <td class="center">
+                      <span class="status-badge ${statusClass}">
+                        ${statusText}
+                      </span>
+                    </td>
+                    <td class="center">${item.reason || '-'}</td>
+                    <td class="center">${item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
+                    <td class="center">${item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
+                    <td class="center">${item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
+                    <td class="center">${item.accountant || '-'}</td>
+                    <td class="center">${item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
+                    <td class="center">${item.cancel_reason || '-'}</td>
+                    <td class="center">${item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'}</td>
+                  </tr>
+                `}).join('')}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 100);
   }
 
   // Initialize page actions on mount
@@ -180,18 +542,18 @@ const Employee = () => {
       show: true,
       excel: handleExcelDownload,
       pdf: handlePdfDownload,
-      csv: handleCsvDownload
+      csv: handleCsvDownload,
     })
     setPrint({
       show: true,
-      onClick: handlePrint
+      onClick: handlePrint,
     })
 
     return () => {
       clearDownload()
       clearPrint()
     }
-  }, [])
+  }, [UserReports])
 
   const formatNum = (val) => {
     if (!val && val !== 0) return '';
@@ -390,7 +752,7 @@ const Employee = () => {
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
                   className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
                   placeholder='Boshlanish sanasi'
-                  
+
                 />
               </div>
 
