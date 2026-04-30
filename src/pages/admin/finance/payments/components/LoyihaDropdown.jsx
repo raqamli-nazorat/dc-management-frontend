@@ -79,20 +79,23 @@ export function LoyihaDropdown({ value, onChange, projects = [] }) {
 }
 
 /* So'rov modal form uchun (error support) */
-export function LoyihaDropdownForm({ value, onChange, error, projects = [] }) {
+export function LoyihaDropdownForm({ value, onChange, error, projects = [], disabled = false }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => String(p.id) === String(value))
 
   return (
     <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+      <button type="button"
+        onClick={() => !disabled && setOpen(o => !o)}
+        disabled={disabled}
+        className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors
           bg-white dark:bg-[#191A1A]
           ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`}>
+          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}
+          ${disabled ? 'opacity-60 cursor-not-allowed bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer'}`}>
         <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
         <div className="flex items-center gap-1 shrink-0 ml-1">
-          {value && (
+          {value && !disabled && (
             <span className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer"
               onMouseDown={e => { e.stopPropagation(); onChange('') }}>
               <FaXmark size={11} />
@@ -102,7 +105,7 @@ export function LoyihaDropdownForm({ value, onChange, error, projects = [] }) {
         </div>
       </button>
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-      {open && (
+      {open && !disabled && (
         <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
           bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />
