@@ -37,7 +37,7 @@ export function SelectField({ label, value, onChange, options = [], placeholder,
             <FaChevronDown size={11} className={`text-[#8F95A8] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
-        {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+        {error && <p className="text-xs text-red-500 mt-1">*{error}</p>}
         {open && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden
             bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">

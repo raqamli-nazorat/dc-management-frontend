@@ -16,7 +16,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
       
       <div className="fixed inset-0 bg-black/60" />
        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
-              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+              bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
               <FaXmark size={14} />
             </button>
       

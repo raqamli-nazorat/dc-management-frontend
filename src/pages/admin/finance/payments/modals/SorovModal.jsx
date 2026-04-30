@@ -1,13 +1,14 @@
-import { useState } from 'react'
-import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
+import { useState, useRef, useEffect } from 'react'
+import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { SelectField } from '../components/SelectField'
 import { LoyihaDropdownForm } from '../components/LoyihaDropdown'
+import { axiosAPI } from '../../../../../service/axiosAPI'
 import {
   TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS,
   labelCls, fmtCard,
 } from '../constants'
 
-// Decimal son formatlash: bo'shliq ajratuvchi, max 2 decimal
+// Decimal son formatlash
 function fmtAmount(raw) {
   let val = raw.replace(/[^\d.]/g, '')
   const parts = val.split('.')
@@ -18,20 +19,56 @@ function fmtAmount(raw) {
   return intFormatted
 }
 
-// Yuborish uchun toza decimal string: "500 000.50" → "500000.50"
 function toDecimalStr(val) {
   return val.replace(/\s/g, '')
 }
 
+// Tur bo'yicha qoidalar
+// withdrawal: sabab majburiy, loyiha ixtiyoriy, toifa majburiy
+// company:    loyiha majburiy, sabab majburiy, toifa majburiy
+// other:      toifa majburiy, loyiha yo'q, sabab ixtiyoriy
+const RULES = {
+  withdrawal: { projectRequired: false, projectVisible: true,  reasonRequired: true,  reasonVisible: true  },
+  company:    { projectRequired: true,  projectVisible: true,  reasonRequired: true,  reasonVisible: true  },
+  other:      { projectRequired: false, projectVisible: false, reasonRequired: false, reasonVisible: true  },
+}
+
+function getRules(type) {
+  return RULES[type] ?? { projectRequired: false, projectVisible: true, reasonRequired: false, reasonVisible: true }
+}
+
 export default function SorovModal({ onClose, onSubmit, categories = [], projects = [] }) {
+  const [userCard, setUserCard] = useState(null)
+
+  // Modal ochilganda /users/me/ dan card_number olamiz
+  useEffect(() => {
+    axiosAPI.get('/users/me/')
+      .then(res => {
+        const data = res.data?.data ?? res.data
+        const raw = data?.card_number
+        if (raw) setUserCard(fmtCard(String(raw).replace(/\s/g, '')))
+      })
+      .catch(() => {})
+  }, [])
+
   const [form, setForm] = useState({
     type: '', project: '', expense_category: '',
     amount: '', reason: '', payment_method: '', card_number: '',
   })
   const [errors, setErrors] = useState({})
+  const [showCardSuggest, setShowCardSuggest] = useState(false)
+  const cardRef = useRef(null)
+
   const setF = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const showCard = form.payment_method === 'card'
+  const rules = getRules(form.type)
+
+  // Tur o'zgarganda loyiha va sababni tozalash
+  const handleTypeChange = (v) => {
+    setForm(p => ({ ...p, type: v, project: '', reason: '' }))
+    setErrors({})
+  }
 
   const validate = () => {
     const e = {}
@@ -42,6 +79,13 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
     if (!form.payment_method)   e.payment_method   = "To'lov turi tanlanmagan"
     if (showCard && form.card_number.replace(/\s/g, '').length < 16)
       e.card_number = "Karta raqami to'liq emas"
+
+    // Tur bo'yicha qo'shimcha validatsiya
+    if (rules.projectRequired && !form.project)
+      e.project = 'Loyiha tanlash majburiy'
+    if (rules.reasonRequired && !form.reason.trim())
+      e.reason = 'Sabab kiritish majburiy'
+
     return e
   }
 
@@ -53,11 +97,18 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
       type:             form.type,
       expense_category: Number(form.expense_category),
       amount:           toDecimalStr(form.amount),
-      reason:           form.reason,
       payment_method:   form.payment_method,
-      card_number:      showCard ? form.card_number.replace(/\s/g, '') : null,
     }
-    // project ixtiyoriy — faqat tanlangan bo'lsa qo'shiladi
+
+    // reason — faqat bo'sh bo'lmasa qo'shiladi
+    if (form.reason.trim()) body.reason = form.reason.trim()
+
+    // card_number — faqat karta tanlanganda qo'shiladi
+    if (showCard && form.card_number) {
+      body.card_number = form.card_number.replace(/\s/g, '')
+    }
+
+    // project — faqat tanlanganda qo'shiladi
     if (form.project) body.project = Number(form.project)
 
     onSubmit(body)
@@ -70,25 +121,27 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
 
   const categoryOptions = categories.map(c => ({ label: c.title, value: String(c.id) }))
 
+  // Loyiha label
+  const projectLabel = rules.projectRequired
+    ? 'Loyiha'
+    : <span>Loyiha <span className="text-[#B6BCCB]">(ixtiyoriy)</span></span>
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer transition-colors
-              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
-              <FaXmark size={14} />
-            </button>
+      <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer transition-colors
+        bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
 
         {/* Header */}
         <div className="px-6 pt-7">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-                <FaArrowLeft size={16} className="dark:text-white text-[#1A1D2E]" />
-              </button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">So'rov yuborish</h2>
-            </div>
-          
+          <div className="flex items-center gap-3 mb-2">
+            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+              <FaArrowLeft size={16} className="dark:text-white text-[#1A1D2E]" />
+            </button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">So'rov yuborish</h2>
           </div>
           <p className="text-[15px] text-[#5B6078] dark:text-[#C2C8E0]">
             So'rov uchun kerakli ma'lumotlarni kiriting
@@ -98,23 +151,12 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
         {/* Body */}
         <div className="px-6 py-5 flex flex-col gap-4">
 
-          {/* Loyiha — ixtiyoriy */}
-          <div>
-            <label className={labelCls}>Loyiha <span className="text-[#B6BCCB]">(ixtiyoriy)</span></label>
-            <LoyihaDropdownForm
-              value={form.project}
-              onChange={v => setF('project', v)}
-              projects={projects}
-              error={errors.project}
-            />
-          </div>
-
           {/* Xarajat turi + Toifa */}
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               label="Xarajat turi"
               value={form.type}
-              onChange={v => setF('type', v)}
+              onChange={handleTypeChange}
               options={TYPE_OPTIONS}
               placeholder="Turini tanlang"
               error={errors.type}
@@ -129,7 +171,20 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
             />
           </div>
 
-          {/* Miqdor — decimal */}
+          {/* Loyiha — tur bo'yicha ko'rinadi */}
+          {(rules.projectVisible) && (
+            <div>
+              <label className={labelCls}>{projectLabel}</label>
+              <LoyihaDropdownForm
+                value={form.project}
+                onChange={v => setF('project', v)}
+                projects={projects}
+                error={errors.project}
+              />
+            </div>
+          )}
+
+          {/* Miqdor */}
           <div>
             <label className={labelCls}>Miqdor (UZS)</label>
             <input
@@ -139,28 +194,34 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
               value={form.amount}
               onChange={e => setF('amount', fmtAmount(e.target.value))}
             />
-            {errors.amount && <p className="text-xs text-red-500 mt-1">{errors.amount}</p>}
+            {errors.amount && <p className="text-xs text-red-500 mt-1">*{errors.amount}</p>}
           </div>
 
-          {/* Sabab */}
-          <div>
-            <label className={labelCls}>Sabab</label>
-            <div className="relative">
-              <textarea
-                rows={3}
-                className={iCls('reason') + ' !h-auto resize-none pr-8'}
-                placeholder="Sababni yozing..."
-                value={form.reason}
-                onChange={e => setF('reason', e.target.value)}
-              />
-              {form.reason && (
-                <button type="button" onClick={() => setF('reason', '')}
-                  className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer">
-                  <FaXmark size={12} />
-                </button>
-              )}
+          {/* Sabab — tur bo'yicha majburiy/ixtiyoriy */}
+          {rules.reasonVisible && (
+            <div>
+              <label className={labelCls}>
+                Sabab
+                {!rules.reasonRequired && <span className="text-[#B6BCCB] ml-1">(ixtiyoriy)</span>}
+              </label>
+              <div className="relative">
+                <textarea
+                  rows={3}
+                  className={iCls('reason') + ' h-auto! resize-none pr-8'}
+                  placeholder="Sababni yozing..."
+                  value={form.reason}
+                  onChange={e => setF('reason', e.target.value)}
+                />
+                {form.reason && (
+                  <button type="button" onClick={() => setF('reason', '')}
+                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer">
+                    <FaXmark size={12} />
+                  </button>
+                )}
+              </div>
+              {errors.reason && <p className="text-xs text-red-500 mt-1">*{errors.reason}</p>}
             </div>
-          </div>
+          )}
 
           {/* To'lov turi + Karta */}
           <div className={showCard ? 'grid grid-cols-2 gap-4' : ''}>
@@ -177,10 +238,13 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
                 <label className={labelCls}>Karta raqami</label>
                 <div className="relative">
                   <input
+                    ref={cardRef}
                     className={iCls('card_number')}
                     placeholder="0000 0000 0000 0000"
                     value={form.card_number}
-                    onChange={e => setF('card_number', fmtCard(e.target.value))}
+                    onChange={e => { setF('card_number', fmtCard(e.target.value)); setShowCardSuggest(false) }}
+                    onFocus={() => { if (userCard) setShowCardSuggest(true) }}
+                    onBlur={() => setTimeout(() => setShowCardSuggest(false), 150)}
                     maxLength={19}
                   />
                   {form.card_number && (
@@ -189,8 +253,35 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
                       <FaXmark size={12} />
                     </button>
                   )}
+                  {/* Karta taklifi */}
+                  {showCardSuggest && userCard && (
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-xl shadow-xl border overflow-hidden
+                      bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
+                      <button
+                        type="button"
+                        onMouseDown={() => {
+                          // userCard allaqachon fmtCard orqali formatlangan — to'g'ridan qo'yamiz
+                          setForm(p => ({ ...p, card_number: userCard }))
+                          setErrors(p => ({ ...p, card_number: '' }))
+                          setShowCardSuggest(false)
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors cursor-pointer
+                          hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]">
+                        <div className="w-8 h-8 rounded-lg bg-[#EEF1FB] dark:bg-[#292A2A] flex items-center justify-center shrink-0">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3F57B3" strokeWidth="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/>
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-[#8F95A8] dark:text-[#C2C8E0] mb-0.5">Mening kartam</p>
+                          <p className="text-sm font-mono font-semibold text-[#1A1D2E] dark:text-white tracking-wider">{userCard}</p>
+                        </div>
+                        <FaChevronDown size={11} className="text-[#8F95A8] -rotate-90 shrink-0" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {errors.card_number && <p className="text-xs text-red-500 mt-1">{errors.card_number}</p>}
+                {errors.card_number && <p className="text-xs text-red-500 mt-1">*{errors.card_number}</p>}
               </div>
             )}
           </div>
