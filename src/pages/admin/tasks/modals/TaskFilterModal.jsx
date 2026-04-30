@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
-import { PROJECTS_LIST, EMPLOYEES_LIST, LEVELS, TYPES } from '../components/constants'
+import { LEVELS, TYPES } from '../components/constants'
+import { axiosAPI } from '../../../../service/axiosAPI'
 
 /* ─── constants ─── */
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
@@ -137,19 +138,18 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
 }
 
 /* ─── ProjectSelectModal ─── */
-function ProjectSelectModal({ selected, onClose, onApply }) {
+function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
   const [query, setQuery] = useState('')
   const [local, setLocal] = useState(selected)
 
-  const filtered = PROJECTS_LIST.filter(p =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.desc.toLowerCase().includes(query.toLowerCase())
+  const filtered = projectsList.filter(p =>
+    (p.title ?? '').toLowerCase().includes(query.toLowerCase())
   )
 
   const toggle = p => setLocal(prev =>
     prev.find(x => x.id === p.id)
       ? prev.filter(x => x.id !== p.id)
-      : [...prev, { id: p.id, name: p.name }]
+      : [...prev, { id: p.id, name: p.title }]
   )
 
   return (
@@ -169,9 +169,9 @@ function ProjectSelectModal({ selected, onClose, onApply }) {
             <button
               type="button"
               onClick={() =>
-                local.length === PROJECTS_LIST.length
+                local.length === projectsList.length
                   ? setLocal([])
-                  : setLocal(PROJECTS_LIST.map(p => ({ id: p.id, name: p.name })))
+                  : setLocal(projectsList.map(p => ({ id: p.id, name: p.title })))
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
                 text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors shrink-0"
@@ -184,7 +184,7 @@ function ProjectSelectModal({ selected, onClose, onApply }) {
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Ism Sharifi bo'yicha izlash"
+                placeholder="Loyiha nomi bo'yicha izlash"
                 className="flex-1 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]"
               />
             </div>
@@ -193,6 +193,7 @@ function ProjectSelectModal({ selected, onClose, onApply }) {
 
         {/* List */}
         <div className="flex-1 overflow-y-auto px-7 pb-2 flex flex-col gap-2">
+          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Loyiha topilmadi</p>}
           {filtered.map(p => {
             const checked = !!local.find(x => x.id === p.id)
             return (
@@ -213,11 +214,7 @@ function ProjectSelectModal({ selected, onClose, onApply }) {
                     </svg>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{p.name}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{p.desc}</p>
-                </div>
-                <span className="text-xs text-[#8F95A8] shrink-0">{p.date}</span>
+                <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate flex-1">{p.title}</p>
               </button>
             )
           })}
@@ -251,19 +248,19 @@ function ProjectSelectModal({ selected, onClose, onApply }) {
 }
 
 /* ─── AuthorSelectModal ─── */
-function AuthorSelectModal({ title, selected, onClose, onApply }) {
+function AuthorSelectModal({ title, selected, onClose, onApply, usersList = [] }) {
   const [query, setQuery] = useState('')
   const [local, setLocal] = useState(selected)
 
-  const filtered = EMPLOYEES_LIST.filter(e =>
-    e.name.toLowerCase().includes(query.toLowerCase()) ||
-    e.role.toLowerCase().includes(query.toLowerCase())
+  const filtered = usersList.filter(u =>
+    (u.username ?? '').toLowerCase().includes(query.toLowerCase()) ||
+    (u.position_info?.name ?? '').toLowerCase().includes(query.toLowerCase())
   )
 
-  const toggle = emp => setLocal(prev =>
-    prev.find(x => x.name === emp.name)
-      ? prev.filter(x => x.name !== emp.name)
-      : [...prev, emp]
+  const toggle = u => setLocal(prev =>
+    prev.find(x => x.id === u.id)
+      ? prev.filter(x => x.id !== u.id)
+      : [...prev, { id: u.id, name: u.username, role: u.position_info?.name || u.roles?.[0] || '' }]
   )
 
   return (
@@ -283,9 +280,9 @@ function AuthorSelectModal({ title, selected, onClose, onApply }) {
             <button
               type="button"
               onClick={() =>
-                local.length === EMPLOYEES_LIST.length
+                local.length === usersList.length
                   ? setLocal([])
-                  : setLocal([...EMPLOYEES_LIST])
+                  : setLocal(usersList.map(u => ({ id: u.id, name: u.username, role: u.position_info?.name || u.roles?.[0] || '' })))
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
                 text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors shrink-0"
@@ -298,7 +295,7 @@ function AuthorSelectModal({ title, selected, onClose, onApply }) {
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Ism Sharifi bo'yicha izlash"
+                placeholder="Ism bo'yicha izlash"
                 className="flex-1 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]"
               />
             </div>
@@ -307,13 +304,14 @@ function AuthorSelectModal({ title, selected, onClose, onApply }) {
 
         {/* List */}
         <div className="flex-1 overflow-y-auto px-7 pb-2 flex flex-col gap-2">
-          {filtered.map(emp => {
-            const checked = !!local.find(x => x.name === emp.name)
+          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
+          {filtered.map(u => {
+            const checked = !!local.find(x => x.id === u.id)
             return (
               <button
-                key={emp.name}
+                key={u.id}
                 type="button"
-                onClick={() => toggle(emp)}
+                onClick={() => toggle(u)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
                   ${checked
                     ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[#526ED3]'
@@ -328,11 +326,11 @@ function AuthorSelectModal({ title, selected, onClose, onApply }) {
                   )}
                 </div>
                 <div className="w-8 h-8 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
-                  {emp.name.slice(0, 2).toUpperCase()}
+                  {(u.username ?? '?').slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{emp.name}</p>
-                  <p className="text-xs text-[#8F95A8]">{emp.role}</p>
+                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
+                  <p className="text-xs text-[#8F95A8]">{u.position_info?.name || u.roles?.[0] || '—'}</p>
                 </div>
               </button>
             )
@@ -371,6 +369,25 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...TASK_EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
   const [subModal, setSubModal] = useState(null) // 'project' | 'author'
+
+  const [projectsList, setProjectsList] = useState([])
+  const [usersList, setUsersList] = useState([])
+
+  useEffect(() => {
+    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+      .then(res => {
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setProjectsList(list)
+      }).catch(() => {})
+
+    axiosAPI.get('/users/', { params: { page_size: 200 } })
+      .then(res => {
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setUsersList(list)
+      }).catch(() => {})
+  }, [])
 
   return (
     <>
@@ -503,6 +520,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           selected={f.projects}
           onClose={() => setSubModal(null)}
           onApply={items => { set('projects', items); setSubModal(null) }}
+          projectsList={projectsList}
         />
       )}
       {subModal === 'author' && (
@@ -511,6 +529,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           selected={f.authors}
           onClose={() => setSubModal(null)}
           onApply={items => { set('authors', items); setSubModal(null) }}
+          usersList={usersList}
         />
       )}
     </>
