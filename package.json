@@ -12,6 +12,7 @@
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@tailwindcss/vite": "^4.2.4",
+    "antd": "^6.3.7",
     "axios": "^1.15.2",
     "dayjs": "^1.11.20",
     "react": "^19.1.1",

@@ -3,9 +3,10 @@ import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { usePageAction } from '../context/PageActionContext'
 import { useTheme } from '../context/ThemeContext'
-import { FaXmark } from 'react-icons/fa6'
+import { FaAngleDown, FaXmark } from 'react-icons/fa6'
 import { FaFolder } from 'react-icons/fa'
-import { MdCheck } from 'react-icons/md'
+import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
+import { ExcelIcon, PdfIcon } from './icons'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -13,9 +14,11 @@ const labelMap = {
   projects: 'Loyihalar', payments: "Xarajat so'rovlari", finance: 'Ish haqi',
   history: 'Tarix',
   reports: 'Hisobotlar', messages: 'Xabarlar', settings: 'Sozlamalar',
-  team: 'Jamoam', tasks: 'Vazifalar', calendar: 'Kalendar',
-  salary: 'Maosh', archive: 'Arxiv', staff: 'Xodimlar', done: 'Bajarilgan',
-  applications: 'Arizalar', positions: 'Lavozimlar', regions: 'Viloyatlar', districts: 'Tumanlar',
+  team: 'Jamoam', tasks: 'Vazifalar', by_tasks: 'Vazifalar bo\'yicha',
+  project: "Loyihalar bo\'yicha", cost_inquiries: "Xarajat so'rovlari bo'yicha",
+  calendar: 'Kalendar',
+  salary: 'Ish haqi bo\'yicha', employee: 'Xodimlar bo\'yicha', archive: 'Arxiv', staff: 'Xodimlar', done: 'Bajarilgan',
+  applications: 'Arizalar', positions: 'Lavozimlar', regions: 'Viloyatlar',
 }
 
 const NOTIFS_DATA = [
@@ -36,11 +39,9 @@ function groupByDate(notifs) {
 }
 
 function NotificationPanel({ notifs, setNotifs, onClose }) {
-  const unreadCount = notifs.filter(n => !n.read).length
   const grouped = groupByDate(notifs)
 
   const markRead = (id) => setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-  const markAllRead = () => setNotifs(prev => prev.map(n => ({ ...n, read: true })))
 
   return (
     <div
@@ -51,7 +52,7 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-[#EEF1F7] dark:border-[#292A2A] shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2> 
+          <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -129,7 +130,7 @@ function Breadcrumb() {
     return false
   }
 
-  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create', 'admin', 'manager', 'employee']
+  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create', 'admin', 'manager']
 
   const parts = location.pathname.split('/').filter(part => {
     if (!part) return false
@@ -142,7 +143,7 @@ function Breadcrumb() {
     <>
       {parts.map((part, i) => {
         const isLast = i === parts.length - 1
-        const label  = labelMap[part] || part
+        const label = labelMap[part] || part
         return (
           <span key={i} className="flex items-center gap-1">
             {i > 0 && (
@@ -162,10 +163,22 @@ function Breadcrumb() {
 }
 
 export default function Layout() {
-  const { action, breadcrumbExtra, navbarExtra, sidebarClickHandler } = usePageAction()
+  const { action, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
   const { isDark, toggleTheme } = useTheme()
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifs, setNotifs] = useState(NOTIFS_DATA)
+  const [downloadOpen, setDownloadOpen] = useState(false)
+  const downloadRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (downloadRef.current && !downloadRef.current.contains(event.target)) {
+        setDownloadOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // navbarExtra mavjud bo'lsa sidebar collapsed holda ko'rsatiladi (kanban mode)
   const isKanban = !!navbarExtra
@@ -213,6 +226,60 @@ export default function Layout() {
               </button>
             )}
 
+            {print && (
+              <button
+                onClick={print.onClick}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors bg-[#e9eeff] text-[#1A1D2E] "
+                style={{ fontSize: 13, fontWeight: 800 }}
+              >
+                <MdOutlinePrint size={20} />
+                Chop etish
+              </button>
+            )}
+
+            {download && (
+              <div className="relative" ref={downloadRef}>
+                <button className='flex items-center gap-[2px] rounded-xl overflow-hidden'>
+                  <span className='flex items-center h-full px-3 py-2 gap-1 text-[13px] font-extrabold text-white! bg-[#3f57b3] cursor-pointer hover:bg-[#526ED3] transition-colors'>
+                    <MdOutlineFileDownload size={20} />
+                    Yuklab olish
+                  </span>
+                  <span
+                    onClick={() => setDownloadOpen(!downloadOpen)}
+                    className='flex items-center h-full px-1.5 py-2.5 justify-center bg-[#3f57b3] text-white! cursor-pointer border-l border-white/20 hover:bg-[#526ED3] transition-colors'
+                  >
+                    <FaAngleDown size={16} />
+                  </span>
+                </button>
+
+                {downloadOpen && (
+                  <div className="absolute top-full right-0 mt-3 w-[230px] bg-[#F1F3F9] dark:bg-[#292A2A] rounded-[24px] p-3 shadow-2xl z-50 flex flex-col gap-2 border border-white/50 dark:border-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {[
+                      { label: 'Excel', icon: <ExcelIcon size={24} />, key: 'excel' },
+                      { label: 'PDF', icon: <PdfIcon size={24} />, key: 'pdf' },
+                      { label: 'CSV', icon: <img src="/imgs/csv.svg" alt="CSV" className="w-8 h-8" />, key: 'csv' }
+                    ].map((item) => (
+                      <div
+                        key={item.key}
+                        onClick={() => { download[item.key](); setDownloadOpen(false) }}
+                        className="flex items-center justify-between p-2 bg-white/40 dark:bg-white/5 rounded-[18px] cursor-pointer hover:bg-white dark:hover:bg-white/10 transition-all active:scale-[0.98] group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white dark:bg-[#1C1D1D] rounded-[14px] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                            {item.icon}
+                          </div>
+                          <span className="text-[#1A1D2E] dark:text-white font-bold text-base">{item.label}</span>
+                        </div>
+                        <div className="w-6 h-6 flex items-center justify-center text-[#5B6078] dark:text-[#C2C8E0] group-hover:text-[#3F57B3] transition-colors">
+                          <MdOutlineFileDownload size={22} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Dark mode toggle */}
             <button
               onClick={toggleTheme}
@@ -224,12 +291,12 @@ export default function Layout() {
             >
               {isDark ? (
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="4"/>
-                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
                 </svg>
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
               )}
             </button>

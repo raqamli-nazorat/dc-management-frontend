@@ -47,7 +47,7 @@ const ApplicationDetail = () => {
   const handleSave = async () => {
     try {
       const { data } = await axiosAPI.patch(`applications/${id}/`, { conclusion })
-      setApplication(data?.data)
+      setConclusion(data?.data?.conclusion)
       toast.success('Xodim hulosasi yangilandi!', 'Xodim hulosasi muvaffaqiyatli yuborildi!')
     } catch (error) {
       const errData = error?.response?.data?.error;
@@ -198,7 +198,7 @@ const ApplicationDetail = () => {
               <input
                 disabled
                 className={`${inputCls} underline`}
-                value={(application?.portfolio.length < 80 ? application?.portfolio : application.portfolio.slice(0, 80) + '...') || 'Portfolio yuklanmagan'}
+                value={(application?.portfolio?.length < 80 ? application?.portfolio : application?.portfolio?.slice(0, 80) + '...') || 'Portfolio yuklanmagan'}
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.portfolio); setCopyText(true) }}
@@ -215,6 +215,7 @@ const ApplicationDetail = () => {
             <label className={labelCls}>O'qish joyi va kursi</label>
             <textarea
               disabled
+              placeholder="O'qish joyi yoki kursi ma'lumotlari"
               className={`${inputCls} h-[80px]`}
               value={application.university || ''}
             />
