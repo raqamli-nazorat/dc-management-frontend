@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from "../../../Toast/ToastProvider";
 
 const Roles = {
-  superadmin: 'Bosh administrator',
   admin: 'Admin',
   manager: 'Menejer',
   employee: 'Xodim',
@@ -124,10 +123,9 @@ export default function UsersPage() {
       cancelSelecting()
     } catch (error) {
       console.error(error)
+      toast.error("Foydalanuvchilarni o'chirish", error?.response?.data?.error?.errorMsg || "Foydalanuvchilarni o'chirishda xatolik yuz berdi")
     }
   }
-
-  const handleMove = () => { toast.success("Ko'chirildi", "Tanlangan foydalanuvchi muvaffaqiyatli ko'chirildi"); cancelSelecting() }
 
   // ── List view ──
   return (
@@ -235,7 +233,7 @@ export default function UsersPage() {
             }}
             width='130px'
           />
-          <FilterSelect options={SORTS} value={sort} width='140px' onChange={setSort} />
+          <FilterSelect options={SORTS} value={sort} placeholder="Saralash" width='140px' onChange={setSort} />
         </div>
 
         {/* Table */}
@@ -321,10 +319,6 @@ export default function UsersPage() {
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
             <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
-            <button onClick={handleMove} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-[#EEF1F7] text-[#1A1D2E] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#333434]">
-              <MdArrowForward size={16} />
-              Ko'chirish
-            </button>
             <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
               <MdDelete size={16} />
               O'chirish

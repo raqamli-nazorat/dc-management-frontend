@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaFileLines, FaCamera } from "react-icons/fa6"
 import { MdCheck } from "react-icons/md"
 import { FiGithub } from "react-icons/fi"
@@ -87,9 +87,14 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
         integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
         if (decimalPart !== undefined) {
-            return `${integerPart}.${decimalPart.slice(0, 2)}`;
+            const sliced = decimalPart.slice(0, 2);
+            if (sliced === '00') {
+                return integerPart === '0' ? '' : integerPart;
+            }
+            return `${integerPart}.${sliced}`;
         }
-        return integerPart;
+
+        return integerPart === '0' ? '' : integerPart;
     }
 
     const handleSubmit = async () => {
@@ -121,7 +126,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                         formData.append(key, form[key])
                     }
                 } else if (key === 'salary') {
-                    formData.append('salary', form.salary.toString().replace(/\s/g, ''))
+                    formData.append('fixed_salary', form.salary.toString().replace(/\s/g, ''))
                 } else if (form[key] !== null && form[key] !== '') {
                     formData.append(key, form[key])
                 }

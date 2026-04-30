@@ -7,14 +7,16 @@ import dayjs from 'dayjs'
 import { FaFileLines } from 'react-icons/fa6'
 import { CopyIcon } from '../../../components/icons'
 import { Alert } from '../Components/Alert'
+import { FaCheck } from 'react-icons/fa6'
 
 const ApplicationDetail = () => {
   const { id } = useParams()
-  const user = JSON.parse(localStorage.getItem("user"))
   const { registerBreadcrumb, clearBreadcrumb } = usePageAction()
   const [application, setApplication] = useState(null)
   const [copyText, setCopyText] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const [conclusion, setConclusion] = useState(null)
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -23,6 +25,7 @@ const ApplicationDetail = () => {
         const { data } = await axiosAPI.get(`applications/${id}/`)
         const app = data?.data
         setApplication(app)
+        setConclusion(app?.conclusion || '')
         if (app?.full_name) {
           registerBreadcrumb(app.full_name)
         }
@@ -41,16 +44,26 @@ const ApplicationDetail = () => {
     }
   }, [id])
 
-  const statuses = (status) => {
-    switch (status) {
-      case 'accepted':
-        return 'Qabul qilindi'
-      case 'pending':
-        return 'Kutilmoqda'
-      case 'rejected':
-        return 'Rad etildi'
-      default:
-        return 'Noto\'g\'ri'
+  const handleSave = async () => {
+    try {
+      const { data } = await axiosAPI.patch(`applications/${id}/`, { conclusion })
+      setConclusion(data?.data?.conclusion)
+      toast.success('Xodim hulosasi yangilandi!', 'Xodim hulosasi muvaffaqiyatli yuborildi!')
+    } catch (error) {
+      const errData = error?.response?.data?.error;
+
+      // Field-level detail xatolarini chiqarish (masalan: password, name ...)
+      let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+      if (errData?.details && typeof errData.details === 'object') {
+        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        if (detailMsgs) errMsg = detailMsgs;
+      } else if (errData?.errorMsg) {
+        errMsg = errData.errorMsg;
+      } else if (typeof error?.response?.data === 'string') {
+        errMsg = error.response.data;
+      }
+      
+      toast.error('Yangilanishda xatolik', errMsg);
     }
   }
 
@@ -148,7 +161,7 @@ const ApplicationDetail = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Lavozim</label>
             <input
@@ -163,14 +176,6 @@ const ApplicationDetail = () => {
               disabled
               className={inputCls}
               value={application.region_info?.name || ''}
-            />
-          </div>
-          <div>
-            <label className={labelCls}>Holati</label>
-            <input
-              disabled
-              className={inputCls}
-              value={statuses(application.status) || ''}
             />
           </div>
         </div>
@@ -193,7 +198,7 @@ const ApplicationDetail = () => {
               <input
                 disabled
                 className={`${inputCls} underline`}
-                value={(application?.portfolio.length < 80 ? application?.portfolio : application.portfolio.slice(0, 80) + '...') || 'Portfolio yuklanmagan'}
+                value={(application?.portfolio?.length < 80 ? application?.portfolio : application?.portfolio?.slice(0, 80) + '...') || 'Portfolio yuklanmagan'}
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.portfolio); setCopyText(true) }}
@@ -205,25 +210,47 @@ const ApplicationDetail = () => {
             </div>
           </div>
         </div>
-        <div>
-          <label className={labelCls}>O'qish joyi va kursi</label>
-          <textarea
-            disabled
-            className={`${inputCls} h-25`}
-            value={application.university || ''}
-          />
-        </div>
-
-        {user?.roles?.map((role) => (role.includes('admin') || role.includes('manager'))) && (
-          <div className="flex flex-col gap-2 mt-0!">
-            <span className="text-[20px] font-bold dark:text-white">Xodim hulosasi</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>O'qish joyi va kursi</label>
             <textarea
-              className={`${inputCls} h-[120px]`}
-              placeholder='Xodim hulosasini kiriting'
-              value={application.conclusion || ''}
+              disabled
+              placeholder="O'qish joyi yoki kursi ma'lumotlari"
+              className={`${inputCls} h-[80px]`}
+              value={application.university || ''}
             />
           </div>
-        )}
+          <div>
+            <label className={labelCls}>Qo'shimcha ma'lumotlar yoki savollar</label>
+            <textarea
+              disabled
+              placeholder="Qo'shimcha ma'lumot"
+              className={`${inputCls} h-[80px]`}
+              value={application.extra_info || ''}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 -mt-3!">
+          <span className="text-[20px] font-bold dark:text-white">Xodim hulosasi</span>
+          <textarea
+            className={`${inputCls} h-25`}
+            placeholder='Xodim hulosasini kiriting'
+            value={conclusion}
+            onChange={(e) => setConclusion(e.target.value)}
+          />
+          <div className="flex justify-end mt-1">
+            <button
+              onClick={handleSave}
+              style={{ fontSize: 14, color: '#FFFFFF' }}
+              className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold transition-colors hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! disabled:text-gray-500!"
+              disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
+            >
+              <FaCheck size={15} />
+              Saqlash
+            </button>
+          </div>
+        </div>
       </div>
       <Alert
         show={copyText}
@@ -231,6 +258,12 @@ const ApplicationDetail = () => {
         onClose={() => setCopyText(false)}
         duration={2000}
       />
+
+      <style>{`
+        body{
+          overflow: hidden !important;
+        }
+      `}</style>
     </>
   )
 }

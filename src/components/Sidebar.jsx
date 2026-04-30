@@ -45,8 +45,16 @@ const menuByRole = {
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
+<<<<<<< HEAD
         { label: 'Umumiy',   path: '/admin/reports' },
         { label: 'Xodimlar', path: '/admin/reports/staff' },
+=======
+        { label: 'Xodim bo\'yicha', path: '/admin/reports/employee' },
+        { label: 'Loyihalar bo\'yicha', path: '/admin/reports/project' },
+        { label: 'Xarajat so\'rovlari bo\'yicha', path: '/admin/reports/cost_inquiries' },
+        { label: 'Ish haqi bo\'yicha', path: '/admin/reports/salary' },
+        { label: 'Vazifalar bo\'yicha', path: '/admin/reports/by_tasks' },
+>>>>>>> 88ef4a8213f37e49315a732dd3b5916cdd906831
       ],
     },
     {
@@ -55,7 +63,6 @@ const menuByRole = {
         { label: 'Arizalar',   path: '/admin/applications' },
         { label: 'Lavozimlar', path: '/admin/applications/positions' },
         { label: 'Viloyatlar', path: '/admin/applications/regions' },
-        { label: 'Tumanlar',   path: '/admin/applications/districts' },
       ],
     },
   ],

@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { MdConstruction } from 'react-icons/md'
+import { usePageAction } from '../../../../context/PageActionContext'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
-import { usePageAction } from '../../../../context/PageActionContext'
-import CreatePosition from './CreatePosition'
-import { FaCheck } from 'react-icons/fa'
+import CreateRegion from './CreateRegion'
 import { ConfirmationModal } from '../../../../components/ConfirmationModal'
+import { FaCheck } from 'react-icons/fa'
 
-const ApplicationsPage = () => {
+
+const RegionsPage = () => {
   const { registerAction, clearAction } = usePageAction()
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
@@ -17,8 +19,8 @@ const ApplicationsPage = () => {
 
   useEffect(() => {
     registerAction({
-      label: "Lavozim qo'shish",
-      icon: <img src="/imgs/user-square.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
+      label: "Viloyat qo'shish",
+      icon: <img src="/imgs/location-06.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
       onClick: () => setShowAdd(true),
     })
     return () => clearAction()
@@ -26,11 +28,11 @@ const ApplicationsPage = () => {
 
   const fetchApplications = async (params = {}) => {
     try {
-      const { data } = await axiosAPI.get('applications/positions/', { params })
+      const { data } = await axiosAPI.get('applications/regions/', { params })
       setApplications(data.data.results)
     } catch (error) {
       console.error('Error fetching applications:', error)
-      toast.error(error.data.error.errorMsg || 'Arizalar yuklanmadi')
+      toast.error(error?.response?.data?.error?.errorMsg || 'Viloyatlar yuklanmadi')
     }
   }
 
@@ -44,8 +46,8 @@ const ApplicationsPage = () => {
 
   const handleIsApplication = async (id) => {
     try {
-      await axiosAPI.patch(`applications/positions/${id}/`, { is_application: !applications.find(item => item.id === id).is_application })
-      toast.success('Lavozim yangilandi')
+      await axiosAPI.patch(`applications/regions/${id}/`, { is_application: !applications.find(item => item.id === id).is_application })
+      toast.success('Viloyat yangilandi')
       fetchApplications()
       setShowConfirm(false)
     } catch (error) {
@@ -53,7 +55,7 @@ const ApplicationsPage = () => {
       const errData = error?.response?.data?.error;
 
       // Field-level detail xatolarini chiqarish (masalan: password, name ...)
-      let errMsg = "Xatolik yuz berdi";
+      let errMsg = "Xatolik yuz berdi" || errData.errorMsg;
       if (errData?.details && typeof errData.details === 'object') {
         const detailMsgs = Object.values(errData.details).flat().join(' ');
         if (detailMsgs) errMsg = detailMsgs;
@@ -71,6 +73,7 @@ const ApplicationsPage = () => {
     fetchApplications()
   }, [])
 
+
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -79,7 +82,7 @@ const ApplicationsPage = () => {
             className="text-[#1A1D2E] dark:text-[#FFFFFF]"
             style={{ fontSize: 24, fontWeight: 800 }}
           >
-            Lavozimlar
+            Viloyatlar
           </h1>
           <div className="flex items-center gap-5">
             <div className="relative">
@@ -107,7 +110,7 @@ const ApplicationsPage = () => {
                   <th className="w-[300px]" style={{ fontWeight: 500, color: '#5B6078' }}>
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
-                      Lavozim
+                      Viloyat
                     </span>
                   </th>
                   <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>Yaratilgan vaqt</th>
@@ -144,14 +147,14 @@ const ApplicationsPage = () => {
               </tbody>
             </table>
             {applications.length === 0 && (
-              <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Arizalar topilmadi</div>
+              <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Viloyatlar topilmadi</div>
             )}
           </div>
         </div>
       </div>
 
       {showAdd &&
-        <CreatePosition
+        <CreateRegion
           onClose={() => setShowAdd(false)}
           refetch={fetchApplications}
         />
@@ -171,4 +174,4 @@ const ApplicationsPage = () => {
   )
 }
 
-export default ApplicationsPage
+export default RegionsPage

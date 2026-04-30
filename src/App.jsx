@@ -18,11 +18,17 @@ import AdminApplications from './pages/admin/applications/Applications'
 import AdminApplicationDetail from './pages/admin/applications/ApplicationDetail'
 import AdminPositions from './pages/admin/applications/Positions/'
 import AdminRegions from './pages/admin/applications/Regions'
-import AdminDistricts from './pages/admin/applications/Districts'
 import MenagerDashboard from './pages/menager/Dashboard'
 import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
 import { ToastProvider } from './Toast/ToastProvider'
+
+// Reports
+import ByTasks from './pages/admin/Reports/ByTasks'
+import CostInquiries from './pages/admin/Reports/CostInquiries'
+import Employee from './pages/admin/Reports/Employee'
+import Project from './pages/admin/Reports/Project'
+import Salary from './pages/admin/Reports/Salary'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -36,6 +42,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
+<<<<<<< HEAD
               {/* ── Admin ── */}
               <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
                 <Route path="dashboard" element={<AdminDashboard />} />
@@ -60,6 +67,33 @@ function App() {
                 <Route path="messages" element={PH('Xabarlar')} />
                 <Route path="settings" element={PH('Sozlamalar')} />
               </Route>
+=======
+            {/* Admin */}
+            <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="users/detail/:id" element={<AdminUserDetail />} />
+              <Route path="roles" element={PH('Rollar')} />
+              <Route path="projects" element={<AdminProjects />} />
+              <Route path="projects/archive" element={PH('Arxiv')} />
+              <Route path="tasks" element={<AdminTasks />} />
+              <Route path="meetings" element={<AdminMeetings />} />
+              <Route path="payments" element={<AdminPayments />} />
+              <Route path="finance" element={<AdminSalary />} />
+              <Route path="finance/history" element={<AdminFinanceHistory />} />
+              <Route path="reports/project" element={<Project />} />
+              <Route path="reports/cost_inquiries" element={<CostInquiries />} />
+              <Route path="reports/employee" element={<Employee />} />
+              <Route path="reports/salary" element={<Salary />} />
+              <Route path="reports/by_tasks" element={<ByTasks />} />
+              <Route path="applications" element={<AdminApplications />} />
+              <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
+              <Route path="applications/positions" element={<AdminPositions />} />
+              <Route path="applications/regions" element={<AdminRegions />} />
+              <Route path="messages" element={PH('Xabarlar')} />
+              <Route path="settings" element={PH('Sozlamalar')} />
+            </Route>
+>>>>>>> 88ef4a8213f37e49315a732dd3b5916cdd906831
 
               {/* ── Menager ── */}
               <Route path="/menager" element={<ProtectedRoute allowedRole="menager"><Layout /></ProtectedRoute>}>

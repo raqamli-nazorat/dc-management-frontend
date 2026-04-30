@@ -1,4 +1,4 @@
-﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
@@ -13,7 +13,6 @@ import { toast } from "../../../Toast/ToastProvider"
 const Dropdown = FilterSelect
 
 const Roles = {
-    superadmin: 'Bosh administrator',
     admin: 'Admin',
     manager: 'Menejer',
     employee: 'Xodim',
@@ -72,12 +71,12 @@ const UserDetail = () => {
     }, [])
 
     useEffect(() => {
-        if (form.region) {
-            axiosAPI.get(`/applications/districts/?region=${form.region}`)
+        if (form.region_info?.id) {
+            axiosAPI.get(`/applications/districts/?region=${form.region_info.id}`)
                 .then(res => setDistricts(res.data.data.results))
                 .catch(err => console.error(err))
         }
-    }, [form.region])
+    }, [form.region_info?.id])
 
     useEffect(() => {
         if (user) {
@@ -141,38 +140,66 @@ const UserDetail = () => {
 
     const handleCancel = () => { setForm(initial); setIsDirty(false) }
 
-    console.log(user);
-
     const handleSave = async () => {
         try {
-
-            // --- FormData yaratish ---
             const formData = new FormData()
+            
+            // Ism o'zgargan bo'lsa
+            if (form.name !== initial.name) {
+                formData.append('name', form.name)
+            }
 
-            // Hamma oddiy maydonlarni qo'shamiz faqat o'zgargan maydonlar yuboriladi
-            Object.keys(form).forEach(key => {
-                if (form[key] !== user[key]) { // Faqat o'zgargan maydonlarni tekshiramiz
-                    if (key === 'roles') {
-                        form.roles.map(r => Object.keys(Roles).find(k => Roles[k] === r)).forEach(role => formData.append('roles', role))
-                    } else if (key === 'avatar' && form.avatar instanceof File) {
-                        formData.append('avatar', form.avatar)
-                    } else if (key === 'passport_image' && form.passport_image instanceof File) {
-                        formData.append('passport_image', form.passport_image)
-                    } else if (key === 'fixed_salary') {
-                        formData.append('fixed_salary', form.fixed_salary.toString().replace(/\s/g, ''))
-                    } else if (key === 'balance') {
-                        formData.append('balance', form.balance.toString().replace(/\s/g, ''))
-                    } else if (form[key] !== null && form[key] !== '') {
-                        formData.append(key, form[key])
-                    }
-                }
-            });
+            // Parol kiritilgan bo'lsa
+            if (form.password) {
+                formData.append('password', form.password)
+            }
 
-            formData.append("social_links", JSON.stringify({
-                "github": form.github,
-                "linkedin": form.linkedin,
-                "telegram": form.telegram,
-            }))
+            // Oylik maosh o'zgargan bo'lsa
+            const salary = form.fixed_salary?.toString().replace(/\s/g, '') || ''
+            const initialSalary = initial.fixed_salary?.toString().replace(/\s/g, '') || ''
+            if (salary !== initialSalary) {
+                formData.append('fixed_salary', salary)
+            }
+
+            // Viloyat, tuman va lavozim o'zgargan bo'lsa (ID larni jo'natamiz)
+            if (form.region_info?.id !== initial.region_info?.id) {
+                formData.append('region', form.region_info?.id || '')
+            }
+            if (form.district_info?.id !== initial.district_info?.id) {
+                formData.append('district', form.district_info?.id || '')
+            }
+            if (form.position_info?.id !== initial.position_info?.id) {
+                formData.append('position', form.position_info?.id || '')
+            }
+
+            // Rollar o'zgargan bo'lsa
+            const rolesChanged = JSON.stringify([...(form.roles || [])].sort()) !== JSON.stringify([...(initial.roles || [])].sort())
+            if (rolesChanged) {
+                form.roles.map(r => Object.keys(Roles).find(k => Roles[k] === r) || r)
+                    .forEach(role => formData.append('roles', role))
+            }
+
+            // Rasmlar o'zgargan bo'lsa (yangi fayl tanlangan bo'lsa)
+            if (form.avatar instanceof File) {
+                formData.append('avatar', form.avatar)
+            }
+            if (form.passport_image instanceof File) {
+                formData.append('passport_image', form.passport_image)
+            }
+
+            // Passport seriya va raqami o'zgargan bo'lsa
+            if (form.passportSeria !== initial.passportSeria || form.passportRaqam !== initial.passportRaqam) {
+                formData.append('passport_series', (form.passportSeria || '') + (form.passportRaqam || ''))
+            }
+
+            // Ijtimoiy tarmoqlar o'zgargan bo'lsa
+            if (form.github !== initial.github || form.linkedin !== initial.linkedin || form.telegram !== initial.telegram) {
+                formData.append("social_links", JSON.stringify({
+                    "github": form.github || '',
+                    "linkedin": form.linkedin || '',
+                    "telegram": form.telegram || '',
+                }))
+            }
 
             const { data } = await axiosAPI.patch(`users/${id}/`, formData);
 
@@ -219,9 +246,14 @@ const UserDetail = () => {
         integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
         if (decimalPart !== undefined) {
-            return `${integerPart}.${decimalPart.slice(0, 2)}`;
+            const sliced = decimalPart.slice(0, 2);
+            if (sliced === '00') {
+                return integerPart === '0' ? '' : integerPart;
+            }
+            return `${integerPart}.${sliced}`;
         }
-        return integerPart;
+
+        return integerPart === '0' ? '' : integerPart;
     }
 
     if (loading) return <span>Loading...</span>
@@ -348,6 +380,7 @@ const UserDetail = () => {
                                 className={inputCls + ' text-right'}
                                 type="text"
                                 inputMode="numeric"
+                                placeholder="0.00"
                                 value={formatNum(form.fixed_salary)}
                                 onChange={e => set('fixed_salary', formatNum(e.target.value))}
                             />
@@ -358,6 +391,7 @@ const UserDetail = () => {
                                 className={inputCls + ' text-right'}
                                 type="text"
                                 inputMode="numeric"
+                                placeholder="0.00"
                                 value={form.balance ? formatNum(form.balance) : ''}
                                 disabled
                             />

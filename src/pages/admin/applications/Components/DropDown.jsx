@@ -39,10 +39,11 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
+                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[#526ED3]' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
-                <span className="flex-1 text-left truncate">{display}</span>
+                {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[#526ED3]!" size={16} /> : null}
+                <span className={`flex-1 text-left truncate ${display === "Rad etildi" ? "text-red-500!" : display === "Qabul qilindi" ? "text-[#526ED3]!" : ""}`}>{display}</span>
                 <MdExpandMore
                     size={16}
                     className={`shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
