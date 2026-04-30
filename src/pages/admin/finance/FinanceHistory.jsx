@@ -44,7 +44,8 @@ const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E
 async function apiGetLedger(params = {}) {
   const res = await axiosAPI.get('/ledger/', { params })
   const payload = res.data?.data ?? res.data
-  return Array.isArray(payload) ? payload : (payload.results ?? [])
+  if (Array.isArray(payload)) return { results: payload, next: null }
+  return { results: payload.results ?? [], next: payload.next ?? null }
 }
 
 function buildParams(filters, search) {
@@ -354,36 +355,57 @@ export default function FinanceHistoryPage() {
   const [search, setSearch] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
   const [showFilter, setShowFilter] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [detailItem, setDetailItem] = useState(null)
+  const scrollRef = useRef(null)
 
   const hasFilter = Object.values(filters).some(v => v)
 
-  const loadData = async (f = filters, q = search) => {
-    setLoading(true)
+  const loadData = async (f = filters, q = search, pg = 1) => {
+    if (pg === 1) setLoading(true)
+    else setLoadingMore(true)
     try {
-      const result = await apiGetLedger(buildParams(f, q))
-      setData(result)
+      const { results, next } = await apiGetLedger({ ...buildParams(f, q), page: pg, page_size: 20 })
+      setData(prev => pg === 1 ? results : [...prev, ...results])
+      setHasMore(!!next)
+      setPage(pg)
     } catch (err) {
       console.error(err)
       toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
+
+  // Scroll listener
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60 && hasMore && !loadingMore) {
+        loadData(filters, search, page + 1)
+      }
+    }
+    el.addEventListener('scroll', handleScroll)
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [hasMore, loadingMore, page, filters, search])
 
   useEffect(() => { loadData() }, [])
 
   const handleSearch = (val) => {
     setSearch(val)
-    loadData(filters, val)
+    loadData(filters, val, 1)
   }
 
   const handleApplyFilter = (f) => {
     setFilters(f)
     setShowFilter(false)
-    loadData(f, search)
+    loadData(f, search, 1)
   }
 
   const handleRowClick = (item) => {
@@ -423,7 +445,7 @@ export default function FinanceHistoryPage() {
       </div>
 
       {/* Scroll bo'ladigan qism */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto  dark:border-[#292A2A]">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-auto  dark:border-[#292A2A]">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : data.length === 0 ? (
@@ -460,6 +482,15 @@ export default function FinanceHistoryPage() {
               ))}
             </tbody>
           </table>
+        )}
+        {loadingMore && (
+          <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+            <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            Yuklanmoqda...
+          </div>
         )}
       </div>
 
