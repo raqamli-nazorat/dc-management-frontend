@@ -12,13 +12,13 @@ import EmptyState from '../../../components/EmptyState'
 
 /* ── Columns ── */
 const COLUMNS = [
-  { id: 'Qilinishi kerak',   color: '#6366F1' },
-  { id: 'Jarayonda',         color: '#3B82F6' },
-  { id: 'Bajarilgan',        color: '#8B5CF6' },
-  { id: 'Ishga tushirilgan', color: '#10B981' },
-  { id: 'Tekshirilgan',      color: '#F59E0B' },
-  { id: 'Rad etilgan',       color: '#EF4444' },
-  { id: "Muddati o'tgan",    color: '#6B7280' },
+  { id: 'Qilinishi kerak',   color: '#6366F1', bg: '#EEF2FF' },
+  { id: 'Jarayonda',         color: '#3B82F6', bg: '#EFF6FF' },
+  { id: 'Bajarilgan',        color: '#8B5CF6', bg: '#F5F3FF' },
+  { id: 'Ishga tushirilgan', color: '#10B981', bg: '#ECFDF5' },
+  { id: 'Tekshirilgan',      color: '#F59E0B', bg: '#FFFBEB' },
+  { id: 'Rad etilgan',       color: '#EF4444', bg: '#FEF2F2' },
+  { id: "Muddati o'tgan",    color: '#6B7280', bg: '#F9FAFB' },
 ]
 
 /* ── Initial cards ── */
@@ -44,8 +44,7 @@ const INITIAL_CARDS = [
 ]
 
 /* ── KanbanCard ── */
-function KanbanCard({ card, index, colColor }) {
-  const bgAlpha = colColor + '18' // ~10% opacity hex
+function KanbanCard({ card, index }) {
   return (
     <Draggable draggableId={card.id} index={index}>
       {(provided, snapshot) => (
@@ -55,17 +54,17 @@ function KanbanCard({ card, index, colColor }) {
           {...provided.dragHandleProps}
           style={{
             ...provided.draggableProps.style,
-            opacity: snapshot.isDragging ? 0.88 : 1,
+            opacity: snapshot.isDragging ? 0.92 : 1,
             transform: snapshot.isDragging
               ? `${provided.draggableProps.style?.transform} scale(1.02)`
               : provided.draggableProps.style?.transform,
-            boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.14)' : undefined,
-            backgroundColor: snapshot.isDragging ? '#fff' : bgAlpha,
+            boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.12)' : undefined,
           }}
-          className={`rounded-2xl bg-red-500 border p-3 flex flex-col gap-2 cursor-grab active:cursor-grabbing select-none
+          className={`rounded-2xl bg-white border p-3 flex flex-col gap-2 cursor-grab active:cursor-grabbing select-none
+            dark:bg-[#1C1D1D]
             ${snapshot.isDragging
-              ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
-              : 'border-transparent'}`}
+              ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20 dark:border-[#526ED3]'
+              : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}
         >
           {/* Title */}
           <p className="text-[12px] font-bold text-[#1A1D2E] dark:text-white leading-snug">{card.title}</p>
@@ -105,7 +104,7 @@ function KanbanCard({ card, index, colColor }) {
           </div>
 
           {/* Assignee */}
-          <div className="flex  items-center gap-1.5 pt-1.5 border-t border-black/[0.06] dark:border-white/[0.06]">
+          <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#EEF1F7] dark:border-[#292A2A]">
             <div className="w-5 h-5 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[9px] font-bold text-[#526ED3] shrink-0">
               {card.assignee.slice(0, 2).toUpperCase()}
             </div>
@@ -123,8 +122,8 @@ function KanbanCard({ card, index, colColor }) {
 /* ── KanbanColumn ── */
 function KanbanColumn({ col, cards }) {
   return (
-    <div className="flex flex-col shrink-0 w-[200px] ">
-      {/* Header: Nom + badge yonma-yon, chapda */}
+    <div className="flex flex-col shrink-0 w-[220px]">
+      {/* Header */}
       <div className="flex items-center gap-2 mb-2 px-1">
         <span className="text-[13px] font-bold text-[#1A1D2E] dark:text-white truncate">{col.id}</span>
         <span
@@ -141,14 +140,17 @@ function KanbanColumn({ col, cards }) {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`flex flex-col gap-[10px] rounded-2xl p-1.5 transition-all duration-150
-              ${snapshot.isDraggingOver
-                ? 'ring-2 ring-dashed ring-[#526ED3] bg-[#526ED3]/5'
-                : ''}`}
-            style={{ minHeight: 60 }}
+            className="flex flex-col gap-[8px] rounded-2xl p-2 transition-all duration-150 min-h-[60px]"
+            style={{
+              backgroundColor: snapshot.isDraggingOver
+                ? col.color + '18'
+                : col.bg,
+              outline: snapshot.isDraggingOver ? `2px dashed ${col.color}` : 'none',
+              outlineOffset: '-2px',
+            }}
           >
             {cards.map((card, index) => (
-              <KanbanCard key={card.id} card={card} index={index} colColor={col.color} />
+              <KanbanCard key={card.id} card={card} index={index} />
             ))}
             {provided.placeholder}
           </div>
@@ -284,7 +286,7 @@ export default function TasksPage() {
 
   /* ── TABLE VIEW ── */
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-full gap-4">
 
       {toast && (
         <div className="fixed top-5 right-5 z-[100] flex items-start gap-3 p-4 rounded-2xl shadow-xl w-[340px]
@@ -333,7 +335,7 @@ export default function TasksPage() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
