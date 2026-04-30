@@ -1,8 +1,10 @@
 ﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { MdExpandMore, MdExpandLess, MdSettings } from 'react-icons/md'
-import { useState } from 'react'
+import { MdExpandMore, MdExpandLess } from 'react-icons/md'
+import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket } from 'react-icons/fa6'
+import { useState, useRef, useEffect } from 'react'
 
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { getRouteRole } from './ProtectedRoute'
 import {
   IconUserGroup, IconFolder, IconBriefcaseDollar,
@@ -133,12 +135,24 @@ const menuByRole = {
 }
 
 export default function Sidebar({ forceCollapsed = false, onForceClick }) {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
 
   const [collapsed, setCollapsed]   = useState(false)
   const [openGroups, setOpenGroups] = useState({ 0: true })
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef(null)
+
+  // Outside click — popup yopish
+  useEffect(() => {
+    const h = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
 
   const isCollapsed = forceCollapsed || collapsed
 
@@ -147,6 +161,11 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const toggleGroup   = (i) => setOpenGroups(prev => ({ [i]: !prev[i] }))
   const isGroupActive = (group) => group.children?.some(c => location.pathname === c.path)
   const handleDashboard = () => navigate(`/${routeRole}/dashboard`)
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   /* isCollapsed ikonka style — active/inactive */
   const iconBtn = (active) => [
@@ -296,17 +315,17 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         ].join(' ')}
       >
         {isCollapsed ? (
-          /* Yopilgan: Sozlamalar ikonka */
+          /* Yopilgan: Chiqindi qutisi ikonka */
           <button
-            onClick={() => navigate(`/${user?.role}/settings`)}
-            title="Sozlamalar"
-            className={iconBtn(location.pathname.includes('settings'))}
+            onClick={() => navigate(`/${routeRole}/trash`)}
+            title="Chiqindi qutisi"
+            className={iconBtn(location.pathname.includes('trash'))}
           >
-            <MdSettings size={18} />
+            <FaTrashCan size={16} />
           </button>
         ) : (
           <NavLink
-            to={`/${user?.role}/settings`}
+            to={`/${routeRole}/trash`}
             className={({ isActive }) => [
               'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium transition-colors cursor-pointer border',
               isActive
@@ -314,40 +333,122 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
             ].join(' ')}
           >
-            <MdSettings size={18} className="shrink-0" />
-            <span>Sozlamalar</span>
+            <FaTrashCan size={16} className="shrink-0" />
+            <span>Chiqindi qutisi</span>
           </NavLink>
         )}
 
         {/* Separator */}
         <div className="border-t border-[#E2E6F2] dark:border-[#474848] mx-1 min-w-10" />
 
-        {/* Account */}
-        {isCollapsed ? (
-          <button
-            onClick={handleDashboard}
-            title={`${user?.username} (${user?.roles?.[0]})`}
-            className="w-9 h-9 rounded-xl bg-[#3A3B3B] flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity shrink-0"
-          >
-            {user?.username?.[0]?.toUpperCase()}
-          </button>
-        ) : (
-          <div
-            onClick={handleDashboard}
-            className="flex items-center gap-2.5 px-4 py-3 rounded-lg transition-colors cursor-pointer
-              hover:bg-[#E2E6F2] dark:hover:bg-[#303131]"
-          >
-            <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-medium bg-[#3A3B3B] dark:bg-[#3A3B3B]">
+        {/* Account + Profile Popup */}
+        <div ref={profileRef} className="relative">
+          {isCollapsed ? (
+            <button
+              onClick={() => setProfileOpen(o => !o)}
+              title={`${user?.username} (${user?.roles?.[0]})`}
+              className="w-9 h-9 rounded-xl bg-[#3A3B3B] flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+            >
               {user?.username?.[0]?.toUpperCase()}
+            </button>
+          ) : (
+            <button
+              onClick={() => setProfileOpen(o => !o)}
+              className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg transition-colors cursor-pointer
+                hover:bg-[#E2E6F2] dark:hover:bg-[#303131]"
+            >
+              <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-medium bg-[#3A3B3B]">
+                {user?.username?.[0]?.toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="text-[13px] font-medium truncate leading-tight text-[#1A1D2E] dark:text-white">
+                  {user?.username}
+                </p>
+                <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{getRouteRole(user)}</p>
+              </div>
+            </button>
+          )}
+
+          {/* ── Profile Popup ── */}
+          {profileOpen && (
+            <div
+              className="fixed z-[200] w-[240px] rounded-2xl shadow-2xl border overflow-hidden
+                bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]"
+              style={{ bottom: 16, left: isCollapsed ? 72 : 288 }}
+            >
+
+              {/* Current user */}
+              <div className="px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#526ED3] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {user?.username?.[0]?.toUpperCase()}{user?.username?.[1]?.toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-[#1A1D2E] dark:text-white truncate">{user?.username}</p>
+                    <p className="text-xs text-[#8F95A8] dark:text-[#5B6078]">{getRouteRole(user)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dark mode toggle */}
+              <div className="px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    {isDark ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5B6078] dark:text-[#C2C8E0]">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5B6078] dark:text-[#C2C8E0]">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                      </svg>
+                    )}
+                    <span className="text-[13px] font-medium text-[#1A1D2E] dark:text-white">
+                      {isDark ? "Qorong'i mavzu" : 'Kunduzgi mavzu'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={toggleTheme}
+                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer shrink-0
+                      ${isDark ? 'bg-[#526ED3]' : 'bg-[#D0D5E2]'}`}
+                  >
+                    <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
+                      ${isDark ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Shaxsiy kabinet */}
+              <button
+                onClick={() => { navigate(`/${routeRole}/profile`); setProfileOpen(false) }}
+                className="w-full flex items-center justify-between px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]
+                  hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5B6078] dark:text-[#C2C8E0]">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                  <span className="text-[13px] font-medium text-[#1A1D2E] dark:text-white">Shaxsiy kabinet</span>
+                </div>
+                <FaChevronRight size={11} className="text-[#8F95A8]" />
+              </button>
+
+              {/* Chiqish */}
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-end  gap-2.5 px-4 py-3
+                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] transition-colors cursor-pointer" 
+              >
+                  <span className="text-[13px] font-semibold text-[#E02D2D]">Chiqish</span>
+                <FaArrowRightFromBracket size={14} className="text-[#E02D2D]" />
+              
+              </button>
             </div>
-            <div className="min-w-0">
-              <p className="text-[13px] font-medium truncate leading-tight text-[#1A1D2E] dark:text-white">
-                {user?.username}
-              </p>
-              <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{getRouteRole(user)}</p>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </aside>
   )

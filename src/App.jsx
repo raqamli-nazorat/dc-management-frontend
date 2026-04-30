@@ -29,6 +29,8 @@ import CostInquiries from './pages/admin/Reports/CostInquiries'
 import Employee from './pages/admin/Reports/Employee'
 import Project from './pages/admin/Reports/Project'
 import Salary from './pages/admin/Reports/Salary'
+import TrashPage from './pages/admin/Trash/Trash'
+import ProfilePage from './pages/admin/Profile/Profile'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -89,6 +91,8 @@ function App() {
                 <Route path="applications/regions" element={<AdminRegions />} />
                 <Route path="messages" element={PH('Xabarlar')} />
                 <Route path="settings" element={PH('Sozlamalar')} />
+                <Route path="trash" element={<TrashPage />} />
+                <Route path="profile" element={<ProfilePage />} />
               </Route>
 
               {/* ── Menager ── */}
