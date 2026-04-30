@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -7,18 +7,25 @@ import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 
-const PROJECTS_DATA = [
-  { id: 1, name: 'CRM sistema', manager: "Dudan Turg'unov", status: 'Rejalashtirilmoqda', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 2, name: 'Dashboard', manager: "To'raqul Fozilov", status: 'Yakunlangan', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 3, name: 'SaaS loyiha', manager: 'Davron Turdiyev', status: 'Faol', startDate: '01.01.2024 20:00', deadline: '01.01.2024 20:00' },
-  { id: 4, name: 'Mobile App', manager: 'Jasur Karimov', status: 'Faol', startDate: '15.02.2024 09:00', deadline: '15.08.2024 18:00' },
-  { id: 5, name: 'ERP tizimi', manager: 'Nilufar Yusupova', status: 'Rejalashtirilmoqda', startDate: '01.03.2024 10:00', deadline: '01.09.2024 18:00' },
-  { id: 6, name: 'HR platforma', manager: 'Bobur Rahimov', status: 'Yakunlangan', startDate: '10.01.2024 08:00', deadline: '10.06.2024 18:00' },
-]
-
 const STATUSES = ['Faol', 'Rejalashtirilmoqda', 'Yakunlangan']
 const EMPTY_FILTER = { manager: '', status: '', employee: '', startFromD: '', startFromT: '', startToD: '', startToT: '', deadFromD: '', deadFromT: '', deadToD: '', deadToT: '' }
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+
+const STATUS_LABEL = {
+  planning:  'Rejalashtirilmoqda',
+  active:    'Faol',
+  overdue:   "Muddati o'tgan",
+  completed: 'Yakunlangan',
+  cancelled: 'Bekor qilingan',
+}
+
+const fmtDt = (iso) => {
+  if (!iso) return '—'
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  } catch { return iso }
+}
 
 const MANAGERS = [
   'Mira Patel', 'Liam Johnson', 'Sofia Martinez', 'Aisha Khatun', 'Rajiv Menon',
@@ -86,18 +93,44 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
 }
 
 /* ── FilterModal ── */
-function ProjectFilterModal({ onClose, onApply, initial }) {
+function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
-  const employeeNames = EMPLOYEES.map(e => e.name)
+
+  const dateFromRef = useRef(null)
+  const timeFromRef = useRef(null)
+  const dateToRef   = useRef(null)
+  const timeToRef   = useRef(null)
+  const deadFromRef = useRef(null)
+  const deadFromTRef = useRef(null)
+  const deadToRef   = useRef(null)
+  const deadToTRef  = useRef(null)
+
+  const mgrDd = useDropdown()
+  const empDd = useDropdown()
+  const stsDd = useDropdown()
+
+  const STATUS_API = [
+    { label: 'Faol',               value: 'active' },
+    { label: 'Rejalashtirilmoqda', value: 'planning' },
+    { label: 'Yakunlangan',        value: 'completed' },
+    { label: 'Bekor qilingan',     value: 'cancelled' },
+  ]
+
+  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
+  const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
+  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors'
+
+  const selectedMgr = users.find(u => u.id === f.manager)
+  const selectedEmp = users.find(u => u.id === f.employee)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" /> <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
-          <FaXmark size={14} />
-        </button>
+      <div className="fixed inset-0 bg-black/60" />
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-       
 
         {/* Header */}
         <div className="px-7 pt-7 pb-3">
@@ -107,54 +140,185 @@ function ProjectFilterModal({ onClose, onApply, initial }) {
             </button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#5B6078] ">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+          <p className="text-sm text-[#5B6078]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
 
         {/* Body */}
         <div className="px-7 pb-5 pt-2 flex flex-col gap-4">
-          {/* Menejer + Holati */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Menejer</label>
-              <SimpleSelect value={f.manager} onChange={v => set('manager', v)} options={MANAGERS} placeholder="Menejer tanlang" />
-            </div>
-            <div>
-              <label className={labelCls}>Holati</label>
-              <SimpleSelect value={f.status} onChange={v => set('status', v)} options={STATUSES} placeholder="Holatini tanlang" />
-            </div>
-          </div>
 
-          {/* Xodim */}
-          <div>
-            <label className={labelCls}>Xodim</label>
-            <SimpleSelect value={f.employee} onChange={v => set('employee', v)} options={employeeNames} placeholder="Xodim tanlang" />
+          {/* Menejer + Holati + Xodim */}
+          <div className="grid grid-cols-3 gap-3">
+            {/* Menejer */}
+            <div ref={mgrDd.ref}>
+              <label className={labelCls}>Menejer</label>
+              <div className="relative">
+                <button type="button" onClick={() => mgrDd.setOpen(o => !o)} className={ddBtn(f.manager)}>
+                  <span className="flex-1 text-left truncate">{selectedMgr?.username || 'Tanlang'}</span>
+                  <div className="flex items-center gap-1 shrink-0 ml-1">
+                    {f.manager
+                      ? <span onMouseDown={e => { e.stopPropagation(); set('manager', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrDd.open ? 'rotate-180' : ''}`} />}
+                  </div>
+                </button>
+                {mgrDd.open && (
+                  <div className={ddList}>
+                    {users.map((u, i) => (
+                      <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                          {(u.username ?? '?').slice(0, 2).toUpperCase()}
+                        </div>
+                        <p className={`text-sm truncate ${f.manager === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6] font-semibold' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Holati */}
+            <div ref={stsDd.ref}>
+              <label className={labelCls}>Holati</label>
+              <div className="relative">
+                <button type="button" onClick={() => stsDd.setOpen(o => !o)} className={ddBtn(f.status)}>
+                  <span className="flex-1 text-left truncate">{STATUS_API.find(s => s.value === f.status)?.label || 'Tanlang'}</span>
+                  <div className="flex items-center gap-1 shrink-0 ml-1">
+                    {f.status
+                      ? <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${stsDd.open ? 'rotate-180' : ''}`} />}
+                  </div>
+                </button>
+                {stsDd.open && (
+                  <div className={ddList}>
+                    {STATUS_API.map((s, i) => (
+                      <button key={s.value} type="button" onClick={() => { set('status', s.value); stsDd.setOpen(false) }}
+                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Xodim */}
+            <div ref={empDd.ref}>
+              <label className={labelCls}>Xodim</label>
+              <div className="relative">
+                <button type="button" onClick={() => empDd.setOpen(o => !o)} className={ddBtn(f.employee)}>
+                  <span className="flex-1 text-left truncate">{selectedEmp?.username || 'Tanlang'}</span>
+                  <div className="flex items-center gap-1 shrink-0 ml-1">
+                    {f.employee
+                      ? <span onMouseDown={e => { e.stopPropagation(); set('employee', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${empDd.open ? 'rotate-180' : ''}`} />}
+                  </div>
+                </button>
+                {empDd.open && (
+                  <div className={ddList}>
+                    {users.map((u, i) => (
+                      <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                          {(u.username ?? '?').slice(0, 2).toUpperCase()}
+                        </div>
+                        <p className={`text-sm truncate ${f.employee === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6] font-semibold' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Boshlanish sanasi oralig'i */}
           <div>
             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
-            <div className="grid grid-cols-4 gap-2">
-              <DateTimeBox type="date" value={f.startFromD} onChange={v => set('startFromD', v)} placeholder="dan" />
-              <DateTimeBox type="time" value={f.startFromT} onChange={v => set('startFromT', v)} />
-              <DateTimeBox type="date" value={f.startToD} onChange={v => set('startToD', v)} placeholder="gacha" />
-              <DateTimeBox type="time" value={f.startToT} onChange={v => set('startToT', v)} />
+            <div className="flex items-center gap-2">
+              <div className={`${inputBox} flex-1 min-w-0`}>
+                {!f.startFromD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>}
+                <input ref={dateFromRef} type="date" value={f.startFromD} onChange={e => set('startFromD', e.target.value)}
+                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
+                <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} shrink-0`}>
+                <input ref={timeFromRef} type="time" value={f.startFromT || '00:00'} onChange={e => set('startFromT', e.target.value === '00:00' ? '' : e.target.value)}
+                  step="60"
+                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
+                <button type="button" onClick={() => timeFromRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} flex-1 min-w-0`}>
+                {!f.startToD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>}
+                <input ref={dateToRef} type="date" value={f.startToD} onChange={e => set('startToD', e.target.value)}
+                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
+                <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} shrink-0`}>
+                <input ref={timeToRef} type="time" value={f.startToT || '00:00'} onChange={e => set('startToT', e.target.value === '00:00' ? '' : e.target.value)}
+                  step="60"
+                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
+                <button type="button" onClick={() => timeToRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Muddat oralig'i */}
           <div>
             <label className={labelCls}>Muddat oralig'i</label>
-            <div className="grid grid-cols-4 gap-2">
-              <DateTimeBox type="date" value={f.deadFromD} onChange={v => set('deadFromD', v)} placeholder="dan" />
-              <DateTimeBox type="time" value={f.deadFromT} onChange={v => set('deadFromT', v)} />
-              <DateTimeBox type="date" value={f.deadToD} onChange={v => set('deadToD', v)} placeholder="gacha" />
-              <DateTimeBox type="time" value={f.deadToT} onChange={v => set('deadToT', v)} />
+            <div className="flex items-center gap-2">
+              <div className={`${inputBox} flex-1 min-w-0`}>
+                {!f.deadFromD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>}
+                <input ref={deadFromRef} type="date" value={f.deadFromD} onChange={e => set('deadFromD', e.target.value)}
+                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
+                <button type="button" onClick={() => deadFromRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} shrink-0`}>
+                <input ref={deadFromTRef} type="time" value={f.deadFromT || '00:00'} onChange={e => set('deadFromT', e.target.value === '00:00' ? '' : e.target.value)}
+                  step="60"
+                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
+                <button type="button" onClick={() => deadFromTRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} flex-1 min-w-0`}>
+                {!f.deadToD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>}
+                <input ref={deadToRef} type="date" value={f.deadToD} onChange={e => set('deadToD', e.target.value)}
+                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
+                <button type="button" onClick={() => deadToRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+              </div>
+              <div className={`${inputBox} shrink-0`}>
+                <input ref={deadToTRef} type="time" value={f.deadToT || '00:00'} onChange={e => set('deadToT', e.target.value === '00:00' ? '' : e.target.value)}
+                  step="60"
+                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
+                <button type="button" onClick={() => deadToTRef.current?.showPicker?.()}
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-end gap-3">
+        <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
@@ -1143,15 +1307,76 @@ export default function ProjectsPage() {
   const [editProject, setEditProject] = useState(null)
   const [detailProject, setDetailProject] = useState(null)
   const [deleteProject, setDeleteProject] = useState(null)
-  const [toast, setToast] = useState(null)
-
-  const showToast = (title, msg) => {
-    setToast({ title, msg })
-    setTimeout(() => setToast(null), 3000)
-  }
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [viewMode, setViewMode] = useState('table')
-  const [data, setData] = useState(PROJECTS_DATA)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [users, setUsers] = useState([])
+  const scrollRef = useRef(null)
+
+  // ── API funksiyalari ──
+  const buildParams = useCallback((f = filters, q = search, pg = 1) => {
+    const p = { page: pg, page_size: 20 }
+    if (q) p.search = q
+    if (f.status)    p.status              = f.status
+    if (f.manager)   p.manager             = f.manager
+    if (f.employee)  p.employee            = f.employee
+    if (f.deadFromD) p.deadline__date__gte = f.deadFromD
+    if (f.deadToD)   p.deadline__date__lte = f.deadToD
+    if (f.startFromD) p.created_at__date__gte = f.startFromD
+    if (f.startToD)   p.created_at__date__lte = f.startToD
+    return p
+  }, [filters, search])
+
+  const loadProjects = useCallback(async (f = filters, q = search, pg = 1) => {
+    if (pg === 1) setLoading(true)
+    else setLoadingMore(true)
+    try {
+      const res = await axiosAPI.get('/projects/', { params: buildParams(f, q, pg) })
+      const payload = res.data?.data ?? res.data
+      const results = Array.isArray(payload) ? payload : (payload.results ?? [])
+      const next = Array.isArray(payload) ? null : (payload.next ?? null)
+      setData(prev => pg === 1 ? results : [...prev, ...results])
+      setHasMore(!!next)
+      setPage(pg)
+    } catch (err) {
+      toast.error('Xatolik', err?.response?.data?.detail || "Ma'lumotlarni yuklashda xatolik")
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }, [buildParams])
+
+  // Users yuklash (menejer va xodim tanlash uchun)
+  useEffect(() => {
+    axiosAPI.get('/users/', { params: { page_size: 100 } })
+      .then(res => {
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setUsers(list)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    loadProjects()
+  }, [])
+
+  // Scroll pagination
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60 && hasMore && !loadingMore) {
+        loadProjects(filters, search, page + 1)
+      }
+    }
+    el.addEventListener('scroll', handleScroll)
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [hasMore, loadingMore, page, filters, search])
 
   useEffect(() => {
     registerAction({
@@ -1164,45 +1389,64 @@ export default function ProjectsPage() {
 
   const hasFilter = Object.values(filters).some(v => v)
 
-  const filtered = data.filter(p => {
-    const q = search.toLowerCase()
-    if (q && !p.name.toLowerCase().includes(q) && !p.manager.toLowerCase().includes(q)) return false
-    if (filters.status && p.status !== filters.status) return false
-    return true
-  })
+  const handleSearch = (val) => {
+    setSearch(val)
+    loadProjects(filters, val, 1)
+  }
+
+  const handleApplyFilter = (f) => {
+    setFilters(f)
+    setShowFilter(false)
+    loadProjects(f, search, 1)
+  }
+
+  const handleAdd = async (body) => {
+    try {
+      const res = await axiosAPI.post('/projects/', body)
+      const created = res.data?.data ?? res.data
+      setData(prev => [created, ...prev])
+      toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
+    } catch (err) {
+      const msg = err?.response?.data?.detail || err?.response?.data?.title?.[0] || "Loyiha yaratishda xatolik"
+      toast.error('Xatolik', msg)
+    }
+  }
+
+  const handleEdit = async (id, body) => {
+    try {
+      const res = await axiosAPI.put(`/projects/${id}/`, body)
+      const updated = res.data?.data ?? res.data
+      setData(prev => prev.map(p => p.id === id ? updated : p))
+      toast.success("Loyiha yangilandi", "O'zgarishlar saqlandi.")
+    } catch (err) {
+      toast.error('Xatolik', err?.response?.data?.detail || "Yangilashda xatolik")
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosAPI.delete(`/projects/${id}/`)
+      setData(prev => prev.filter(p => p.id !== id))
+      toast.delete("Loyiha o'chirildi", "Loyiha chiqindi qutisiga yuborildi.")
+    } catch (err) {
+      toast.error('Xatolik', err?.response?.data?.detail || "O'chirishda xatolik")
+    }
+  }
 
   return (
     <div className="flex flex-col h-full gap-4">
 
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-5 right-5 z-[100] flex items-start gap-3 p-4 rounded-2xl shadow-xl w-[340px]
-          bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5">
-            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
-            <path d="M8 12l3 3 5-5" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-bold text-[#1A1D2E] dark:text-white">{toast.title}</p>
-            <p className="text-[13px] text-[#8F95A8] dark:text-[#8E95B5] mt-0.5 leading-snug">{toast.msg}</p>
-          </div>
-          <button onClick={() => setToast(null)} className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer shrink-0">
-            <FaXmark size={14} />
-          </button>
-        </div>
-      )}
-
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Loyihalar</h1>
+      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white shrink-0">Loyihalar</h1>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
@@ -1239,7 +1483,7 @@ export default function ProjectsPage() {
 
       {/* Table */}
       {viewMode === 'table' && (
-        <div className="flex-1 overflow-auto">
+        <div ref={scrollRef} className="flex-1 overflow-auto">
           <table className="w-full text-sm whitespace-nowrap">
             <thead>
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
@@ -1253,34 +1497,52 @@ export default function ProjectsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p, idx) => {
-                const st = statusStyle[p.status] || statusStyle['Rejalashtirilmoqda']
-                return (
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                    {[1,2,3,4,5,6,7].map(j => (
+                      <td key={j} className="px-4 py-3">
+                        <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                data.map((p, idx) => (
                   <tr key={p.id}
                     onClick={() => setDetailProject(p)}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3 transition-colors cursor-pointer">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.name}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager}</td>
+                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || p.manager || '—'}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">{p.status}</span>
+                      <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">{STATUS_LABEL[p.status] || p.status}</span>
                     </td>
-                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{p.startDate}</td>
-                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{p.deadline}</td>
+                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
+                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} />
                     </td>
                   </tr>
-                )
-              })}
+                ))
+              )}
             </tbody>
           </table>
-          {filtered.length === 0 && (
+          {!loading && data.length === 0 && (
             <EmptyState
               icon="/imgs/loyhalarIcon.svg"
               title="Hozircha loyihalar yo'q"
               description="Yangi loyiha qo'shish orqali ishni boshlang"
             />
+          )}
+          {loadingMore && (
+            <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+              <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              Yuklanmoqda...
+            </div>
           )}
         </div>
       )}
@@ -1289,7 +1551,7 @@ export default function ProjectsPage() {
       {viewMode === 'grid' && (
         <div className="flex-1 overflow-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(p => {
+          {data.map(p => {
             const statusMap = {
               'Faol':               { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
               'active':             { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
@@ -1360,7 +1622,7 @@ export default function ProjectsPage() {
               </div>
             )
           })}
-          {filtered.length === 0 && (
+          {!loading && data.length === 0 && (
             <div className="col-span-3">
               <EmptyState
                 icon="/imgs/loyhalarIcon.svg"
@@ -1374,17 +1636,14 @@ export default function ProjectsPage() {
       )}
 
       {showFilter && (
-        <ProjectFilterModal
-          initial={filters}
-          onClose={() => setShowFilter(false)}
-          onApply={f => { setFilters(f); setShowFilter(false) }}
-        />
+        <ProjectFilterModal initial={filters} onClose={() => setShowFilter(false)} onApply={handleApplyFilter} users={users} />
       )}
 
       {showAdd && (
         <AddProjectModal
           onClose={() => setShowAdd(false)}
-          onAdd={p => { setData(prev => [...prev, { ...p, manager: p.manager || '—' }]); showToast('Loyiha yaratildi', "Yangi loyiha muvaffaqiyatli qo'shildi.") }}
+          onAdd={handleAdd}
+          users={users}
         />
       )}
 
@@ -1392,7 +1651,8 @@ export default function ProjectsPage() {
         <EditProjectModal
           project={editProject}
           onClose={() => setEditProject(null)}
-          onSave={updated => setData(prev => prev.map(p => p.id === updated.id ? updated : p))}
+          onSave={(id, body) => handleEdit(id, body)}
+          users={users}
         />
       )}
 
@@ -1407,7 +1667,7 @@ export default function ProjectsPage() {
         <DeleteConfirmModal
           project={deleteProject}
           onClose={() => setDeleteProject(null)}
-          onConfirm={id => setData(prev => prev.filter(p => p.id !== id))}
+          onConfirm={id => handleDelete(id)}
         />
       )}
     </div>

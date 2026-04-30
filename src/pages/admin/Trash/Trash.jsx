@@ -255,7 +255,7 @@ function TasksTab() {
 
   const filtered = tasks.filter(t =>
     (t.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (t.project_info ?? '').toLowerCase().includes(search.toLowerCase()) ||
+    (typeof t.project_info === 'object' ? t.project_info?.title : t.project_info ?? '').toLowerCase().includes(search.toLowerCase()) ||
     (t.created_by_info?.username ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
@@ -350,7 +350,7 @@ function TasksTab() {
                 className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 transition-colors">
                 <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
                 <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.project_info || '—'}</td>
+                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
                 <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.created_by_info?.username || '—'}</td>
                 <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.assignee_info?.username || '—'}</td>
                 <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{typeLabel(t.type)}</td>
