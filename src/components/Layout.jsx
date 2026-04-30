@@ -241,7 +241,10 @@ export default function Layout() {
             {download && (
               <div className="relative" ref={downloadRef}>
                 <button className='flex items-center gap-[2px] rounded-xl overflow-hidden'>
-                  <span className='flex items-center h-full px-3 py-2 gap-1 text-[13px] font-extrabold text-white! bg-[#3f57b3] cursor-pointer hover:bg-[#526ED3] transition-colors'>
+                  <span
+                    onClick={() => download?.excel()}
+                    className='flex items-center h-full px-3 py-2 gap-1 text-[13px] font-extrabold text-white! bg-[#3f57b3] cursor-pointer hover:bg-[#526ED3] transition-colors'
+                  >
                     <MdOutlineFileDownload size={20} />
                     Yuklab olish
                   </span>
