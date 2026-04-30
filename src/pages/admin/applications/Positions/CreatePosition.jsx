@@ -42,7 +42,7 @@ const CreatePosition = ({ onClose, refetch }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto modal-scroll py-8 px-4">
             <div className="fixed inset-0 bg-black/60" />
-            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
+            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
                 <FaXmark size={16} />
             </button>
             <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
