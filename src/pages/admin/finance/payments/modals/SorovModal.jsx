@@ -24,17 +24,17 @@ function toDecimalStr(val) {
 }
 
 // Tur bo'yicha qoidalar
-// withdrawal: sabab majburiy, loyiha ixtiyoriy, toifa majburiy
-// company:    loyiha majburiy, sabab majburiy, toifa majburiy
-// other:      toifa majburiy, loyiha yo'q, sabab ixtiyoriy
+// company:    toifa disabled, loyiha aktiv (majburiy)
+// other:      loyiha disabled, toifa aktiv
+// withdrawal: loyiha disabled, toifa disabled
 const RULES = {
-  withdrawal: { projectRequired: false, projectVisible: true,  reasonRequired: true,  reasonVisible: true  },
-  company:    { projectRequired: true,  projectVisible: true,  reasonRequired: true,  reasonVisible: true  },
-  other:      { projectRequired: false, projectVisible: false, reasonRequired: false, reasonVisible: true  },
+  company:    { projectDisabled: false, categoryDisabled: true,  projectRequired: true,  reasonRequired: true  },
+  other:      { projectDisabled: true,  categoryDisabled: false, projectRequired: false, reasonRequired: false },
+  withdrawal: { projectDisabled: true,  categoryDisabled: true,  projectRequired: false, reasonRequired: true  },
 }
 
 function getRules(type) {
-  return RULES[type] ?? { projectRequired: false, projectVisible: true, reasonRequired: false, reasonVisible: true }
+  return RULES[type] ?? { projectDisabled: false, categoryDisabled: false, projectRequired: false, reasonRequired: false }
 }
 
 export default function SorovModal({ onClose, onSubmit, categories = [], projects = [] }) {
@@ -73,19 +73,17 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
   const validate = () => {
     const e = {}
     if (!form.type)             e.type             = 'Xarajat turi tanlanmagan'
-    if (!form.expense_category) e.expense_category = 'Toifa tanlanmagan'
+    if (!rules.categoryDisabled && !form.expense_category)
+      e.expense_category = 'Toifa tanlanmagan'
     if (!form.amount || isNaN(parseFloat(toDecimalStr(form.amount))))
       e.amount = 'Miqdor kiritilmagan'
     if (!form.payment_method)   e.payment_method   = "To'lov turi tanlanmagan"
     if (showCard && form.card_number.replace(/\s/g, '').length < 16)
       e.card_number = "Karta raqami to'liq emas"
-
-    // Tur bo'yicha qo'shimcha validatsiya
     if (rules.projectRequired && !form.project)
       e.project = 'Loyiha tanlash majburiy'
     if (rules.reasonRequired && !form.reason.trim())
       e.reason = 'Sabab kiritish majburiy'
-
     return e
   }
 
@@ -168,21 +166,26 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
               options={categoryOptions}
               placeholder="Toifani tanlang"
               error={errors.expense_category}
+              disabled={rules.categoryDisabled}
             />
           </div>
 
-          {/* Loyiha — tur bo'yicha ko'rinadi */}
-          {(rules.projectVisible) && (
-            <div>
-              <label className={labelCls}>{projectLabel}</label>
-              <LoyihaDropdownForm
-                value={form.project}
-                onChange={v => setF('project', v)}
-                projects={projects}
-                error={errors.project}
-              />
-            </div>
-          )}
+          {/* Loyiha — har doim ko'rinadi, ba'zan disabled */}
+          <div>
+            <label className={labelCls}>
+              {rules.projectRequired
+                ? 'Loyiha'
+                : <span>Loyiha <span className="text-[#B6BCCB]">(ixtiyoriy)</span></span>
+              }
+            </label>
+            <LoyihaDropdownForm
+              value={form.project}
+              onChange={v => setF('project', v)}
+              projects={projects}
+              error={errors.project}
+              disabled={rules.projectDisabled}
+            />
+          </div>
 
           {/* Miqdor */}
           <div>
@@ -197,13 +200,12 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
             {errors.amount && <p className="text-xs text-red-500 mt-1">*{errors.amount}</p>}
           </div>
 
-          {/* Sabab — tur bo'yicha majburiy/ixtiyoriy */}
-          {rules.reasonVisible && (
-            <div>
-              <label className={labelCls}>
-                Sabab
-                {!rules.reasonRequired && <span className="text-[#B6BCCB] ml-1">(ixtiyoriy)</span>}
-              </label>
+          {/* Sabab */}
+          <div>
+            <label className={labelCls}>
+              Sabab
+              {!rules.reasonRequired && <span className="text-[#B6BCCB] ml-1">(ixtiyoriy)</span>}
+            </label>
               <div className="relative">
                 <textarea
                   rows={3}
@@ -220,8 +222,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
                 )}
               </div>
               {errors.reason && <p className="text-xs text-red-500 mt-1">*{errors.reason}</p>}
-            </div>
-          )}
+          </div>
 
           {/* To'lov turi + Karta */}
           <div className={showCard ? 'grid grid-cols-2 gap-4' : ''}>
