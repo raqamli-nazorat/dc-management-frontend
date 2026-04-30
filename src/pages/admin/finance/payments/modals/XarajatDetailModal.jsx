@@ -97,6 +97,15 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaidModal, setShowPaidModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyCard = () => {
+    const raw = payment.card_number?.replace(/\s/g, '') ?? ''
+    navigator.clipboard.writeText(raw).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
 
   const user = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null } })()
   const c = payment.expense_category_info ?? {}
@@ -117,7 +126,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
         <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
-          bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+          bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
@@ -159,7 +168,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {/* Sababi */}
             <div>
               <label className={labelCls}>Sababi</label>
-              <div className={`${fieldCls} h-auto! min-h-[80px] items-start whitespace-pre-wrap leading-relaxed`}>
+              <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
                 {payment.reason || ''}
               </div>
             </div>
@@ -173,7 +182,21 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
               {isCard && payment.card_number && (
                 <div>
                   <label className={labelCls}>Karta raqam</label>
-                  <div className={`${fieldCls} font-mono tracking-wider`}>{fmtCard(payment.card_number)}</div>
+                  <div className={`${fieldCls} font-mono tracking-wider justify-between`}>
+                    <span>{fmtCard(payment.card_number)}</span>
+                    <button
+                      type="button"
+                      onClick={handleCopyCard}
+                      title="Nusxa olish"
+                      className="shrink-0 ml-2 cursor-pointer transition-opacity hover:opacity-70">
+                      <img
+                        src={copied ? '/imgs/checkIcon.svg' : '/imgs/Copy.svg'}
+                        alt={copied ? 'copied' : 'copy'}
+                        className={`w-4 h-4 ${copied ? 'brightness-0 saturate-100 invert-0' : 'opacity-50'}`}
+                        style={copied ? { filter: 'invert(48%) sepia(79%) saturate(476%) hue-rotate(86deg) brightness(95%) contrast(91%)' } : {}}
+                      />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

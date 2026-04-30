@@ -96,6 +96,11 @@ async function apiCancel(id, cancelReason) {
   return res.data?.data ?? res.data
 }
 
+async function apiGetPaymentDetail(id) {
+  const res = await axiosAPI.get(`/expense-request/${id}/`)
+  return res.data?.data ?? res.data
+}
+
 async function apiGetCategories() {
   const res = await axiosAPI.get('/expense-category/')
   const payload = res.data?.data ?? res.data
@@ -337,7 +342,12 @@ export default function PaymentsPage() {
             <tbody>
               {payments.map((p, idx) => (
                 <tr key={p.id}
-                  onClick={() => canSelect && selecting ? toggleOne(p.id) : setDetailPayment(p)}
+                  onClick={() => {
+                    if (canSelect && selecting) { toggleOne(p.id); return }
+                    apiGetPaymentDetail(p.id)
+                      .then(detail => setDetailPayment(detail))
+                      .catch(() => setDetailPayment(p))
+                  }}
                   className="group border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   {canSelect && selecting && (
                     <td className="px-4 py-3 w-10" onClick={e => e.stopPropagation()}>

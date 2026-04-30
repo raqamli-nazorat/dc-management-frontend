@@ -378,7 +378,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
         <div className="fixed inset-0 bg-black/60" />
         <button
           onClick={onClose}
-          className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white cursor-pointer transition-colors z-[200]"
+          className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]"
         >
           <FaXmark size={14} />
         </button>
