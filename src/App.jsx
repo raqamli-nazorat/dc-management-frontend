@@ -18,11 +18,17 @@ import AdminApplications from './pages/admin/applications/Applications'
 import AdminApplicationDetail from './pages/admin/applications/ApplicationDetail'
 import AdminPositions from './pages/admin/applications/Positions/'
 import AdminRegions from './pages/admin/applications/Regions'
-import AdminDistricts from './pages/admin/applications/Districts'
 import MenagerDashboard from './pages/menager/Dashboard'
 import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
 import { ToastProvider } from './Toast/ToastProvider'
+
+// Reports
+import ByTasks from './pages/admin/Reports/ByTasks'
+import CostInquiries from './pages/admin/Reports/CostInquiries'
+import Employee from './pages/admin/Reports/Employee'
+import Project from './pages/admin/Reports/Project'
+import Salary from './pages/admin/Reports/Salary'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -49,13 +55,15 @@ function App() {
               <Route path="payments" element={<AdminPayments />} />
               <Route path="finance" element={<AdminSalary />} />
               <Route path="finance/history" element={<AdminFinanceHistory />} />
-              <Route path="reports" element={PH('Hisobotlar')} />
-              <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
+              <Route path="reports/project" element={<Project />} />
+              <Route path="reports/cost_inquiries" element={<CostInquiries />} />
+              <Route path="reports/employee" element={<Employee />} />
+              <Route path="reports/salary" element={<Salary />} />
+              <Route path="reports/by_tasks" element={<ByTasks />} />
               <Route path="applications" element={<AdminApplications />} />
               <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
               <Route path="applications/positions" element={<AdminPositions />} />
               <Route path="applications/regions" element={<AdminRegions />} />
-              <Route path="applications/districts" element={<AdminDistricts />} />
               <Route path="messages" element={PH('Xabarlar')} />
               <Route path="settings" element={PH('Sozlamalar')} />
             </Route>

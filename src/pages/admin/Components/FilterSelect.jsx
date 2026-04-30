@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { MdCancel, MdCheck, MdExpandMore } from "react-icons/md"
 
-const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, title, error = false }) => {
+const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, title, error = false, padding = '6px 12px', radius = '12px', placeholder }) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
     const [dropPos, setDropPos] = useState({ top: 0, left: 0, dropUp: false })
@@ -38,11 +38,11 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
     }
 
     // Qiymat mavjudligini tekshirish
-    const hasValue = multiple ? (Array.isArray(value) && value.length > 0) : (value && value !== options[0])
+    const hasValue = multiple ? (Array.isArray(value) && value.length > 0) : !!value
 
     const display = multiple
-        ? (Array.isArray(value) && value.length > 0 ? value.join(', ') : label || options[0])
-        : (value || label || options[0])
+        ? (Array.isArray(value) && value.length > 0 ? value.join(', ') : label)
+        : (value || label)
 
     const isDark = document.documentElement.classList.contains('dark')
 
@@ -55,9 +55,10 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
                 className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#191a1a] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
-                style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
+                style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
+                <span className={display ? 'hidden' : 'text-slate-500 dark:text-slate-400'}>{placeholder}</span>
                 <span className="flex-1 text-left truncate">{display}</span>
 
                 {/* Ant Design uslubidagi krestik logikasi */}

@@ -123,6 +123,7 @@ export default function UsersPage() {
       cancelSelecting()
     } catch (error) {
       console.error(error)
+      toast.error("Foydalanuvchilarni o'chirish", error?.response?.data?.error?.errorMsg || "Foydalanuvchilarni o'chirishda xatolik yuz berdi")
     }
   }
 
@@ -232,7 +233,7 @@ export default function UsersPage() {
             }}
             width='130px'
           />
-          <FilterSelect options={SORTS} value={sort} width='140px' onChange={setSort} />
+          <FilterSelect options={SORTS} value={sort} placeholder="Saralash" width='140px' onChange={setSort} />
         </div>
 
         {/* Table */}
