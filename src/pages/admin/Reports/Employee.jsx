@@ -6,86 +6,29 @@ import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker, Select } from 'antd'
 import { usePositions, useRegions } from "../../../MostUsesDates"
 import FilterSelect from '../Components/FilterSelect'
+import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
 import { toast } from '../../../Toast/ToastProvider'
 import { axiosAPI } from '../../../service/axiosAPI'
 import dayjs from 'dayjs'
 
-const CostInquiries = {
-  paid: "To'landi",
-  pending: "Kutulmoqda",
-  accepted: "Tasdiqlandi",
-  rejected: "Bekor qilindi"
-}
+const CostInquiries = [
+  { value: "paid", label: "To'landi" },
+  { value: "pending", label: "Kutulmoqda" },
+  { value: "accepted", label: "Tasdiqlandi" },
+  { value: "rejected", label: "Bekor qilindi" }
+]
 
-const SalaryType = {
-  kpi: "KPI bonusi",
-  fine: "Jarima miqdori"
-}
+const SalaryType = [
+  { value: "kpi", label: "KPI bonusi" },
+  { value: "fine", label: "Jarima miqdori" }
+]
 
-const FilterInput = ({ label, value, onChange, isFine, className = '' }) => {
-  const [focused, setFocused] = useState(false)
-  const hasValue = value !== '' && value !== null && value !== undefined && value !== 0
-  const isActive = focused || hasValue
-
-  const getFontSize = () => {
-    if (!isActive) return 14
-    const strValue = value?.toString() || ''
-    const length = strValue.length
-    if (length <= 10) return 14
-    if (length <= 12) return 12
-    if (length <= 14) return 11
-    return 10
-  }
-
-  const fontSize = getFontSize()
-  const labelWidth = label === 'dan' ? 38 : 52
-
-  return (
-    <div
-      className={`flex-1 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl flex flex-col justify-center px-4 h-11 focus-within:border-blue-400 transition-all duration-300 relative cursor-text group ${className}`}
-      onClick={() => setFocused(true)}
-    >
-      <span
-        className={`absolute left-4 transition-all duration-300 pointer-events-none font-semibold
-          ${isActive
-            ? 'top-1.5 text-[10px] text-slate-400'
-            : 'top-1/2 -translate-y-1/2 text-sm text-slate-400'
-          }`}
-      >
-        {label}{!isActive && ':'}
-      </span>
-
-      <div
-        className={`flex items-center transition-all duration-300
-          ${isActive
-            ? 'mt-3'
-            : `ml-[${labelWidth}px]`
-          }`}
-        style={{ marginLeft: isActive ? 0 : `${labelWidth}px` }}
-      >
-        {isFine && (hasValue || value === 0) && (
-          <span className="text-red-500 font-bold mr-0.5" style={{ fontSize: `${fontSize}px` }}>-</span>
-        )}
-
-        {!isActive && !focused ? (
-          <span className="text-slate-900 dark:text-white text-sm font-medium">0</span>
-        ) : (
-          <input
-            value={value === 0 ? '' : value}
-            onChange={onChange}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            className={`w-full bg-transparent outline-none font-bold transition-all duration-300 ${isFine ? 'text-red-500!' : 'text-slate-900! dark:text-white!'}`}
-            style={{ fontSize: `${fontSize}px` }}
-            autoFocus={focused}
-            placeholder={focused ? "0" : ""}
-          />
-        )}
-      </div>
-    </div>
-  )
-}
+const meetings = [
+  { label: "Qatnashgan", value: "attended" },
+  { label: "Qatnashmagan \"Sababli\"", value: "missed_excused" },
+  { label: "Qatnashmagan \"Sababsiz\"", value: "missed_unexcused" }
+]
 
 const initialFilters = {
   startDate: '',
@@ -126,12 +69,18 @@ const Employee = () => {
   const [hasFetched, setHasFetched] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const filterRef = useRef(null)
+  const filterButtonRef = useRef(null)
 
   useEffect(() => {
     if (!filterModal) return
 
     const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target)
+      ) {
         setFilterModal(false)
       }
     }
@@ -254,20 +203,43 @@ const Employee = () => {
     return integerPart === '0' ? '' : integerPart;
   }
 
+  const sanitizeParams = (params) => {
+    if (!params || typeof params !== 'object') return {}
+
+    return Object.entries(params).reduce((cleaned, [key, value]) => {
+      if (value === undefined || value === null || value === '') return cleaned
+
+      if (typeof value === 'string') {
+        const trimmed = value.trim()
+        cleaned[key] = trimmed.replace(/\s+/g, '')
+      } else {
+        cleaned[key] = value
+      }
+
+      return cleaned
+    }, {})
+  }
+
+  const handleFetchReports = () => {
+    const params = sanitizeParams(filters)
+
+    getEmployeeReports({ params, search })
+    setFilterModal(false)
+  }
+
   const handleClear = () => {
     setFilters({})
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
+    setHasFetched(false)
+    setUserReports([])
   }
 
   const handleSelectEmployeeConfirm = (selected) => {
-    console.log('confirm', selected)
-    setFilters(prev => ({ ...prev, users: selected }))
-    console.log(filters)
+    setFilters(prev => ({ ...prev, users: selected.join(',') }))
     setSelectEmployee(false)
   }
-
 
   return (
     <div className="relative">
@@ -287,7 +259,11 @@ const Employee = () => {
             />
           </div>
           <button
-            onClick={() => setFilterModal(!filterModal)}
+            ref={filterButtonRef}
+            onClick={(e) => {
+              e.preventDefault()
+              setFilterModal(prev => !prev)
+            }}
             className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${Object.keys(filters).some(key => filters[key] !== initialFilters[key] && filters[key] !== null && filters[key] !== undefined) ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
@@ -308,10 +284,7 @@ const Employee = () => {
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
           disabled={!Object.keys(filters).some(key => filters[key] !== initialFilters[key] && filters[key] !== null && filters[key] !== undefined) && !search}
-          onClick={() => {
-            getEmployeeReports({ params: filters, search });
-            setFilterModal(false);
-          }}
+          onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
           Shakillantirish
@@ -333,6 +306,7 @@ const Employee = () => {
                     format="DD.MM.YYYY HH:mm"
                     value={filters.startDate}
                     onChange={(value) => handleFilterChange('startDate', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
                     className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
                     placeholder='Boshlanish sana'
                   />
@@ -344,6 +318,7 @@ const Employee = () => {
                     value={filters.endDate}
                     format="DD.MM.YYYY HH:mm"
                     onChange={(value) => handleFilterChange('endDate', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
                     className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
                     placeholder='Tugash sana'
                   />
@@ -369,10 +344,10 @@ const Employee = () => {
               <div className="relative">
                 <FilterSelect
                   padding='12px 12px'
-                  value={filters.region}
+                  value={regions.find(reg => reg.id === filters.region)?.name}
                   placeholder="Viloyat tanlash"
                   options={regions.map(reg => reg.name)}
-                  onChange={(value) => handleFilterChange('region', value)}
+                  onChange={(value) => handleFilterChange('region', regions.find(reg => reg.name === value).id)}
                 />
               </div>
             </div>
@@ -426,37 +401,38 @@ const Employee = () => {
               <div className='grid grid-cols-4 gap-3'>
                 <div className="col-span-2 relative">
                   <Select
-                    value={filters.project_status || 'Jami'}
+                    value={filters.project_status || undefined}
                     onChange={(value) => handleFilterChange('project_status', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
                     className="w-full custom-antd-select text-sm! py-[11px]! rounded-xl!"
                     size="large"
                     allowClear
                     placeholder="Jami"
                     optionLabelProp="label"
-                    options={[
+                    options={[ 
                       {
                         value: 'completed',
-                        label: 'Tugatilgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#99CC00]"></span> Tugatilgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#99CC00]"></span> Tugatilgan</div>
                       },
                       {
                         value: 'active',
-                        label: 'Jarayonda',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#8BBABB]"></span> Jarayonda</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#8BBABB]"></span> Jarayonda</div>
                       },
                       {
                         value: 'cancelled',
-                        label: 'Bekor qilingan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1A1D2E]"></span> Bekor qilingan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1A1D2E]"></span> Bekor qilingan</div>
                       },
                       {
                         value: 'overdue',
-                        label: 'Muddati o\'tgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FF1919]"></span> Muddati o'tgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FF1919]"></span> Muddati o'tgan</div>
                       },
                       {
                         value: 'planning',
-                        label: 'Rejalashtirilgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#D9D9D9]"></span> Rejalashtirilgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#D9D9D9]"></span> Rejalashtirilgan</div>
                       },
                     ]}
@@ -484,47 +460,48 @@ const Employee = () => {
               <div className='grid grid-cols-4 gap-3'>
                 <div className="col-span-2">
                   <Select
-                    value={filters.task_status || 'Jami'}
+                    value={filters.task_status || undefined}
                     onChange={(value) => handleFilterChange('task_status', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
                     className="w-full custom-antd-select text-sm! py-[11px]! rounded-xl!"
                     size="large"
                     allowClear
                     placeholder="Jami"
                     optionLabelProp="label"
-                    options={[
+                    options={[ 
                       {
                         value: 'todo',
-                        label: 'Qilish kerak',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>
                       },
                       {
                         value: 'in_progress',
-                        label: 'Jarayonda',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>
                       },
                       {
                         value: 'production',
-                        label: 'Ishga tushurilgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>
                       },
                       {
                         value: 'checked',
-                        label: 'Tekshirilgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span> Tekshirilgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span>Tekshirilgan</div>
                       },
                       {
                         value: 'rejected',
-                        label: 'Rad etilgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>
                       },
                       {
                         value: 'overdue',
-                        label: 'Muddati o\'tgan',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>
                       },
                       {
                         value: 'done',
-                        label: 'Bajarildi',
+                        label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#4CAF50]"></span> Bajarildi</div>,
                         dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#4CAF50]"></span> Bajarildi</div>
                       },
                     ]}
@@ -545,15 +522,15 @@ const Employee = () => {
             </div>
 
             <div className="col-span-4 md:col-span-4">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Ish staji</label>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Yig'ilishlar</label>
               <div className="grid grid-cols-4 gap-3">
                 <div className="col-span-2 relative">
                   <FilterSelect
-                    // value={filters.ishStajiType}
+                    value={meetings.find(m => m.value === filters.meetings)?.label}
                     padding='11px 12px'
-                    placeholder={'Jami'}
-                    // onChange={(value) => handleFilterChange('', value)}
-                    options={['Jami', '1 yildan kam', '1-3 yil', '3-5 yil', '5-10 yil', '10 yildan ko\'p']}
+                    placeholder='Jami'
+                    onChange={(value) => handleFilterChange('meetings', meetings.find(m => m.label === value)?.value)}
+                    options={meetings.map(m => m.label)}
                   />
                 </div>
                 <div className="col-span-1 relative">
@@ -582,11 +559,11 @@ const Employee = () => {
               <div className="grid grid-cols-4 gap-3">
                 <div className="col-span-2 relative">
                   <FilterSelect
-                    // value={filters.ishStajiType}
+                    value={CostInquiries.find((inquiry) => inquiry.value === filters.expenses_amount)?.label}
                     padding='11px 12px'
                     placeholder={'Jami'}
-                    // onChange={(value) => handleFilterChange('', value)}
-                    options={Object.values(CostInquiries)}
+                    onChange={(value) => handleFilterChange('expenses_amount', CostInquiries.find((inquiry) => inquiry.label === value)?.value)}
+                    options={CostInquiries.map((inquiry) => inquiry.label)}
                   />
                 </div>
                 <FilterInput
@@ -607,24 +584,24 @@ const Employee = () => {
               <div className="grid grid-cols-4 gap-3">
                 <div className="col-span-2 relative">
                   <FilterSelect
-                    value={filters.ishHaqiType}
+                    value={SalaryType.find((type) => type.value === filters.salary_type)?.label}
                     padding='11px 12px'
                     placeholder={'Jami'}
-                    onChange={(value) => handleFilterChange('ishHaqiType', value)}
-                    options={Object.values(SalaryType)}
+                    onChange={(value) => handleFilterChange('salary_type', SalaryType.find((type) => type.label === value)?.value)}
+                    options={SalaryType.map((type) => type.label)}
                   />
                 </div>
                 <FilterInput
                   label="dan"
                   value={filters.payrolls_amount_min}
                   onChange={(e) => handleFilterChange('payrolls_amount_min', formatNum(e.target.value))}
-                  isFine={filters.ishHaqiType === SalaryType.fine}
+                  isFine={filters.salary_type === SalaryType[1].value}
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.payrolls_amount_max}
                   onChange={(e) => handleFilterChange('payrolls_amount_max', formatNum(e.target.value))}
-                  isFine={filters.ishHaqiType === SalaryType.fine}
+                  isFine={filters.salary_type === SalaryType[1].value}
                 />
               </div>
             </div>
@@ -656,7 +633,7 @@ const Employee = () => {
           onScroll={handleMoreReportsScroll}
         >
           <table className="text-left border-collapse w-[4500px]">
-            <thead className="bg-[#7186ED] text-white">
+            <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
               <tr>
                 <th rowSpan={2} className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2]">№</th>
                 <th rowSpan={2} className="p-3 text-xs sticky left-[45px] z-10! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2]">Ism Sharifi</th>
@@ -705,7 +682,7 @@ const Employee = () => {
               {UserReports.map((item, index) => (
                 <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors">
                   <td
-                    className="p-3 text-xs text-slate-500 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-20! bg-slate-50">
+                    className="p-3 text-xs text-slate-500 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
                     {index + 1}
                   </td>
                   <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky left-[44px] z-10! bg-slate-50">
@@ -791,7 +768,11 @@ const Employee = () => {
       `}</style>
 
       {selectEmployee && (
-        <EmployeeStep selectedList={[]} onConfirm={handleSelectEmployeeConfirm} onClose={() => setSelectEmployee(false)} />
+        <EmployeeStep
+          selectedList={filters.users}
+          onConfirm={handleSelectEmployeeConfirm}
+          onClose={() => setSelectEmployee(false)}
+        />
       )}
 
     </div>

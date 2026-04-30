@@ -6,12 +6,17 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
     const [hovered, setHovered] = useState(null)
     const [dropPos, setDropPos] = useState({ top: 0, left: 0, dropUp: false })
     const ref = useRef(null)
+    const dropdownRef = useRef(null)
 
     // Asosiy tugma uchun hover holati
     const [isBtnHovered, setIsBtnHovered] = useState(false)
 
     useEffect(() => {
-        const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+        const h = (e) => {
+            if (ref.current && dropdownRef.current && !ref.current.contains(e.target) && !dropdownRef.current.contains(e.target)) {
+                setOpen(false)
+            }
+        }
         document.addEventListener('mousedown', h)
         return () => document.removeEventListener('mousedown', h)
     }, [])
@@ -82,6 +87,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
 
             {open && (
                 <div
+                    ref={dropdownRef}
                     className="rounded-2xl shadow-xl bg-white dark:bg-[#1C1D1D]"
                     style={{
                         position: 'fixed',

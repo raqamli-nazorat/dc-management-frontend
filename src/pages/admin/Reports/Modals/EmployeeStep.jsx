@@ -12,17 +12,25 @@ import { MdOutlinePlaylistAddCheck } from "react-icons/md";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all" }) => {
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedIds, setSelectedIds] = useState(selectedList.map(emp => emp.id));
+    const [selectedIds, setSelectedIds] = useState(selectedList);
     const [loading, setLoading] = useState(true );
+    
 
     // Ma'lumotlarni yuklash
     const getEmployee = async ({ search }) => {
+
+        const params = { search };
+
+        if (employee_role !== "all") {
+            params.roles = employee_role;
+        }
+        
         setLoading(true);
         try {
-            const { data } = await axiosAPI.get("users/", { params: { search } });
+            const { data } = await axiosAPI.get("users/", { params } );
             setEmployees(data?.data?.results || []);
         } catch (error) {
             console.error(error);

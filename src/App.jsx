@@ -44,33 +44,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
-<<<<<<< HEAD
-            {/* Admin */}
-            <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="users/detail/:id" element={<AdminUserDetail />} />
-              <Route path="roles" element={PH('Rollar')} />
-              <Route path="projects" element={<AdminProjects />} />
-              <Route path="projects/archive" element={PH('Arxiv')} />
-              <Route path="tasks" element={<AdminTasks />} />
-              <Route path="meetings" element={<AdminMeetings />} />
-              <Route path="payments" element={<AdminPayments />} />
-              <Route path="finance" element={<AdminSalary />} />
-              <Route path="finance/history" element={<AdminFinanceHistory />} />
-              <Route path="reports/project" element={<Project />} />
-              <Route path="reports/cost_inquiries" element={<CostInquiries />} />
-              <Route path="reports/employee" element={<Employee />} />
-              <Route path="reports/salary" element={<Salary />} />
-              <Route path="reports/by_tasks" element={<ByTasks />} />
-              <Route path="applications" element={<AdminApplications />} />
-              <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
-              <Route path="applications/positions" element={<AdminPositions />} />
-              <Route path="applications/regions" element={<AdminRegions />} />
-              <Route path="messages" element={PH('Xabarlar')} />
-              <Route path="settings" element={PH('Sozlamalar')} />
-            </Route>
-=======
               {/* ── Admin ── */}
               <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
                 <Route path="dashboard" element={<AdminDashboard />} />
@@ -121,7 +94,6 @@ function App() {
                 <Route path="trash" element={<TrashPage />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
->>>>>>> 17867bb5600828c577bf1909e3b321564a65ec2f
 
               {/* ── Menager ── */}
               <Route path="/menager" element={<ProtectedRoute allowedRole="menager"><Layout /></ProtectedRoute>}>
