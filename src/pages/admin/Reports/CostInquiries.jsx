@@ -14,24 +14,6 @@ import dayjs from 'dayjs'
 import { PiUsersThreeBold } from 'react-icons/pi'
 import ProjectsStep from './Modals/ProjectsStep'
 
-const CostInquiries = [
-  { value: "paid", label: "To'landi" },
-  { value: "pending", label: "Kutulmoqda" },
-  { value: "accepted", label: "Tasdiqlandi" },
-  { value: "rejected", label: "Bekor qilindi" }
-]
-
-const SalaryType = [
-  { value: "kpi", label: "KPI bonusi" },
-  { value: "fine", label: "Jarima miqdori" }
-]
-
-const meetings = [
-  { label: "Qatnashgan", value: "attended" },
-  { label: "Qatnashmagan \"Sababli\"", value: "missed_excused" },
-  { label: "Qatnashmagan \"Sababsiz\"", value: "missed_unexcused" }
-]
-
 const payment_type = [
   { label: "Naqd pul orqali", value: "cash" },
   { label: "Karta raqam orqali", value: "card" },
@@ -56,31 +38,27 @@ const category_type = [
   { label: "Tibbiy xarajat uchun", value: "medical" }
 ]
 
+const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
+const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
+
 const initialFilters = {
-  startDate: '',
-  endDate: '',
-  position: '',
-  region: '',
-  salary_min: '',
-  salary_max: '',
-  balance_min: '',
-  balance_max: '',
-  task_status: '',
-  tasks_min: '',
-  tasks_max: '',
-  expenses_amount_min: '',
-  expenses_amount_max: '',
-  payrolls_amount_min: '',
-  payrolls_amount_max: '',
-  project_status: '',
+  created_at_start: monthStart,
+  created_at_end: monthEnd,
+  confirmed_at_start: '',
+  confirmed_at_end: '',
+  paid_at_start: '',
+  paid_at_end: '',
+  cancelled_at_start: '',
+  cancelled_at_end: '',
+  amount_min: '',
+  amount_max: '',
+  payment_method: '',
+  status: '',
   user: '',
   accountants: '',
   projects: '',
-  projects_min: '',
-  projects_max: '',
-  meetings_min: '',
-  meetings_max: '',
-  ishHaqiType: '',
+  type: '',
+  expense_category: '',
 }
 
 const Employee = () => {
@@ -91,7 +69,7 @@ const Employee = () => {
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
   const [filterModal, setFilterModal] = useState(false)
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState(initialFilters)
   const [selectEmployee, setSelectEmployee] = useState(false)
   const [selectAccountant, setSelectAccountant] = useState(false)
   const [selectProject, setSelectProject] = useState(false)
@@ -253,10 +231,30 @@ const Employee = () => {
     }, {})
   }
 
+  const hasActiveFilters = Object.values(filters).some((value) => {
+    if (value === undefined || value === null || value === '') return false
+    if (Array.isArray(value) && value.length === 0) return false
+    return true
+  })
+
+  const showClearButton = Object.keys(filters).some((key) => {
+    const value = filters[key];
+    if (key === 'created_at_start' || key === 'created_at_end') {
+      if (!value) return false;
+      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
+        return false;
+      }
+      return true;
+    }
+    if (value === undefined || value === null || value === '') return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    return true;
+  });
+
   const handleFetchReports = () => {
     const params = sanitizeParams(filters)
 
-    getEmployeeReports({ params, search })
+    getEmployeeReports({ params })
     setFilterModal(false)
   }
 
@@ -284,6 +282,12 @@ const Employee = () => {
     setSelectProject(false)
   }
 
+  const handleSearch = () => {
+    const params = sanitizeParams(filters)
+
+    getEmployeeReports({ params, search })
+  }
+
   return (
     <div className="relative">
       <div className='flex items-center justify-between'>
@@ -299,6 +303,12 @@ const Employee = () => {
               onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 outline-none transition-colors bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearch();
+                }
+              }}
             />
           </div>
           <button
@@ -307,14 +317,14 @@ const Employee = () => {
               e.preventDefault()
               setFilterModal(prev => !prev)
             }}
-            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${Object.keys(filters).some(key => filters[key] !== initialFilters[key] && filters[key] !== null && filters[key] !== undefined) ? 'filter-notif' : ''}`}
+            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
             Filtrlash
 
             <FaAngleDown size={16} className={`transition-transform duration-300 ${!filterModal ? '-rotate-90' : ''}`} />
           </button>
-          {Object.keys(filters).some(key => filters[key] !== initialFilters[key] && filters[key] !== null && filters[key] !== undefined) && (
+          {showClearButton && (
             <button
               onClick={handleClear}
               className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-red-100 text-sm font-semibold cursor-pointer`}
@@ -326,129 +336,70 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!Object.keys(filters).some(key => filters[key] !== initialFilters[key] && filters[key] !== null && filters[key] !== undefined) && !search}
+          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
           Shakillantirish
         </button>
       </div>
+
       {/* Filter Panel */}
-      {filterModal && (
-        <div ref={filterRef} className="absolute top-8 z-50 mt-4 p-6 bg-white dark:bg-[#1E2021] border border-slate-200 dark:border-[#292A2A] rounded-3xl shadow-xl space-y-6 transition-all duration-500 animate-in fade-in slide-in-from-top-4 w-full">
+      <div className={`transition-all duration-300 ease-in-out w-full ${filterModal ? 'max-h-[1200px] opacity-100 pointer-events-auto' : 'max-h-0 opacity-0 pointer-events-none'} mt-4`}>
 
-          {/* Row 1 */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-4 lg:col-span-2">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">So'ralgan vaqt</label>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="relative flex-1">
-                  <DatePicker
-                    showTime
-                    inputReadOnly
-                    format="DD.MM.YYYY HH:mm"
-                    value={filters.created_at_start}
-                    onChange={(value) => handleFilterChange('created_at_start', value)}
-                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                    placeholder='Boshlanish sanasi'
-                  />
-                </div>
-                <div className="relative flex-1">
-                  <DatePicker
-                    showTime
-                    inputReadOnly
-                    value={filters.created_at_end}
-                    format="DD.MM.YYYY HH:mm"
-                    onChange={(value) => handleFilterChange('created_at_end', value)}
-                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                    placeholder='Tugash sana'
-                  />
-                </div>
+        {/* Row 1 */}
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-4 lg:col-span-2">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">So'ralgan vaqt</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative flex-1">
+                <DatePicker
+                  inputReadOnly
+                  format="DD.MM.YYYY HH:mm"
+                  value={filters.created_at_start}
+                  onChange={(value) => handleFilterChange('created_at_start', value)}
+                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  placeholder='Boshlanish sanasi'
+                />
               </div>
-            </div>
-
-            <div className="col-span-4 lg:col-span-2">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Tasdiqlangan vaqt</label>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <DatePicker
-                    showTime
-                    inputReadOnly
-                    value={filters.confirmed_at_start}
-                    format="DD.MM.YYYY HH:mm"
-                    onChange={(value) => handleFilterChange('confirmed_at_start', value)}
-                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                    placeholder='Boshlanish sanasi'
-                  />
-                </div>
-
-                <div className="relative">
-                  <DatePicker
-                    showTime
-                    inputReadOnly
-                    value={filters.confirmed_at_end}
-                    format="DD.MM.YYYY HH:mm"
-                    onChange={(value) => handleFilterChange('confirmed_at_end', value)}
-                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                    placeholder='Tugash sanasi'
-                  />
-                </div>
+              <div className="relative flex-1">
+                <DatePicker
+                  inputReadOnly
+                  value={filters.created_at_end}
+                  format="DD.MM.YYYY HH:mm"
+                  onChange={(value) => handleFilterChange('created_at_end', value)}
+                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  placeholder='Tugash sana'
+                />
               </div>
             </div>
           </div>
 
-          {/* Row 2 */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-2">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">To'langan vaqt</label>
-              <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-4 lg:col-span-2">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Tasdiqlangan vaqt</label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
                 <DatePicker
-                  showTime
                   inputReadOnly
-                  value={filters.paid_at_start}
+                  value={filters.confirmed_at_start}
                   format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('paid_at_start', value)}
+                  onChange={(value) => handleFilterChange('confirmed_at_start', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
                   className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
                   placeholder='Boshlanish sanasi'
-                />
-                <DatePicker
-                  showTime
-                  inputReadOnly
-                  value={filters.paid_at_end}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('paid_at_end', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                  placeholder='Tugash sanasi'
+                  
                 />
               </div>
-            </div>
 
-            <div className="col-span-2">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Bekor qilingan vaqt</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
                 <DatePicker
-                  showTime
                   inputReadOnly
-                  value={filters.cancelled_at_start}
+                  value={filters.confirmed_at_end}
                   format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('cancelled_at_start', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                  placeholder='Boshlanish sanasi'
-                />
-                <DatePicker
-                  showTime
-                  inputReadOnly
-                  value={filters.cancelled_at_end}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('cancelled_at_end', value)}
+                  onChange={(value) => handleFilterChange('confirmed_at_end', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
                   className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
                   placeholder='Tugash sanasi'
@@ -456,169 +407,223 @@ const Employee = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Row 3*/}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-2 md:col-span-2">
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Miqdor</label>
-              <div className='grid grid-cols-2 gap-3'>
-                <FilterInput
-                  label="dan"
-                  value={filters.amount_min}
-                  onChange={(e) => handleFilterChange('amount_min', formatNum(e.target.value))}
-                />
-                <FilterInput
-                  label="gacha"
-                  value={filters.amount_max}
-                  onChange={(e) => handleFilterChange('amount_max', formatNum(e.target.value))}
-                />
-              </div>
-            </div>
-
-            <div className="col-span-2 md:col-span-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">To'lov turi</label>
-                  <FilterSelect
-                    padding='13.5px 12px'
-                    placeholder="To'lov turi tanlang"
-                    options={payment_type.map(type => type.label)}
-                    value={payment_type.find(type => type.value === filters.payment_method)?.label}
-                    onChange={(value) => handleFilterChange('payment_method', payment_type.find(type => type.label === value)?.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
-                  <FilterSelect
-                    padding='13.5px 12px'
-                    placeholder="Holatini tanlang"
-                    options={status_type.map(type => type.label)}
-                    value={status_type.find(type => type.value === filters.status)?.label}
-                    onChange={(value) => handleFilterChange('status', status_type.find(type => type.label === value)?.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 4 */}
-          <div className="grid grid-cols-5 gap-4">
-            <div>
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
-              <button
-                type="button"
-                onClick={() => setSelectEmployee(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
-              >
-                <span className="truncate text-sm font-medium">
-                  {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <PiUsersThreeBold size={18} />
-
-                  {filters.user && (
-                    <FaXmark
-                      size={18}
-                      className="text-red-500"
-                      onClick={(e) => { e.stopPropagation(); handleFilterChange('user', '') }}
-                    />
-                  )}
-                </div>
-              </button>
-            </div>
-            <div>
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Hisobchi</label>
-              <button
-                type="button"
-                onClick={() => setSelectAccountant(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
-              >
-                <span className="truncate text-sm font-medium">
-                  {filters.accountants ? `${filters.accountants.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <PiUsersThreeBold size={18} />
-
-                  {filters.accountants && (
-                    <FaXmark
-                      size={18}
-                      className="text-red-500"
-                      onClick={(e) => { e.stopPropagation(); handleFilterChange('accountants', '') }}
-                    />
-                  )}
-                </div>
-              </button>
-            </div>
-            <div>
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Loyihalar</label>
-              <button
-                type="button"
-                onClick={() => setSelectProject(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
-              >
-                <span className="truncate text-sm font-medium">
-                  {filters.projects ? `${filters.projects.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <img src="/imgs/Briefcase.svg" alt="Loyiha" size={18} />
-
-                  {filters.projects && (
-                    <FaXmark
-                      size={18}
-                      className="text-red-500"
-                      onClick={(e) => { e.stopPropagation(); handleFilterChange('projects', '') }}
-                    />
-                  )}
-                </div>
-              </button>
-            </div>
-
-            <div>
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xarajat turi</label>
-              <FilterSelect
-                value={cost_type.find((type) => type.value === filters.type)?.label}
-                padding='11px 12px'
-                placeholder={'Jami'}
-                onChange={(value) => handleFilterChange('type', cost_type.find((type) => type.label === value)?.value)}
-                options={cost_type.map((type) => type.label)}
+        {/* Row 2 */}
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-2">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">To'langan vaqt</label>
+            <div className="grid grid-cols-2 gap-3">
+              <DatePicker
+                inputReadOnly
+                value={filters.paid_at_start}
+                format="DD.MM.YYYY HH:mm"
+                onChange={(value) => handleFilterChange('paid_at_start', value)}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                placeholder='Boshlanish sanasi'
+              />
+              <DatePicker
+                inputReadOnly
+                value={filters.paid_at_end}
+                format="DD.MM.YYYY HH:mm"
+                onChange={(value) => handleFilterChange('paid_at_end', value)}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                placeholder='Tugash sanasi'
               />
             </div>
-            <div>
-              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Toifa</label>
-              <FilterSelect
-                value={category_type.find((type) => type.value === filters.expense_category)?.label}
-                padding='11px 12px'
-                placeholder={'Jami'}
-                onChange={(value) => handleFilterChange('expense_category', category_type.find((type) => type.label === value)?.value)}
-                options={category_type.map((type) => type.label)}
+          </div>
+
+          <div className="col-span-2">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Bekor qilingan vaqt</label>
+            <div className="grid grid-cols-2 gap-3">
+              <DatePicker
+                inputReadOnly
+                value={filters.cancelled_at_start}
+                format="DD.MM.YYYY HH:mm"
+                onChange={(value) => handleFilterChange('cancelled_at_start', value)}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                placeholder='Boshlanish sanasi'
+              />
+              <DatePicker
+                inputReadOnly
+                value={filters.cancelled_at_end}
+                format="DD.MM.YYYY HH:mm"
+                onChange={(value) => handleFilterChange('cancelled_at_end', value)}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                placeholder='Tugash sanasi'
               />
             </div>
           </div>
         </div>
-      )}
+
+        {/* Row 3*/}
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-2 md:col-span-2">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Miqdor</label>
+            <div className='grid grid-cols-2 gap-3'>
+              <FilterInput
+                label="dan"
+                value={filters.amount_min}
+                onChange={(e) => handleFilterChange('amount_min', formatNum(e.target.value))}
+              />
+              <FilterInput
+                label="gacha"
+                value={filters.amount_max}
+                onChange={(e) => handleFilterChange('amount_max', formatNum(e.target.value))}
+              />
+            </div>
+          </div>
+
+          <div className="col-span-2 md:col-span-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">To'lov turi</label>
+                <FilterSelect
+                  padding='13.5px 12px'
+                  placeholder="To'lov turi tanlang"
+                  options={payment_type.map(type => type.label)}
+                  value={payment_type.find(type => type.value === filters.payment_method)?.label}
+                  onChange={(value) => handleFilterChange('payment_method', payment_type.find(type => type.label === value)?.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
+                <FilterSelect
+                  padding='13.5px 12px'
+                  placeholder="Holatini tanlang"
+                  options={status_type.map(type => type.label)}
+                  value={status_type.find(type => type.value === filters.status)?.label}
+                  onChange={(value) => handleFilterChange('status', status_type.find(type => type.label === value)?.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 4 */}
+        <div className="grid grid-cols-5 gap-4">
+          <div>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
+            <button
+              type="button"
+              onClick={() => setSelectEmployee(true)}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
+            >
+              <span className="truncate text-sm font-medium">
+                {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
+              </span>
+              <div className="flex items-center gap-2">
+                <PiUsersThreeBold size={18} />
+
+                {filters.user && (
+                  <FaXmark
+                    size={18}
+                    className="text-red-500"
+                    onClick={(e) => { e.stopPropagation(); handleFilterChange('user', '') }}
+                  />
+                )}
+              </div>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Hisobchi</label>
+            <button
+              type="button"
+              onClick={() => setSelectAccountant(true)}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
+            >
+              <span className="truncate text-sm font-medium">
+                {filters.accountants ? `${filters.accountants.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
+              </span>
+              <div className="flex items-center gap-2">
+                <PiUsersThreeBold size={18} />
+
+                {filters.accountants && (
+                  <FaXmark
+                    size={18}
+                    className="text-red-500"
+                    onClick={(e) => { e.stopPropagation(); handleFilterChange('accountants', '') }}
+                  />
+                )}
+              </div>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Loyihalar</label>
+            <button
+              type="button"
+              onClick={() => setSelectProject(true)}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
+            >
+              <span className="truncate text-sm font-medium">
+                {filters.projects ? `${filters.projects.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
+              </span>
+              <div className="flex items-center gap-2">
+                <img src="/imgs/Briefcase.svg" alt="Loyiha" size={18} />
+
+                {filters.projects && (
+                  <FaXmark
+                    size={18}
+                    className="text-red-500"
+                    onClick={(e) => { e.stopPropagation(); handleFilterChange('projects', '') }}
+                  />
+                )}
+              </div>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xarajat turi</label>
+            <FilterSelect
+              value={cost_type.find((type) => type.value === filters.type)?.label}
+              padding='11px 12px'
+              placeholder={'Jami'}
+              onChange={(value) => handleFilterChange('type', cost_type.find((type) => type.label === value)?.value)}
+              options={cost_type.map((type) => type.label)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Toifa</label>
+            <FilterSelect
+              value={category_type.find((type) => type.value === filters.expense_category)?.label}
+              padding='11px 12px'
+              placeholder={'Jami'}
+              onChange={(value) => handleFilterChange('expense_category', category_type.find((type) => type.label === value)?.value)}
+              options={category_type.map((type) => type.label)}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Table Section */}
       {
         isLoading ? (
-          <div className="mt-6 rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
           </div>
         ) : (
           <div
-            className="mt-6 overflow-auto rounded-2xl h-[76vh] border border-slate-200 dark:border-[#292A2A]"
+            className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
             onScroll={handleMoreReportsScroll}
           >
             <table className="text-left border-collapse w-full min-w-[2000px]">
@@ -626,20 +631,20 @@ const Employee = () => {
                 <tr>
                   <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2]">№</th>
                   <th className="p-3 text-xs w-[150px] sticky left-[40px] z-10! bg-[#7186ED] font-bold border-r border-[#e2e6f2]">Ism Sharifi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[160px] sticky left-[155px] z-10! bg-[#7186ED] border-[#e2e6f2] text-center">Loyiha nomi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] sticky left-[140px] z-10! bg-[#7186ED] border-[#e2e6f2] text-center">Loyiha nomi</th>
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">Xarajat turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">Toifa</th>
+                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] text-end">Toifa</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Miqdori (UZS)</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">To'lov turi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] text-end">To'lov turi</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Holati</th>
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">So'rov sababi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">So'ralgan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">To'langan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-center">Tasdiqlangan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[190px] border-[#e2e6f2] text-end">So'ralgan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] text-end">To'langan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] text-center">Tasdiqlangan vaqti</th>
                   <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] text-end">Hisobchi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-start">Bekor qilingan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] text-start">Bekor qilingan vaqti</th>
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">Bekor sababi</th>
-                  <th className="p-3 text-xs sticky right-0 z-10! w-[180px] bg-[#7186ED] font-bold border-l border-[#e2e6f2] text-end">Kart raqami</th>
+                  <th className="p-3 text-xs sticky right-0 z-10! w-[280px] bg-[#7186ED] font-bold border-l border-[#e2e6f2] text-end">Kart raqami</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
@@ -651,7 +656,7 @@ const Employee = () => {
                     <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[40px] z-10! bg-slate-50">{
                       item.user}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[155px] z-10! bg-slate-50">{
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[140px] z-10! bg-slate-50">{
                       item.project || "-"}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
@@ -693,7 +698,7 @@ const Employee = () => {
                       {item.cancel_reason || '-'}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-l border-[#e2e6f2] dark:border-[#292A2A] text-center sticky right-0 z-10! bg-slate-50">
-                      {item.card_number || '-'}
+                      {item.card_number ? String(item.card_number).replace(/\\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'}
                     </td>
                   </tr>
                 ))}

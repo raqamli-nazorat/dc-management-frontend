@@ -146,12 +146,13 @@ const UserDetail = () => {
             
             // Ism o'zgargan bo'lsa
             if (form.name !== initial.name) {
-                formData.append('name', form.name)
+                formData.append('username', form.name)
             }
 
             // Parol kiritilgan bo'lsa
             if (form.password) {
                 formData.append('password', form.password)
+                formData.append('confirm_password', form.password)
             }
 
             // Oylik maosh o'zgargan bo'lsa

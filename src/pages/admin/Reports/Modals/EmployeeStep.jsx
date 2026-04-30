@@ -15,9 +15,18 @@ import { FaXmark } from "react-icons/fa6";
 const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all" }) => {
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedIds, setSelectedIds] = useState(selectedList);
+    const normalizeSelectedList = (list) => {
+        if (!Array.isArray(list)) return [];
+        return list
+            .map((item) => (typeof item === 'string' ? Number(item) : item))
+            .filter((id) => id !== null && id !== undefined && id !== '' && !Number.isNaN(id));
+    };
+    const [selectedIds, setSelectedIds] = useState(normalizeSelectedList(selectedList));
     const [loading, setLoading] = useState(true );
-    
+
+    useEffect(() => {
+        setSelectedIds(normalizeSelectedList(selectedList));
+    }, [selectedList]);
 
     // Ma'lumotlarni yuklash
     const getEmployee = async ({ search }) => {
