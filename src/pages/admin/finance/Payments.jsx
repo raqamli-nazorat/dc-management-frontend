@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -66,10 +66,13 @@ function buildParams(filters, search, forceMyRequests) {
   return p
 }
 
-async function apiGetPayments(filters, search, forceMyRequests) {
-  const res = await axiosAPI.get('/expense-request/', { params: buildParams(filters, search, forceMyRequests) })
+async function apiGetPayments(filters, search, forceMyRequests, page = 1) {
+  const res = await axiosAPI.get('/expense-request/', {
+    params: { ...buildParams(filters, search, forceMyRequests), page, page_size: 20 }
+  })
   const payload = res.data?.data ?? res.data
-  return Array.isArray(payload) ? payload : (payload.results ?? [])
+  if (Array.isArray(payload)) return { results: payload, next: null, count: payload.length }
+  return { results: payload.results ?? [], next: payload.next ?? null, count: payload.count ?? 0 }
 }
 
 async function apiCreatePayment(body) {
@@ -139,6 +142,9 @@ export default function PaymentsPage() {
   const [categories, setCategories] = useState([])
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [showFilter, setShowFilter] = useState(false)
@@ -146,21 +152,39 @@ export default function PaymentsPage() {
   const [selecting, setSelecting] = useState(false)
   const [selected, setSelected] = useState(new Set())
   const [detailPayment, setDetailPayment] = useState(null)
+  const scrollRef = useRef(null)
 
   const hasFilter = Object.entries(filters).some(([, v]) => v && v !== false)
 
-  const loadPayments = async (f = filters, q = search) => {
-    setLoading(true)
+  const loadPayments = async (f = filters, q = search, pg = 1) => {
+    if (pg === 1) setLoading(true)
+    else setLoadingMore(true)
     try {
-      const data = await apiGetPayments(f, q, forceMyRequests)
-      setPayments(data)
+      const { results, next } = await apiGetPayments(f, q, forceMyRequests, pg)
+      setPayments(prev => pg === 1 ? results : [...prev, ...results])
+      setHasMore(!!next)
+      setPage(pg)
     } catch (err) {
       console.error(err)
       toast.error(getErrorMessage(err, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
+
+  // Scroll listener
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60 && hasMore && !loadingMore) {
+        loadPayments(filters, search, page + 1)
+      }
+    }
+    el.addEventListener('scroll', handleScroll)
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [hasMore, loadingMore, page, filters, search])
 
   useEffect(() => {
     loadPayments()
@@ -190,13 +214,13 @@ export default function PaymentsPage() {
   const handleSearch = (e) => {
     const val = e.target.value
     setSearch(val)
-    loadPayments(filters, val)
+    loadPayments(filters, val, 1)
   }
 
   const handleApplyFilter = async (f) => {
     setFilters(f)
     setShowFilter(false)
-    await loadPayments(f, search)
+    await loadPayments(f, search, 1)
   }
 
   const handleSubmitSorov = async (body) => {
@@ -309,7 +333,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* ── Jadval ── */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-auto">
         {loading ? (
           <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Yuklanmoqda...</div>
         ) : payments.length === 0 ? (
@@ -373,6 +397,15 @@ export default function PaymentsPage() {
               ))}
             </tbody>
           </table>
+        )}
+        {loadingMore && (
+          <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+            <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            Yuklanmoqda...
+          </div>
         )}
       </div>
 
