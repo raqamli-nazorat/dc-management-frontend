@@ -27,8 +27,11 @@ const toIso = (date, time) => {
   const absMin = Math.abs(offsetMin)
   const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
   const mm = String(absMin % 60).padStart(2, '0')
-  return `${date}T${t}:00.000000${sign}${hh}:${mm}`
+  return `${date}T${t}:00${sign}${hh}:${mm}`
 }
+
+// Filter uchun sana+vaqt → ISO+timezone
+const toIsoWithOffset = (date, time) => toIso(date, time)
 
 const fromIso = (iso) => {
   if (!iso) return { date: '', time: '' }
@@ -248,10 +251,35 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
 
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
+  // Loyha o'zgarganda qatnashchilarni tozalash
+  const handleProjectChange = (v) => {
+    setForm(p => ({ ...p, project: v, participants: [] }))
+    setErrors(p => ({ ...p, project: '' }))
+  }
+
+  // Faqat tanlangan loyha azolari
+  const projectMembers = (() => {
+    if (!form.project) return users
+    const proj = projects.find(p => p.id === form.project)
+    if (!proj) return users
+    const memberIds = new Set([
+      ...(proj.employees || []),
+      ...(proj.testers || []),
+      proj.manager,
+    ].filter(Boolean).map(x => typeof x === 'object' ? x.id : x))
+    const filtered = users.filter(u => memberIds.has(u.id))
+    return filtered.length > 0 ? filtered : users
+  })()
+
   const validate = () => {
     const e = {}
-    if (!form.project)      e.project = true
-    if (!form.title.trim()) e.title   = true
+    if (!form.project)            e.project     = true
+    if (!form.title.trim())       e.title       = true
+    if (!form.description.trim()) e.description = true
+    if (!form.link.trim())        e.link        = true
+    if (!form.date)               e.date        = true
+    if (!form.time)               e.time        = true
+    if (!form.durationVal || isNaN(parseInt(form.durationVal, 10))) e.durationVal = true
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -300,7 +328,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
           </div>
 
           <div className="px-7 pb-2 flex flex-col gap-3">
-            <ProjectDropdown value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} />
+            <ProjectDropdown value={form.project} onChange={handleProjectChange} error={errors.project} projects={projects} />
 
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -319,7 +347,8 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <div>
               <label className={labelCls}>Havolasi</label>
               <input value={form.link} onChange={e => set('link', e.target.value)}
-                placeholder="URL manzil kiriting" className={inputCls(false)} />
+                placeholder="URL manzil kiriting" className={inputCls(errors.link)} />
+              {errors.link && <p className="text-xs text-red-500 mt-1">*To'g'ri URL manzil kiriting</p>}
             </div>
 
             <div>
@@ -327,7 +356,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
               <div className="relative">
                 <textarea value={form.description} onChange={e => set('description', e.target.value)}
                   placeholder="Tavsifni yozing" rows={3}
-                  className={inputCls(false) + ' resize-none pr-8'} />
+                  className={inputCls(errors.description) + ' resize-none pr-8'} />
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
@@ -335,12 +364,13 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
                   </button>
                 )}
               </div>
+              {errors.description && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
             </div>
 
             <div className="grid grid-cols-4 gap-3">
               <div className="col-span-2">
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.date ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
                   <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
@@ -348,10 +378,11 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
+                {errors.date && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.time ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
                   <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
                     placeholder="00:00" step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
@@ -360,17 +391,17 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
+                {errors.time && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
               <div>
                 <label className={labelCls}>Davomiyligi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.durationVal ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
                   <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
                     placeholder="0"
                     className="flex-1 min-w-0 w-8 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
-                  <span className="shrink-0 text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">
-                    {form.durationVal ? 'daqiqa' : 'daqiqa'}
-                  </span>
+                  <span className="shrink-0 text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
                 </div>
+                {errors.durationVal && <p className="text-xs text-red-500 mt-1">*Kiriting</p>}
               </div>
             </div>
 
@@ -389,7 +420,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
               )}
               <button type="button" onClick={() => setShowParticipants(true)}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
-                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer ">
+                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 Qatnashchilarni qo'shish
               </button>
@@ -400,17 +431,17 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading
                   ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
                   : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -422,7 +453,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
         </div>
       </div>
       {showParticipants && (
-        <ParticipantsModal selected={form.participants} users={users}
+        <ParticipantsModal selected={form.participants} users={projectMembers}
           onClose={() => setShowParticipants(false)}
           onApply={vals => { set('participants', vals); setShowParticipants(false) }} />
       )}
@@ -1015,12 +1046,12 @@ export default function MeetingsPage() {
 
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
-    if (q)           p.search    = q
-    if (f.organizer) p.organizer = f.organizer
-    if (f.project)   p.project   = f.project
+    if (q)           p.search         = q
+    if (f.organizer) p.organizer      = f.organizer
+    if (f.project)   p.project        = f.project
     if (f.status !== undefined && f.status !== '') p.is_completed = f.status
-    if (f.dateFrom)  p.start_time__date__gte = f.dateFrom
-    if (f.dateTo)    p.start_time__date__lte = f.dateTo
+    if (f.dateFrom)  p.start_date_gte = f.dateFrom
+    if (f.dateTo)    p.start_date_lte = f.dateTo
     return p
   }, [filters, search])
 
@@ -1069,10 +1100,18 @@ export default function MeetingsPage() {
       toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
     } catch (err) {
       const errData = err?.response?.data
-      const msg = errData?.detail
-        || (typeof errData === 'object' ? Object.entries(errData).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join(', ') : null)
-        || "Yig'ilish yaratishda xatolik"
-      toast.error('Xatolik', msg)
+      const details = errData?.error?.details
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join('\n')
+        toast.error('Xatolik', msgs)
+      } else {
+        const msg = errData?.error?.errorMsg
+          || errData?.detail
+          || "Yig'ilish yaratishda xatolik"
+        toast.error('Xatolik', msg)
+      }
       throw err
     }
   }
