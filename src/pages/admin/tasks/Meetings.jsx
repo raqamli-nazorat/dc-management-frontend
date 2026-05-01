@@ -20,7 +20,14 @@ const fmtDt = (iso) => {
 
 const toIso = (date, time) => {
   if (!date) return null
-  return time ? `${date}T${time}:00` : `${date}T00:00:00`
+  const t = time || '00:00'
+  const now = new Date()
+  const offsetMin = -now.getTimezoneOffset()
+  const sign = offsetMin >= 0 ? '+' : '-'
+  const absMin = Math.abs(offsetMin)
+  const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+  const mm = String(absMin % 60).padStart(2, '0')
+  return `${date}T${t}:00.000000${sign}${hh}:${mm}`
 }
 
 const fromIso = (iso) => {
@@ -234,7 +241,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     project: null, title: '', fine: '', link: '', description: '',
-    date: '', time: '', durationVal: '', durationUnit: 'Daqiqa',
+    date: '', time: '', durationVal: '',
     participants: [], is_completed: false,
   })
   const [errors, setErrors] = useState({})
@@ -267,8 +274,8 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
       if (form.fine)               body.penalty_percentage = `-${form.fine}`
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
-      const mins = durationToMinutes(form.durationVal, form.durationUnit)
-      if (mins) body.duration_minutes = mins
+      const mins = parseInt(form.durationVal, 10)
+      if (mins && !isNaN(mins)) body.duration_minutes = mins
       await onAdd(body)
       onClose()
     } finally {
@@ -330,32 +337,41 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
+            <div className="grid grid-cols-4 gap-3">
+              <div className="col-span-2">
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
                     placeholder="00:00" step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
               </div>
-              <DurationSelect value={form.durationVal} unit={form.durationUnit}
-                onValueChange={v => set('durationVal', v)} onUnitChange={v => set('durationUnit', v)} />
+              <div>
+                <label className={labelCls}>Davomiyligi</label>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                  <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
+                    placeholder="0"
+                    className="flex-1 min-w-0 w-8 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
+                  <span className="shrink-0 text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">
+                    {form.durationVal ? 'daqiqa' : 'daqiqa'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -530,32 +546,41 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
+            <div className="grid grid-cols-4 gap-2">
+              <div className="col-span-2">
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
                     placeholder="00:00" step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
               </div>
-              <DurationSelect value={form.durationVal} unit={form.durationUnit}
-                onValueChange={v => set('durationVal', v)} onUnitChange={v => set('durationUnit', v)} />
+              <div>
+                <label className={labelCls}>Davomiyligi</label>
+                <div className="flex rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] overflow-hidden focus-within:border-[#526ED3]">
+                  <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
+                    placeholder="40"
+                    className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
+                  <span className="flex items-center px-2 text-xs text-[#5B6078] dark:text-[#C2C8E0] border-l border-[#E2E6F2] dark:border-[#292A2A] whitespace-nowrap">
+                    {form.durationUnit === 'Soat' ? 'Soat' : 'Daqiqa'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -680,8 +705,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
+          <div className="grid grid-cols-4 gap-3">
+            <div className="col-span-2">
               <label className={labelCls}>Boshlanish sanasi</label>
               <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
                 <span>{startDate ? startDate.split('-').reverse().join('.') : '—'}</span>
@@ -701,12 +726,11 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
             <div>
               <label className={labelCls}>Davomiyligi</label>
-              <div className="flex rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] overflow-hidden">
-                <div className="flex-1 px-3 py-2.5 text-sm text-[#1A1D2E] dark:text-white">{durVal || '—'}</div>
-                <div className="flex items-center gap-1 px-2.5 text-sm text-[#1A1D2E] dark:text-white border-l border-[#E2E6F2] dark:border-[#292A2A]">
-                  <span className="whitespace-nowrap">{durUnit}</span>
-                  <FaChevronDown size={10} className="text-[#8F95A8]" />
-                </div>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || '—'}</span>
+                {meeting.duration_minutes && (
+                  <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
+                )}
               </div>
             </div>
           </div>

@@ -127,7 +127,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
         <div className="fixed inset-0 bg-black/60" />
         <button onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
-              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">                                                                        
             <FaXmark size={14} />
           </button>
 

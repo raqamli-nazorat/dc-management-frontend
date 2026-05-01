@@ -21,8 +21,11 @@ export function AuthProvider({ children }) {
       localStorage.setItem('user', JSON.stringify(userData))
       return { success: true, roles: userData.roles }
     } catch (error) {
-      console.log('Login error:', error)
-      return { success: false, error: error?.response?.data?.detail || "Xato yuz berdi" }
+      const responseData = error?.response?.data
+      return {
+        success: false,
+        error: responseData?.error ?? { errorMsg: responseData?.detail ?? "Xato yuz berdi" }
+      }
     }
   }
 

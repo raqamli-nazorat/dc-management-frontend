@@ -177,14 +177,15 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
-
         {/* X tugmasi */}
         <button onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
             bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
           <FaXmark size={14} />
         </button>
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+
+      
 
         <div className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-3 mb-1">
@@ -228,7 +229,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
             </div>
           </div>
         </div>
-        <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
+        <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
@@ -257,15 +258,16 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
-
-        {/* X tugmasi */}
-        <button onClick={onClose}
+       <button onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
             bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
           <FaXmark size={14} />
         </button>
 
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
+
+        {/* X tugmasi */}
+       
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center">
           <div className="flex items-center gap-3">
@@ -323,16 +325,14 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Xarajat</label>
-              <div className={`${fieldCls} justify-between`}>
-                <span>{item.description || ''}</span>
-                {/* <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" /> */}
+              <div className="w-full min-h-[42px] max-h-[100px] overflow-y-auto px-3 py-2.5 rounded-xl text-sm border flex items-start bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] whitespace-pre-wrap break-words leading-relaxed">
+                {item.description || ''}
               </div>
             </div>
             <div>
               <label className={labelCls}>Turi</label>
               <div className={`${fieldCls} justify-between`}>
                 <span>{typeLabel}</span>
-                {/* <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" /> */}
               </div>
             </div>
           </div>
