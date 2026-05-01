@@ -1222,6 +1222,7 @@ const Employee = () => {
       {selectEmployee && (
         <EmployeeStep
           selectedList={filters.users}
+          title="Xodim tanlang"
           onConfirm={handleSelectEmployeeConfirm}
           onClose={() => setSelectEmployee(false)}
         />

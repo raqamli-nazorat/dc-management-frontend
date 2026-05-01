@@ -12,7 +12,7 @@ import { MdOutlinePlaylistAddCheck } from "react-icons/md";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all" }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang" }) => {
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const normalizeSelectedList = (list) => {
@@ -22,7 +22,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
             .filter((id) => id !== null && id !== undefined && id !== '' && !Number.isNaN(id));
     };
     const [selectedIds, setSelectedIds] = useState(normalizeSelectedList(selectedList));
-    const [loading, setLoading] = useState(true );
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setSelectedIds(normalizeSelectedList(selectedList));
@@ -33,17 +33,20 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
         const params = { search };
 
-        if (employee_role !== "all") {
+        if (employee_role !== "all" && employee_role !== "tester") {
             params.roles = employee_role;
         }
-        
+
         setLoading(true);
         try {
-            const { data } = await axiosAPI.get("users/", { params } );
-            setEmployees(data?.data?.results || []);
+            const { data } = await axiosAPI.get(employee_role === "tester" ? "reports/projects/all-testers/" : "users/", { params });
+
+            const response = employee_role === "tester" ? data.data : data?.data?.results || [];
+
+            setEmployees(response);
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.error?.errorMgs || "Xodimlarni yuklashda xatolik yuz berdi.");
+            toast.error(error?.response?.data?.error?.errorMsg || "Xodimlarni yuklashda xatolik yuz berdi.");
         } finally {
             setLoading(false);
         }
@@ -84,7 +87,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                         <FaArrowLeft size={18} />
                     </button>
-                    <h2 className="ml-2 text-[17px] font-bold text-[#1A1D2E]">Boshqaruvchi tanlang</h2>
+                    <h2 className="ml-2 text-[17px] font-bold text-[#1A1D2E]">{title}</h2>
                 </div>
 
                 <div className="p-6">
@@ -117,8 +120,8 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                                 key={emp.id}
                                 onClick={() => toggleSelect(emp.id)}
                                 className={`flex items-center p-3 rounded-[16px] border cursor-pointer transition-all ${selectedIds.includes(emp.id)
-                                        ? "border-indigo-500 bg-indigo-50/30"
-                                        : "border-gray-100 bg-[#F8F9FD] hover:border-gray-300"
+                                    ? "border-indigo-500 bg-indigo-50/30"
+                                    : "border-gray-100 bg-[#F8F9FD] hover:border-gray-300"
                                     }`}
                             >
                                 <div className={`w-5 h-5 rounded-md border flex items-center justify-center mr-4 transition-all ${selectedIds.includes(emp.id) ? "bg-indigo-600 border-indigo-600" : "bg-white border-gray-300"
@@ -139,7 +142,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
                         {employees?.length === 0 && (
                             <div className="flex justify-center items-center h-[400px]">
-                                <p className="text-gray-500">{loading ? "Yuklanmoqda..." : "Hech qanday boshqaruvchi topilmadi."}</p>
+                                <p className="text-gray-500">{loading ? "Yuklanmoqda..." : `Hech qanday ${title.toLowerCase()?.split(" ")[0] || "ma'lumot"} topilmadi.`}</p>
                             </div>
                         )}
                     </div>

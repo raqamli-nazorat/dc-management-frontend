@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter, LuUserPlus } from 'react-icons/lu'
-import { FaAngleDown, FaChevronDown } from 'react-icons/fa'
+import { LuFilter } from 'react-icons/lu'
+import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, Select } from 'antd'
-import { usePositions, useRegions } from "../../../MostUsesDates"
+import { DatePicker } from 'antd'
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -12,7 +11,6 @@ import { toast } from '../../../Toast/ToastProvider'
 import { axiosAPI } from '../../../service/axiosAPI'
 import dayjs from 'dayjs'
 import { PiUsersThreeBold } from 'react-icons/pi'
-import ProjectsStep from './Modals/ProjectsStep'
 import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import jsPDF from 'jspdf'
@@ -61,23 +59,13 @@ const initialFilters = {
   penalty_max: '',
 }
 
-const getCurrentMonth = () => {
-  const now = dayjs()
-  return now.month() + 1
-}
-
 const Employee = () => {
-
-  const positions = usePositions()
-  const regions = useRegions()
-
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
   const [filterModal, setFilterModal] = useState(false)
   const [filters, setFilters] = useState(initialFilters)
   const [selectEmployee, setSelectEmployee] = useState(false)
   const [selectAccountant, setSelectAccountant] = useState(false)
-  const [selectProject, setSelectProject] = useState(false)
   const [UserReports, setUserReports] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
@@ -601,7 +589,6 @@ const Employee = () => {
     setSelectAccountant(false)
   }
 
-
   const handleSearch = () => {
     const params = sanitizeParams(filters)
     getEmployeeReports({ params, search })
@@ -667,7 +654,7 @@ const Employee = () => {
         className={`transition-all duration-300 ease-in-out w-full ${filterModal ? 'max-h-[1200px] opacity-100 pointer-events-auto' : 'max-h-0 opacity-0 pointer-events-none'} mt-4`}
       >
         {/* Row 1 */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4 mb-3">
           <div className="col-span-4 lg:col-span-2">
             <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">So'ralgan vaqt</label>
             <div className="grid grid-cols-2 gap-3">
@@ -728,7 +715,7 @@ const Employee = () => {
         </div>
 
         {/* Row 2 */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4 mb-3">
           <div className="col-span-2">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -810,11 +797,13 @@ const Employee = () => {
             <div className='grid grid-cols-2 gap-3'>
               <FilterInput
                 label="dan"
+                className='bg-white'
                 value={filters.total_amount_min}
                 onChange={(e) => handleFilterChange('total_amount_min', formatNum(e.target.value))}
               />
               <FilterInput
                 label="gacha"
+                className='bg-white'
                 value={filters.total_amount_max}
                 onChange={(e) => handleFilterChange('total_amount_max', formatNum(e.target.value))}
               />
@@ -825,11 +814,13 @@ const Employee = () => {
             <div className='grid grid-cols-2 gap-3'>
               <FilterInput
                 label="dan"
+                className='bg-white'
                 value={filters.salary_min}
                 onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
               />
               <FilterInput
                 label="gacha"
+                className='bg-white'
                 value={filters.salary_max}
                 onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
               />
@@ -840,11 +831,13 @@ const Employee = () => {
             <div className='grid grid-cols-2 gap-3'>
               <FilterInput
                 label="dan"
+                className='bg-white'
                 value={filters.kpi_min}
                 onChange={(e) => handleFilterChange('kpi_min', formatNum(e.target.value))}
               />
               <FilterInput
                 label="gacha"
+                className='bg-white'
                 value={filters.kpi_max}
                 onChange={(e) => handleFilterChange('kpi_max', formatNum(e.target.value))}
               />
@@ -855,11 +848,13 @@ const Employee = () => {
             <div className='grid grid-cols-2 gap-3'>
               <FilterInput
                 label="dan"
+                className='bg-white'
                 value={filters.penalty_min}
                 onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
               />
               <FilterInput
                 label="gacha"
+                className='bg-white'
                 value={filters.penalty_max}
                 onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
               />
@@ -972,6 +967,7 @@ const Employee = () => {
         selectEmployee && (
           <EmployeeStep
             selectedList={filters.user ? filters.user.split(',') : []}
+            title="Xodimlar tanlang"
             onConfirm={handleSelectEmployeeConfirm}
             onClose={() => setSelectEmployee(false)}
           />
@@ -982,6 +978,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.accountant ? filters.accountant.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
+          title="Hisobchilar tanlang"
           employee_role='accountant'
           onClose={() => setSelectAccountant(false)}
         />

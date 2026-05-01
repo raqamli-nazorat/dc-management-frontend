@@ -1089,6 +1089,7 @@ const Employee = () => {
           <EmployeeStep
             selectedList={filters.user ? filters.user.split(',') : []}
             onConfirm={handleSelectEmployeeConfirm}
+            title="Xodimlar tanlang"
             onClose={() => setSelectEmployee(false)}
           />
         )
@@ -1099,6 +1100,7 @@ const Employee = () => {
           selectedList={filters.accountants ? filters.accountants.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
           employee_role='accountant'
+          title="Hisobchilar tanlang"
           onClose={() => setSelectAccountant(false)}
         />
       )}
