@@ -1477,7 +1477,10 @@ export default function ProjectsPage() {
       setData(prev => prev.filter(p => p.id !== id))
       toast.delete("Loyiha o'chirildi", "Loyiha chiqindi qutisiga yuborildi.")
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "O'chirishda xatolik")
+      const msg = err?.response?.data?.error?.errorMsg
+        || err?.response?.data?.detail
+        || "O'chirishda xatolik yuz berdi"
+      toast.error('Xatolik', msg)
     }
   }
 

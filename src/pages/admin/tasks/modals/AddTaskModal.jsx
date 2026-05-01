@@ -13,7 +13,6 @@ const PRIORITY_OPTIONS = [
 const TYPE_OPTIONS = [
   { label: 'Xato',           value: 'bug' },
   { label: 'Yangi funksiya', value: 'feature' },
-  { label: 'Vazifa',         value: 'task' },
   { label: "Qo'shimcha",    value: 'improvement' },
 ]
 const STATUS_OPTIONS = [
@@ -203,7 +202,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   }, [])
 
   const [form, setForm] = useState({
-    project: "", title: "", description: "", priority: "low", type: "task", status: "todo",
+    project: "", title: "", description: "", priority: "low", type: "bug", status: "todo",
     assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
     deadline: "", estimated_hours: "", estimated_minutes: "",
   })
@@ -212,10 +211,13 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
   const validate = () => {
     const e = {}
-    if (!form.project)      e.project = true
-    if (!form.title.trim()) e.title   = true
+    if (!form.project)      e.project  = true
+    if (!form.title.trim()) e.title    = true
     if (!form.priority)     e.priority = true
-    if (!form.type)         e.type    = true
+    if (!form.type)         e.type     = true
+    if (form.sprint && (isNaN(Number(form.sprint)) || Number(form.sprint) > 10 || Number(form.sprint) < 0)) {
+      e.sprint = 'Sprint 0 dan 10 gacha bo\'lishi kerak'
+    }
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -251,8 +253,17 @@ export default function AddTaskModal({ onClose, onAdd }) {
       }
       await onAdd(body)
       onClose()
-    } catch {
-      // error handled in parent
+    } catch (err) {
+      const details = err?.response?.data?.error?.details
+      const errorMsg = err?.response?.data?.error?.errorMsg || "Vazifa yaratishda xatolik"
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
+      } else {
+        toast.error('Xatolik', errorMsg)
+      }
     } finally {
       setLoading(false)
     }
@@ -337,8 +348,9 @@ export default function AddTaskModal({ onClose, onAdd }) {
               <SelectDropdown label="Lavozim" value={form.position} onChange={v => set("position", v)} options={positionOptions} placeholder="Lavozim tanlang" />
               <div>
                 <label className={labelCls}>Sprint raqami</label>
-                <input type="number" min="0" value={form.sprint} onChange={e => set("sprint", e.target.value)}
-                  placeholder="0" className={inputCls(false)} />
+                <input type="number" min="0" max="10" value={form.sprint} onChange={e => set("sprint", e.target.value)}
+                  placeholder="0" className={inputCls(errors.sprint)} />
+                {errors.sprint && <p className="text-xs text-red-500 mt-1">{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
               </div>
             </div>
 
