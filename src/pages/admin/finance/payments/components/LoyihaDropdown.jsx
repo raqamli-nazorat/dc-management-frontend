@@ -44,7 +44,7 @@ function ProjectList({ projects, value, onChange, setOpen }) {
 }
 
 /* Filter modal uchun */
-export function LoyihaDropdown({ value, onChange, projects = [] }) {
+export function LoyihaDropdown({ value, onChange, projects = [], disabled = false }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => String(p.id) === String(value))
 
@@ -52,13 +52,15 @@ export function LoyihaDropdown({ value, onChange, projects = [] }) {
     <div ref={ref}>
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
-        <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
+        <button type="button" onClick={() => !disabled && setOpen(o => !o)}
+          disabled={disabled}
+          className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
-            ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
+            ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}
+            ${disabled ? 'opacity-50 cursor-not-allowed bg-[#F8F9FC] dark:bg-[#1A1B1B] pointer-events-none' : 'cursor-pointer'}`}>
           <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
           <div className="flex items-center gap-1 shrink-0 ml-1">
-            {value && (
+            {value && !disabled && (
               <span className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer"
                 onMouseDown={e => { e.stopPropagation(); onChange('') }}>
                 <FaXmark size={11} />
@@ -67,7 +69,7 @@ export function LoyihaDropdown({ value, onChange, projects = [] }) {
             <FaChevronDown size={11} className={`text-[#8F95A8] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
-        {open && (
+        {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
             bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
             <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />

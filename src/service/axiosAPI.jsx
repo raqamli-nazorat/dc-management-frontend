@@ -3,7 +3,15 @@ import axios from "axios";
 const axiosAPI = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   paramsSerializer: {
-    encode: (param) => param,
+    serialize: (params) => {
+      return Object.entries(params)
+        .filter(([, v]) => v !== undefined && v !== null && v !== '')
+        .map(([k, v]) => {
+          const encoded = String(v).replace(/\+/g, '%2B')
+          return `${encodeURIComponent(k)}=${encoded}`
+        })
+        .join('&')
+    },
   },
 });
 

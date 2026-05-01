@@ -463,10 +463,9 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
   return (
     <div>
       <label className={labelCls}>{label}</label>
-      <button
-        type="button"
+      <div
         onClick={onOpen}
-        className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border  cursor-pointer text-left
+        className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[#526ED3]"
       >
         <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
@@ -478,16 +477,17 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
                   bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]">
                 {u.username}
-                <button type="button" onMouseDown={e => { e.stopPropagation(); onRemove(u.id) }}
-                  className="hover:opacity-70 cursor-pointer ml-0.5">
+                <span
+                  onMouseDown={e => { e.stopPropagation(); onRemove(u.id) }}
+                  className="hover:opacity-70 cursor-pointer ml-0.5 flex items-center">
                   <FaXmark size={9} />
-                </button>
+                </span>
               </span>
             ))
           )}
         </div>
         <FaChevronDown size={11} className="text-[#8F95A8] shrink-0 ml-2" />
-      </button>
+      </div>
     </div>
   )
 }
@@ -579,7 +579,7 @@ function AddProjectModal({ onClose, onAdd }) {
   }, [])
 
   const [form, setForm] = useState({
-    title: '', status: '', description: '', manager: null,
+    title: '', prefix: '', status: '', description: '', manager: null,
     manager_bonus: '', employees: [], testers: [],
     deadline: '', time: '', is_active: true,
   })
@@ -596,8 +596,9 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim()) e.title = true
-    if (!form.status)       e.status = true
+    if (!form.title.trim())       e.title       = true
+    if (!form.prefix.trim())      e.prefix      = true
+    if (!form.status)             e.status      = true
     if (!form.description.trim()) e.description = true
     setErrors(e)
     return Object.keys(e).length === 0
@@ -609,14 +610,15 @@ function AddProjectModal({ onClose, onAdd }) {
     try {
       const body = {
         title:       form.title.trim(),
+        prefix:      form.prefix.trim().toUpperCase(),
         status:      form.status,
         description: form.description.trim(),
         is_active:   form.is_active,
       }
-      if (form.manager)       body.manager       = form.manager.id
-      if (form.manager_bonus) body.manager_bonus = form.manager_bonus.replace(/\s/g, '')
-      if (form.employees.length) body.employees  = form.employees.map(u => u.id)
-      if (form.testers.length)   body.testers    = form.testers.map(u => u.id)
+      if (form.manager)          body.manager       = form.manager.id
+      if (form.manager_bonus)    body.manager_bonus = form.manager_bonus.replace(/\s/g, '')
+      if (form.employees.length) body.employees     = form.employees.map(u => u.id)
+      if (form.testers.length)   body.testers       = form.testers.map(u => u.id)
       if (form.deadline) {
         const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
         body.deadline = dt
@@ -627,14 +629,18 @@ function AddProjectModal({ onClose, onAdd }) {
       toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
       onClose()
     } catch (err) {
-      const data = err?.response?.data?.data ?? err?.response?.data
-      if (data && typeof data === 'object') {
+      const errData = err?.response?.data?.error?.details ?? err?.response?.data?.data ?? err?.response?.data
+      if (errData && typeof errData === 'object') {
         const newErrors = {}
-        if (data.title)       newErrors.title = true
-        if (data.status)      newErrors.status = true
-        if (data.description) newErrors.description = true
+        if (errData.title)       newErrors.title       = true
+        if (errData.prefix)      newErrors.prefix      = true
+        if (errData.status)      newErrors.status      = true
+        if (errData.description) newErrors.description = true
         if (Object.keys(newErrors).length) setErrors(newErrors)
-        else toast.error('Xatolik', data?.detail || data?.message || 'Xatolik yuz berdi')
+        else {
+          const msg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || 'Xatolik yuz berdi'
+          toast.error('Xatolik', msg)
+        }
       } else {
         toast.error('Xatolik', 'Loyiha yaratishda xatolik yuz berdi')
       }
@@ -675,13 +681,21 @@ function AddProjectModal({ onClose, onAdd }) {
           </div>
 
           <div className="px-7 pb-4 flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2">
                 <label className={labelCls}>Nomi</label>
                 <input value={form.title} onChange={e => set('title', e.target.value)}
                   placeholder="Nomi kiriting" className={inputCls(errors.title)} />
                 {errors.title && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
+              <div>
+                <label className={labelCls}>Prefiks</label>
+                <input value={form.prefix} onChange={e => set('prefix', e.target.value.toUpperCase().slice(0, 5))}
+                  placeholder="PRJ" className={inputCls(errors.prefix)} />
+                {errors.prefix && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div ref={statusRef}>
                 <label className={labelCls}>Holati</label>
                 <div className="relative">

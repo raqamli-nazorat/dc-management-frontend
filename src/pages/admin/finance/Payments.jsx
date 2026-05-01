@@ -1,5 +1,4 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { FaXmark } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -12,56 +11,52 @@ import FilterModal from './payments/modals/FilterModal'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 
+// ── Timezone offset helper ───────────────────────────────────
+// ── Datetime helper ──────────────────────────────────────────
+// API kutayotgan format: 2026-04-27T22:52:05.977018+05:00
+function toIsoWithOffset(date, time, isEnd = false) {
+  if (!date) return null
+  const t = time || (isEnd ? '23:59' : '00:00')
+  const secs = isEnd ? '59' : '00'
+  // Mahalliy timezone offset ni olish
+  const now = new Date()
+  const offsetMin = -now.getTimezoneOffset()
+  const sign = offsetMin >= 0 ? '+' : '-'
+  const absMin = Math.abs(offsetMin)
+  const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+  const mm = String(absMin % 60).padStart(2, '0')
+  const offset = `${sign}${hh}:${mm}`
+  // microseconds qo'shish (API talab qiladi)
+  return `${date}T${t}:${secs}.000000${offset}`
+}
+
 // ── API ──────────────────────────────────────────────────────
 function buildParams(filters, search, forceMyRequests) {
   const p = {}
   if (search) p.search = search
-  if (filters.type) p.type = filters.type
-  if (filters.status) p.status = filters.status
+  if (filters.type)             p.type             = filters.type
+  if (filters.status)           p.status           = filters.status
   if (filters.expense_category) p.expense_category = filters.expense_category
-  if (filters.project) p.project = filters.project
-  if (filters.amount__gte) p.amount__gte = filters.amount__gte
-  if (filters.amount__lte) p.amount__lte = filters.amount__lte
+  if (filters.project)          p.project          = filters.project
+  if (filters.amount__gte)      p.amount__gte      = filters.amount__gte
+  if (filters.amount__lte)      p.amount__lte      = filters.amount__lte
 
-  if (filters.created_at__date__gte) {
-    p.created_at__gte = filters.created_at__time__gte
-      ? `${filters.created_at__date__gte}T${filters.created_at__time__gte}:00`
-      : `${filters.created_at__date__gte}T00:00:00`
-  }
-  if (filters.created_at__date__lte) {
-    p.created_at__lte = filters.created_at__time__lte
-      ? `${filters.created_at__date__lte}T${filters.created_at__time__lte}:59`
-      : `${filters.created_at__date__lte}T23:59:59`
-  }
-  if (filters.paid_at__date__gte) {
-    p.paid_at__gte = filters.paid_at__time__gte
-      ? `${filters.paid_at__date__gte}T${filters.paid_at__time__gte}:00`
-      : `${filters.paid_at__date__gte}T00:00:00`
-  }
-  if (filters.paid_at__date__lte) {
-    p.paid_at__lte = filters.paid_at__time__lte
-      ? `${filters.paid_at__date__lte}T${filters.paid_at__time__lte}:59`
-      : `${filters.paid_at__date__lte}T23:59:59`
-  }
-  if (filters.confirmed_at__date__gte) {
-    p.confirmed_at__gte = filters.confirmed_at__time__gte
-      ? `${filters.confirmed_at__date__gte}T${filters.confirmed_at__time__gte}:00`
-      : `${filters.confirmed_at__date__gte}T00:00:00`
-  }
-  if (filters.confirmed_at__date__lte) {
-    p.confirmed_at__lte = filters.confirmed_at__time__lte
-      ? `${filters.confirmed_at__date__lte}T${filters.confirmed_at__time__lte}:59`
-      : `${filters.confirmed_at__date__lte}T23:59:59`
-  }
+  const cGte = toIsoWithOffset(filters.created_at__date__gte, filters.created_at__time__gte, false)
+  const cLte = toIsoWithOffset(filters.created_at__date__lte, filters.created_at__time__lte, true)
+  if (cGte) p.created_at__gte = cGte
+  if (cLte) p.created_at__lte = cLte
 
-  // forceMyRequests=true → employee: faqat o'ziniki
-  // forceMyRequests=false → admin/manager/accountant: hammasi (my_requests parametri yuborilmaydi)
-  // filters.my_requests → admin/manager o'zlari qo'lda "faqat o'ziniki" filtri qo'ysa
-  if (forceMyRequests) {
-    p.my_requests = true
-  } else if (filters.my_requests) {
-    p.my_requests = true
-  }
+  const pGte = toIsoWithOffset(filters.paid_at__date__gte, filters.paid_at__time__gte, false)
+  const pLte = toIsoWithOffset(filters.paid_at__date__lte, filters.paid_at__time__lte, true)
+  if (pGte) p.paid_at__gte = pGte
+  if (pLte) p.paid_at__lte = pLte
+
+  const cfGte = toIsoWithOffset(filters.confirmed_at__date__gte, filters.confirmed_at__time__gte, false)
+  const cfLte = toIsoWithOffset(filters.confirmed_at__date__lte, filters.confirmed_at__time__lte, true)
+  if (cfGte) p.confirmed_at__gte = cfGte
+  if (cfLte) p.confirmed_at__lte = cfLte
+
+  if (forceMyRequests || filters.my_requests) p.my_requests = true
 
   return p
 }
@@ -149,8 +144,6 @@ export default function PaymentsPage() {
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [showFilter, setShowFilter] = useState(false)
   const [showSorov, setShowSorov] = useState(false)
-  const [selecting, setSelecting] = useState(false)
-  const [selected, setSelected] = useState(new Set())
   const [detailPayment, setDetailPayment] = useState(null)
   const scrollRef = useRef(null)
 
@@ -202,14 +195,7 @@ export default function PaymentsPage() {
     return () => clearAction()
   }, [registerAction, clearAction])
 
-  const allSelected = payments.length > 0 && payments.every(p => selected.has(p.id))
-  const toggleAll = () => {
-    if (allSelected) setSelected(prev => { const s = new Set(prev); payments.forEach(p => s.delete(p.id)); return s })
-    else setSelected(prev => { const s = new Set(prev); payments.forEach(p => s.add(p.id)); return s })
-  }
-  const toggleOne = (id) => setSelected(prev => {
-    const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s
-  })
+
 
   const handleSearch = (e) => {
     const val = e.target.value
@@ -235,19 +221,6 @@ export default function PaymentsPage() {
     }
   }
 
-  const handleDelete = async () => {
-    try {
-      await Promise.all([...selected].map(id => apiDeletePayment(id)))
-      setPayments(prev => prev.filter(p => !selected.has(p.id)))
-      toast.delete(`${selected.size} ta so'rov o'chirildi.`)
-    } catch (err) {
-      console.error(err)
-      toast.error(getErrorMessage(err, "O'chirishda xatolik yuz berdi."))
-    } finally {
-      setSelecting(false)
-      setSelected(new Set())
-    }
-  }
 
   const handlePaid = async (id) => {
     try {
@@ -290,22 +263,6 @@ export default function PaymentsPage() {
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Xarajat so'rovlari</h1>
-          {canSelect && (
-            selecting ? (
-              <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
-                  bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
-                <FaXmark size={13} /> Bekor qilish
-              </button>
-            ) : (
-              <button onClick={() => setSelecting(true)}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
-                  bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
-                <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
-                Tanlash
-              </button>
-            )
-          )}
         </div>
 
         {/* Search + Filter */}
@@ -346,11 +303,6 @@ export default function PaymentsPage() {
           <table className="w-full text-sm whitespace-nowrap">
             <thead className="sticky top-0 z-10 bg-[#F8F9FC] dark:bg-[#191A1A]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-                {canSelect && selecting && (
-                  <th className="w-10 px-4 py-3 text-left bg-[#F8F9FC] dark:bg-[#191A1A]">
-                    <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]" />
-                  </th>
-                )}
                 <th className={`${thCls} text-left w-10 bg-[#F8F9FC] dark:bg-[#191A1A]`}>№</th>
                 <th className={`${thCls} text-left bg-[#F8F9FC] dark:bg-[#191A1A]`}>Xodim</th>
                 <th className={`${thCls} text-left bg-[#F8F9FC] dark:bg-[#191A1A]`}>Xarajat turi</th>
@@ -367,17 +319,11 @@ export default function PaymentsPage() {
               {payments.map((p, idx) => (
                 <tr key={p.id}
                   onClick={() => {
-                    if (canSelect && selecting) { toggleOne(p.id); return }
                     apiGetPaymentDetail(p.id)
                       .then(detail => setDetailPayment(detail))
                       .catch(() => setDetailPayment(p))
                   }}
                   className="group border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
-                  {canSelect && selecting && (
-                    <td className="px-4 py-3 w-10" onClick={e => e.stopPropagation()}>
-                      <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} className="cursor-pointer accent-[#3F57B3]" />
-                    </td>
-                  )}
                   <td className="px-4 py-3 w-10 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{p.user_info?.username ?? ''}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(p.type)}</td>
@@ -408,20 +354,6 @@ export default function PaymentsPage() {
           </div>
         )}
       </div>
-
-      {/* Selection bar */}
-      {canSelect && selecting && selected.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
-          bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
-          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
-          <button onClick={handleDelete}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer
-              bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA]
-              dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
-            O'chirish
-          </button>
-        </div>
-      )}
 
       {/* Modals */}
       {showFilter && (
