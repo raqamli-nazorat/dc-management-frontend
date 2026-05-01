@@ -33,7 +33,7 @@ function CancelReasonModal({ onCancel, onConfirm }) {
             value={reason}
             onChange={e => { setReason(e.target.value); setError(false) }}
             placeholder="Iltimos, sababni yozing. Bu majburiy"
-            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none transition-colors
+            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none 
               bg-white text-[#1A1D2E] placeholder-[#8F95A8]
               dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]
               ${error ? 'border-[#E02D2D]' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`}
@@ -42,12 +42,12 @@ function CancelReasonModal({ onCancel, onConfirm }) {
         </div>
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
           <button onClick={onCancel}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={handleSubmit}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               text-white"
             style={{ backgroundColor: '#E02D2D' }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#c42424'}
@@ -77,12 +77,12 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
         </div>
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
           <button onClick={onCancel}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={onConfirm}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               bg-green-500 text-white hover:bg-green-600">
             <MdCheck size={15} /> Tasdiqlash
           </button>
@@ -125,7 +125,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer 
           bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
           <FaXmark size={14} />
         </button>
@@ -215,7 +215,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {showCancel && onCancel && (
               <button
                 onClick={() => setShowCancelModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white "
                 style={{ backgroundColor: '#E02D2D' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#c42424'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = '#E02D2D'}>
@@ -227,7 +227,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {showPaid && onPaid && (
               <button
                 onClick={() => setShowPaidModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white "
                 style={{ backgroundColor: '#3F57B3' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#526ED3'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = '#3F57B3'}>
@@ -239,7 +239,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             {showConfirm && onConfirm && (
               <button
                 onClick={() => setShowConfirmModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-white "
                 style={{ backgroundColor: '#3F57B3' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#526ED3'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = '#3F57B3'}>

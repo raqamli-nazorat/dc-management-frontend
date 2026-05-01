@@ -59,7 +59,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#191a1a] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#191a1a] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
@@ -123,7 +123,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                 }}
                                 onMouseEnter={() => setHovered(opt)}
                                 onMouseLeave={() => setHovered(null)}
-                                className="w-full text-left px-3 py-2.5 rounded-xl cursor-pointer transition-colors flex items-center justify-between gap-2"
+                                className="w-full text-left px-3 py-2.5 rounded-xl cursor-pointer  flex items-center justify-between gap-2"
                                 style={{
                                     fontSize: 13,
                                     fontWeight: 500,

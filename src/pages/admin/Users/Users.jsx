@@ -134,7 +134,7 @@ export default function UsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
           <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
             <div className="flex items-center gap-3 mb-3">
@@ -152,13 +152,13 @@ export default function UsersPage() {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
               >
                 O'chirish
               </button>
@@ -179,7 +179,7 @@ export default function UsersPage() {
           {selecting ? (
             <button
               onClick={cancelSelecting}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] hover:bg-[#c8ceea]
               dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
             >
@@ -189,7 +189,7 @@ export default function UsersPage() {
           ) : (
             <button
               onClick={startSelecting}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] hover:bg-[#c8ceea]
               dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
             >
@@ -211,7 +211,7 @@ export default function UsersPage() {
               placeholder="Ism Sharifi bo'yicha izlash"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none transition-colors
+              className="pl-8 pr-3 outline-none 
               bg-white border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
               dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
@@ -277,7 +277,7 @@ export default function UsersPage() {
                       navigate(`/admin/users/detail/${u.id}`)
                     }
                   }}
-                  className="transition-colors cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                  className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                 >
                   <td className="px-4 py-3 w-14" >
                     {selecting ? (
@@ -319,7 +319,7 @@ export default function UsersPage() {
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
             <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
-            <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
+            <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
               <MdDelete size={16} />
               O'chirish
             </button>

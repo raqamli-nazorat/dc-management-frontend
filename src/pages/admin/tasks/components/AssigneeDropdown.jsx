@@ -9,7 +9,7 @@ export default function AssigneeDropdown({ value, onChange }) {
       <label className={labelCls}>Topshiruvchi</label>
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
             ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
           <span className="flex-1 text-left truncate">{value || 'Topshiruvchi'}</span>
@@ -25,7 +25,7 @@ export default function AssigneeDropdown({ value, onChange }) {
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {EMPLOYEES_LIST.map((e, i) => (
               <button key={e.name} type="button" onClick={() => { onChange(e.name); setOpen(false) }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left  cursor-pointer
                   ${i < EMPLOYEES_LIST.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === e.name ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                 <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">

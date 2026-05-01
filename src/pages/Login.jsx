@@ -106,7 +106,7 @@ export default function Login() {
               placeholder="Login"
               value={loginVal}
               onChange={e => { setLoginVal(e.target.value); setError('') }}
-              className="w-full px-4 py-3.5 rounded-xl text-sm outline-none transition-colors
+              className="w-full px-4 py-3.5 rounded-xl text-sm outline-none 
                 bg-[#F8F9FC] border border-[#EEF1F7] text-[#1A1D2E] placeholder-[#B6BCCB]
                  focus:border-[#EEF1F7] dark:focus:border-[#474848]
                 dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]"
@@ -120,7 +120,7 @@ export default function Login() {
                 placeholder="Parol"
                 value={parolVal}
                 onChange={e => { setParolVal(e.target.value); setError('') }}
-                className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm outline-none transition-colors
+                className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm outline-none 
                   bg-[#F8F9FC] border border-[#EEF1F7] text-[#1A1D2E] placeholder-[#B6BCCB]
                   focus:border-[#EEF1F7] dark:focus:border-[#474848]
                   dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]"
@@ -147,7 +147,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading || !filled}
-              className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-colors duration-200 mt-1
+              className={`w-full py-3.5 rounded-xl font-semibold text-sm  duration-200 mt-1
                 ${filled
                   ? 'bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer'
                   : 'bg-[#E9ECF5] text-[#B6BCCB] cursor-not-allowed dark:bg-[#F2F1F0] dark:text-[#757575]'

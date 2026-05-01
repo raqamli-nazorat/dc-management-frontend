@@ -326,13 +326,13 @@ export default function TasksPage() {
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
             <input type="text" placeholder="Izlash" value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none transition-colors w-[200px]
+              className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]" />
           </div>
           {/* Filter */}
           <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-1.5 px-3 py-[5px] rounded-xl text-[13px] font-semibold border transition-colors cursor-pointer
+            className="relative flex items-center gap-1.5 px-3 py-[5px] rounded-xl text-[13px] font-semibold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
             <LuFilter size={13} /> Filtrlash
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
@@ -391,12 +391,12 @@ export default function TasksPage() {
           </svg>
           <input type="text" placeholder="Izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[200px]
+            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[200px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
         </div>
         <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
           <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
@@ -406,7 +406,7 @@ export default function TasksPage() {
             <LuLayoutList size={16} />
           </button>
           <button onClick={switchToKanban}
-            className="p-1.5 rounded-lg transition-colors cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#3F57B3]">
+            className="p-1.5 rounded-lg  cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#3F57B3]">
             <LuLayoutGrid size={16} />
           </button>
         </div>
@@ -447,7 +447,7 @@ export default function TasksPage() {
             ) : (
               data.map((t, idx) => (
                 <tr key={t.id}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 transition-colors cursor-pointer">
+                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title || t.name}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || t.project || '—')}</td>

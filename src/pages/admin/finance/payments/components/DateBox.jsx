@@ -8,7 +8,7 @@ export function DateBox({ type, value, onChange, icon, placeholder }) {
 
   return (
     <div className="flex items-center gap-1.5 px-3 py-2.5 border border-[#E2E6F2] dark:border-[#292A2A]
-      rounded-xl bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text">
+      rounded-xl bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text">
       {placeholder && (
         <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
           {placeholder}:
@@ -30,7 +30,7 @@ export function DateBox({ type, value, onChange, icon, placeholder }) {
       <button
         type="button"
         onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] transition-colors"
+        className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] "
       >
         {icon}
       </button>

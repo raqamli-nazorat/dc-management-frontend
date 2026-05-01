@@ -66,7 +66,7 @@ function ProjectDropdown({ value, onChange, error, projects = [] }) {
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white dark:bg-[#191A1A]
             ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
             ${selected ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
@@ -87,7 +87,7 @@ function ProjectDropdown({ value, onChange, error, projects = [] }) {
             )}
             {projects.map((p, i) => (
               <button key={p.id} type="button" onClick={() => { onChange(p.id); setOpen(false) }}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors cursor-pointer
+                className={`w-full flex items-center justify-between px-4 py-3 text-left  cursor-pointer
                   ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                 <p className={`text-sm font-medium truncate ${value === p.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{p.title}</p>
@@ -110,10 +110,10 @@ function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
         <input type="number" min="1" value={value} onChange={e => onValueChange(e.target.value)}
           placeholder="40"
           className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none border border-[#E2E6F2] dark:border-[#292A2A]
-            bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] focus:border-[#526ED3] transition-colors" />
+            bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] focus:border-[#526ED3] " />
         <div className="relative w-28">
           <button type="button" onClick={() => setOpen(o => !o)}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
               bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] text-[#1A1D2E] dark:text-white">
             <span>{unit}</span>
             <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -123,7 +123,7 @@ function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
               bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
               {DURATION_UNITS.map((u, i) => (
                 <button key={u} type="button" onClick={() => { onUnitChange(u); setOpen(false) }}
-                  className={`w-full text-left px-3 py-2.5 text-sm transition-colors cursor-pointer
+                  className={`w-full text-left px-3 py-2.5 text-sm  cursor-pointer
                     ${i < DURATION_UNITS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                     ${unit === u ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                   {u}
@@ -157,7 +157,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
@@ -169,7 +169,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
           <div className="flex items-center gap-3">
             <button onClick={toggleAll}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors shrink-0">
+                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               Barchasini tanlash
             </button>
@@ -189,10 +189,10 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
             const checked = sel.has(u.id)
             return (
               <button key={u.id} type="button" onClick={() => toggle(u.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${checked ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1E2340] dark:border-[#526ED3]'
                     : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 
                   ${checked ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
                   {checked && <FaCheck size={9} className="text-white" />}
                 </div>
@@ -212,11 +212,11 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
           <div className="flex items-center gap-3">
             <button onClick={() => setSel(new Set())}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-[#5B6078] dark:text-[#C2C8E0]
-                hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors">
+                hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer ">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={() => onApply(users.filter(u => sel.has(u.id)))}
-              className="flex items-center gap-2 px-5 py-2 rounded-2xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer transition-colors">
+              className="flex items-center gap-2 px-5 py-2 rounded-2xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer ">
               <FaCheck size={12} /> Qo'shish
             </button>
           </div>
@@ -250,7 +250,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
   }
 
   const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -280,7 +280,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -333,23 +333,23 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
                     placeholder="00:00" step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
@@ -373,7 +373,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
               )}
               <button type="button" onClick={() => setShowParticipants(true)}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
-                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors">
+                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer ">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 Qatnashchilarni qo'shish
               </button>
@@ -384,17 +384,17 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading
                   ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
                   : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -450,7 +450,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
   }
 
   const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -480,7 +480,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -533,23 +533,23 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
                     placeholder="00:00" step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
@@ -573,7 +573,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               )}
               <button type="button" onClick={() => setShowParticipants(true)}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
-                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors">
+                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer ">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 Qatnashchilarni qo'shish
               </button>
@@ -584,17 +584,17 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading
                   ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
                   : <FaCheck size={13} />
@@ -623,7 +623,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -734,7 +734,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
           </div>
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
         </div>
@@ -759,9 +759,9 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
   const reset = () => { setOrganizer(''); setProject(''); setStatus(''); setDateFrom(''); setDateTo('') }
 
-  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
+  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
   const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
-  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors'
+  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] '
 
   const STATUS_OPTIONS = [
     { label: 'Tugallangan',   value: 'true' },
@@ -771,7 +771,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -801,7 +801,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <div className={ddList}>
                     {users.map((u, i) => (
                       <button key={u.id} type="button" onClick={() => { setOrganizer(u.id); orgDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
                           {(u.username ?? '?').slice(0, 2).toUpperCase()}
                         </div>
@@ -829,7 +829,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <div className={ddList}>
                     {projects.map((p, i) => (
                       <button key={p.id} type="button" onClick={() => { setProject(p.id); prjDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${project === p.id ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${project === p.id ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {p.title}
                       </button>
                     ))}
@@ -854,7 +854,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <div className={ddList}>
                     {STATUS_OPTIONS.map((s, i) => (
                       <button key={s.value} type="button" onClick={() => { setStatus(s.value); stsDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${i < STATUS_OPTIONS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_OPTIONS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {s.label}
                       </button>
                     ))}
@@ -873,7 +873,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                 <input ref={dateFromRef} type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${dateFrom ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -882,7 +882,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                 <input ref={dateToRef} type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${dateTo ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -892,11 +892,11 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
         <div className="px-6 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <button onClick={reset}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply({ organizer, project, status, dateFrom, dateTo })}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
@@ -922,7 +922,7 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
   return (
     <div ref={ref} className="relative flex justify-end">
       <button onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
-        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[#8F95A8] cursor-pointer transition-colors">
+        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[#8F95A8] cursor-pointer ">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
         </svg>
@@ -930,22 +930,22 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
       {open && (
         <div className="absolute top-full right-0 mt-1 z-50 w-44 rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           <button onClick={() => { onDetail(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer transition-colors border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             Ko'rish
           </button>
           <button onClick={() => { onEdit(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer transition-colors border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Tahrirlash
           </button>
           <button onClick={() => { onCloseMeeting(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer transition-colors border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <FaCheck size={13} />
             Yakunlash
           </button>
           <button onClick={() => { onDelete(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer ">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             O'chirish
           </button>
@@ -1113,12 +1113,12 @@ export default function MeetingsPage() {
           </svg>
           <input type="text" placeholder="Nomi bo'yicha izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[220px]
+            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[220px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
         </div>
         <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
           <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
@@ -1159,7 +1159,7 @@ export default function MeetingsPage() {
                   const { val: durVal, unit: durUnit } = minutesToDisplay(m.duration_minutes)
                   return (
                     <tr key={m.id}
-                      className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                      className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
                       onClick={() => setDetail(m)}>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '—'}</td>

@@ -163,7 +163,7 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <button
                                     type="button"
                                     onClick={() => set('is_student', !f.is_student)}
-                                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${f.is_student ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
                                 >
                                     <span
                                         className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
@@ -173,13 +173,13 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                             <div className="px-7 py-5 flex items-center justify-end gap-3">
                                 <button
                                     onClick={handleClear}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
                                 >
                                     <FaXmark size={13} /> Tozalash
                                 </button>
                                 <button
                                     onClick={handleApply}
-                                    className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
                                 >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                         <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />

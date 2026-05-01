@@ -58,7 +58,7 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
         <div className="flex items-center gap-2">
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
+            className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
               text-[#8F95A8] hover:bg-[#F1F3F9] dark:text-[#8E95B5] dark:hover:bg-[#292A2A]"
           >
             <FaXmark size={15} />
@@ -76,7 +76,7 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
                 <button
                   key={n.id}
                   onClick={() => markRead(n.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-colors cursor-pointer
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
                     ${!n.read
                       ? 'bg-[#F4F6FD] dark:bg-[#222323]'
                       : 'hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'
@@ -218,7 +218,7 @@ export default function Layout() {
             {action && (
               <button
                 onClick={action.onClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors
+                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer 
                   bg-[#3F57B3] text-white hover:bg-[#526ED3]"
                 style={{ fontSize: 13, fontWeight: 800 }}
               >
@@ -230,7 +230,7 @@ export default function Layout() {
             {print && (
               <button
                 onClick={print.onClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors bg-[#e9eeff] text-[#1A1D2E] "
+                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer  bg-[#e9eeff] text-[#1A1D2E] "
                 style={{ fontSize: 13, fontWeight: 800 }}
               >
                 <MdOutlinePrint size={20} />
@@ -243,14 +243,14 @@ export default function Layout() {
                 <button className='flex items-center gap-[2px] rounded-xl overflow-hidden'>
                   <span
                     onClick={() => download?.excel()}
-                    className='flex items-center h-full px-3 py-2 gap-1 text-[13px] font-extrabold text-white! bg-[#3f57b3] cursor-pointer hover:bg-[#526ED3] transition-colors'
+                    className='flex items-center h-full px-3 py-2 gap-1 text-[13px] font-extrabold text-white! bg-[#3f57b3] cursor-pointer hover:bg-[#526ED3] '
                   >
                     <MdOutlineFileDownload size={20} />
                     Yuklab olish
                   </span>
                   <span
                     onClick={() => setDownloadOpen(!downloadOpen)}
-                    className='flex items-center h-full px-1.5 py-2.5 justify-center bg-[#3f57b3] text-white! cursor-pointer border-l border-white/20 hover:bg-[#526ED3] transition-colors'
+                    className='flex items-center h-full px-1.5 py-2.5 justify-center bg-[#3f57b3] text-white! cursor-pointer border-l border-white/20 hover:bg-[#526ED3] '
                   >
                     <FaAngleDown size={16} />
                   </span>
@@ -274,7 +274,7 @@ export default function Layout() {
                           </div>
                           <span className="text-[#1A1D2E] dark:text-white font-bold text-base">{item.label}</span>
                         </div>
-                        <div className="w-6 h-6 flex items-center justify-center text-[#5B6078] dark:text-[#C2C8E0] group-hover:text-[#3F57B3] transition-colors">
+                        <div className="w-6 h-6 flex items-center justify-center text-[#5B6078] dark:text-[#C2C8E0] group-hover:text-[#3F57B3] ">
                           <MdOutlineFileDownload size={22} />
                         </div>
                       </div>
@@ -288,7 +288,7 @@ export default function Layout() {
             <div className="relative">
               <button
                 onClick={() => setNotifOpen(o => !o)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer transition-colors
+                className="w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer 
                   bg-[#F1F3F9] hover:bg-[#E8EAF2]
                   dark:bg-[#292A2A] dark:hover:bg-[#333435]"
               >

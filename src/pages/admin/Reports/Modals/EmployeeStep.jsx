@@ -4,11 +4,8 @@ import { toast } from "../../../../Toast/ToastProvider";
 import {
     IoSearchOutline,
     IoClose,
-    IoChevronBack,
     IoCheckmarkOutline,
-    IoCheckmark
 } from "react-icons/io5";
-import { MdOutlinePlaylistAddCheck } from "react-icons/md";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
@@ -76,29 +73,21 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="w-full max-w-[600px] bg-white rounded-[24px] shadow-2xl overflow-hidden">
-                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
+                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-white/20 text-white hover:bg-white/30">
                     <FaXmark size={16} />
                 </button>
                 {/* Modal Header */}
                 <div className="flex items-center px-6 py-4 border-b border-b-gray-100">
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full ">
                         <FaArrowLeft size={18} />
                     </button>
                     <h2 className="ml-2 text-[17px] font-bold text-[#1A1D2E]">Boshqaruvchi tanlang</h2>
                 </div>
 
                 <div className="p-6">
-                    {/* Controls: Select All & Search */}
-                    <div className="flex items-center justify-between gap-4 mb-6">
-                        <button
-                            onClick={toggleAll}
-                            className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
-                        >
-                            <MdOutlinePlaylistAddCheck size={20} />
-                            <span className="text-sm font-medium">Barchasini tanlash</span>
-                        </button>
-
-                        <div className="relative w-[300px]">
+                    {/* Controls: Search */}
+                    <div className="flex items-center justify-end gap-4 mb-6">
+                        <div className="relative w-full">
                             <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input
                                 type="text"
@@ -121,11 +110,6 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                                         : "border-gray-100 bg-[#F8F9FD] hover:border-gray-300"
                                     }`}
                             >
-                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center mr-4 transition-all ${selectedIds.includes(emp.id) ? "bg-indigo-600 border-indigo-600" : "bg-white border-gray-300"
-                                    }`}>
-                                    {selectedIds.includes(emp.id) && <IoCheckmark className="text-white" size={14} />}
-                                </div>
-
                                 <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium mr-3">
                                     {emp.username?.substring(0, 2).toUpperCase()}
                                 </div>
@@ -153,7 +137,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setSelectedIds([])}
-                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 font-semibold hover:bg-gray-100 rounded-xl transition-colors"
+                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 font-semibold hover:bg-gray-100 rounded-xl "
                             >
                                 <IoClose size={20} />
                                 Tozalash

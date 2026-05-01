@@ -37,7 +37,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
-const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
 const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]'
 
 // ── API ──────────────────────────────────────────────────────
@@ -80,7 +80,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
       {label && <label className={labelCls}>{label}</label>}
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
             ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`}>
           <span className="flex-1 text-left truncate">{display || placeholder}</span>
@@ -94,7 +94,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
             bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
-                className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer
+                className={`w-full text-left px-4 py-3 text-sm  cursor-pointer
                   ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#292A2A]' : ''}
                   ${value === o.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-[#FFFFFF] hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                 {o.label}
@@ -113,7 +113,7 @@ function DateBox({ value, onChange, placeholder }) {
   const isEmpty = !value
   return (
     <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text">
+      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text">
       {placeholder && (
         <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
           {placeholder}:
@@ -126,7 +126,7 @@ function DateBox({ value, onChange, placeholder }) {
         `}
       />
       <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] transition-colors">
+        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] ">
         <FaCalendarDays size={12} />
       </button>
     </div>
@@ -138,14 +138,14 @@ function TimeBox({ value, onChange }) {
   const ref = useRef(null)
   return (
     <div className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text w-[90px]">
+      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text w-[90px]">
       <input ref={ref} type="time" value={value || '00:00'} onChange={e => onChange(e.target.value)}
         step="60"
         className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
           [&::-webkit-calendar-picker-indicator]:hidden"
       />
       <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] transition-colors">
+        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] ">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
         </svg>
@@ -160,7 +160,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+        <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
               bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
               <FaXmark size={14} />
             </button>
@@ -212,12 +212,12 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
         </div>
         <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
           <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -239,7 +239,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+      <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
             bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
@@ -340,7 +340,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end ">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               text-[#3F57B3] hover:bg-[#EEF1FB] dark:text-[#7F95E6] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Yopish
           </button>
@@ -429,12 +429,12 @@ export default function FinanceHistoryPage() {
             </svg>
             <input type="text" placeholder="Qidirish" value={search}
               onChange={e => handleSearch(e.target.value)}
-              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
+              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]" />
           </div>
           <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
             <LuFilter size={13} />
@@ -470,7 +470,7 @@ export default function FinanceHistoryPage() {
             <tbody>
               {data.map((h, idx) => (
                   <tr key={h.id} onClick={() => handleRowClick(h)}
-                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                    className="border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{h.user_info?.username ?? ''}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || ''}</td>

@@ -3,7 +3,7 @@ import { useDropdown } from '../useDropdown'
 import { labelCls } from '../constants'
 
 const triggerCls = (hasVal, error) =>
-  `w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+  `w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
    bg-white dark:bg-[#191A1A]
    ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
    ${hasVal ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`
@@ -51,7 +51,7 @@ export function SelectField({ label, value, onChange, options = [], placeholder,
             bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
             {normalized.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
-                className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer
+                className={`w-full text-left px-4 py-3 text-sm  cursor-pointer
                   ${i < normalized.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#292A2A]' : ''}
                   ${value === o.value
                     ? 'bg-[#EEF1FB] dark:bg-[#292A2A] text-[#3F57B3] dark:text-[#7F95E6] font-semibold'

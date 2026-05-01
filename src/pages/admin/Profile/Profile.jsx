@@ -90,7 +90,7 @@ function ChangePasswordModal({ onClose }) {
   }
 
   const inputCls = (err) => [
-    'w-full px-4 py-3 rounded-xl text-sm outline-none border transition-colors pr-11',
+    'w-full px-4 py-3 rounded-xl text-sm outline-none border  pr-11',
     'bg-white text-[#1A1D2E] placeholder-[#8F95A8]',
     'dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]',
     err ? 'border-red-400 dark:border-red-500'
@@ -101,7 +101,7 @@ function ChangePasswordModal({ onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
       <button onClick={onClose}
-        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full z-10 cursor-pointer transition-colors
+        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full z-10 cursor-pointer 
           bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
         <FaXmark size={14} />
       </button>
@@ -142,12 +142,12 @@ function ChangePasswordModal({ onClose }) {
         </div>
         <div className="flex items-center justify-end gap-3 mt-7">
           <button onClick={onClose} disabled={loading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={handleSave} disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
             {loading ? (
               <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -176,7 +176,7 @@ function PassportViewer({ url, onClose }) {
       <div className="fixed inset-0 bg-black/80" />
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full z-10 cursor-pointer transition-colors
+        className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full z-10 cursor-pointer 
           bg-white/20 hover:bg-white/30 text-white"
       >
         <FaXmark size={16} />
@@ -203,7 +203,7 @@ function PassportViewer({ url, onClose }) {
               href={url}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3] transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3]  cursor-pointer"
             >
               Ochish
             </a>
@@ -254,7 +254,7 @@ function SocialField({ label, value, icon }) {
           <button
             onClick={handleCopy}
             title="Nusxa olish"
-            className="shrink-0 cursor-pointer transition-colors text-[#8F95A8] hover:text-[#526ED3]"
+            className="shrink-0 cursor-pointer  text-[#8F95A8] hover:text-[#526ED3]"
           >
             {copied ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#22c55e]">
@@ -360,7 +360,7 @@ export default function ProfilePage() {
           <p className="text-lg font-bold text-[#1A1D2E] dark:text-white">{fullName}</p>
           <button
             onClick={() => setShowPasswordModal(true)}
-            className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
+            className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
               border-[#E2E6F2] text-[#5B6078] hover:bg-[#F1F3F9]
               dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
           >
