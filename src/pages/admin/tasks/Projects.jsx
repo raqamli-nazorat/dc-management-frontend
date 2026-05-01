@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
+import { useAuth } from '../../../context/AuthContext'
 import { DateTimeBox } from '../Components/DateTimeBox'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -111,8 +112,8 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const stsDd = useDropdown()
 
   const STATUS_API = [
-    { label: 'Faol',               value: 'active' },
     { label: 'Rejalashtirilmoqda', value: 'planning' },
+    { label: 'Faol',               value: 'active' },
     { label: 'Yakunlangan',        value: 'completed' },
     { label: 'Bekor qilingan',     value: 'cancelled' },
   ]
@@ -629,20 +630,26 @@ function AddProjectModal({ onClose, onAdd }) {
       toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
       onClose()
     } catch (err) {
-      const errData = err?.response?.data?.error?.details ?? err?.response?.data?.data ?? err?.response?.data
-      if (errData && typeof errData === 'object') {
+      const details = err?.response?.data?.error?.details
+      const errorMsg = err?.response?.data?.error?.errorMsg || 'Loyiha yaratishda xatolik yuz berdi'
+
+      if (details && typeof details === 'object') {
+        // Input fieldlarni qizil qilish va xato matnini saqlash
         const newErrors = {}
-        if (errData.title)       newErrors.title       = true
-        if (errData.prefix)      newErrors.prefix      = true
-        if (errData.status)      newErrors.status      = true
-        if (errData.description) newErrors.description = true
+        if (details.title)       newErrors.title       = Array.isArray(details.title) ? details.title[0] : true
+        if (details.prefix)      newErrors.prefix      = Array.isArray(details.prefix) ? details.prefix[0] : true
+        if (details.status)      newErrors.status      = Array.isArray(details.status) ? details.status[0] : true
+        if (details.description) newErrors.description = Array.isArray(details.description) ? details.description[0] : true
         if (Object.keys(newErrors).length) setErrors(newErrors)
-        else {
-          const msg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || 'Xatolik yuz berdi'
-          toast.error('Xatolik', msg)
-        }
+
+        // Har bir xato uchun toast chiqarish
+        const msgs = Object.entries(details)
+          .map(([, v]) => Array.isArray(v) ? v[0] : v)
+          .filter(Boolean)
+          .join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
       } else {
-        toast.error('Xatolik', 'Loyiha yaratishda xatolik yuz berdi')
+        toast.error('Xatolik', errorMsg)
       }
     } finally {
       setLoading(false)
@@ -656,10 +663,10 @@ function AddProjectModal({ onClose, onAdd }) {
     ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
 
   const STATUS_API = [
-    { label: 'Faol', value: 'active' },
     { label: 'Rejalashtirilmoqda', value: 'planning' },
-    { label: 'Yakunlangan', value: 'completed' },
-    { label: 'Bekor qilingan', value: 'cancelled' },
+    { label: 'Faol',               value: 'active' },
+    { label: 'Yakunlangan',        value: 'completed' },
+    { label: 'Bekor qilingan',     value: 'cancelled' },
   ]
 
   return (
@@ -686,13 +693,17 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Nomi</label>
                 <input value={form.title} onChange={e => set('title', e.target.value)}
                   placeholder="Nomi kiriting" className={inputCls(errors.title)} />
-                {errors.title && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+                {errors.title && <p className="text-xs text-red-500 mt-1">{typeof errors.title === 'string' ? errors.title : '*Bu maydon majburiy'}</p>}
               </div>
               <div>
                 <label className={labelCls}>Prefiks</label>
                 <input value={form.prefix} onChange={e => set('prefix', e.target.value.toUpperCase().slice(0, 5))}
                   placeholder="PRJ" className={inputCls(errors.prefix)} />
-                {errors.prefix && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+                {errors.prefix && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {typeof errors.prefix === 'string' ? errors.prefix : '*Bu maydon majburiy'}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -732,7 +743,7 @@ function AddProjectModal({ onClose, onAdd }) {
                   </button>
                 )}
               </div>
-              {errors.description && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+              {errors.description && <p className="text-xs text-red-500 mt-1">{typeof errors.description === 'string' ? errors.description : '*Bu maydon majburiy'}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -754,9 +765,9 @@ function AddProjectModal({ onClose, onAdd }) {
                   </button>
                   {mgrOpen && (
                     <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-                      {users.map((u, i) => (
+                      {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                           <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                             {u.username?.slice(0, 2).toUpperCase()}
                           </div>
@@ -852,12 +863,16 @@ function AddProjectModal({ onClose, onAdd }) {
       </div>
 
       {pickerOpen === 'employees' && (
-        <UserPickerModal title="Xodim tanlang" selected={form.employees} users={users}
+        <UserPickerModal title="Xodim tanlang"
+          selected={form.employees}
+          users={users.filter(u => u.roles?.includes('employee'))}
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('employees', list); setPickerOpen(null) }} />
       )}
       {pickerOpen === 'testers' && (
-        <UserPickerModal title="Sinovchi tanlang" selected={form.testers} users={users}
+        <UserPickerModal title="Sinovchi tanlang"
+          selected={form.testers}
+          users={users.filter(u => u.roles?.includes('manager') || u.roles?.includes('employee'))}
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('testers', list); setPickerOpen(null) }} />
       )}
@@ -907,14 +922,23 @@ function DetailModal({ project, onClose }) {
   const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white'
   const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
+  const fmtDeadline = (iso) => {
+    if (!iso) return '—'
+    try { return new Date(iso).toLocaleDateString('ru-RU') } catch { return iso }
+  }
+
+  const managerName = project.manager_info?.username || project.manager_info?.name || '—'
+  const statusLabel = STATUS_LABEL[project.status] || project.status || '—'
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-       <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+
+        {/* X tugmasi */}
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer z-10">
           <FaXmark size={14} />
         </button>
-      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-       
 
         {/* Header */}
         <div className="px-7 pt-7 pb-4">
@@ -924,7 +948,7 @@ function DetailModal({ project, onClose }) {
             </button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Batafsil ma'lumot</h2>
           </div>
-          <p className="text-sm text-[#1A1D2E] ">Loyiha haqida batafsil ma'lumotlar</p>
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">Loyiha haqida batafsil ma'lumotlar</p>
         </div>
 
         {/* Body */}
@@ -934,27 +958,19 @@ function DetailModal({ project, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Nomi</label>
-              <div className={fCls}>{project.name || '—'}</div>
+              <div className={fCls}>{project.title || project.name || '—'}</div>
             </div>
             <div>
               <label className={labelCls}>Holati</label>
-              <div className={fCls + ' flex items-center justify-between'}>
-                <span>{project.status || '—'}</span>
-                <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" />
-              </div>
+              <div className={fCls}>{statusLabel}</div>
             </div>
           </div>
 
           {/* Tavsifi */}
           <div>
             <label className={labelCls}>Tavsifi</label>
-            <div className="relative">
-              <div className={fCls + ' min-h-[80px] pr-8 whitespace-pre-wrap leading-relaxed'}>
-                {project.description || '—'}
-              </div>
-              {project.description && (
-                <span className="absolute top-2.5 right-2.5 text-[#B6BCCB]"><FaXmark size={12} /></span>
-              )}
+            <div className={fCls + ' min-h-[80px] whitespace-pre-wrap leading-relaxed'}>
+              {project.description || '—'}
             </div>
           </div>
 
@@ -962,14 +978,11 @@ function DetailModal({ project, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Menejer</label>
-              <div className={fCls + ' flex items-center justify-between'}>
-                <span>{project.manager || '—'}</span>
-                <FaChevronDown size={11} className="text-[#8F95A8] shrink-0" />
-              </div>
+              <div className={fCls}>{managerName}</div>
             </div>
             <div>
-              <label className={labelCls}>Menejer bonusi</label>
-              <div className={fCls + ' text-right'}>{project.bonus || '0,0'}</div>
+              <label className={labelCls}>Menejer bonusi (UZS)</label>
+              <div className={fCls + ' text-right'}>{project.manager_bonus || '—'}</div>
             </div>
           </div>
 
@@ -977,11 +990,15 @@ function DetailModal({ project, onClose }) {
           <div>
             <label className={labelCls}>Xodimlar</label>
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
-              {project.employees?.length > 0
-                ? project.employees.map(e => (
-                  <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
-                ))
-                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
+              {project.employees_info?.length > 0
+                ? project.employees_info.map(e => (
+                    <span key={e.id} className={tagCls}>{e.username}</span>
+                  ))
+                : project.employees?.length > 0
+                  ? project.employees.map((e, i) => (
+                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
+                    ))
+                  : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
           </div>
@@ -990,49 +1007,42 @@ function DetailModal({ project, onClose }) {
           <div>
             <label className={labelCls}>Sinovchilar</label>
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
-              {project.testers?.length > 0
-                ? project.testers.map(e => (
-                  <span key={e.name} className={tagCls}>{e.name} | {e.role}</span>
-                ))
-                : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
+              {project.testers_info?.length > 0
+                ? project.testers_info.map(e => (
+                    <span key={e.id} className={tagCls}>{e.username}</span>
+                  ))
+                : project.testers?.length > 0
+                  ? project.testers.map((e, i) => (
+                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
+                    ))
+                  : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
           </div>
 
-          {/* Muddati + Vaqti */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Muddati</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{project.deadline || '—'}</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                  <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <label className={labelCls}>Vaqti</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{project.time || '—'}</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                  <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-                </svg>
-              </div>
+          {/* Muddati */}
+          <div>
+            <label className={labelCls}>Muddati</label>
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+              <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{fmtDeadline(project.deadline)}</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
+                <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
             </div>
           </div>
 
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-between">
+        <div className="px-7 py-5 flex items-center justify-between border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
-            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.active !== false ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.active !== false ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_active !== false ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.is_active !== false ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </div>
           </div>
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
@@ -1052,16 +1062,17 @@ function EditProjectModal({ project, onClose, onSave }) {
   const fmtBonus = (raw) => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 
   const [form, setForm] = useState({
-    name: project.name || '',
-    status: project.status || '',
+    title:       project.title       || project.name  || '',
+    prefix:      project.prefix      || '',
+    status:      project.status      || '',
     description: project.description || '',
-    manager: project.manager || '',
-    bonus: project.bonus || '',
-    employees: project.employees || [],
-    testers: project.testers || [],
-    deadline: project.deadline || '',
-    time: project.time || '',
-    active: project.active !== undefined ? project.active : true,
+    manager:     project.manager_info?.username || project.manager || '',
+    bonus:       project.manager_bonus || '',
+    employees:   project.employees   || [],
+    testers:     project.testers     || [],
+    deadline:    project.deadline ? project.deadline.slice(0, 10) : '',
+    time:        project.deadline ? project.deadline.slice(11, 16) : '',
+    active:      project.is_active !== undefined ? project.is_active : true,
   })
   const [errors, setErrors] = useState({})
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -1252,7 +1263,24 @@ function EditProjectModal({ project, onClose, onSave }) {
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
             </button>
-            <button onClick={() => { if (validate()) { onSave({ ...project, ...form }); onClose() } }}
+            <button onClick={() => {
+              if (!validate()) return
+              const body = {
+                title:       form.title.trim(),
+                status:      form.status,
+                description: form.description.trim(),
+                is_active:   form.active,
+              }
+              if (form.prefix)   body.prefix        = form.prefix.trim().toUpperCase()
+              if (form.manager)  body.manager_name  = form.manager
+              if (form.bonus)    body.manager_bonus = form.bonus.replace(/\s/g, '')
+              if (form.deadline) {
+                const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
+                body.deadline = dt
+              }
+              onSave(project.id, body)
+              onClose()
+            }}
               className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -1267,45 +1295,48 @@ function EditProjectModal({ project, onClose, onSave }) {
 }
 
 /* ── RowMenu ── */
-function RowMenu({ onEdit, onDetail, onDelete }) {
+function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
   const { open, setOpen, ref } = useDropdown()
   return (
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
+        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
           text-[#8F95A8] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-2xl shadow-2xl border overflow-hidden
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-          {/* Tahrirlash */}
-          <button onClick={() => { onEdit?.(); setOpen(false) }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer ">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
-              <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-            </svg>
-            Tahrirlash
-          </button>
-          {/* Batafsil */}
+          {/* Batafsil — hammaga */}
           <button onClick={() => { onDetail?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer ">
+              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
               <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             Batafsil
           </button>
-          {/* O'chirish */}
-          <button onClick={() => { onDelete?.(); setOpen(false) }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E02D2D]
-              hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer ">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
-            </svg>
-            O'chirish
-          </button>
+          {/* Tahrirlash + O'chirish — faqat admin */}
+          {canEdit && (
+            <>
+              <button onClick={() => { onEdit?.(); setOpen(false) }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
+                  hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
+                  <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                </svg>
+                Tahrirlash
+              </button>
+              <button onClick={() => { onDelete?.(); setOpen(false) }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E02D2D]
+                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                  <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
+                </svg>
+                O'chirish
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -1315,6 +1346,9 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
 /* ── Main Page ── */
 export default function ProjectsPage() {
   const { registerAction, clearAction } = usePageAction()
+  const { user } = useAuth()
+  const roles = user?.roles ?? []
+  const canEdit = roles.includes('admin') || roles.includes('superadmin')
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
@@ -1535,7 +1569,7 @@ export default function ProjectsPage() {
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} />
+                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
                     </td>
                   </tr>
                 ))
@@ -1630,7 +1664,7 @@ export default function ProjectsPage() {
                     </div>
                   </div>
                   <div onClick={e => e.stopPropagation()}>
-                    <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} />
+                    <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
                   </div>
                 </div>
               </div>
