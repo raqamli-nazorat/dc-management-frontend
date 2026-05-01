@@ -28,7 +28,7 @@ function RowMenu({ onRestore, onDelete }) {
     <div ref={ref} className="relative flex justify-end">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-[#8F95A8] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] transition-colors cursor-pointer"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-[#8F95A8] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]  cursor-pointer"
       >
         <FaEllipsisVertical size={14} />
       </button>
@@ -38,7 +38,7 @@ function RowMenu({ onRestore, onDelete }) {
           <button
             onClick={() => { onRestore(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] transition-colors cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]"
+              hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]"
           >
             <FaCheck size={13} className="text-[#22c55e]" />
             Tiklash
@@ -46,7 +46,7 @@ function RowMenu({ onRestore, onDelete }) {
           <button
             onClick={() => { onDelete(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#E02D2D]
-              hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] transition-colors cursor-pointer"
+              hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A]  cursor-pointer"
           >
             <FaTrashCan size={13} />
             Butunlay o'chirish
@@ -143,8 +143,8 @@ function ProjectsTab() {
           placeholder="Loyihani izlash"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border transition-colors
-            bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
+          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
+              border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
             dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]
             focus:border-[#526ED3]"
         />
@@ -174,7 +174,7 @@ function ProjectsTab() {
               <SkeletonRows cols={7} />
             ) : filtered.map((p, i) => (
               <tr key={p.id}
-                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 transition-colors">
+                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
                 <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
                 <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title}</td>
                 <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || '—'}</td>
@@ -313,7 +313,7 @@ function TasksTab() {
           placeholder="Vazifani izlash"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border transition-colors
+          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
             bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
             dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]
             focus:border-[#526ED3]"
@@ -347,7 +347,7 @@ function TasksTab() {
               <SkeletonRows cols={10} />
             ) : filtered.map((t, i) => (
               <tr key={t.id}
-                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 transition-colors">
+                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
                 <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
                 <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title}</td>
                 <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
@@ -424,7 +424,7 @@ export default function TrashPage() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={[
-              'px-4 py-2.5 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px',
+              'px-4 py-2.5 text-sm font-semibold cursor-pointer border-b-2 -mb-px',
               activeTab === tab.id
                 ? 'border-[#526ED3] text-[#526ED3] dark:text-[#7F95E6] dark:border-[#7F95E6]'
                 : 'border-transparent text-[#5B6078] dark:text-[#8F95A8] hover:text-[#1A1D2E] dark:hover:text-white',

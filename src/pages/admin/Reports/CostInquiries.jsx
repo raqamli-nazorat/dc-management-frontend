@@ -663,7 +663,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none transition-colors bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -721,7 +721,7 @@ const Employee = () => {
                   value={filters.created_at_start}
                   onChange={(value) => handleFilterChange('created_at_start', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                   placeholder='Boshlanish sanasi'
                 />
               </div>
@@ -732,7 +732,7 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('created_at_end', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                   placeholder='Tugash sana'
                 />
               </div>
@@ -750,7 +750,7 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('confirmed_at_start', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                   placeholder='Boshlanish sanasi'
 
                 />
@@ -763,7 +763,7 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('confirmed_at_end', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                   placeholder='Tugash sanasi'
                 />
               </div>
@@ -782,7 +782,7 @@ const Employee = () => {
                 format="DD.MM.YYYY HH:mm"
                 onChange={(value) => handleFilterChange('paid_at_start', value)}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                 placeholder='Boshlanish sanasi'
               />
               <DatePicker
@@ -791,7 +791,7 @@ const Employee = () => {
                 format="DD.MM.YYYY HH:mm"
                 onChange={(value) => handleFilterChange('paid_at_end', value)}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                 placeholder='Tugash sanasi'
               />
             </div>
@@ -806,7 +806,7 @@ const Employee = () => {
                 format="DD.MM.YYYY HH:mm"
                 onChange={(value) => handleFilterChange('cancelled_at_start', value)}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                 placeholder='Boshlanish sanasi'
               />
               <DatePicker
@@ -815,7 +815,7 @@ const Employee = () => {
                 format="DD.MM.YYYY HH:mm"
                 onChange={(value) => handleFilterChange('cancelled_at_end', value)}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
+                className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
                 placeholder='Tugash sanasi'
               />
             </div>
@@ -874,7 +874,7 @@ const Employee = () => {
             <button
               type="button"
               onClick={() => setSelectEmployee(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
             >
               <span className="truncate text-sm font-medium">
                 {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
@@ -898,7 +898,7 @@ const Employee = () => {
             <button
               type="button"
               onClick={() => setSelectAccountant(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
             >
               <span className="truncate text-sm font-medium">
                 {filters.accountants ? `${filters.accountants.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
@@ -922,7 +922,7 @@ const Employee = () => {
             <button
               type="button"
               onClick={() => setSelectProject(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
+              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
             >
               <span className="truncate text-sm font-medium">
                 {filters.projects ? `${filters.projects.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
@@ -1011,7 +1011,7 @@ const Employee = () => {
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors">
+                  <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
                     <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
                       {index + 1}
                     </td>

@@ -17,7 +17,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, error })
       {label && <label className={labelCls}>{label}</label>}
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white dark:bg-[#191A1A]
             ${error ? "border-red-400 dark:border-red-500" : "border-[#E2E6F2] dark:border-[#292A2A]"}
             ${value ? "text-[#1A1D2E] dark:text-white" : "text-[#5B6078] dark:text-[#5B6078]"}`}>
@@ -33,7 +33,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, error })
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {options.map((o, i) => (
               <button key={o} type="button" onClick={() => { onChange(o); setOpen(false) }}
-                className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer
+                className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                   ${i < options.length - 1 ? "border-b border-[#F1F3F9] dark:border-[#2A2B2B]" : ""}
                   ${value === o ? "bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]" : "text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]"}`}>
                 {o}
@@ -61,7 +61,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white dark:bg-[#191A1A]
             ${error ? "border-red-400 dark:border-red-500" : "border-[#E2E6F2] dark:border-[#292A2A]"}
             ${value ? "text-[#1A1D2E] dark:text-white" : "text-[#5B6078] dark:text-[#5B6078]"}`}>
@@ -77,7 +77,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {projects.map((p, i) => (
               <button key={p.id} type="button" onClick={() => { onChange(String(p.id)); setOpen(false) }}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors cursor-pointer
+                className={`w-full flex items-center justify-between px-4 py-3 text-left  cursor-pointer
                   ${i < projects.length - 1 ? "border-b border-[#F1F3F9] dark:border-[#2A2B2B]" : ""}
                   ${String(value) === String(p.id) ? "bg-[#EEF1FB] dark:bg-[#292A2A]" : "hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]"}`}>
                 <div className="min-w-0">
@@ -121,7 +121,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setTemp(temp.length === filtered.length ? [] : [...filtered])}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
                 border-[#E2E6F2] text-[#5B6078] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
@@ -133,7 +133,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
               <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border transition-colors
+                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border 
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
             </div>
@@ -144,9 +144,9 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
             const isSel = temp.find(x => x.id === u.id)
             return (
               <button key={u.id} onClick={() => toggle(u)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${isSel ? "bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[#3F57B3]" : "bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]"}`}>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 
                   ${isSel ? "bg-[#3F57B3] border-[#3F57B3]" : "border-[#D0D5E2] dark:border-[#474848]"}`}>
                   {isSel && <FaCheck size={9} className="text-white" />}
                 </div>
@@ -165,12 +165,12 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button onClick={() => setTemp([])}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={() => onConfirm(temp)}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold  cursor-pointer
                 bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <FaCheck size={12} /> Qo'shish
             </button>
@@ -229,7 +229,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   }
 
   const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-white text-[#1A1D2E] placeholder-[#5B6078]
     dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]
     ${err ? "border-red-400 dark:border-red-500" : "border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]"}`
@@ -242,7 +242,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-200">
+        <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-200">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -294,7 +294,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div>
               <label className={labelCls}>Topshiruvchi</label>
               <button type="button" onClick={() => setPickerOpen(true)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
                   bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[#526ED3]`}>
                 <span className={assigneeLabel ? "text-[#1A1D2E] dark:text-white flex-1 text-left truncate" : "text-[#5B6078] flex-1 text-left"}>
                   {assigneeLabel || "Topshiruvchi"}
@@ -338,25 +338,25 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={dateRef} type="date" value={form.deadline} onChange={e => set("deadline", e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                       ${!form.deadline ? "[&::-webkit-datetime-edit]:opacity-0" : "text-[#1A1D2E] dark:text-white"}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Taxminiy vaqt</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={timeRef} type="time" value={form.time || "00:00"} onChange={e => set("time", e.target.value === "00:00" ? "" : e.target.value)}
                     step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                       ${!form.time ? "text-[#B6BCCB] dark:text-[#474848]" : "text-[#1A1D2E] dark:text-white"}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
@@ -367,7 +367,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
           <div className="px-7 py-5 flex items-center justify-end gap-3">
             <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
             </button>
             <button onClick={() => {
@@ -381,7 +381,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
               })
               onClose()
             }}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Qo'shish
             </button>

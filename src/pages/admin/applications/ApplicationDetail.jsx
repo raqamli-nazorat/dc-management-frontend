@@ -83,7 +83,7 @@ const ApplicationDetail = () => {
     )
   }
 
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] disabled:cursor-default`
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] disabled:cursor-default`
   const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
 
 
@@ -243,7 +243,7 @@ const ApplicationDetail = () => {
             <button
               onClick={handleSave}
               style={{ fontSize: 14, color: '#FFFFFF' }}
-              className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold transition-colors hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! disabled:text-gray-500!"
+              className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! disabled:text-gray-500!"
               disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
             >
               <FaCheck size={15} />

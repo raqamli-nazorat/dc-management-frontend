@@ -91,7 +91,7 @@ const ApplicationsPage = () => {
                 placeholder="Izlash..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 outline-none transition-colors bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+                className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               />
             </div>
@@ -119,7 +119,7 @@ const ApplicationsPage = () => {
                   <tr
                     key={application.id}
                     // onClick={() => navigate(`/admin/applications/position/detail/${application.id}`)}
-                    className="transition-colors cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                    className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                   >
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white font-medium">
@@ -132,7 +132,7 @@ const ApplicationsPage = () => {
                       <button
                         type="button"
                         onClick={() => setShowConfirm(application)}
-                        className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${application?.is_application ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
+                        className={`relative w-10 h-5 rounded-full  cursor-pointer ${application?.is_application ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
                       >
                         <span
                           className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${application?.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}

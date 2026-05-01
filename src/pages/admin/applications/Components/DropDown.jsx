@@ -39,7 +39,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer transition-colors bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[#526ED3]' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[#526ED3]' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
                 {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[#526ED3]!" size={16} /> : null}
@@ -88,7 +88,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                 }}
                                 onMouseEnter={() => setHovered(opt)}
                                 onMouseLeave={() => setHovered(null)}
-                                className={`w-full text-left px-3 py-2.5 rounded-xl cursor-pointer transition-colors flex items-center justify-between gap-2 ${opt === "Rad etish" ? "text-red-500!" : opt === "Qabul qilish" ? "text-[#526ED3]!" : ""}`}
+                                className={`w-full text-left px-3 py-2.5 rounded-xl cursor-pointer  flex items-center justify-between gap-2 ${opt === "Rad etish" ? "text-red-500!" : opt === "Qabul qilish" ? "text-[#526ED3]!" : ""}`}
                                 style={{
                                     fontSize: 13,
                                     fontWeight: 500,

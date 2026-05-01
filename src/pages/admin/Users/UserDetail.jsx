@@ -260,7 +260,7 @@ const UserDetail = () => {
     if (loading) return <span>Loading...</span>
     if (!user) return <span>User not found</span>
 
-    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border transition-colors
+    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border 
       bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB]
       dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
     const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
@@ -273,7 +273,7 @@ const UserDetail = () => {
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                         <div className="fixed inset-0 bg-black/60" />
                         <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-                            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+                            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
                                 <FaXmark size={14} />
                             </button>
                             <div className="flex items-center gap-3 mb-3">
@@ -291,13 +291,13 @@ const UserDetail = () => {
                             <div className="flex items-center justify-end gap-3">
                                 <button
                                     onClick={() => setConfirmDelete(false)}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
                                 >
                                     <FaXmark size={14} /> Bekor qilish
                                 </button>
                                 <button
                                     onClick={handleDelateUser}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
                                 >
                                     O'chirish
                                 </button>
@@ -312,7 +312,7 @@ const UserDetail = () => {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setConfirmDelete(true)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#E02D2D] bg-[#FFF2F2] hover:bg-[#fdcaca] dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/6 dark:bg-[#E02D2D]/10"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer text-[#E02D2D] bg-[#FFF2F2] hover:bg-[#fdcaca] dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/6 dark:bg-[#E02D2D]/10"
                         >
                             <FaTrash size={13} /> O'chirish
                         </button>
@@ -459,7 +459,7 @@ const UserDetail = () => {
                             ) : (
                                 <div className="flex items-center justify-between gap-3 pl-3 pr-1.5 py-1.5 rounded-lg border text-sm bg-[#F8F9FC] border-[#E2E6F2] text-[#8F95A8] dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:text-[#8E95B5]">
                                     <span className="truncate">Fayl yuklanmagan</span>
-                                    <label className="cursor-pointer bg-[#3F57B3] text-white px-3 py-1.5 rounded-md hover:bg-[#32458C] transition-colors text-xs font-medium shrink-0">
+                                    <label className="cursor-pointer bg-[#3F57B3] text-white px-3 py-1.5 rounded-md hover:bg-[#32458C]  text-xs font-medium shrink-0">
                                         Fayl yuklash
                                         <input
                                             type="file"
@@ -536,13 +536,13 @@ const UserDetail = () => {
                 <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E2E6F2] dark:border-[#292A2A]">
                     <button
                         onClick={handleCancel}
-                        className="px-6 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
+                        className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
                     >
                         Tozalash
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer text-white bg-[#3F57B3] hover:bg-[#32458C]"
+                        className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[#3F57B3] hover:bg-[#32458C]"
                     >
                         Saqlash
                     </button>

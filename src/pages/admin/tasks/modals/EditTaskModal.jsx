@@ -24,14 +24,14 @@ export default function EditTaskModal({ task, onClose, onSave }) {
   })
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
-  const inputCls = `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+  const inputCls = `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
     dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -93,25 +93,25 @@ export default function EditTaskModal({ task, onClose, onSave }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Muddati</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                 <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
                   className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                     ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
             </div>
             <div>
               <label className={labelCls}>Taxminiy vaqt</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                 <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
                   step="60"
                   className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                     ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </button>
               </div>
@@ -122,11 +122,11 @@ export default function EditTaskModal({ task, onClose, onSave }) {
 
         <div className="px-7 py-5 flex items-center justify-end gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
           <button onClick={() => { onSave({ ...task, ...form }); onClose() }}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
             Tahrirlash
           </button>

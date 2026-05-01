@@ -66,7 +66,7 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
           ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
         <span className="flex-1 text-left truncate">{value || placeholder}</span>
@@ -80,7 +80,7 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           {options.map((o, i) => (
             <button key={o} type="button" onClick={() => { onChange(o); setOpen(false) }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer
+              className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                 ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                 ${value === o ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
               {o}
@@ -117,9 +117,9 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
     { label: 'Bekor qilingan',     value: 'cancelled' },
   ]
 
-  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
+  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
   const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
-  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors'
+  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] '
 
   const selectedMgr = users.find(u => u.id === f.manager)
   const selectedEmp = users.find(u => u.id === f.employee)
@@ -127,7 +127,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -164,7 +164,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {users.map((u, i) => (
                       <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                           {(u.username ?? '?').slice(0, 2).toUpperCase()}
                         </div>
@@ -192,7 +192,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {STATUS_API.map((s, i) => (
                       <button key={s.value} type="button" onClick={() => { set('status', s.value); stsDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {s.label}
                       </button>
                     ))}
@@ -217,7 +217,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {users.map((u, i) => (
                       <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                           {(u.username ?? '?').slice(0, 2).toUpperCase()}
                         </div>
@@ -239,7 +239,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                 <input ref={dateFromRef} type="date" value={f.startFromD} onChange={e => set('startFromD', e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -248,7 +248,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   step="60"
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </button>
               </div>
@@ -257,7 +257,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                 <input ref={dateToRef} type="date" value={f.startToD} onChange={e => set('startToD', e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -266,7 +266,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   step="60"
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </button>
               </div>
@@ -282,7 +282,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                 <input ref={deadFromRef} type="date" value={f.deadFromD} onChange={e => set('deadFromD', e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => deadFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -291,7 +291,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   step="60"
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => deadFromTRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </button>
               </div>
@@ -300,7 +300,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                 <input ref={deadToRef} type="date" value={f.deadToD} onChange={e => set('deadToD', e.target.value)}
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => deadToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors ml-auto">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 </button>
               </div>
@@ -309,7 +309,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   step="60"
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => deadToTRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </button>
               </div>
@@ -320,12 +320,12 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
         {/* Footer */}
         <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
@@ -375,7 +375,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
                 border-[#E2E6F2] text-[#5B6078] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -392,7 +392,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 placeholder="Ism Sharifi bo'yicha izlash"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border transition-colors
+                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border 
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]
                   focus:border-[#526ED3]"
@@ -412,14 +412,14 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
               <button
                 key={u.id}
                 onClick={() => toggle(u.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${isSelected
                     ? 'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[#3F57B3]'
                     : 'bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'
                   }`}
               >
                 {/* Checkbox */}
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 
                   ${isSelected ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
                   {isSelected && <FaCheck size={9} className="text-white" />}
                 </div>
@@ -442,12 +442,12 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button onClick={() => setTemp([])}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={handleConfirm}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold  cursor-pointer
                 bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <FaCheck size={12} /> Qo'shish
             </button>
@@ -466,7 +466,7 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
       <button
         type="button"
         onClick={onOpen}
-        className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border transition-colors cursor-pointer text-left
+        className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border  cursor-pointer text-left
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[#526ED3]"
       >
         <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
@@ -518,7 +518,7 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
     <div ref={ref} className="relative">
       <div
         onClick={() => setOpen(true)}
-        className={`min-h-[42px] w-full flex flex-wrap gap-1.5 px-3 py-2 rounded-xl border transition-colors cursor-text
+        className={`min-h-[42px] w-full flex flex-wrap gap-1.5 px-3 py-2 rounded-xl border  cursor-text
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
           ${open ? 'border-[#526ED3] dark:border-[#526ED3]' : ''}`}>
         {selected.map(s => (
@@ -545,7 +545,7 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           {filtered.map(o => (
             <button key={o.name} type="button" onMouseDown={() => add(o)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] transition-colors cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0">
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0">
               <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
                 {o.name.slice(0, 2).toUpperCase()}
               </div>
@@ -644,7 +644,7 @@ function AddProjectModal({ onClose, onAdd }) {
   }
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-white text-[#1A1D2E] placeholder-[#8F95A8]
     dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]
     ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
@@ -660,7 +660,7 @@ function AddProjectModal({ onClose, onAdd }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]">
+        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -686,7 +686,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Holati</label>
                 <div className="relative">
                   <button type="button" onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
                     <span>{STATUS_API.find(s => s.value === form.status)?.label || 'Holati tanlang'}</span>
                     <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -695,7 +695,7 @@ function AddProjectModal({ onClose, onAdd }) {
                     <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {STATUS_API.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -726,7 +726,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
                     <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
@@ -742,7 +742,7 @@ function AddProjectModal({ onClose, onAdd }) {
                     <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {users.map((u, i) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                           <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                             {u.username?.slice(0, 2).toUpperCase()}
                           </div>
@@ -781,23 +781,23 @@ function AddProjectModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddat sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Soati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                   <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
                     step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
@@ -809,17 +809,17 @@ function AddProjectModal({ onClose, onAdd }) {
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
               <button type="button" onClick={() => set('is_active', !form.is_active)}
-                className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.is_active ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_active ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading ? (
                   <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
@@ -856,7 +856,7 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
           <FaXmark size={14} />
         </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -874,12 +874,12 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
         </div>
         <div className="px-7 py-5 flex items-center justify-end gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={() => { onConfirm(project.id); onClose() }}
-            className="px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#E02D2D] text-white hover:bg-red-600">
+            className="px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#E02D2D] text-white hover:bg-red-600">
             O'chirish
           </button>
         </div>
@@ -896,7 +896,7 @@ function DetailModal({ project, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-       <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+       <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
           <FaXmark size={14} />
         </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -1018,7 +1018,7 @@ function DetailModal({ project, onClose }) {
             </div>
           </div>
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
@@ -1061,7 +1061,7 @@ function EditProjectModal({ project, onClose, onSave }) {
   }
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-white text-[#1A1D2E] placeholder-[#8F95A8]
     dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]
     ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
@@ -1069,7 +1069,7 @@ function EditProjectModal({ project, onClose, onSave }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
           <FaXmark size={14} />
         </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
@@ -1097,7 +1097,7 @@ function EditProjectModal({ project, onClose, onSave }) {
               <label className={labelCls}>Holati</label>
               <div className="relative">
                 <button type="button" onClick={() => setStatusOpen(o => !o)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
                     bg-white dark:bg-[#191A1A]
                     ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
                     ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
@@ -1109,7 +1109,7 @@ function EditProjectModal({ project, onClose, onSave }) {
                     bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                     {STATUSES.map((s, i) => (
                       <button key={s} type="button" onClick={() => { set('status', s); setStatusOpen(false) }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer
+                        className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                           ${i < STATUSES.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                           ${form.status === s ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {s}
@@ -1143,7 +1143,7 @@ function EditProjectModal({ project, onClose, onSave }) {
               <label className={labelCls}>Menejer</label>
               <div className="relative">
                 <button type="button" onClick={() => setMgrOpen(o => !o)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
                     bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
                   <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
                     {form.manager || 'Menejer tanlang'}
@@ -1161,7 +1161,7 @@ function EditProjectModal({ project, onClose, onSave }) {
                     bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                     {MANAGERS.map((m, i) => (
                       <button key={m} type="button" onClick={() => { set('manager', m); setMgrOpen(false) }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer
+                        className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                           ${i < MANAGERS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                           ${form.manager === m ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {m}
@@ -1196,12 +1196,12 @@ function EditProjectModal({ project, onClose, onSave }) {
             <div>
               <label className={labelCls}>Muddati</label>
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                 <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
                   className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                     ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
@@ -1209,13 +1209,13 @@ function EditProjectModal({ project, onClose, onSave }) {
             <div>
               <label className={labelCls}>Vaqti</label>
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
                 <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
                   step="60"
                   className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
                     ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors">
+                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
@@ -1228,18 +1228,18 @@ function EditProjectModal({ project, onClose, onSave }) {
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
             <button type="button" onClick={() => set('active', !form.active)}
-              className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.active ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.active ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
               <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </button>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
             </button>
             <button onClick={() => { if (validate()) { onSave({ ...project, ...form }); onClose() } }}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -1258,7 +1258,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
   return (
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
+        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
           text-[#8F95A8] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
         <FaEllipsisVertical size={14} />
       </button>
@@ -1268,7 +1268,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
           {/* Tahrirlash */}
           <button onClick={() => { onEdit?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
+              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer ">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
               <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
             </svg>
@@ -1277,7 +1277,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
           {/* Batafsil */}
           <button onClick={() => { onDetail?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
+              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer ">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
               <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
@@ -1286,7 +1286,7 @@ function RowMenu({ onEdit, onDetail, onDelete }) {
           {/* O'chirish */}
           <button onClick={() => { onDelete?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E02D2D]
-              hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
+              hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer ">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
               <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
             </svg>
@@ -1447,13 +1447,13 @@ export default function ProjectsPage() {
           </svg>
           <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
+            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
         </div>
 
         <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
             bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
             dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
           <LuFilter size={13} />
@@ -1464,14 +1464,14 @@ export default function ProjectsPage() {
         {/* View toggle */}
         <div className="ml-auto flex items-center gap-1 p-1 rounded-xl bg-[#F1F3F9] dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#474848]">
           <button onClick={() => setViewMode('table')}
-            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer
+            className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
               ${viewMode === 'table' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18" />
             </svg>
           </button>
           <button onClick={() => setViewMode('grid')}
-            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer
+            className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
               ${viewMode === 'grid' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="8" height="8" rx="1" /><rect x="13" y="3" width="8" height="8" rx="1" />
@@ -1511,7 +1511,7 @@ export default function ProjectsPage() {
                 data.map((p, idx) => (
                   <tr key={p.id}
                     onClick={() => setDetailProject(p)}
-                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3 transition-colors cursor-pointer">
+                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || p.manager || '—'}</td>

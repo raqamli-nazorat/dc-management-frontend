@@ -169,7 +169,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
 
   /* isCollapsed ikonka style — active/inactive */
   const iconBtn = (active) => [
-    'w-9 h-9 flex items-center justify-center rounded-xl transition-colors cursor-pointer border',
+    'w-9 h-9 flex items-center justify-center rounded-xl  cursor-pointer border',
     active
       ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
       : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:hover:border-[#474848]',
@@ -221,7 +221,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             </button>
             <button
               onClick={() => setCollapsed(true)}
-              className="ml-1 flex items-center justify-center w-7 h-7 rounded-md transition-colors cursor-pointer shrink-0
+              className="ml-1 flex items-center justify-center w-7 h-7 rounded-md  cursor-pointer shrink-0
                 text-[#5B6078] hover:text-[#1A1D2E] dark:text-[#C2C8E0] dark:hover:text-white"
             >
               <IconSidebarLeft size={18} />
@@ -258,7 +258,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 <button
                   onClick={() => toggleGroup(i)}
                   className={[
-                    'w-full flex items-center gap-2.5 px-4 py-3 rounded-lg transition-colors cursor-pointer',
+                    'w-full flex items-center gap-2.5 px-4 py-3 rounded-lg  cursor-pointer',
                     'text-[13px] font-medium',
                     active
                       ? 'bg-[#E2E6F2] text-[#1A1D2E] border border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
@@ -290,7 +290,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                         key={child.path}
                         to={child.path}
                         className={() => [
-                          'block px-4 py-3 rounded-lg text-[13px] font-medium transition-colors cursor-pointer border',
+                          'block px-4 py-3 rounded-lg text-[13px] font-medium  cursor-pointer border',
                           childActive
                             ? 'bg-[#E9ECF5] text-[#5B6078] border-[#E2E6F2] dark:bg-[#292A2A] dark:text-[#C2C8E0] dark:border-[#292A2A]'
                             : 'text-[#5B6078] border-transparent hover:bg-[#E9ECF5] hover:border-[#E2E6F2] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A] dark:hover:border-[#292A2A]',
@@ -327,7 +327,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           <NavLink
             to={`/${routeRole}/trash`}
             className={({ isActive }) => [
-              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium transition-colors cursor-pointer border',
+              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium  cursor-pointer border',
               isActive
                 ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
                 : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
@@ -354,7 +354,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           ) : (
             <button
               onClick={() => setProfileOpen(o => !o)}
-              className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg transition-colors cursor-pointer
+              className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg  cursor-pointer
                 hover:bg-[#E2E6F2] dark:hover:bg-[#303131]"
             >
               <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-medium bg-[#3A3B3B]">
@@ -410,7 +410,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   </div>
                   <button
                     onClick={toggleTheme}
-                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer shrink-0
+                    className={`relative w-10 h-5 rounded-full  cursor-pointer shrink-0
                       ${isDark ? 'bg-[#526ED3]' : 'bg-[#D0D5E2]'}`}
                   >
                     <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
@@ -423,7 +423,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
               <button
                 onClick={() => { navigate(`/${routeRole}/profile`); setProfileOpen(false) }}
                 className="w-full flex items-center justify-between px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]
-                  hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] transition-colors cursor-pointer"
+                  hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]  cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5B6078] dark:text-[#C2C8E0]">
@@ -440,7 +440,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center justify-end  gap-2.5 px-4 py-3
-                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] transition-colors cursor-pointer" 
+                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A]  cursor-pointer" 
               >
                   <span className="text-[13px] font-semibold text-[#E02D2D]">Chiqish</span>
                 <FaArrowRightFromBracket size={14} className="text-[#E02D2D]" />

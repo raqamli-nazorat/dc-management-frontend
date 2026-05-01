@@ -112,7 +112,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
     onSubmit(body)
   }
 
-  const iCls = (k) => `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+  const iCls = (k) => `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-white text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
     dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]
     ${errors[k] ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`
@@ -127,7 +127,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer transition-colors
+      <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer 
         bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
@@ -266,7 +266,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
                           setErrors(p => ({ ...p, card_number: '' }))
                           setShowCardSuggest(false)
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors cursor-pointer
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left  cursor-pointer
                           hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]">
                         <div className="w-8 h-8 rounded-lg bg-[#EEF1FB] dark:bg-[#292A2A] flex items-center justify-center shrink-0">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3F57B3" strokeWidth="2">
@@ -292,12 +292,12 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={14} /> Yopish
           </button>
           <button onClick={handleSubmit}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <img src="/imgs/checkIcon.svg" alt="" className="w-3.5 h-3.5 brightness-0 invert" />
             So'rov yuborish

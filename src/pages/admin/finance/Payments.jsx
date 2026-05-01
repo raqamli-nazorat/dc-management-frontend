@@ -293,13 +293,13 @@ export default function PaymentsPage() {
           {canSelect && (
             selecting ? (
               <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
                   bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
                 <FaXmark size={13} /> Bekor qilish
               </button>
             ) : (
               <button onClick={() => setSelecting(true)}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+                className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
                   bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
                 <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
                 Tanlash
@@ -317,12 +317,12 @@ export default function PaymentsPage() {
             </svg>
             <input type="text" placeholder="Qidirish" value={search}
               onChange={handleSearch}
-              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[240px]
+              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]" />
           </div>
           <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
             <LuFilter size={13} />
@@ -372,7 +372,7 @@ export default function PaymentsPage() {
                       .then(detail => setDetailPayment(detail))
                       .catch(() => setDetailPayment(p))
                   }}
-                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   {canSelect && selecting && (
                     <td className="px-4 py-3 w-10" onClick={e => e.stopPropagation()}>
                       <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} className="cursor-pointer accent-[#3F57B3]" />
@@ -388,7 +388,7 @@ export default function PaymentsPage() {
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(p.confirmed_at)}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{p.project_info?.title ?? ''}</td>
                   <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] 
-                  group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] transition-colors">
+                  group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] ">
                     <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(p.status)}`}>
                       {statusLabel(p.status)}
                     </span>
@@ -415,7 +415,7 @@ export default function PaymentsPage() {
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
           <button onClick={handleDelete}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer
               bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA]
               dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
             O'chirish

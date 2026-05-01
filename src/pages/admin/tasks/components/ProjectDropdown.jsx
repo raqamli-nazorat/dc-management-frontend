@@ -9,7 +9,7 @@ export default function ProjectDropdown({ value, onChange, error }) {
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white dark:bg-[#191A1A]
             ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
             ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
@@ -27,7 +27,7 @@ export default function ProjectDropdown({ value, onChange, error }) {
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {PROJECTS_LIST.map((p, i) => (
               <button key={p.id} type="button" onClick={() => { onChange(p.name); setOpen(false) }}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors cursor-pointer
+                className={`w-full flex items-center justify-between px-4 py-3 text-left  cursor-pointer
                   ${i < PROJECTS_LIST.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === p.name ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                 <div className="min-w-0">

@@ -51,7 +51,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
             ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}
         >
@@ -81,7 +81,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
                 key={o}
                 type="button"
                 onClick={() => { onChange(o); setOpen(false) }}
-                className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors cursor-pointer
+                className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm  cursor-pointer
                   ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === o
                     ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
@@ -105,7 +105,7 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
       <button
         type="button"
         onClick={onClick}
-        className="w-full min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border transition-colors cursor-pointer text-left
+        className="w-full min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border  cursor-pointer text-left
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]"
       >
         {selected.length === 0 ? (
@@ -174,7 +174,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                   : setLocal(projectsList.map(p => ({ id: p.id, name: p.title })))
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors shrink-0"
+                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0"
             >
               <LuSlidersHorizontal size={12} /> Barchasi tanlash
             </button>
@@ -201,12 +201,12 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                 key={p.id}
                 type="button"
                 onClick={() => toggle(p)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${checked
                     ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[#526ED3]'
                     : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
               >
-                <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors
+                <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center 
                   ${checked ? 'border-[#526ED3] bg-[#526ED3]' : 'border-[#C2C8E0] dark:border-[#474848]'}`}>
                   {checked && (
                     <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
@@ -226,14 +226,14 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setLocal([])}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
             >
               <FaXmark size={13} /> Tozalash
             </button>
             <button
               onClick={() => onApply(local)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
             >
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -285,7 +285,7 @@ function AuthorSelectModal({ title, selected, onClose, onApply, usersList = [] }
                   : setLocal(usersList.map(u => ({ id: u.id, name: u.username, role: u.position_info?.name || u.roles?.[0] || '' })))
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer transition-colors shrink-0"
+                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0"
             >
               <LuSlidersHorizontal size={12} /> Barchasi tanlash
             </button>
@@ -312,12 +312,12 @@ function AuthorSelectModal({ title, selected, onClose, onApply, usersList = [] }
                 key={u.id}
                 type="button"
                 onClick={() => toggle(u)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors cursor-pointer text-left
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${checked
                     ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[#526ED3]'
                     : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
               >
-                <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors
+                <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center 
                   ${checked ? 'border-[#526ED3] bg-[#526ED3]' : 'border-[#C2C8E0] dark:border-[#474848]'}`}>
                   {checked && (
                     <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
@@ -343,14 +343,14 @@ function AuthorSelectModal({ title, selected, onClose, onApply, usersList = [] }
           <div className="flex items-center gap-3">
             <button
               onClick={() => setLocal([])}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
             >
               <FaXmark size={13} /> Tozalash
             </button>
             <button
               onClick={() => onApply(local)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
             >
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -395,7 +395,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
         <div className="fixed inset-0 bg-black/60" />
         <button
           onClick={onClose}
-          className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer transition-colors z-[200]"
+          className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]"
         >
           <FaXmark size={14} />
         </button>
@@ -485,7 +485,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
               <button
                 type="button"
                 onClick={() => set('myTasks', !f.myTasks)}
-                className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer
+                className={`relative w-10 h-5 rounded-full  cursor-pointer
                   ${f.myTasks ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
               >
                 <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
@@ -495,14 +495,14 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setF({ ...TASK_EMPTY_FILTER })}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                   text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
               >
                 <FaXmark size={13} /> Tozalash
               </button>
               <button
                 onClick={() => onApply(f)}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />

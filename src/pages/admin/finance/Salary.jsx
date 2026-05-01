@@ -32,7 +32,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
-const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
 
 // -- API ------------------------------------------------------
 async function apiGetPayrolls(params = {}) {
@@ -70,7 +70,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
   const isEmpty = !value
   return (
     <div className="flex items-center gap-1.5 px-3 py-2.5 border border-[#E2E6F2] dark:border-[#292A2A]
-      rounded-xl bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors cursor-text">
+      rounded-xl bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text">
       {placeholder && (
         <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
           {placeholder}:
@@ -86,7 +86,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
         `}
       />
       <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] transition-colors">
+        className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] ">
         {icon}
       </button>
     </div>
@@ -97,7 +97,7 @@ function DateBox({ type, value, onChange, icon, placeholder }) {
 function Toggle({ checked, onChange }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
-      className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${checked ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+      className={`relative w-10 h-5 rounded-full  cursor-pointer ${checked ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
       <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   )
@@ -109,7 +109,7 @@ function MonthDropdownFull({ value, onChange }) {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border transition-colors cursor-pointer
+        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
           ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}`}>
         <span className="flex-1 text-left truncate">{value || 'Oy tanlang'}</span>
@@ -123,7 +123,7 @@ function MonthDropdownFull({ value, onChange }) {
           bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           {MONTHS.map((m, i) => (
             <button key={m} type="button" onClick={() => { onChange(m); setOpen(false) }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer
+              className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                 ${i < MONTHS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#292A2A]' : ''}
                 ${value === m ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-[#FFFFFF] hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
               {m}
@@ -143,7 +143,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60 " />
-      <button onClick={onClose} className="w-8 absolute top-5 right-5 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+      <button onClick={onClose} className="w-8 absolute top-5 right-5 h-8 flex items-center justify-center rounded-full cursor-pointer 
               bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
@@ -231,12 +231,12 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -278,7 +278,7 @@ function ConfirmModal({ onCancel, onConfirm }) {
             </button>
             <h2 className="text-base font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqini tasdiqlaysizmi?</h2>
           </div>
-          <button onClick={onCancel} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+          <button onClick={onCancel} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
             bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
             <FaXmark size={14} />
           </button>
@@ -287,11 +287,11 @@ function ConfirmModal({ onCancel, onConfirm }) {
           <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">Tasdiqlangandan so'ng, bu amalni bekor qilib bo'lmaydi.</p>
         </div>
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
-          <button onClick={onCancel} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer
+          <button onClick={onCancel} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
             text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Bekor qilish
           </button>
-          <button onClick={onConfirm} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+          <button onClick={onConfirm} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
             bg-green-500 text-white hover:bg-green-600">
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Tasdiqlash
@@ -311,7 +311,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
               bg-[#FFFFFF29] absolute top-7 right-7 hover:bg-[#FFFFFF40] text-white">
           <FaXmark size={14} />
         </button>
@@ -374,13 +374,13 @@ function UserDetailModal({ user, onClose, onApprove }) {
           {/* Footer */}
           <div className="px-6 py-4 flex items-center justify-end gap-3 ">
             <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
               <FaXmark size={13} /> {user.is_confirmed ? 'Yopish' : 'Bekor qilish'}
             </button>
             {!user.is_confirmed && (
               <button onClick={() => setShowConfirm(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold  cursor-pointer
                   bg-green-500 text-white hover:bg-green-600">
                 <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                   <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -522,13 +522,13 @@ export default function SalaryPage() {
           <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
           {selecting ? (
             <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
               <FaXmark size={13} /> Bekor qilish
             </button>
           ) : (
             <button onClick={() => setSelecting(true)}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold transition-colors cursor-pointer
+              className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold  cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
               Tanlash
@@ -546,12 +546,12 @@ export default function SalaryPage() {
               </svg>
               <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
                 onChange={e => handleSearch(e.target.value)}
-                className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none transition-colors w-[280px]
+                className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[280px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]"/>
             </div>
             <button onClick={() => setShowFilter(true)}
-              className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border transition-colors cursor-pointer
+              className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
               <LuFilter size={13} />
@@ -609,7 +609,7 @@ export default function SalaryPage() {
             <tbody>
               {data.map((u, idx) => (
                 <tr key={u.id} onClick={() => handleRowClick(u)}
-                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A] transition-colors last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   {selecting && (
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <input type="checkbox" checked={selected.has(u.id)} onChange={() => toggleOne(u.id)} className="cursor-pointer accent-[#3F57B3]" />
@@ -623,7 +623,7 @@ export default function SalaryPage() {
                   <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.penalty_amount)}</td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.total_amount)}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(u.created_at)}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] transition-colors" onClick={e => e.stopPropagation()}>
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] " onClick={e => e.stopPropagation()}>
                     {u.is_confirmed
                       ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-green-500">
                         <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -653,7 +653,7 @@ export default function SalaryPage() {
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
           <button onClick={() => setShowConfirm(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer bg-green-500 text-white hover:bg-green-600">
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold  cursor-pointer bg-green-500 text-white hover:bg-green-600">
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Tasdiqlash
           </button>

@@ -77,7 +77,7 @@ export const ToastProvider = ({ children }) => {
                             </div>
                             <button
                                 onClick={() => removeToast(t.id)}
-                                className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] dark:hover:text-[#C2C8E0] shrink-0 cursor-pointer transition-colors mt-0.5"
+                                className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] dark:hover:text-[#C2C8E0] shrink-0 cursor-pointer  mt-0.5"
                             >
                                 <FaTimes size={14} />
                             </button>

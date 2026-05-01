@@ -150,14 +150,14 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
         }
     }
 
-    const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border transition-colors bg-white text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[#E2E6F2] focus:border-[#526ED3] dark:border-[#292A2A]'}`
+    const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[#E2E6F2] focus:border-[#526ED3] dark:border-[#292A2A]'}`
     const inputCls = getInputCls(false)
     const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
 
     return (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto modal-scroll py-8 px-4">
             <div className="fixed inset-0 bg-black/60" />
-            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
+            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
                 <FaXmark size={16} />
             </button>
             <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
@@ -279,7 +279,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             <button
                                 type="button"
                                 onClick={() => fileRef.current?.click()}
-                                className="w-[80px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shrink-0 border-[#D0D5E2] bg-[#F8F9FC] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:bg-[#191A1A] dark:hover:bg-[#292A2A]">
+                                className="w-[80px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer  shrink-0 border-[#D0D5E2] bg-[#F8F9FC] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:bg-[#191A1A] dark:hover:bg-[#292A2A]">
                                 {avatarPreview
                                     ? <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover rounded-xl" />
                                     : <>
@@ -353,11 +353,11 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     </div>
                 </div>
                 <div className="px-7 py-5 flex items-center justify-end gap-3">
-                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
                         <FaXmark size={14} />
                         Yopish
                     </button>
-                    <button onClick={handleSubmit} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+                    <button onClick={handleSubmit} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
                         <MdCheck size={16} />
                         Qo'shish
                     </button>

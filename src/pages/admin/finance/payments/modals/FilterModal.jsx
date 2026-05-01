@@ -15,7 +15,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       
       <div className="fixed inset-0 bg-black/60" />
-       <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer transition-colors
+       <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer 
               bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
               <FaXmark size={14} />
             </button>
@@ -78,7 +78,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
             <div className=" grid-cols-2 gap-4 flex">
               <input
                 inputMode="decimal"
-                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border 
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="dan: 0"
@@ -87,7 +87,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               />
               <input
                 inputMode="decimal"
-                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border transition-colors
+                className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border 
                   bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="gacha: 0"
@@ -131,12 +131,12 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
           <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />

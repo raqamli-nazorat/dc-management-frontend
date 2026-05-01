@@ -15,7 +15,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange }) => {
           </svg>
 
     return (
-        <div className="flex items-center gap-1.5 px-2.5 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] transition-colors">
+        <div className="flex items-center gap-1.5 px-2.5 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
             {placeholder && isEmpty && (
                 <span className="text-xs shrink-0 select-none text-[#B6BCCB] dark:text-[#474848]">
                     {placeholder}:
@@ -45,7 +45,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange }) => {
             <button
                 type="button"
                 onClick={() => ref.current?.showPicker?.()}
-                className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] transition-colors"
+                className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] "
             >
                 {icon}
             </button>

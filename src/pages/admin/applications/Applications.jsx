@@ -148,7 +148,7 @@ const ApplicationsPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
           <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-            <button onClick={() => setConfirmModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer transition-colors z-10">
+            <button onClick={() => setConfirmModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
             <div className="flex items-center gap-3 mb-3">
@@ -168,13 +168,13 @@ const ApplicationsPage = () => {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmModal(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
               <button
                 onClick={handleStatusChange}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${confirmApplication?.status === "Qabul qilish" ? 'bg-[#526ED3] hover:bg-[#4356a0]' : confirmApplication?.status === "Rad etish" ? 'bg-[#ff4433] hover:bg-[#c63626]' : 'bg-[#526ED3] hover:bg-[#4356a0]'} text-white`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer ${confirmApplication?.status === "Qabul qilish" ? 'bg-[#526ED3] hover:bg-[#4356a0]' : confirmApplication?.status === "Rad etish" ? 'bg-[#ff4433] hover:bg-[#c63626]' : 'bg-[#526ED3] hover:bg-[#4356a0]'} text-white`}
               >
                 {confirmApplication?.status === "Qabul qilish" ? <FaCheck size={14} /> : confirmApplication?.status === "Rad etish" ? <FaXmark size={12} /> : ""}
                 {confirmApplication?.status === "Qabul qilish" ? 'Qabul qilish' : confirmApplication.status === "Rad etish" ? "Rad etish" : "Kutilmoqda"}
@@ -202,7 +202,7 @@ const ApplicationsPage = () => {
                 placeholder="Ism Sharifi bo'yicha izlash"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 outline-none transition-colors bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+                className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               />
             </div>
@@ -245,7 +245,7 @@ const ApplicationsPage = () => {
                   <tr
                     key={application.id}
                     onClick={() => navigate(`/admin/applications/detail/${application.id}`)}
-                    className="transition-colors cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                    className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                   >
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{application?.full_name || '—'}</td>
