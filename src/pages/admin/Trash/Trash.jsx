@@ -79,12 +79,15 @@ function ProjectsTab() {
   const [confirmRestore, setConfirmRestore] = useState(null)
   const [actionLoading, setActionLoading]   = useState(false)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (q = '') => {
     setLoading(true)
     try {
-      const res = await axiosAPI.get('/projects/trash/')
-      const list = res.data?.data ?? res.data?.results ?? res.data ?? []
-      setProjects(Array.isArray(list) ? list : [])
+      const params = { page_size: 100 }
+      if (q) params.search = q
+      const res = await axiosAPI.get('/projects/trash/', { params })
+      const payload = res.data?.data ?? res.data
+      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+      setProjects(list)
     } catch (err) {
       toast.error('Xatolik', getErrorMessage(err))
     } finally {
@@ -94,10 +97,11 @@ function ProjectsTab() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const filtered = projects.filter(p =>
-    (p.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (p.manager_info?.username ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => fetchData(search), 400)
+    return () => clearTimeout(t)
+  }, [search, fetchData])
 
   const doRestore = async (id) => {
     setActionLoading(true)
@@ -106,7 +110,8 @@ function ProjectsTab() {
       setProjects(prev => prev.filter(p => p.id !== id))
       toast.success('Loyiha tiklandi', 'Loyiha avvalgi holatiga qaytarildi')
     } catch (err) {
-      toast.error('Xatolik', getErrorMessage(err))
+      const msg = err?.response?.data?.error?.errorMsg || getErrorMessage(err)
+      toast.error('Xatolik', msg)
     } finally {
       setActionLoading(false)
     }
@@ -119,7 +124,8 @@ function ProjectsTab() {
       setProjects(prev => prev.filter(p => p.id !== id))
       toast.delete("Muvaffaqiyatli o'chirildi", "Ma'lumot butunlay o'chirildi")
     } catch (err) {
-      toast.error('Xatolik', getErrorMessage(err))
+      const msg = err?.response?.data?.error?.errorMsg || getErrorMessage(err)
+      toast.error('Xatolik', msg)
     } finally {
       setActionLoading(false)
     }
@@ -172,7 +178,7 @@ function ProjectsTab() {
           <tbody>
             {loading ? (
               <SkeletonRows cols={7} />
-            ) : filtered.map((p, i) => (
+            ) : projects.map((p, i) => (
               <tr key={p.id}
                 className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
                 <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
@@ -196,7 +202,7 @@ function ProjectsTab() {
           </tbody>
         </table>
 
-        {!loading && filtered.length === 0 && (
+        {!loading && projects.length === 0 && (
           <EmptyState
             icon="/imgs/delete-02.svg"
             title="Chiqindi qutisi bo'sh"
@@ -238,12 +244,15 @@ function TasksTab() {
   const [confirmRestore, setConfirmRestore] = useState(null)
   const [actionLoading, setActionLoading]   = useState(false)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (q = '') => {
     setLoading(true)
     try {
-      const res = await axiosAPI.get('/tasks/trash/')
-      const list = res.data?.data ?? res.data?.results ?? res.data ?? []
-      setTasks(Array.isArray(list) ? list : [])
+      const params = { page_size: 100 }
+      if (q) params.search = q
+      const res = await axiosAPI.get('/tasks/trash/', { params })
+      const payload = res.data?.data ?? res.data
+      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+      setTasks(list)
     } catch (err) {
       toast.error('Xatolik', getErrorMessage(err))
     } finally {
@@ -253,11 +262,11 @@ function TasksTab() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const filtered = tasks.filter(t =>
-    (t.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (typeof t.project_info === 'object' ? t.project_info?.title : t.project_info ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (t.created_by_info?.username ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => fetchData(search), 400)
+    return () => clearTimeout(t)
+  }, [search, fetchData])
 
   const doRestore = async (id) => {
     setActionLoading(true)
@@ -266,7 +275,8 @@ function TasksTab() {
       setTasks(prev => prev.filter(t => t.id !== id))
       toast.success('Vazifa tiklandi', 'Vazifa avvalgi holatiga qaytarildi')
     } catch (err) {
-      toast.error('Xatolik', getErrorMessage(err))
+      const msg = err?.response?.data?.error?.errorMsg || getErrorMessage(err)
+      toast.error('Xatolik', msg)
     } finally {
       setActionLoading(false)
     }
@@ -279,7 +289,8 @@ function TasksTab() {
       setTasks(prev => prev.filter(t => t.id !== id))
       toast.delete("Muvaffaqiyatli o'chirildi", "Ma'lumot butunlay o'chirildi")
     } catch (err) {
-      toast.error('Xatolik', getErrorMessage(err))
+      const msg = err?.response?.data?.error?.errorMsg || getErrorMessage(err)
+      toast.error('Xatolik', msg)
     } finally {
       setActionLoading(false)
     }
@@ -345,7 +356,7 @@ function TasksTab() {
           <tbody>
             {loading ? (
               <SkeletonRows cols={10} />
-            ) : filtered.map((t, i) => (
+            ) : tasks.map((t, i) => (
               <tr key={t.id}
                 className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
                 <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
@@ -372,7 +383,7 @@ function TasksTab() {
           </tbody>
         </table>
 
-        {!loading && filtered.length === 0 && (
+        {!loading && tasks.length === 0 && (
           <EmptyState
             icon="/imgs/delete-02.svg"
             title="Chiqindi qutisi bo'sh"
