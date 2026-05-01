@@ -38,7 +38,20 @@ function fmtDate(iso) {
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]'
-const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF]'
+
+// ── Timezone offset helper ───────────────────────────────────
+function toIsoWithOffset(date, time, isEnd = false) {
+  if (!date) return null
+  const t = time || (isEnd ? '23:59' : '00:00')
+  const secs = isEnd ? '59' : '00'
+  const now = new Date()
+  const offsetMin = -now.getTimezoneOffset()
+  const sign = offsetMin >= 0 ? '+' : '-'
+  const absMin = Math.abs(offsetMin)
+  const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+  const mm = String(absMin % 60).padStart(2, '0')
+  return `${date}T${t}:${secs}.000000${sign}${hh}:${mm}`
+}
 
 // ── API ──────────────────────────────────────────────────────
 async function apiGetLedger(params = {}) {
@@ -54,8 +67,12 @@ function buildParams(filters, search) {
   if (filters.transaction_type) p.transaction_type = filters.transaction_type
   if (filters.amount__gte) p.amount__gte = filters.amount__gte
   if (filters.amount__lte) p.amount__lte = filters.amount__lte
-  if (filters.created_at__date__gte) p.created_at__date__gte = filters.created_at__date__gte
-  if (filters.created_at__date__lte) p.created_at__date__lte = filters.created_at__date__lte
+
+  const cGte = toIsoWithOffset(filters.created_at__date__gte, filters.created_at__time__gte, false)
+  const cLte = toIsoWithOffset(filters.created_at__date__lte, filters.created_at__time__lte, true)
+  if (cGte) p.created_at__gte = cGte
+  if (cLte) p.created_at__lte = cLte
+
   return p
 }
 
@@ -159,23 +176,24 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
-      <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
-              bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
-              <FaXmark size={14} />
-            </button>
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+
+        {/* X tugmasi */}
+        <button onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
+            bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+          <FaXmark size={14} />
+        </button>
+
         <div className="px-6 pt-6 pb-3">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-3">
-              <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-                <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
-              </button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
-            </div>
-          
+          <div className="flex items-center gap-3 mb-1">
+            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+              <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
+            </button>
+            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] ">
+          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
@@ -201,7 +219,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
             </div>
           </div>
           <div>
-            <label className={labelCls}>Miqdor</label>
+            <label className={labelCls}>Miqdor (UZS)</label>
             <div className="grid grid-cols-2 gap-2">
               <input className={iCls} placeholder="dan: 0" value={f.amount__gte}
                 onChange={e => set('amount__gte', e.target.value.replace(/[^\d.]/g, ''))} />
@@ -212,12 +230,12 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
         </div>
         <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-[#EEF1F7] dark:border-[#292A2A]">
           <button onClick={() => setF(EMPTY_FILTER)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -238,22 +256,24 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className=" absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer 
-            bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
-        <FaXmark size={14} />
-      </button>
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
+        {/* X tugmasi */}
+        <button onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
+            bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+          <FaXmark size={14} />
+        </button>
+
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+        <div className="px-6 pt-6 pb-4 flex items-center">
           <div className="flex items-center gap-3">
             <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
               <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
             </button>
             <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Tarix ma'lumotlari</h2>
           </div>
-
         </div>
 
         {/* User info */}

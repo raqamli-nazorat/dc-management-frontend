@@ -92,22 +92,28 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
     if (Object.keys(e).length) { setErrors(e); return }
 
     const body = {
-      type:             form.type,
-      expense_category: Number(form.expense_category),
-      amount:           toDecimalStr(form.amount),
-      payment_method:   form.payment_method,
+      type:           form.type,
+      amount:         parseFloat(toDecimalStr(form.amount)),
+      payment_method: form.payment_method,
     }
 
-    // reason — faqat bo'sh bo'lmasa qo'shiladi
+    // expense_category — faqat tanlanganda va disabled bo'lmaganda
+    if (!rules.categoryDisabled && form.expense_category) {
+      body.expense_category = Number(form.expense_category)
+    }
+
+    // reason — faqat bo'sh bo'lmasa
     if (form.reason.trim()) body.reason = form.reason.trim()
 
-    // card_number — faqat karta tanlanganda qo'shiladi
+    // card_number — faqat karta tanlanganda
     if (showCard && form.card_number) {
       body.card_number = form.card_number.replace(/\s/g, '')
     }
 
-    // project — faqat tanlanganda qo'shiladi
-    if (form.project) body.project = Number(form.project)
+    // project — faqat tanlanganda va disabled bo'lmaganda
+    if (!rules.projectDisabled && form.project) {
+      body.project = Number(form.project)
+    }
 
     onSubmit(body)
   }

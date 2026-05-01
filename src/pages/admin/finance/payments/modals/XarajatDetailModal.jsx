@@ -125,12 +125,16 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center absolute top-5 right-5 rounded-full cursor-pointer 
-          bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
-          <FaXmark size={14} />
-        </button>
+        <button onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
+              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+            <FaXmark size={14} />
+          </button>
+
         <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
 
+          {/* X tugmasi */}
+          
           {/* Header */}
           <div className="px-6 pt-6 pb-3">
             <div className="flex items-center gap-3 mb-1">

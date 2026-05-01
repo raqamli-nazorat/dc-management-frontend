@@ -3,7 +3,10 @@ import axios from "axios";
 const axiosAPI = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   paramsSerializer: {
-    encode: (param) => param,
+    encode: (param) => {
+      // + belgisini %2B ga o'girish (timezone offset uchun)
+      return String(param).replace(/\+/g, '%2B')
+    },
   },
 });
 
