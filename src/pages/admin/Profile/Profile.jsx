@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -310,6 +310,88 @@ const fmtNum = (v) => {
   return n.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+/* ── Role Dropdown ── */
+function RoleDropdown({ roles, activeRole, onChangeRole }) {
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const dropRef = useRef(null)
+
+  useEffect(() => {
+    const h = e => { if (dropRef.current && !dropRef.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+
+  const handleChange = async (role) => {
+    if (role === activeRole) { setOpen(false); return }
+    setLoading(true)
+    try {
+      await axiosAPI.put('/users/me/change-role/', { active_role: role })
+      const saved = localStorage.getItem('user')
+      if (saved) {
+        const u = JSON.parse(saved)
+        u.active_role = role
+        localStorage.setItem('user', JSON.stringify(u))
+      }
+      onChangeRole(role)
+      toast.success("Rol o'zgartirildi", `Faol rol: ${role}`)
+      setOpen(false)
+      setTimeout(() => window.location.reload(), 800)
+    } catch (err) {
+      toast.error('Xatolik', getErrorMessage(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="relative" ref={dropRef}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        disabled={loading}
+        className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 cursor-pointer hover:border-[#526ED3] transition-colors w-full'}
+      >
+        <span className="text-sm">{activeRole}</span>
+        {loading
+          ? <svg className="animate-spin w-3.5 h-3.5 text-[#8F95A8] shrink-0" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+          : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              className={`text-[#8F95A8] transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}>
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+        }
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
+          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          {roles.map((r, i) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => handleChange(r)}
+              className={`w-full flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
+                ${i < roles.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
+                ${r === activeRole
+                  ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
+                  : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'
+                }`}
+            >
+              <span>{r}</span>
+              {r === activeRole && (
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 /* ── Main Page ── */
 export default function ProfilePage() {
   const { user: authUser } = useAuth()
@@ -434,24 +516,32 @@ export default function ProfilePage() {
       </div>
 
       {/* Lavozim + Rol */}
-      <div className="flex items-end gap-4">
-        <div className="flex w-[50%] justify-between gap-1.5">
-          <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center gap-1.5">
+      <div className="flex items-center gap-6">
+        <div className="flex-1 flex justify-between  gap-1.5">
+          <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center  gap-1.5">
             <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
             Lavozimi
           </span>
-          <div className={boxCls + ' min-h-[42px]  items-center'} style={{ minWidth: 120, maxWidth:200}}>
+          <div className={boxCls + ' min-h-[42px] flex items-center max-w-50  w-40 bg-red-500'}>
             {data.position ?? ''}
           </div>
         </div>
-        <div className="flex w-[50%] justify-between gap-1.5">
+        <div className="flex-1 flex gap-1.5 justify-between">
           <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
             Rolli
           </span>
-          <div className={boxCls + ' min-h-[42px] flex items-center'} style={{ width: 120 }}>
-            {role ?? ''}
-          </div>
+          {data.roles?.length > 1 ? (
+            <RoleDropdown
+              roles={data.roles}
+              activeRole={data.active_role || data.roles[0]}
+              onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
+            />
+          ) : (
+            <div className={boxCls + ' min-h-[42px] flex items-center'}>
+              {data.active_role || data.roles?.[0] || role}
+            </div>
+          )}
         </div>
       </div>
 

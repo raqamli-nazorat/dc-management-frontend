@@ -14,7 +14,9 @@ function fmtAmount(raw) {
   const parts = val.split('.')
   if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('')
   const [int, dec] = val.split('.')
-  const intFormatted = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  // Integer qismini 12 xonaga cheklash
+  const intLimited = (int || '').slice(0, 12)
+  const intFormatted = intLimited.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   if (dec !== undefined) return intFormatted + '.' + dec.slice(0, 2)
   return intFormatted
 }
@@ -202,6 +204,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
               placeholder="0.00"
               value={form.amount}
               onChange={e => setF('amount', fmtAmount(e.target.value))}
+              maxLength={17}
             />
             {errors.amount && <p className="text-xs text-red-500 mt-1">*{errors.amount}</p>}
           </div>
