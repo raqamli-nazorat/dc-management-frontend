@@ -364,7 +364,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 <p className="text-[13px] font-medium truncate leading-tight text-[#1A1D2E] dark:text-white">
                   {user?.username}
                 </p>
-                <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{getRouteRole(user)}</p>
+                <p className="text-xs truncate text-[#526ED3] dark:text-[#7F95E6]">{user?.active_role || getRouteRole(user)}</p>
               </div>
             </button>
           )}
@@ -376,20 +376,42 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]"
               style={{ bottom: 16, left: isCollapsed ? 72 : 288 }}
             >
-
-              {/* Current user */}
-              <div className="px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#526ED3] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                    {user?.username?.[0]?.toUpperCase()}{user?.username?.[1]?.toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-[#1A1D2E] dark:text-white truncate">{user?.username}</p>
-                    <p className="text-xs text-[#8F95A8] dark:text-[#5B6078]">{getRouteRole(user)}</p>
-                  </div>
-                </div>
+              {/* Rollar ro'yxati */}
+              <div className="border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                {(user?.roles?.length > 0 ? user.roles : [user?.active_role || getRouteRole(user)]).map((role) => {
+                  const isActive = (user?.active_role || user?.roles?.[0]) === role
+                  return (
+                    <button
+                      key={role}
+                      onClick={async () => {
+                        if (isActive) return
+                        try {
+                          const { axiosAPI: api } = await import('../service/axiosAPI')
+                          await api.put('/users/me/change-role/', { active_role: role })
+                          const saved = localStorage.getItem('user')
+                          if (saved) {
+                            const u = JSON.parse(saved)
+                            u.active_role = role
+                            localStorage.setItem('user', JSON.stringify(u))
+                          }
+                          window.location.reload()
+                        } catch { /* silent */ }
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors
+                        ${isActive ? 'bg-[#F1F3F9] dark:bg-[#252626]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0
+                        ${isActive ? 'bg-[#526ED3] text-white' : 'bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:text-[#C2C8E0]'}`}>
+                        {user?.username?.[0]?.toUpperCase()}{user?.username?.[1]?.toUpperCase()}
+                      </div>
+                      <div className="min-w-0 text-left">
+                        <p className="text-[13px] font-bold text-[#1A1D2E] dark:text-white truncate">{user?.username}</p>
+                        <p className="text-xs text-[#8F95A8] dark:text-[#5B6078]">{role}</p>
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
-
               {/* Dark mode toggle */}
               <div className="px-4 py-3 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
                 <div className="flex items-center justify-between">
