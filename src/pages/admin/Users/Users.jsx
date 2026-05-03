@@ -218,17 +218,18 @@ export default function UsersPage() {
             />
           </div>
           <FilterSelect
-            options={['Barcha lavozimlar', ...positions.map(pos => pos.name)]}
-            value={positions.find(pos => pos.id === position)?.name || 'Barcha lavozimlar'}
+            options={positions.map(pos => pos.name)}
+            value={positions.find(pos => pos.id === position)?.name}
+            placeholder='Barcha lavozimlar'
             onChange={e => setPosition(positions.find(pos => pos.name === e)?.id || '')}
             width='160px'
           />
           <FilterSelect
-            options={['Barcha rollar', ...Object.values(Roles)]}
-            value={role === 'Barcha rollar' ? 'Barcha rollar' : Roles[role] || 'Barcha rollar'}
+            options={Object.values(Roles)}
+            value={Roles[role]}
+            placeholder='Barcha rollar'
             onChange={e => {
               const foundKey = Object.keys(Roles).find(k => Roles[k] === e);
-              console.log(foundKey);
               setRole(foundKey || 'Barcha rollar');
             }}
             width='130px'

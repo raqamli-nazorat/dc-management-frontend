@@ -143,7 +143,7 @@ const UserDetail = () => {
     const handleSave = async () => {
         try {
             const formData = new FormData()
-            
+
             // Ism o'zgargan bo'lsa
             if (form.name !== initial.name) {
                 formData.append('username', form.name)
@@ -532,6 +532,7 @@ const UserDetail = () => {
 
 
                 </div>
+
                 {/* Footer / Actions */}
                 <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E2E6F2] dark:border-[#292A2A]">
                     <button

@@ -24,7 +24,6 @@ const CostInquiries = [
   { value: "paid", label: "To'landi" },
   { value: "pending", label: "Kutulmoqda" },
   { value: "accepted", label: "Tasdiqlandi" },
-  { value: "rejected", label: "Bekor qilindi" }
 ]
 
 const SalaryType = [
@@ -320,20 +319,20 @@ const Employee = () => {
           { content: 'Viloyati', rowSpan: 2 },
           { content: 'Tumani', rowSpan: 2 },
           { content: 'Telefon raqami', rowSpan: 2 },
-          { content: 'Oylik maosh', rowSpan: 2 },
-          { content: 'Balans', rowSpan: 2 },
+          { content: 'Oylik maosh (UZS)', rowSpan: 2 },
+          { content: 'Balans (UZS)', rowSpan: 2 },
           { content: 'Loyihalar', colSpan: 6 },
           { content: 'Vazifalar', colSpan: 8 },
           { content: 'Yig\'ilishlar', colSpan: 4 },
-          { content: 'Xarajat so\'rovlari', colSpan: 4 },
-          { content: 'Ish haqi', colSpan: 3 },
+          { content: 'Xarajat so\'rovlari (UZS)', colSpan: 4 },
+          { content: 'Ish haqi (UZS)', colSpan: 3 },
           { content: 'Ishga kirgan vaqti', rowSpan: 2 }
         ],
         [
           'Jami', 'Tugatilgan', 'Jarayonda', 'Bekor', 'Muddati', 'Reja',
           'Jami', 'Qilish', 'Jarayon', 'Muddati', 'Bajarilgan', 'Ishga t', 'Tekshirilgan', 'Rad',
           'Jami', 'Qatnashgan', 'Sababli', 'Sababsiz',
-          'Jami', 'Kutilmoqda', 'To\'landi', 'Rad',
+          'Jami', 'Kutilmoqda', 'To\'landi', 'Tasdiqlangan',
           'Jami', 'KPI', 'Jarima'
         ]
       ],
@@ -410,8 +409,8 @@ const Employee = () => {
       'Viloyati': item?.region || '-',
       'Tumani': item?.district || '-',
       'Telefon raqami': item?.phone_number || '-',
-      'Oylik maosh': item?.fixed_salary || 0,
-      'Balans': item?.balance || 0,
+      'Oylik maosh (UZS)': item?.fixed_salary || 0,
+      'Balans (UZS)': item?.balance || 0,
       'Loyihalar - Jami': item?.report?.projects?.total || 0,
       'Loyihalar - Tugatilgan': item?.report?.projects?.completed || 0,
       'Loyihalar - Jarayonda': item?.report?.projects?.in_progress || 0,
@@ -430,12 +429,12 @@ const Employee = () => {
       "Yig'ilishlar - Qatnashgan": item?.report?.meetings?.attended || 0,
       "Yig'ilishlar - Sababli qatnashmagan": item?.report?.meetings?.missed_excused || 0,
       "Yig'ilishlar - Sababsiz qatnashmagan": item?.report?.meetings?.missed_unexcused || 0,
-      "Xarajat so'rovlari - Jami": item?.report?.expense_requests_amount?.total || 0,
-      "Xarajat so'rovlari - Kutilmoqda": item?.report?.expense_requests_amount?.pending || 0,
-      "Xarajat so'rovlari - To'landi": item?.report?.expense_requests_amount?.pain || 0,
-      "Xarajat so'rovlari - Xodim qabul qilmagan": item?.report?.expense_requests_amount?.confirmed || 0,
-      'Ish haqi - Jami': item?.report?.payroll_amount?.total || 0,
-      'Ish haqi - KPI bonusi': item?.report?.payroll_amount?.kpi_bonuses || 0,
+      "Xarajat so'rovlari (UZS) - Jami": item?.report?.expense_requests_amount?.total || 0,
+      "Xarajat so'rovlari (UZS) - Kutilmoqda": item?.report?.expense_requests_amount?.pending || 0,
+      "Xarajat so'rovlari (UZS) - To'landi": item?.report?.expense_requests_amount?.pain || 0,
+      "Xarajat so'rovlari (UZS) - Tasdiqlangan": item?.report?.expense_requests_amount?.confirmed || 0,
+      'Ish haqi (UZS) - Jami': item?.report?.payroll_amount?.total || 0,
+      'Ish haqi (UZS) - KPI bonusi': item?.report?.payroll_amount?.kpi_bonuses || 0,
       'Ish haqi - Jarima miqdori': item?.report?.payroll_amount?.penalty_amount || 0,
       'Ishga kirgan vaqti': item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY') : '-'
     }));
@@ -494,7 +493,7 @@ const Employee = () => {
                   <th class="sub-group">Jami</th><th class="sub-group">Tugatilgan</th><th class="sub-group">Jarayonda</th><th class="sub-group">Bekor qilingan</th><th class="sub-group">Muddati o'tgan</th><th class="sub-group">Rejalashtirilayotgan</th>
                   <th class="sub-group">Jami</th><th class="sub-group">Qilish kerak</th><th class="sub-group">Jarayonda</th><th class="sub-group">Muddati o'tgan</th><th class="sub-group">Bajarilgan</th><th class="sub-group">Ishga tushurilgan</th><th class="sub-group">Tekshirilgan</th><th class="sub-group">Rad etilgan</th>
                   <th class="sub-group">Jami</th><th class="sub-group">Qatnashgan</th><th class="sub-group">Sababli</th><th class="sub-group">Sababsiz</th>
-                  <th class="sub-group">Jami</th><th class="sub-group">Kutilmoqda</th><th class="sub-group">To'landi</th><th class="sub-group">Qabul qilinmagan</th>
+                  <th class="sub-group">Jami</th><th class="sub-group">Kutilmoqda</th><th class="sub-group">To'landi</th><th class="sub-group">Tasdiqlangan</th>
                   <th class="sub-group">Jami</th><th class="sub-group">KPI bonusi</th><th class="sub-group">Jarima miqdori</th>
                 </tr>
               </thead>
@@ -738,7 +737,7 @@ const Employee = () => {
         {/* Row 1: Muddat, Lavozimi, Viloyat, UserIcon */}
         <div className="grid grid-cols-16 gap-4 mb-2">
           <div className="col-span-12 lg:col-span-8">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muddat</label>
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Ishga kirish sanasi</label>
             <div className="flex items-center gap-3">
               <div className="relative flex-1">
                 <DatePicker
@@ -1124,7 +1123,7 @@ const Employee = () => {
                 <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
                 <th className="p-2 border-r border-[#e2e6f2]">Kutilmoqda</th>
                 <th className="p-2 border-r border-[#e2e6f2]">To'landi</th>
-                <th className="p-2 border-r border-[#e2e6f2]">To'lov o'tkazildi "xodim qabul qilmagan</th>
+                <th className="p-2 border-r border-[#e2e6f2]">Tasdiqlangan</th>
                 <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
                 <th className="p-2 border-r border-[#e2e6f2]">KPI bonusi</th>
                 <th className="p-2 border-r border-[#e2e6f2]">Jarima miqdori</th>

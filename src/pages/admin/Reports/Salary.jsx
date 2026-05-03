@@ -772,9 +772,9 @@ const Employee = () => {
             <FilterSelect
               padding='13.5px 12px'
               placeholder="Oy tanlang"
-              options={months.map(type => type.label)}
-              value={months.find(type => type.value === filters.month)?.label}
-              onChange={(value) => handleFilterChange('month', months.find(type => type.label === value)?.value)}
+              options={months}
+              value={filters.month}
+              onChange={(value) => handleFilterChange('month', value)}
             />
           </div>
 
@@ -783,9 +783,9 @@ const Employee = () => {
             <FilterSelect
               padding='13.5px 12px'
               placeholder="Holatini tanlang"
-              options={status_type.map(type => type.label)}
-              value={status_type.find(type => type.value === filters.is_confirmed)?.label}
-              onChange={(value) => handleFilterChange('is_confirmed', status_type.find(type => type.label === value)?.value)}
+              options={status_type}
+              value={filters.is_confirmed}
+              onChange={(value) => handleFilterChange('is_confirmed', value)}
             />
           </div>
         </div>
