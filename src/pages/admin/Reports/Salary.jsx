@@ -14,7 +14,7 @@ import { PiUsersThreeBold } from 'react-icons/pi'
 import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 
 const status_type = [
@@ -274,7 +274,7 @@ const Employee = () => {
 
     const doc = new jsPDF({ orientation: 'landscape' });
 
-    doc.autoTable({
+    autoTable(doc, {
       head: [['№', 'Ism Sharifi', 'Oy', 'Oylik maosh', 'KPI bonus', 'Jarima miqdori', 'Jami miqdori', 'Holati', 'Hisoblangan vaqti', 'Tasdiqlangan vaqti', 'Hisobchi']],
       body: UserReports.map((item, index) => [
         index + 1,

@@ -14,7 +14,7 @@ import { PiUsersThreeBold } from 'react-icons/pi'
 import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 import ProjectsStep from './Modals/ProjectsStep'
 import { usePositions } from '../../../MostUsesDates/'
@@ -314,8 +314,8 @@ const Employee = () => {
 
     const doc = new jsPDF({ orientation: 'landscape' });
 
-    doc.autoTable({
-      head: [['№', 'Titul', 'Loyiha', 'Vazifa', 'Topshiruvchi', 'Muallif', 'Daraja', 'Holat', 'Turi', 'Narxi', 'Jarima %', 'Muddati', 'Yaratilgan', 'Sprint', 'Kimga', 'Qaytish', 'Sabab']],
+    autoTable(doc, {
+      head: [['№', 'Titul', 'Loyiha', 'Vazifa', 'Topshiruvchi', 'Muallif', 'Daraja', 'Holat', 'Turi', 'Narxi', 'Jarima %', 'Muddati', 'Yaratilgan', 'Sprint', 'Kimga', 'Qaytish', 'Bekor qilish sababi']],
       body: UserReports.map((item, index) => [
         index + 1,
         item?.prefix || "-",
@@ -483,7 +483,7 @@ const Employee = () => {
                 <th>Sprint</th>
                 <th>Kimga</th>
                 <th>Qaytish</th>
-                <th>Sabab</th>
+                <th>Bekor qilish sababi</th>
               </tr>
             </thead>
             <tbody>
