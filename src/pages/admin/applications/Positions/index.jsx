@@ -3,12 +3,15 @@ import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
 import { usePageAction } from '../../../../context/PageActionContext'
+import { useAuth } from '../../../../context/AuthContext'
 import CreatePosition from './CreatePosition'
 import { FaCheck } from 'react-icons/fa'
 import { ConfirmationModal } from '../../../../components/ConfirmationModal'
 
 const ApplicationsPage = () => {
   const { registerAction, clearAction } = usePageAction()
+  const { user } = useAuth()
+  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
 
@@ -16,6 +19,7 @@ const ApplicationsPage = () => {
   const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
+    if (isAuditor) return
     registerAction({
       label: "Lavozim qo'shish",
       icon: <img src="/imgs/user-square.svg" alt="" className="w-4 h-4 brightness-0 invert" />,

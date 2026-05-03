@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MdConstruction } from 'react-icons/md'
 import { usePageAction } from '../../../../context/PageActionContext'
+import { useAuth } from '../../../../context/AuthContext'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
@@ -11,6 +12,8 @@ import { FaCheck } from 'react-icons/fa'
 
 const RegionsPage = () => {
   const { registerAction, clearAction } = usePageAction()
+  const { user } = useAuth()
+  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
 
@@ -18,6 +21,7 @@ const RegionsPage = () => {
   const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
+    if (isAuditor) return
     registerAction({
       label: "Viloyat qo'shish",
       icon: <img src="/imgs/location-06.svg" alt="" className="w-4 h-4 brightness-0 invert" />,

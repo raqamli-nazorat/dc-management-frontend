@@ -1349,6 +1349,7 @@ export default function ProjectsPage() {
   const { user } = useAuth()
   const roles = user?.roles ?? []
   const canEdit = roles.includes('admin') || roles.includes('superadmin')
+  const isAuditor = user?.active_role === 'auditor' || (roles.includes('auditor') && !user?.active_role)
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
@@ -1427,6 +1428,7 @@ export default function ProjectsPage() {
   }, [hasMore, loadingMore, page, filters, search])
 
   useEffect(() => {
+    if (isAuditor) return
     registerAction({
       label: "Loyiha qo'shish",
       icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,

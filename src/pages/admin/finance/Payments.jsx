@@ -118,20 +118,22 @@ export default function PaymentsPage() {
 
   // ── Rol aniqlash ──
   const roles = user?.roles ?? []
+  const activeRole = user?.active_role
   const isEmployee = roles.includes('employee')
   const isManager = roles.includes('manager')
   const isAdmin = roles.includes('admin') || roles.includes('superadmin')
   const isAccountant = roles.includes('accountant')
+  const isAuditor = activeRole === 'auditor' || (roles.includes('auditor') && !activeRole)
 
   // employee → my_requests=true majburiy; qolganlar → false (hammasi ko'rinadi)
   const forceMyRequests = isEmployee && !isManager && !isAdmin && !isAccountant
 
-  // So'rov yuborish: admin, manager, employee (accountant emas)
-  const canSendRequest = isAdmin || isManager || isEmployee
+  // So'rov yuborish: admin, manager, employee (accountant va auditor emas)
+  const canSendRequest = !isAuditor && (isAdmin || isManager || isEmployee)
 
   // Tanlash/o'chirish: faqat o'z so'rovlarini o'chirishi mumkin bo'lganlar
   // (admin ham o'z so'rovlarini o'chira oladi, lekin boshqalarnikini emas — backend hal qiladi)
-  const canSelect = isAdmin || isManager || isEmployee
+  const canSelect = !isAuditor && (isAdmin || isManager || isEmployee)
 
   const [payments, setPayments] = useState([])
   const [categories, setCategories] = useState([])
