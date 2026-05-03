@@ -54,21 +54,6 @@ const status = {
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
 
-const months = [
-  { label: "Yanvar", value: 1 },
-  { label: "Fevral", value: 2 },
-  { label: "Mart", value: 3 },
-  { label: "Aprel", value: 4 },
-  { label: "May", value: 5 },
-  { label: "Iyun", value: 6 },
-  { label: "Iyul", value: 7 },
-  { label: "Avgust", value: 8 },
-  { label: "Sentabr", value: 9 },
-  { label: "Oktabr", value: 10 },
-  { label: "Noyabr", value: 11 },
-  { label: "Dekabr", value: 12 },
-]
-
 const initialFilters = {
   created_at_min: monthStart,
   created_at_max: monthEnd,
@@ -1094,16 +1079,14 @@ const Employee = () => {
         }
       `}</style>
 
-      {
-        selectSubmitter && (
-          <EmployeeStep
-            selectedList={filters.assignee ? filters.assignee.split(',') : []}
-            title="Topshiruvchi tanlang"
-            onConfirm={handleSelectEmployeeConfirm}
-            onClose={() => setSelectSubmitter(false)}
-          />
-        )
-      }
+      {selectSubmitter && (
+        <EmployeeStep
+          selectedList={filters.assignee ? filters.assignee.split(',') : []}
+          title="Topshiruvchi tanlang"
+          onConfirm={handleSelectEmployeeConfirm}
+          onClose={() => setSelectSubmitter(false)}
+        />
+      )}
 
       {selectAuthor && (
         <EmployeeStep
