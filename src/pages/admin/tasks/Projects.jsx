@@ -3,7 +3,6 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
-import { DateTimeBox } from '../Components/DateTimeBox'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
@@ -13,9 +12,9 @@ const EMPTY_FILTER = { manager: '', status: '', employee: '', startFromD: '', st
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 
 const STATUS_LABEL = {
-  planning:  'Rejalashtirilmoqda',
-  active:    'Faol',
-  overdue:   "Muddati o'tgan",
+  planning: 'Rejalashtirilmoqda',
+  active: 'Faol',
+  overdue: "Muddati o'tgan",
   completed: 'Yakunlangan',
   cancelled: 'Bekor qilingan',
 }
@@ -44,12 +43,6 @@ const EMPLOYEES = [
   { name: 'Nilufar Yusupova', role: 'Dasturchi' },
 ]
 
-const statusStyle = {
-  'Faol': { dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
-  'Rejalashtirilmoqda': { dot: 'bg-[#8F95A8]', text: 'text-[#5B6078] dark:text-[#C2C8E0]' },
-  'Yakunlangan': { dot: 'bg-[#526ED3]', text: 'text-[#526ED3] dark:text-[#7F95E6]' },
-}
-
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -61,38 +54,6 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-/* ── SimpleSelect (filter uchun) ── */
-function SimpleSelect({ value, onChange, options, placeholder }) {
-  const { open, setOpen, ref } = useDropdown()
-  return (
-    <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-          bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
-          ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
-        <span className="flex-1 text-left truncate">{value || placeholder}</span>
-        <div className="flex items-center gap-1.5 shrink-0 ml-1">
-          {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
-          <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
-        </div>
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48
-          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-          {options.map((o, i) => (
-            <button key={o} type="button" onClick={() => { onChange(o); setOpen(false) }}
-              className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
-                ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                ${value === o ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-              {o}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 /* ── FilterModal ── */
 function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
@@ -100,12 +61,12 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
 
   const dateFromRef = useRef(null)
   const timeFromRef = useRef(null)
-  const dateToRef   = useRef(null)
-  const timeToRef   = useRef(null)
+  const dateToRef = useRef(null)
+  const timeToRef = useRef(null)
   const deadFromRef = useRef(null)
   const deadFromTRef = useRef(null)
-  const deadToRef   = useRef(null)
-  const deadToTRef  = useRef(null)
+  const deadToRef = useRef(null)
+  const deadToTRef = useRef(null)
 
   const mgrDd = useDropdown()
   const empDd = useDropdown()
@@ -113,9 +74,9 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
 
   const STATUS_API = [
     { label: 'Rejalashtirilmoqda', value: 'planning' },
-    { label: 'Faol',               value: 'active' },
-    { label: 'Yakunlangan',        value: 'completed' },
-    { label: 'Bekor qilingan',     value: 'cancelled' },
+    { label: 'Faol', value: 'active' },
+    { label: 'Yakunlangan', value: 'completed' },
+    { label: 'Bekor qilingan', value: 'cancelled' },
   ]
 
   const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
@@ -241,7 +202,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} shrink-0`}>
@@ -250,7 +211,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeFromRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} flex-1 min-w-0`}>
@@ -259,7 +220,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} shrink-0`}>
@@ -268,7 +229,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => timeToRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
             </div>
@@ -284,7 +245,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => deadFromRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} shrink-0`}>
@@ -293,7 +254,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => deadFromTRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} flex-1 min-w-0`}>
@@ -302,7 +263,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
                 <button type="button" onClick={() => deadToRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                 </button>
               </div>
               <div className={`${inputBox} shrink-0`}>
@@ -311,7 +272,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                 <button type="button" onClick={() => deadToTRef.current?.showPicker?.()}
                   className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                 </button>
               </div>
             </div>
@@ -380,13 +341,13 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 border-[#E2E6F2] text-[#5B6078] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
               </svg>
               Barchini tanlash
             </button>
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input
                 type="text"
@@ -576,7 +537,7 @@ function AddProjectModal({ onClose, onAdd }) {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setUsers(Array.isArray(list) ? list : [])
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   const [form, setForm] = useState({
@@ -597,9 +558,9 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim())       e.title       = true
-    if (!form.prefix.trim())      e.prefix      = true
-    if (!form.status)             e.status      = true
+    if (!form.title.trim()) e.title = true
+    if (!form.prefix.trim()) e.prefix = true
+    if (!form.status) e.status = true
     if (!form.description.trim()) e.description = true
     setErrors(e)
     return Object.keys(e).length === 0
@@ -610,16 +571,16 @@ function AddProjectModal({ onClose, onAdd }) {
     setLoading(true)
     try {
       const body = {
-        title:       form.title.trim(),
-        prefix:      form.prefix.trim().toUpperCase(),
-        status:      form.status,
+        title: form.title.trim(),
+        prefix: form.prefix.trim().toUpperCase(),
+        status: form.status,
         description: form.description.trim(),
-        is_active:   form.is_active,
+        is_active: form.is_active,
       }
-      if (form.manager)          body.manager       = form.manager.id
-      if (form.manager_bonus)    body.manager_bonus = form.manager_bonus.replace(/\s/g, '')
-      if (form.employees.length) body.employees     = form.employees.map(u => u.id)
-      if (form.testers.length)   body.testers       = form.testers.map(u => u.id)
+      if (form.manager) body.manager = form.manager.id
+      if (form.manager_bonus) body.manager_bonus = form.manager_bonus.replace(/\s/g, '')
+      if (form.employees.length) body.employees = form.employees.map(u => u.id)
+      if (form.testers.length) body.testers = form.testers.map(u => u.id)
       if (form.deadline) {
         const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
         body.deadline = dt
@@ -636,9 +597,9 @@ function AddProjectModal({ onClose, onAdd }) {
       if (details && typeof details === 'object') {
         // Input fieldlarni qizil qilish va xato matnini saqlash
         const newErrors = {}
-        if (details.title)       newErrors.title       = Array.isArray(details.title) ? details.title[0] : true
-        if (details.prefix)      newErrors.prefix      = Array.isArray(details.prefix) ? details.prefix[0] : true
-        if (details.status)      newErrors.status      = Array.isArray(details.status) ? details.status[0] : true
+        if (details.title) newErrors.title = Array.isArray(details.title) ? details.title[0] : true
+        if (details.prefix) newErrors.prefix = Array.isArray(details.prefix) ? details.prefix[0] : true
+        if (details.status) newErrors.status = Array.isArray(details.status) ? details.status[0] : true
         if (details.description) newErrors.description = Array.isArray(details.description) ? details.description[0] : true
         if (Object.keys(newErrors).length) setErrors(newErrors)
 
@@ -664,9 +625,9 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const STATUS_API = [
     { label: 'Rejalashtirilmoqda', value: 'planning' },
-    { label: 'Faol',               value: 'active' },
-    { label: 'Yakunlangan',        value: 'completed' },
-    { label: 'Bekor qilingan',     value: 'cancelled' },
+    { label: 'Faol', value: 'active' },
+    { label: 'Yakunlangan', value: 'completed' },
+    { label: 'Bekor qilingan', value: 'cancelled' },
   ]
 
   return (
@@ -811,7 +772,7 @@ function AddProjectModal({ onClose, onAdd }) {
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
                     className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                   </button>
                 </div>
               </div>
@@ -823,7 +784,7 @@ function AddProjectModal({ onClose, onAdd }) {
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
                     className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                   </button>
                 </div>
               </div>
@@ -847,12 +808,12 @@ function AddProjectModal({ onClose, onAdd }) {
                 className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading ? (
                   <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                   </svg>
                 ) : (
                   <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
                 Qo'shish
@@ -869,6 +830,7 @@ function AddProjectModal({ onClose, onAdd }) {
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('employees', list); setPickerOpen(null) }} />
       )}
+      
       {pickerOpen === 'testers' && (
         <UserPickerModal title="Sinovchi tanlang"
           selected={form.testers}
@@ -885,11 +847,11 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
-          <FaXmark size={14} />
-        </button>
+      <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-      
+
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-2">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
@@ -992,12 +954,12 @@ function DetailModal({ project, onClose }) {
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.employees_info?.length > 0
                 ? project.employees_info.map(e => (
-                    <span key={e.id} className={tagCls}>{e.username}</span>
-                  ))
+                  <span key={e.id} className={tagCls}>{e.username}</span>
+                ))
                 : project.employees?.length > 0
                   ? project.employees.map((e, i) => (
-                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
-                    ))
+                    <span key={i} className={tagCls}>{e.username || e.name || e}</span>
+                  ))
                   : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
@@ -1009,12 +971,12 @@ function DetailModal({ project, onClose }) {
             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
               {project.testers_info?.length > 0
                 ? project.testers_info.map(e => (
-                    <span key={e.id} className={tagCls}>{e.username}</span>
-                  ))
+                  <span key={e.id} className={tagCls}>{e.username}</span>
+                ))
                 : project.testers?.length > 0
                   ? project.testers.map((e, i) => (
-                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
-                    ))
+                    <span key={i} className={tagCls}>{e.username || e.name || e}</span>
+                  ))
                   : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
               }
             </div>
@@ -1062,17 +1024,17 @@ function EditProjectModal({ project, onClose, onSave }) {
   const fmtBonus = (raw) => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 
   const [form, setForm] = useState({
-    title:       project.title       || project.name  || '',
-    prefix:      project.prefix      || '',
-    status:      project.status      || '',
+    title: project.title || project.name || '',
+    prefix: project.prefix || '',
+    status: project.status || '',
     description: project.description || '',
-    manager:     project.manager_info?.username || project.manager || '',
-    bonus:       project.manager_bonus || '',
-    employees:   project.employees   || [],
-    testers:     project.testers     || [],
-    deadline:    project.deadline ? project.deadline.slice(0, 10) : '',
-    time:        project.deadline ? project.deadline.slice(11, 16) : '',
-    active:      project.is_active !== undefined ? project.is_active : true,
+    manager: project.manager_info?.username || project.manager || '',
+    bonus: project.manager_bonus || '',
+    employees: project.employees || [],
+    testers: project.testers || [],
+    deadline: project.deadline ? project.deadline.slice(0, 10) : '',
+    time: project.deadline ? project.deadline.slice(11, 16) : '',
+    active: project.is_active !== undefined ? project.is_active : true,
   })
   const [errors, setErrors] = useState({})
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -1094,11 +1056,11 @@ function EditProjectModal({ project, onClose, onSave }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
-          <FaXmark size={14} />
-        </button>
+      <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-      
+
 
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-1">
@@ -1266,14 +1228,14 @@ function EditProjectModal({ project, onClose, onSave }) {
             <button onClick={() => {
               if (!validate()) return
               const body = {
-                title:       form.title.trim(),
-                status:      form.status,
+                title: form.title.trim(),
+                status: form.status,
                 description: form.description.trim(),
-                is_active:   form.active,
+                is_active: form.active,
               }
-              if (form.prefix)   body.prefix        = form.prefix.trim().toUpperCase()
-              if (form.manager)  body.manager_name  = form.manager
-              if (form.bonus)    body.manager_bonus = form.bonus.replace(/\s/g, '')
+              if (form.prefix) body.prefix = form.prefix.trim().toUpperCase()
+              if (form.manager) body.manager_name = form.manager
+              if (form.bonus) body.manager_bonus = form.bonus.replace(/\s/g, '')
               if (form.deadline) {
                 const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
                 body.deadline = dt
@@ -1369,13 +1331,13 @@ export default function ProjectsPage() {
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
     if (q) p.search = q
-    if (f.status)    p.status              = f.status
-    if (f.manager)   p.manager             = f.manager
-    if (f.employee)  p.employee            = f.employee
+    if (f.status) p.status = f.status
+    if (f.manager) p.manager = f.manager
+    if (f.employee) p.employee = f.employee
     if (f.deadFromD) p.deadline__date__gte = f.deadFromD
-    if (f.deadToD)   p.deadline__date__lte = f.deadToD
+    if (f.deadToD) p.deadline__date__lte = f.deadToD
     if (f.startFromD) p.created_at__date__gte = f.startFromD
-    if (f.startToD)   p.created_at__date__lte = f.startToD
+    if (f.startToD) p.created_at__date__lte = f.startToD
     return p
   }, [filters, search])
 
@@ -1406,7 +1368,7 @@ export default function ProjectsPage() {
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setUsers(list)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -1551,7 +1513,7 @@ export default function ProjectsPage() {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
-                    {[1,2,3,4,5,6,7].map(j => (
+                    {[1, 2, 3, 4, 5, 6, 7].map(j => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
                       </td>
@@ -1589,8 +1551,8 @@ export default function ProjectsPage() {
           {loadingMore && (
             <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
               <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
               Yuklanmoqda...
             </div>
@@ -1602,87 +1564,87 @@ export default function ProjectsPage() {
       {viewMode === 'grid' && (
         <div className="flex-1 overflow-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.map(p => {
-            const statusMap = {
-              'Faol':               { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
-              'active':             { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
-              'Rejalashtirilmoqda': { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]',  text: 'text-[#5B6078]' },
-              'planning':           { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]',  text: 'text-[#5B6078]' },
-              'Yakunlangan':        { label: 'Yakunlangan',        bg: 'bg-[#526ED3]',  text: 'text-white' },
-              'completed':          { label: 'Yakunlangan',        bg: 'bg-[#526ED3]',  text: 'text-white' },
-              'cancelled':          { label: 'Bekor qilingan',     bg: 'bg-[#E02D2D]',  text: 'text-white' },
-            }
-            const st = statusMap[p.status] || statusMap['Rejalashtirilmoqda']
-            const managerName = p.manager_info?.username || p.manager || '—'
-            const managerRole = p.manager_info?.position || 'Menejer'
-            const managerInitials = managerName.slice(0, 2).toUpperCase()
-            const fmtDt = (iso) => {
-              if (!iso) return '—'
-              if (iso.includes('T')) {
-                const d = new Date(iso)
-                return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+            {data.map(p => {
+              const statusMap = {
+                'Faol': { label: 'Faol', bg: 'bg-[#22c55e]', text: 'text-white' },
+                'active': { label: 'Faol', bg: 'bg-[#22c55e]', text: 'text-white' },
+                'Rejalashtirilmoqda': { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]', text: 'text-[#5B6078]' },
+                'planning': { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]', text: 'text-[#5B6078]' },
+                'Yakunlangan': { label: 'Yakunlangan', bg: 'bg-[#526ED3]', text: 'text-white' },
+                'completed': { label: 'Yakunlangan', bg: 'bg-[#526ED3]', text: 'text-white' },
+                'cancelled': { label: 'Bekor qilingan', bg: 'bg-[#E02D2D]', text: 'text-white' },
               }
-              return iso
-            }
-            return (
-              <div key={p.id}
-                onClick={() => setDetailProject(p)}
-                className="rounded-2xl border p-4 cursor-pointer transition-all
+              const st = statusMap[p.status] || statusMap['Rejalashtirilmoqda']
+              const managerName = p.manager_info?.username || p.manager || '—'
+              const managerRole = p.manager_info?.position || 'Menejer'
+              const managerInitials = managerName.slice(0, 2).toUpperCase()
+              const fmtDt = (iso) => {
+                if (!iso) return '—'
+                if (iso.includes('T')) {
+                  const d = new Date(iso)
+                  return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+                }
+                return iso
+              }
+              return (
+                <div key={p.id}
+                  onClick={() => setDetailProject(p)}
+                  className="rounded-2xl border p-4 cursor-pointer transition-all
                   bg-white border-[#E2E6F2] hover:border-[#C2C8E0] hover:shadow-sm
                   dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:hover:border-[#474848]">
 
-                {/* Title + Status */}
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <h3 className="text-[14px] font-bold text-[#1A1D2E] dark:text-white leading-snug truncate flex-1">{p.title || p.name}</h3>
-                  <span className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold ${st.bg} ${st.text}`}>
-                    {st.label}
-                  </span>
-                </div>
+                  {/* Title + Status */}
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <h3 className="text-[14px] font-bold text-[#1A1D2E] dark:text-white leading-snug truncate flex-1">{p.title || p.name}</h3>
+                    <span className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold ${st.bg} ${st.text}`}>
+                      {st.label}
+                    </span>
+                  </div>
 
-                {/* Dates */}
-                <div className="flex items-center gap-1.5 text-[11px] text-[#5B6078] dark:text-[#8F95A8] mb-3">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                  </svg>
-                  <span className="truncate">{fmtDt(p.created_at || p.startDate)}</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mx-0.5">
-                    <path d="m9 18 6-6-6-6"/>
-                    <path d="m15 18 6-6-6-6"/>
-                  </svg>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                  </svg>
-                  <span className="truncate">{fmtDt(p.deadline)}</span>
-                </div>
+                  {/* Dates */}
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#5B6078] dark:text-[#8F95A8] mb-3">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                      <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+                    </svg>
+                    <span className="truncate">{fmtDt(p.created_at || p.startDate)}</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mx-0.5">
+                      <path d="m9 18 6-6-6-6" />
+                      <path d="m15 18 6-6-6-6" />
+                    </svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                      <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+                    </svg>
+                    <span className="truncate">{fmtDt(p.deadline)}</span>
+                  </div>
 
-                {/* Manager + Menu */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
-                      {managerInitials}
+                  {/* Manager + Menu */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                        {managerInitials}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-semibold text-[#1A1D2E] dark:text-white truncate">{managerName}</p>
+                        <p className="text-[10px] text-[#8F95A8] dark:text-[#5B6078]">{managerRole}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-semibold text-[#1A1D2E] dark:text-white truncate">{managerName}</p>
-                      <p className="text-[10px] text-[#8F95A8] dark:text-[#5B6078]">{managerRole}</p>
+                    <div onClick={e => e.stopPropagation()}>
+                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
                     </div>
                   </div>
-                  <div onClick={e => e.stopPropagation()}>
-                    <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
-                  </div>
                 </div>
+              )
+            })}
+            {!loading && data.length === 0 && (
+              <div className="col-span-3">
+                <EmptyState
+                  icon="/imgs/loyhalarIcon.svg"
+                  title="Hozircha loyihalar yo'q"
+                  description="Yangi loyiha qo'shish orqali ishni boshlang"
+                />
               </div>
-            )
-          })}
-          {!loading && data.length === 0 && (
-            <div className="col-span-3">
-              <EmptyState
-                icon="/imgs/loyhalarIcon.svg"
-                title="Hozircha loyihalar yo'q"
-                description="Yangi loyiha qo'shish orqali ishni boshlang"
-              />
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         </div>
       )}
 
