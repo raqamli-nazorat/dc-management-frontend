@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, use } from 'react'
 import { MdArrowForward, MdDelete } from 'react-icons/md'
 import { FaArrowLeft, FaXmark } from 'react-icons/fa6'
 import { usePageAction } from '../../../context/PageActionContext'
+import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import CreateUser from './Modal/CreateUser'
 import FilterSelect from '../Components/FilterSelect'
@@ -24,6 +25,8 @@ function fmt(n) {
 /* ── Main Page ── */
 export default function UsersPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
 
   const { registerAction, clearAction } = usePageAction()
 
@@ -77,6 +80,7 @@ export default function UsersPage() {
 
 
   useEffect(() => {
+    if (isAuditor) return
     registerAction({
       label: "Qo'shish",
       icon: <img src="/imgs/add-team.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
@@ -176,7 +180,7 @@ export default function UsersPage() {
           >
             Foydalanuvchilar
           </h1>
-          {selecting ? (
+          {!isAuditor && (selecting ? (
             <button
               onClick={cancelSelecting}
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
@@ -196,7 +200,7 @@ export default function UsersPage() {
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:invert" />
               Tanlash
             </button>
-          )}
+          ))}
         </div>
 
         {/* Filters */}

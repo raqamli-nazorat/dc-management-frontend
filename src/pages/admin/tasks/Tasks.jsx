@@ -3,6 +3,7 @@ import { FaXmark } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
+import { useAuth } from '../../../context/AuthContext'
 import TaskRowMenu     from './components/TaskRowMenu'
 import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
 import AddTaskModal    from './modals/AddTaskModal'
@@ -180,6 +181,8 @@ function KanbanColumn({ col, cards }) {
 /* ── Main Page ── */
 export default function TasksPage() {
   const { registerAction, clearAction, registerNavbarExtra, clearNavbarExtra, registerSidebarClick, clearSidebarClick } = usePageAction()
+  const { user } = useAuth()
+  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
 
   const [viewMode, setViewMode]       = useState('table')
   const [search, setSearch]           = useState('')
@@ -306,11 +309,13 @@ export default function TasksPage() {
   }
 
   useEffect(() => {
-    registerAction({
-      label: "Vazifa qo'shish",
-      icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
-      onClick: () => setShowAdd(true),
-    })
+    if (!isAuditor) {
+      registerAction({
+        label: "Vazifa qo'shish",
+        icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
+        onClick: () => setShowAdd(true),
+      })
+    }
 
     if (viewMode === 'kanban') {
       registerNavbarExtra(
@@ -458,10 +463,12 @@ export default function TasksPage() {
                   <td className="px-4 py-3 text-right font-medium text-[#1A1D2E] dark:text-white">{TASK_STATUS_LABEL[t.status] || t.status || '—'}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtTaskDt(t.deadline)}</td>
                   <td className="px-4 py-3">
-                    <TaskRowMenu
-                      onEdit={() => setEditTask(t)}
-                      onDelete={() => handleDelete(t.id)}
-                    />
+                    {!isAuditor && (
+                      <TaskRowMenu
+                        onEdit={() => setEditTask(t)}
+                        onDelete={() => handleDelete(t.id)}
+                      />
+                    )}
                   </td>
                 </tr>
               ))

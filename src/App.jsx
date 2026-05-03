@@ -18,12 +18,8 @@ import AdminApplications from './pages/admin/applications/Applications'
 import AdminApplicationDetail from './pages/admin/applications/ApplicationDetail'
 import AdminPositions from './pages/admin/applications/Positions/'
 import AdminRegions from './pages/admin/applications/Regions'
-import MenagerDashboard from './pages/menager/Dashboard'
-import XodimDashboard from './pages/xodim/Dashboard'
 import PlaceholderPage from './pages/PlaceholderPage'
 import { ToastProvider } from './Toast/ToastProvider'
-
-// Reports
 import ByTasks from './pages/admin/Reports/ByTasks'
 import CostInquiries from './pages/admin/Reports/CostInquiries'
 import Employee from './pages/admin/Reports/Employee'
@@ -33,6 +29,29 @@ import TrashPage from './pages/admin/Trash/Trash'
 import ProfilePage from './pages/admin/Profile/Profile'
 
 const PH = (title) => <PlaceholderPage title={title} />
+
+// Umumiy sahifalar — barcha rollarda ishlatiladi
+const commonRoutes = (prefix) => [
+  <Route key="payments"       path="payments"              element={<AdminPayments />} />,
+  <Route key="finance"        path="finance"               element={<AdminSalary />} />,
+  <Route key="finance-hist"   path="finance/history"       element={<AdminFinanceHistory />} />,
+  <Route key="projects"       path="projects"              element={<AdminProjects />} />,
+  <Route key="tasks"          path="tasks"                 element={<AdminTasks />} />,
+  <Route key="meetings"       path="meetings"              element={<AdminMeetings />} />,
+  <Route key="trash"          path="trash"                 element={<TrashPage />} />,
+  <Route key="profile"        path="profile"               element={<ProfilePage />} />,
+  <Route key="rep-employee"   path="reports/employee"      element={<Employee />} />,
+  <Route key="rep-project"    path="reports/project"       element={<Project />} />,
+  <Route key="rep-cost"       path="reports/cost_inquiries" element={<CostInquiries />} />,
+  <Route key="rep-salary"     path="reports/salary"        element={<Salary />} />,
+  <Route key="rep-tasks"      path="reports/by_tasks"      element={<ByTasks />} />,
+  <Route key="applications"   path="applications"          element={<AdminApplications />} />,
+  <Route key="app-detail"     path="applications/detail/:id" element={<AdminApplicationDetail />} />,
+  <Route key="app-positions"  path="applications/positions" element={<AdminPositions />} />,
+  <Route key="app-regions"    path="applications/regions"  element={<AdminRegions />} />,
+  <Route key="users"          path="users"                 element={<AdminUsers />} />,
+  <Route key="user-detail"    path="users/detail/:id"      element={<AdminUserDetail />} />,
+]
 
 function App() {
   return (
@@ -44,100 +63,41 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
-              {/* ── Admin ── */}
+              {/* ── ADMIN ── */}
               <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
                 <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="users/detail/:id" element={<AdminUserDetail />} />
-                <Route path="roles" element={PH('Rollar')} />
-                <Route path="projects" element={<AdminProjects />} />
-                <Route path="projects/archive" element={PH('Arxiv')} />
-                <Route path="tasks" element={<AdminTasks />} />
-                <Route path="meetings" element={<AdminMeetings />} />
-                {/* Moliya — 3 sahifa */}
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="finance" element={<AdminSalary />} />
-                <Route path="finance/history" element={<AdminFinanceHistory />} />
-                <Route path="reports" element={PH('Hisobotlar')} />
-                <Route path="reports/staff" element={PH('Xodimlar hisoboti')} />
-                <Route path="applications" element={<AdminApplications />} />
-                <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
-                <Route path="applications/positions" element={<AdminPositions />} />
-                <Route path="applications/regions" element={<AdminRegions />} />
-                <Route path="messages" element={PH('Xabarlar')} />
-                <Route path="settings" element={PH('Sozlamalar')} />
+                {commonRoutes('admin')}
               </Route>
-              {/* Admin */}
-              <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
+
+              {/* ── MANAGER ── */}
+              <Route path="/manager" element={<ProtectedRoute allowedRole="manager"><Layout /></ProtectedRoute>}>
                 <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="users/detail/:id" element={<AdminUserDetail />} />
-                <Route path="roles" element={PH('Rollar')} />
-                <Route path="projects" element={<AdminProjects />} />
-                <Route path="projects/archive" element={PH('Arxiv')} />
-                <Route path="tasks" element={<AdminTasks />} />
-                <Route path="meetings" element={<AdminMeetings />} />
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="finance" element={<AdminSalary />} />
-                <Route path="finance/history" element={<AdminFinanceHistory />} />
-                <Route path="reports/project" element={<Project />} />
-                <Route path="reports/cost_inquiries" element={<CostInquiries />} />
-                <Route path="reports/employee" element={<Employee />} />
-                <Route path="reports/salary" element={<Salary />} />
-                <Route path="reports/by_tasks" element={<ByTasks />} />
-                <Route path="applications" element={<AdminApplications />} />
-                <Route path="applications/detail/:id" element={<AdminApplicationDetail />} />
-                <Route path="applications/positions" element={<AdminPositions />} />
-                <Route path="applications/regions" element={<AdminRegions />} />
-                <Route path="messages" element={PH('Xabarlar')} />
-                <Route path="settings" element={PH('Sozlamalar')} />
-                <Route path="trash" element={<TrashPage />} />
-                <Route path="profile" element={<ProfilePage />} />
+                {commonRoutes('manager')}
               </Route>
 
-              {/* ── Menager ── */}
-              <Route path="/menager" element={<ProtectedRoute allowedRole="menager"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<MenagerDashboard />} />
-                <Route path="team" element={PH('Xodimlar')} />
-                <Route path="tasks" element={PH('Vazifalar')} />
-                <Route path="projects" element={PH('Loyihalar')} />
-                <Route path="projects/archive" element={PH('Arxiv')} />
-                {/* Moliya — 3 sahifa */}
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="finance" element={<AdminSalary />} />
-                <Route path="finance/history" element={<AdminFinanceHistory />} />
-                <Route path="calendar" element={PH('Kalendar')} />
-                <Route path="messages" element={PH('Xabarlar')} />
-                <Route path="settings" element={PH('Sozlamalar')} />
+              {/* ── EMPLOYEE ── */}
+              <Route path="/employee" element={<ProtectedRoute allowedRole="employee"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                {commonRoutes('employee')}
               </Route>
 
-              {/* ── Xodim ── */}
-              <Route path="/xodim" element={<ProtectedRoute allowedRole="xodim"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<XodimDashboard />} />
-                <Route path="tasks" element={PH('Joriy vazifalar')} />
-                <Route path="tasks/done" element={PH('Bajarilgan vazifalar')} />
-                <Route path="projects" element={PH('Loyihalar')} />
-                {/* Moliya — 3 sahifa */}
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="finance" element={<AdminSalary />} />
-                <Route path="finance/history" element={<AdminFinanceHistory />} />
-                <Route path="reports" element={PH('Faoliyat')} />
-                <Route path="calendar" element={PH('Kalendar')} />
-                <Route path="messages" element={PH('Xabarlar')} />
-                <Route path="profile" element={PH('Profilim')} />
-                <Route path="support" element={PH("Qo'llab-quvvatlash")} />
-                <Route path="settings" element={PH('Sozlamalar')} />
+              {/* ── AUDITOR ── */}
+              <Route path="/auditor" element={<ProtectedRoute allowedRole="auditor"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                {commonRoutes('auditor')}
               </Route>
 
-              {/* ── Hisobchi ── */}
-              <Route path="/hisobchi" element={<ProtectedRoute allowedRole="hisobchi"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminPayments />} />
-                {/* Moliya — 3 sahifa */}
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="finance" element={<AdminSalary />} />
-                <Route path="finance/history" element={<AdminFinanceHistory />} />
-                <Route path="settings" element={PH('Sozlamalar')} />
+              {/* ── ACCOUNTANT ── */}
+              <Route path="/accountant" element={<ProtectedRoute allowedRole="accountant"><Layout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                {commonRoutes('accountant')}
               </Route>
+
+              {/* ── Eski URL lar uchun redirect ── */}
+              <Route path="/menager/*"    element={<Navigate to="/manager/dashboard" replace />} />
+              <Route path="/xodim/*"      element={<Navigate to="/employee/dashboard" replace />} />
+              <Route path="/hisobchi/*"   element={<Navigate to="/accountant/dashboard" replace />} />
+              <Route path="/nazoratchi/*" element={<Navigate to="/auditor/dashboard" replace />} />
 
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
