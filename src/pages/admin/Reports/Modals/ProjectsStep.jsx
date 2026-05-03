@@ -9,8 +9,19 @@ import { FaXmark } from "react-icons/fa6";
 const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
      const [Projects, setProjects] = useState([]);
      const [searchTerm, setSearchTerm] = useState("");
-     const [selectedIds, setSelectedIds] = useState(selectedList);
+     const normalizeSelectedList = (list) => {
+          if (!Array.isArray(list)) return [];
+          return list
+               .map((item) => (typeof item === 'string' ? Number(item) : item))
+               .filter((id) => id !== null && id !== undefined && id !== '' && !Number.isNaN(id));
+     };
+
+     const [selectedIds, setSelectedIds] = useState(normalizeSelectedList(selectedList));
      const [loading, setLoading] = useState(true);
+
+     useEffect(() => {
+          setSelectedIds(normalizeSelectedList(selectedList));
+     }, [selectedList]);
 
      const getProjects = async ({ search }) => {
           setLoading(true);
@@ -77,22 +88,40 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                                         <div
                                              key={project.id}
                                              onClick={() => toggleSelect(project.id)}
-                                             className={`flex items-center justify-between gap-3 p-3 rounded-[16px] border cursor-pointer transition-all ${
-                                                  isSelected
-                                                       ? "border-indigo-500 bg-indigo-50/30"
-                                                       : "border-gray-100 bg-[#F8F9FD] hover:border-gray-300"
-                                             }`}
+                                             className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer transition-all ${isSelected
+                                                       ? "border-[#4F5ECE] bg-[#F5F7FF]"
+                                                       : "border-[#F1F5F9] bg-white hover:border-gray-200"
+                                                  }`}
                                         >
-                                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium shrink-0">
+                                             <div className="flex items-center flex-1 min-w-0">
+                                                  {/* Selection Indicator */}
+                                                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-4 transition-all shrink-0 ${isSelected
+                                                            ? "bg-[#4F5ECE]"
+                                                            : "bg-[#EBEFFF]"
+                                                       }`}>
+                                                       {isSelected && (
+                                                            <IoCheckmarkOutline size={14} className="text-white" />
+                                                       )}
+                                                  </div>
+
+                                                  {/* Avatar */}
+                                                  <div className="w-10 h-10 rounded-full bg-[#94A3B8] flex items-center justify-center text-white text-[13px] font-bold mr-4 shrink-0 shadow-sm">
                                                        {initials}
                                                   </div>
+
+                                                  {/* Text Info */}
                                                   <div className="flex-1 min-w-0">
-                                                       <h4 className="font-medium text-gray-900 truncate">{project.title || project.uid}</h4>
-                                                       <p className="text-sm text-gray-500 truncate">{project.description || project.manager_info?.username || "Loyiha haqida ma'lumot yo'q"}</p>
+                                                       <h4 className="text-[15px] font-bold text-[#1F2937] leading-tight truncate">
+                                                            {project.title || project.uid}
+                                                       </h4>
+                                                       <p className="text-[13px] text-[#9CA3AF] mt-0.5 truncate">
+                                                            {project.description || project.manager_info?.username || "Loyiha haqida ma'lumot yo'q"}
+                                                       </p>
                                                   </div>
                                              </div>
-                                             <span className="text-sm whitespace-nowrap text-gray-500">{projectDate}</span>
+                                             <span className="text-[13px] whitespace-nowrap text-[#9CA3AF] ml-2">
+                                                  {projectDate}
+                                             </span>
                                         </div>
                                    );
                               })}

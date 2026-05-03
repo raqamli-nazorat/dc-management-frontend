@@ -1,12 +1,49 @@
 import { useEffect, useRef, useState } from "react"
 import { MdCancel, MdCheck, MdExpandMore } from "react-icons/md"
 
-const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, title, error = false, padding = '6px 12px', radius = '12px', placeholder }) => {
+const FilterSelect = ({
+    options = [],
+    value,
+    onChange,
+    multiple = false,
+    width = '100%',
+    disabled,
+    title,
+    error = false,
+    padding = '6px 12px',
+    radius = '12px',
+    placeholder
+}) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
     const [dropPos, setDropPos] = useState({ top: 0, left: 0, dropUp: false })
     const ref = useRef(null)
     const dropdownRef = useRef(null)
+
+    // Standardize options to [{label, value}]
+    const standardizedOptions = options.map(opt =>
+        typeof opt === 'object' ? opt : { label: opt, value: opt }
+    )
+
+    // Normalize value for logic (always an array of values)
+    const getNormalizedValue = () => {
+        if (multiple) {
+            if (Array.isArray(value)) return value.map(v => String(v));
+            if (typeof value === 'string' && value) return value.split(',').filter(Boolean);
+            if (value === null || value === undefined) return [];
+            return [String(value)];
+        }
+        return value !== null && value !== undefined ? [String(value)] : [];
+    }
+
+    const normalizedValue = getNormalizedValue();
+
+    // Find selected labels for display
+    const selectedOptions = standardizedOptions.filter(opt =>
+        normalizedValue.includes(String(opt.value))
+    )
+
+    const hasValue = multiple ? selectedOptions.length > 0 : !!selectedOptions[0]
 
     // Asosiy tugma uchun hover holati
     const [isBtnHovered, setIsBtnHovered] = useState(false)
@@ -42,13 +79,6 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
         onChange(multiple ? [] : null)
     }
 
-    // Qiymat mavjudligini tekshirish
-    const hasValue = multiple ? (Array.isArray(value) && value.length > 0) : !!value
-
-    const display = multiple
-        ? (Array.isArray(value) && value.length > 0 ? value.join(', ') : label)
-        : (value || label)
-
     const isDark = document.documentElement.classList.contains('dark')
 
     return (
@@ -63,8 +93,21 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
-                <span className={display ? 'hidden' : 'text-slate-500 dark:text-slate-400'}>{placeholder}</span>
-                <span className="flex-1 text-left truncate">{display}</span>
+                {multiple && hasValue ? (
+                    <div className="flex items-center gap-2 flex-1 overflow-hidden">
+                        <span className="text-[#1A1D2E] dark:text-[#FFFFFF] truncate">{placeholder}</span>
+                        <span className="flex items-center justify-center bg-[#F1F3F9] dark:bg-[#303131] text-[#3F57B3] dark:text-[#FFFFFF] rounded-full min-w-[20px] h-5 px-1.5 text-[11px] font-bold">
+                            {selectedOptions.length}
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        {!hasValue && <span className="text-slate-500 dark:text-slate-400 flex-1 text-left truncate">{placeholder}</span>}
+                        {hasValue && <span className="flex-1 text-left truncate">
+                            {multiple ? selectedOptions.map(o => o.label).join(', ') : selectedOptions[0]?.label}
+                        </span>}
+                    </>
+                )}
 
                 {/* Ant Design uslubidagi krestik logikasi */}
                 <div className="flex items-center justify-center w-4 h-4 shrink-0">
@@ -103,25 +146,32 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                         zIndex: 9999,
                     }}
                 >
-                    {options.map((opt) => {
-                        const isSelected = multiple ? (Array.isArray(value) && value.includes(opt)) : value === opt;
+                    {standardizedOptions.map((opt) => {
+                        const isSelected = normalizedValue.includes(String(opt.value));
                         return (
                             <button
-                                key={opt}
+                                key={opt.value}
                                 type="button"
                                 onClick={() => {
                                     if (multiple) {
-                                        const newVal = Array.isArray(value) ? [...value] : [];
-                                        if (newVal.includes(opt)) {
-                                            onChange(newVal.filter(v => v !== opt));
+                                        let newValue;
+                                        if (isSelected) {
+                                            newValue = normalizedValue.filter(v => v !== String(opt.value));
                                         } else {
-                                            onChange([...newVal, opt]);
+                                            newValue = [...normalizedValue, String(opt.value)];
+                                        }
+                                        // If original value was string (comma-separated), return string
+                                        if (typeof value === 'string') {
+                                            onChange(newValue.join(','));
+                                        } else {
+                                            onChange(newValue);
                                         }
                                     } else {
-                                        onChange(opt); setOpen(false);
+                                        onChange(opt.value);
+                                        setOpen(false);
                                     }
                                 }}
-                                onMouseEnter={() => setHovered(opt)}
+                                onMouseEnter={() => setHovered(opt.value)}
                                 onMouseLeave={() => setHovered(null)}
                                 className="w-full text-left px-3 py-2.5 rounded-xl cursor-pointer  flex items-center justify-between gap-2"
                                 style={{
@@ -130,12 +180,12 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                     color: isDark ? '#FFFFFF' : '#1A1D2E',
                                     background: isSelected
                                         ? (isDark ? '#303131' : '#F1F3F9')
-                                        : hovered === opt
+                                        : hovered === opt.value
                                             ? (isDark ? '#222323' : '#F8F9FC')
                                             : 'transparent',
                                 }}
                             >
-                                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{opt}</span>
+                                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{opt.label}</span>
                                 {multiple && isSelected && <MdCheck size={16} className="text-[#3F57B3]" />}
                             </button>
                         )

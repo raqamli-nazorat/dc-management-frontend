@@ -108,18 +108,34 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                             <div
                                 key={emp.id}
                                 onClick={() => toggleSelect(emp.id)}
-                                className={`flex items-center p-3 rounded-[16px] border cursor-pointer transition-all ${selectedIds.includes(emp.id)
-                                    ? "border-indigo-500 bg-indigo-50/30"
-                                    : "border-gray-100 bg-[#F8F9FD] hover:border-gray-300"
+                                className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer transition-all ${selectedIds.includes(emp.id)
+                                    ? "border-[#4F5ECE] bg-[#F5F7FF]"
+                                    : "border-[#F1F5F9] bg-white hover:border-gray-200"
                                     }`}
                             >
-                                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium mr-3">
+                                {/* Selection Indicator */}
+                                <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-4 transition-all ${selectedIds.includes(emp.id)
+                                    ? "bg-[#4F5ECE]"
+                                    : "bg-[#EBEFFF]" 
+                                    }`}>
+                                    {selectedIds.includes(emp.id) && (
+                                        <IoCheckmarkOutline size={14} className="text-white" />
+                                    )}
+                                </div>
+
+                                {/* Avatar */}
+                                <div className="w-10 h-10 rounded-full bg-[#94A3B8] flex items-center justify-center text-white text-[13px] font-bold mr-4 shadow-sm">
                                     {emp.username?.substring(0, 2).toUpperCase()}
                                 </div>
 
+                                {/* Text Info */}
                                 <div className="flex-1">
-                                    <h4 className="font-medium text-gray-900">{emp.username}</h4>
-                                    <p className="text-sm text-gray-500">{emp.position_info?.name || "Lavozim ko'rsatilmadi"}</p>
+                                    <h4 className="text-[15px] font-bold text-[#1F2937] leading-tight">
+                                        {emp.username}
+                                    </h4>
+                                    <p className="text-[13px] text-[#9CA3AF] mt-0.5">
+                                        {emp.position_info?.name || "Lavozim ko'rsatilmadi"}
+                                    </p>
                                 </div>
                             </div>
                         ))}
