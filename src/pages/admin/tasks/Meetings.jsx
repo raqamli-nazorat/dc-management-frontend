@@ -2,6 +2,7 @@
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
+import { useAuth } from '../../../context/AuthContext'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
@@ -1013,6 +1014,8 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
 /* ── Main Page ── */
 export default function MeetingsPage() {
   const { registerAction, clearAction } = usePageAction()
+  const { user } = useAuth()
+  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
 
   const [data, setData]             = useState([])
   const [loading, setLoading]       = useState(false)
@@ -1156,6 +1159,7 @@ export default function MeetingsPage() {
   const hasFilter = Object.values(filters).some(v => v !== '' && v !== undefined && v !== null)
 
   useEffect(() => {
+    if (isAuditor) return
     registerAction({
       label: "Yig'ilish qo'shish",
       icon: <img src="/imgs/addmeetingIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
@@ -1242,12 +1246,14 @@ export default function MeetingsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                        <RowMenu
-                          onDetail={() => setDetail(m)}
-                          onEdit={() => setEditItem(m)}
-                          onCloseMeeting={() => handleClose(m.id)}
-                          onDelete={() => handleDelete(m.id)}
-                        />
+                        {!isAuditor && (
+                          <RowMenu
+                            onDetail={() => setDetail(m)}
+                            onEdit={() => setEditItem(m)}
+                            onCloseMeeting={() => handleClose(m.id)}
+                            onDelete={() => handleDelete(m.id)}
+                          />
+                        )}
                       </td>
                     </tr>
                   )
