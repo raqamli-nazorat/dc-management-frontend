@@ -178,7 +178,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
 export default function EditTaskModal({ task, onClose, onSave, canEdit = true }) {
   const dateRef = useRef(null)
   const [projects, setProjects] = useState([])
-  const [users, setUsers]       = useState([])
+  const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading]   = useState(false)
@@ -192,7 +192,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     axiosAPI.get('/users/', { params: { page_size: 200 } })
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setUsers(Array.isArray(list) ? list : [])
+        setAllUsers(Array.isArray(list) ? list : [])
       }).catch(() => {})
     axiosAPI.get('/applications/positions/', { params: { page_size: 100 } })
       .then(res => {
@@ -233,7 +233,26 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     estimated_minutes:  initMins,
   })
   const [errors, setErrors] = useState({})
-  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: false })) }
+  const set = (k, v) => {
+    if (k === 'project') {
+      setForm(p => ({ ...p, project: v, assignees: [] }))
+      setErrors(p => ({ ...p, project: false }))
+      return
+    }
+    setForm(p => ({ ...p, [k]: v }))
+    setErrors(p => ({ ...p, [k]: false }))
+  }
+
+  // Tanlangan loyihaning xodimlari (topshiruvchi uchun)
+  const selectedProject = projects.find(p => String(p.id) === String(form.project))
+  const projectEmployees = (() => {
+    if (!selectedProject) return []
+    if (selectedProject.employees_info?.length) return selectedProject.employees_info
+    if (selectedProject.employees?.length) {
+      return allUsers.filter(u => selectedProject.employees.includes(u.id))
+    }
+    return []
+  })()
 
   const formatPrice = (val) => {
     const digits = val.replace(/\D/g, '').slice(0, 12)
@@ -370,14 +389,15 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             {/* Topshiruvchi */}
             <div>
               <label className={labelCls}>Topshiruvchi</label>
-              <button type="button" onClick={() => !ro && setPickerOpen(true)}
+              <button type="button"
+                onClick={() => !ro && form.project ? setPickerOpen(true) : null}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-                  ${ro ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]'}
+                  ${ro || !form.project ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]'}
                   border-[#E2E6F2] dark:border-[#292A2A]`}>
                 <span className={assigneeLabel ? 'text-[#1A1D2E] dark:text-white flex-1 text-left truncate' : 'text-[#5B6078] flex-1 text-left'}>
-                  {assigneeLabel || 'Topshiruvchi tanlang'}
+                  {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
                 </span>
-                {!ro && (
+                {!ro && form.project && (
                   <div className="flex items-center gap-1.5 shrink-0 ml-1">
                     {form.assignees.length > 0 && (
                       <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
@@ -474,7 +494,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         <UserPickerModal
           title="Topshiruvchi tanlang"
           selected={form.assignees}
-          users={users}
+          users={projectEmployees}
           onClose={() => setPickerOpen(false)}
           onConfirm={list => { set('assignees', list); setPickerOpen(false) }}
         />

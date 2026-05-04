@@ -42,17 +42,17 @@ const STATUS_TO_COL = {
 
 /* ── Columns ── */
 const COLUMNS = [
-  { id: 'todo',        label: 'Bajarilishi kerak',  color: '#6366F1', bg: '#EEF2FF',  darkBg: '#1e1f3a' },
-  { id: 'in_progress', label: 'Jarayonda',           color: '#3B82F6', bg: '#EFF6FF',  darkBg: '#1a2535' },
-  { id: 'done',        label: 'Bajarilgan',          color: '#8B5CF6', bg: '#F5F3FF',  darkBg: '#1e1a35' },
-  { id: 'deployed',    label: 'Ishga tushirilgan',   color: '#10B981', bg: '#ECFDF5',  darkBg: '#0f2820' },
-  { id: 'reviewed',    label: 'Tekshirilgan',        color: '#F59E0B', bg: '#FFFBEB',  darkBg: '#2a2010' },
-  { id: 'rejected',    label: 'Rad etilgan',         color: '#EF4444', bg: '#FEF2F2',  darkBg: '#2a1515' },
-  { id: 'overdue',     label: "Muddati o'tgan",      color: '#6B7280', bg: '#F9FAFB',  darkBg: '#1a1b1b' },
+  { id: 'todo',        label: 'Bajarilishi kerak',  color: '#F59E0B', bg: '#FFF8E1' },
+  { id: 'in_progress', label: 'Jarayonda',           color: '#3B82F6', bg: '#E3F2FD' },
+  { id: 'done',        label: 'Bajarilgan',          color: '#8B5CF6', bg: '#EDE7F6' },
+  { id: 'deployed',    label: 'Ishga tushirilgan',   color: '#10B981', bg: '#E8F5E9' },
+  { id: 'reviewed',    label: 'Tekshirilgan',        color: '#06B6D4', bg: '#E0FFF9' },
+  { id: 'rejected',    label: 'Rad etilgan',         color: '#EF4444', bg: '#FFEBEE' },
+  { id: 'overdue',     label: "Muddati o'tgan",      color: '#9CA3AF', bg: '#F5F5F5' },
 ]
 
 /* ── KanbanCard ── */
-function KanbanCard({ card, index, onOpen, canEdit }) {
+function KanbanCard({ card, index, onOpen }) {
   const deadline = card.deadline ? new Date(card.deadline) : null
   const isOverdue = deadline && deadline < new Date() && card.status !== 'done' && card.status !== 'deployed'
   const assignee = card.assignee_info?.username || '—'
@@ -63,6 +63,7 @@ function KanbanCard({ card, index, onOpen, canEdit }) {
     ? `${estimatedH ? estimatedH + 'h ' : ''}${estimatedM ? estimatedM + 'min' : ''}`.trim()
     : null
 
+  const col = COLUMNS.find(c => c.id === (card.status || 'todo'))
   const PRIORITY_DOT = { low: '#22c55e', medium: '#f59e0b', high: '#f97316', critical: '#ef4444' }
 
   return (
@@ -75,26 +76,26 @@ function KanbanCard({ card, index, onOpen, canEdit }) {
           onClick={() => onOpen(card.id)}
           style={{
             ...provided.draggableProps.style,
+            width: 160,
             opacity: snapshot.isDragging ? 0.92 : 1,
             transform: snapshot.isDragging
               ? `${provided.draggableProps.style?.transform} scale(1.02)`
               : provided.draggableProps.style?.transform,
             boxShadow: snapshot.isDragging ? '0 6px 20px rgba(0,0,0,0.10)' : undefined,
           }}
-          className={`rounded-xl bg-white border p-2.5 flex flex-col gap-1.5 cursor-pointer select-none
-            dark:bg-[#1C1D1D]
+          className={`rounded-xl bg-white border p-2.5 flex flex-col gap-1.5 select-none cursor-grab active:cursor-grabbing
             ${snapshot.isDragging
-              ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20 dark:border-[#526ED3]'
-              : 'border-[#E2E6F2] dark:border-[#292A2A] hover:border-[#526ED3]/50'}`}
+              ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
+              : 'border-[#E2E6F2] hover:border-[#526ED3]/50'}`}
         >
           {/* UID + priority dot */}
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[9px] font-mono text-[#B6BCCB] dark:text-[#474848]">{card.uid || `#${card.id}`}</span>
+            <span className="text-[9px] font-mono text-[#B6BCCB] truncate">{card.uid || `#${card.id}`}</span>
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PRIORITY_DOT[card.priority] || '#B6BCCB' }} />
           </div>
 
           {/* Title */}
-          <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">{card.title}</p>
+          <p className="text-[11px] font-bold text-[#1A1D2E] leading-snug line-clamp-2">{card.title}</p>
 
           {/* Project */}
           {card.project_info && (
@@ -127,12 +128,12 @@ function KanbanCard({ card, index, onOpen, canEdit }) {
           )}
 
           {/* Assignee */}
-          <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#EEF1F7] dark:border-[#292A2A]">
+          <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#EEF1F7]">
             <div className="w-4 h-4 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[8px] font-bold text-[#526ED3] shrink-0">
               {assignee.slice(0, 2).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-[#1A1D2E] dark:text-white truncate">{assignee}</p>
+              <p className="text-[10px] font-semibold text-[#1A1D2E] truncate">{assignee}</p>
               {position && <p className="text-[9px] text-[#8F95A8] truncate">{position}</p>}
             </div>
           </div>
@@ -143,14 +144,21 @@ function KanbanCard({ card, index, onOpen, canEdit }) {
 }
 
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onOpen, canEdit }) {
+function KanbanColumn({ col, cards, onOpen }) {
   return (
-    <div className="flex flex-col shrink-0" style={{ width: 'clamp(160px, 14vw, 210px)' }}>
+    <div
+      className="flex flex-col rounded-2xl"
+      style={{ width: 170, minWidth: 175,  flexShrink: 0,height:"100%" ,  backgroundColor: col.bg }}
+    
+
+    >
       {/* Header */}
-      <div className="flex items-center gap-1.5 mb-1.5 px-0.5">
-        <span className="text-[12px] font-bold text-[#1A1D2E] dark:text-white truncate">{col.label}</span>
+      <div
+        className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-t-2xl"
+      >
+        <span className="text-[11px] font-bold text-[#1A1D2E] text-center leading-tight">{col.label}</span>
         <span
-          className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
+          className="shrink-0 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
           style={{ backgroundColor: col.color }}
         >
           {cards.length}
@@ -163,15 +171,16 @@ function KanbanColumn({ col, cards, onOpen, canEdit }) {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col gap-[6px] rounded-xl p-1.5 transition-all duration-150 min-h-[50px]"
+            className="flex flex-col gap-[6px] p-1.5 rounded-b-2xl"
             style={{
-              backgroundColor: snapshot.isDraggingOver ? col.color + '18' : col.bg,
+              minHeight: 80,
+              backgroundColor: snapshot.isDraggingOver ? col.color + '28' : col.bg,
               outline: snapshot.isDraggingOver ? `2px dashed ${col.color}` : 'none',
               outlineOffset: '-2px',
             }}
           >
             {cards.map((card, index) => (
-              <KanbanCard key={card.id} card={card} index={index} onOpen={onOpen} canEdit={canEdit} />
+              <KanbanCard key={card.id} card={card} index={index} onOpen={onOpen} />
             ))}
             {provided.placeholder}
           </div>
@@ -343,15 +352,29 @@ export default function TasksPage() {
     // Optimistic update
     setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: newStatus } : c))
 
-    // API ga yuborish
+    // API ga yuborish — to'liq task ma'lumotini olib PUT qilish
     try {
-      await axiosAPI.patch(`/tasks/${taskId}/`, { status: newStatus })
-      // Table view ni ham yangilash
+      const res = await axiosAPI.get(`/tasks/${taskId}/`)
+      const task = res.data?.data ?? res.data
+      await axiosAPI.put(`/tasks/${taskId}/`, {
+        ...task,
+        status: newStatus,
+        project: task.project || task.project_info?.id,
+        assignee: task.assignee || task.assignee_info?.id,
+        position: task.position || task.position_info?.id,
+      })
       setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
     } catch (err) {
       // Rollback
       setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: source.droppableId } : c))
-      toast.error('Xatolik', "Holat yangilashda xatolik yuz berdi")
+      const errMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Holat yangilashda xatolik"
+      const details = err?.response?.data?.error?.details
+      if (details) {
+        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join(', ')
+        toast.error('Xatolik', msgs)
+      } else {
+        toast.error('Xatolik', errMsg)
+      }
     }
   }
 
@@ -414,14 +437,16 @@ export default function TasksPage() {
               </svg>
             </div>
           ) : (
-            <div className="flex gap-2 px-3 pt-3 pb-3 overflow-x-auto h-full items-start">
+            <div
+              className="flex gap-2 px-3 pt-3 pb-3 overflow-y-auto overflow-x-auto h-full items-start"
+              style={{ scrollbarWidth: 'thin' }}
+            >
               {COLUMNS.map(col => (
                 <KanbanColumn
                   key={col.id}
                   col={col}
                   cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
                   onOpen={loadTaskDetail}
-                  canEdit={canEdit}
                 />
               ))}
             </div>

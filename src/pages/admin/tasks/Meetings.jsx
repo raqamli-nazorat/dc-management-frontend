@@ -252,6 +252,12 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
 
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
+  const handleFine = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (!digits) { set('fine', ''); return }
+    set('fine', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+  }
+
   // Loyha o'zgarganda qatnashchilarni tozalash
   const handleProjectChange = (v) => {
     setForm(p => ({ ...p, project: v, participants: [] }))
@@ -340,7 +346,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input value={form.fine} onChange={e => set('fine', e.target.value.replace(/\D/g, ''))}
+                <input type="text" inputMode="numeric" value={form.fine} onChange={e => handleFine(e.target.value)}
                   placeholder="Jarima foizini kiriting" className={inputCls(false)} />
               </div>
             </div>
@@ -489,6 +495,12 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
 
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
+  const handleFine = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (!digits) { set('fine', ''); return }
+    set('fine', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+  }
+
   const validate = () => {
     const e = {}
     if (!form.project)      e.project = true
@@ -552,7 +564,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input value={form.fine} onChange={e => set('fine', e.target.value.replace(/\D/g, ''))}
+                <input type="text" inputMode="numeric" value={form.fine} onChange={e => handleFine(e.target.value)}
                   placeholder="Jarima foizini kiriting" className={inputCls(false)} />
               </div>
             </div>
@@ -1028,6 +1040,7 @@ export default function MeetingsPage() {
   const [showFilter, setShowFilter] = useState(false)
   const [detail, setDetail]         = useState(null)
   const [editItem, setEditItem]     = useState(null)
+  const [meetingLoading, setMeetingLoading] = useState(false)
   const [projects, setProjects]     = useState([])
   const [users, setUsers]           = useState([])
   const scrollRef = useRef(null)
@@ -1156,6 +1169,21 @@ export default function MeetingsPage() {
     }
   }
 
+  // API dan to'liq yig'ilish ma'lumotini olish
+  const loadMeetingDetail = async (id, mode = 'detail') => {
+    setMeetingLoading(true)
+    try {
+      const res = await axiosAPI.get(`/meetings/${id}/`)
+      const meeting = res.data?.data ?? res.data
+      if (mode === 'edit') setEditItem(meeting)
+      else setDetail(meeting)
+    } catch (err) {
+      toast.error('Xatolik', "Yig'ilish ma'lumotlarini yuklashda xatolik")
+    } finally {
+      setMeetingLoading(false)
+    }
+  }
+
   const hasFilter = Object.values(filters).some(v => v !== '' && v !== undefined && v !== null)
 
   useEffect(() => {
@@ -1227,7 +1255,7 @@ export default function MeetingsPage() {
                   return (
                     <tr key={m.id}
                       className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
-                      onClick={() => setDetail(m)}>
+                      onClick={() => loadMeetingDetail(m.id, 'detail')}>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '—'}</td>
                       <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
@@ -1248,8 +1276,8 @@ export default function MeetingsPage() {
                       <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                         {!isAuditor && (
                           <RowMenu
-                            onDetail={() => setDetail(m)}
-                            onEdit={() => setEditItem(m)}
+                            onDetail={() => loadMeetingDetail(m.id, 'detail')}
+                            onEdit={() => loadMeetingDetail(m.id, 'edit')}
                             onCloseMeeting={() => handleClose(m.id)}
                             onDelete={() => handleDelete(m.id)}
                           />
@@ -1294,6 +1322,14 @@ export default function MeetingsPage() {
       {editItem && (
         <EditMeetingModal meeting={editItem} onClose={() => setEditItem(null)}
           onSave={handleEdit} projects={projects} users={users} />
+      )}
+      {meetingLoading && (
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
+          <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+        </div>
       )}
     </div>
   )
