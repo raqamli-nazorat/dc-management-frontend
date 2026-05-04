@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter, LuUserPlus } from 'react-icons/lu'
-import { FaAngleDown, FaChevronDown } from 'react-icons/fa'
+import { LuFilter } from 'react-icons/lu'
+import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, Select } from 'antd'
-import { usePositions, useRegions } from "../../../MostUsesDates"
+import { DatePicker } from 'antd'
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -67,10 +66,6 @@ const initialFilters = {
 }
 
 const Employee = () => {
-
-  const positions = usePositions()
-  const regions = useRegions()
-
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
   const [filterModal, setFilterModal] = useState(false)
@@ -472,20 +467,20 @@ const Employee = () => {
               </thead>
               <tbody>
                 ${UserReports.map((item, index) => {
-                  let statusClass = 'status-boshqa';
-                  let statusText = item.status;
-                  if (item.status === 'confirmed') {
-                    statusClass = 'status-tasdiqlangan';
-                    statusText = 'Tasdiqlangan';
-                  } else if (item.status === 'paid') {
-                    statusClass = 'status-tolangan';
-                    statusText = "To'langan";
-                  } else if (item.status === 'cancelled') {
-                    statusClass = 'status-bekor';
-                    statusText = 'Bekor qilingan';
-                  }
+      let statusClass = 'status-boshqa';
+      let statusText = item.status;
+      if (item.status === 'confirmed') {
+        statusClass = 'status-tasdiqlangan';
+        statusText = 'Tasdiqlangan';
+      } else if (item.status === 'paid') {
+        statusClass = 'status-tolangan';
+        statusText = "To'langan";
+      } else if (item.status === 'cancelled') {
+        statusClass = 'status-bekor';
+        statusText = 'Bekor qilingan';
+      }
 
-                  return `
+      return `
                   <tr>
                     <td class="center">${index + 1}</td>
                     <td><b>${item.user || '-'}</b></td>
@@ -1084,16 +1079,14 @@ const Employee = () => {
         }
       `}</style>
 
-      {
-        selectEmployee && (
-          <EmployeeStep
-            selectedList={filters.user ? filters.user.split(',') : []}
-            onConfirm={handleSelectEmployeeConfirm}
-            title="Xodimlar tanlang"
-            onClose={() => setSelectEmployee(false)}
-          />
-        )
-      }
+      {selectEmployee && (
+        <EmployeeStep
+          selectedList={filters.user ? filters.user.split(',') : []}
+          onConfirm={handleSelectEmployeeConfirm}
+          title="Xodimlar tanlang"
+          onClose={() => setSelectEmployee(false)}
+        />
+      )}
 
       {selectAccountant && (
         <EmployeeStep

@@ -4,7 +4,6 @@ import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker } from 'antd'
-import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
 import { toast } from '../../../Toast/ToastProvider'
@@ -17,28 +16,8 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 
-const status_type = [
-  { label: "Hisoblangan", value: false },
-  { label: "Tasdiqlangan", value: true },
-]
-
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
-
-const months = [
-  { label: "Yanvar", value: 1 },
-  { label: "Fevral", value: 2 },
-  { label: "Mart", value: 3 },
-  { label: "Aprel", value: 4 },
-  { label: "May", value: 5 },
-  { label: "Iyun", value: 6 },
-  { label: "Iyul", value: 7 },
-  { label: "Avgust", value: 8 },
-  { label: "Sentabr", value: 9 },
-  { label: "Oktabr", value: 10 },
-  { label: "Noyabr", value: 11 },
-  { label: "Dekabr", value: 12 },
-]
 
 const tableStatuses = {
   planning: "Rejalashtirilmoqda",

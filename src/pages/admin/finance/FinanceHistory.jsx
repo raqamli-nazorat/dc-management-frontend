@@ -170,6 +170,7 @@ function TimeBox({ value, onChange }) {
     </div>
   )
 }
+
 function HistoryFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
