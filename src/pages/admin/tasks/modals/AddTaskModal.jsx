@@ -201,19 +201,6 @@ export default function AddTaskModal({ onClose, onAdd }) {
       }).catch(() => {})
   }, [])
 
-  // Tanlangan loyihaning xodimlari (topshiruvchi uchun)
-  const selectedProject = projects.find(p => String(p.id) === String(form?.project))
-  const projectEmployees = (() => {
-    if (!selectedProject) return []
-    // employees_info mavjud bo'lsa ishlatamiz
-    if (selectedProject.employees_info?.length) return selectedProject.employees_info
-    // employees (id array) bo'lsa allUsers dan topamiz
-    if (selectedProject.employees?.length) {
-      return allUsers.filter(u => selectedProject.employees.includes(u.id))
-    }
-    return []
-  })()
-
   const [form, setForm] = useState({
     project: "", title: "", description: "", priority: "low", type: "bug", status: "todo",
     assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
@@ -230,6 +217,17 @@ export default function AddTaskModal({ onClose, onAdd }) {
     setForm(p => ({ ...p, [k]: v }))
     setErrors(p => ({ ...p, [k]: false }))
   }
+
+  // Tanlangan loyihaning xodimlari (topshiruvchi uchun)
+  const selectedProject = projects.find(p => String(p.id) === String(form?.project))
+  const projectEmployees = (() => {
+    if (!selectedProject) return []
+    if (selectedProject.employees_info?.length) return selectedProject.employees_info
+    if (selectedProject.employees?.length) {
+      return allUsers.filter(u => selectedProject.employees.includes(u.id))
+    }
+    return []
+  })()
 
   // Narxni formatlash: faqat raqam, max 12 xona, minglik ajratgich
   const formatPrice = (val) => {
