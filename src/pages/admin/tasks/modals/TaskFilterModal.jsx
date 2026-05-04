@@ -1,18 +1,18 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
-import { LEVELS, TYPES } from '../components/constants'
+import { LEVELS, TYPES, LEVEL_LABELS, TYPE_LABELS } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 
 /* ─── constants ─── */
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 
 const LEVEL_COLORS = {
-  'Past':   '#9CA3AF',
-  "O'rta":  '#F59E0B',
-  'Yuqori': '#3B82F6',
-  'Kritik': '#EF4444',
+  low:      '#9CA3AF',
+  medium:   '#F59E0B',
+  high:     '#3B82F6',
+  critical: '#EF4444',
 }
 
 const HOLAT_LIST = [

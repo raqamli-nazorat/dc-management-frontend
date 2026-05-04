@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from 'react-icons/fa6'
-import { LuFilter } from 'react-icons/lu'
+import { LuFilter, LuLayoutGrid, LuLayoutList } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
 import { DateTimeBox } from '../Components/DateTimeBox'
@@ -581,7 +581,8 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const [form, setForm] = useState({
     title: '', prefix: '', status: '', description: '', manager: null,
-    manager_bonus: '', employees: [], testers: [],
+    manager_bonus: '', project_price: '', penalty_percentage: '',
+    employees: [], testers: [],
     deadline: '', time: '', is_active: true,
   })
   const [errors, setErrors] = useState({})
@@ -616,10 +617,12 @@ function AddProjectModal({ onClose, onAdd }) {
         description: form.description.trim(),
         is_active:   form.is_active,
       }
-      if (form.manager)          body.manager       = form.manager.id
-      if (form.manager_bonus)    body.manager_bonus = form.manager_bonus.replace(/\s/g, '')
-      if (form.employees.length) body.employees     = form.employees.map(u => u.id)
-      if (form.testers.length)   body.testers       = form.testers.map(u => u.id)
+      if (form.manager)          body.manager            = form.manager.id
+      if (form.manager_bonus)    body.manager_bonus      = form.manager_bonus.replace(/\s/g, '')
+      if (form.project_price)    body.project_price      = form.project_price.replace(/\s/g, '')
+      if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
+      if (form.employees.length) body.employees          = form.employees.map(u => u.id)
+      if (form.testers.length)   body.testers            = form.testers.map(u => u.id)
       if (form.deadline) {
         const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
         body.deadline = dt
@@ -688,39 +691,34 @@ function AddProjectModal({ onClose, onAdd }) {
           </div>
 
           <div className="px-7 pb-4 flex flex-col gap-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2">
+
+            {/* 1. Nomi + Holati */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
                 <label className={labelCls}>Nomi</label>
                 <input value={form.title} onChange={e => set('title', e.target.value)}
                   placeholder="Nomi kiriting" className={inputCls(errors.title)} />
                 {errors.title && <p className="text-xs text-red-500 mt-1">{typeof errors.title === 'string' ? errors.title : '*Bu maydon majburiy'}</p>}
               </div>
-              <div>
-                <label className={labelCls}>Prefiks</label>
-                <input value={form.prefix} onChange={e => set('prefix', e.target.value.toUpperCase().slice(0, 5))}
-                  placeholder="PRJ" className={inputCls(errors.prefix)} />
-                {errors.prefix && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {typeof errors.prefix === 'string' ? errors.prefix : '*Bu maydon majburiy'}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <div ref={statusRef}>
                 <label className={labelCls}>Holati</label>
                 <div className="relative">
                   <button type="button" onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
                     <span>{STATUS_API.find(s => s.value === form.status)?.label || 'Holati tanlang'}</span>
-                    <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {form.status && (
+                        <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                      )}
+                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
+                    </div>
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {STATUS_API.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -730,6 +728,7 @@ function AddProjectModal({ onClose, onAdd }) {
               </div>
             </div>
 
+            {/* 2. Tavsifi */}
             <div>
               <label className={labelCls}>Tavsifi</label>
               <div className="relative">
@@ -746,12 +745,13 @@ function AddProjectModal({ onClose, onAdd }) {
               {errors.description && <p className="text-xs text-red-500 mt-1">{typeof errors.description === 'string' ? errors.description : '*Bu maydon majburiy'}</p>}
             </div>
 
+            {/* 3. Menejer + Menejer bonusi */}
             <div className="grid grid-cols-2 gap-4">
               <div ref={mgrRef}>
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
                     <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
@@ -764,7 +764,7 @@ function AddProjectModal({ onClose, onAdd }) {
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
                           className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
@@ -784,11 +784,50 @@ function AddProjectModal({ onClose, onAdd }) {
               <div>
                 <label className={labelCls}>Menejer bonusi (UZS)</label>
                 <input value={form.manager_bonus} onChange={e => set('manager_bonus', fmtBonus(e.target.value))}
-                  placeholder="Loyiha uchun: 0,0"
+                  placeholder="0"
                   className={inputCls(false) + ' text-right'} />
               </div>
             </div>
 
+            {/* 4. Titul (prefix) + Jarima foizi */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Titul</label>
+                <input value={form.prefix} onChange={e => set('prefix', e.target.value.toUpperCase().slice(0, 5))}
+                  placeholder="PRJ" className={inputCls(errors.prefix)} />
+                {errors.prefix && <p className="text-xs text-red-500 mt-1">{typeof errors.prefix === 'string' ? errors.prefix : '*Bu maydon majburiy'}</p>}
+              </div>
+              <div>
+                <label className={labelCls}>Jarima foizi (%)</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.penalty_percentage}
+                  onChange={e => {
+                    const digits = e.target.value.replace(/\D/g, '')
+                    if (!digits) { set('penalty_percentage', ''); return }
+                    set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+                  }}
+                  placeholder="0"
+                  className={inputCls(false)}
+                />
+              </div>
+            </div>
+
+            {/* 5. Loyiha narxi */}
+            <div>
+              <label className={labelCls}>Loyiha narxi (UZS)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.project_price}
+                onChange={e => set('project_price', fmtBonus(e.target.value))}
+                placeholder="0"
+                className={inputCls(false) + ' text-right'}
+              />
+            </div>
+
+            {/* 6. Xodimlar */}
             <SelectedUsersField
               label="Xodimlar"
               selected={form.employees}
@@ -796,6 +835,7 @@ function AddProjectModal({ onClose, onAdd }) {
               onRemove={id => set('employees', form.employees.filter(u => u.id !== id))}
             />
 
+            {/* 7. Sinovchilar */}
             <SelectedUsersField
               label="Sinovchilar"
               selected={form.testers}
@@ -803,26 +843,27 @@ function AddProjectModal({ onClose, onAdd }) {
               onRemove={id => set('testers', form.testers.filter(u => u.id !== id))}
             />
 
+            {/* 8. Muddat sanasi + Soati */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddat sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   </button>
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Soati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
                   <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
                     step="60"
                     className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
                   <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
+                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                   </button>
                 </div>
@@ -919,128 +960,155 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
 
 /* ── DetailModal ── */
 function DetailModal({ project, onClose }) {
-  const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white'
-  const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
+  const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
-  const fmtDeadline = (iso) => {
-    if (!iso) return '—'
-    try { return new Date(iso).toLocaleDateString('ru-RU') } catch { return iso }
+  const fmtNum = (val) => {
+    if (!val) return '—'
+    const n = Math.abs(Number(String(val).replace(/[\s,]/g, '')))
+    if (isNaN(n) || n === 0) return '—'
+    return n.toLocaleString('ru-RU') + ' UZS'
   }
 
-  const managerName = project.manager_info?.username || project.manager_info?.name || '—'
-  const statusLabel = STATUS_LABEL[project.status] || project.status || '—'
+  const fmtDtFull = (iso) => {
+    if (!iso) return '—'
+    try {
+      const d = new Date(iso)
+      return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+    } catch { return iso }
+  }
+
+  const statusColors = {
+    active:    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    planning:  'bg-[#F1F3F9] text-[#5B6078] dark:bg-[#292A2A] dark:text-[#C2C8E0]',
+    completed: 'bg-[#EEF1FB] text-[#526ED3] dark:bg-[#1e2340] dark:text-[#7F95E6]',
+    overdue:   'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    cancelled: 'bg-[#FEF2F2] text-[#DC2626] dark:bg-[#2A1A1A] dark:text-[#F87171]',
+  }
+
+  function InfoRow({ label, value }) {
+    return (
+      <div>
+        <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-0.5">{label}</p>
+        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || '—'}</p>
+      </div>
+    )
+  }
+
+  function UserCard({ label, info }) {
+    if (!info) return <InfoRow label={label} value="—" />
+    return (
+      <div>
+        <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-1.5">{label}</p>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
+            {info.username?.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{info.username}</p>
+            <p className="text-xs text-[#8F95A8] truncate">{info.position || info.roles?.[0] || ''}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
+        <FaXmark size={14} />
+      </button>
+
       <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
 
-        {/* X tugmasi */}
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer z-10">
-          <FaXmark size={14} />
-        </button>
-
         {/* Header */}
-        <div className="px-7 pt-7 pb-4">
-          <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+        <div className="px-7 pt-7 pb-5 border-b border-[#F1F3F9] dark:border-[#292A2A]">
+          <div className="flex items-center gap-3 mb-3">
+            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Batafsil ma'lumot</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              {project.uid && (
+                <span className="text-xs font-mono text-[#8F95A8] bg-[#F1F3F9] dark:bg-[#292A2A] px-2 py-0.5 rounded-lg">{project.uid}</span>
+              )}
+              {project.prefix && (
+                <span className="text-xs font-mono font-bold text-[#526ED3] bg-[#EEF1FB] dark:bg-[#1e2340] px-2 py-0.5 rounded-lg">{project.prefix}</span>
+              )}
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[project.status] || statusColors.planning}`}>
+                {STATUS_LABEL[project.status] || project.status}
+              </span>
+              {project.is_active !== false && (
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Faol</span>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">Loyiha haqida batafsil ma'lumotlar</p>
+          <h2 className="text-xl font-extrabold text-[#1A1D2E] dark:text-white ml-8">
+            {project.title || project.name}
+          </h2>
         </div>
 
         {/* Body */}
-        <div className="px-7 pb-4 flex flex-col gap-4">
+        <div className="px-7 py-5 flex flex-col gap-5">
 
-          {/* Nomi + Holati */}
+          {/* Tavsif */}
+          {project.description && (
+            <div>
+              <p className="text-xs text-[#8F95A8] mb-1">Tavsif</p>
+              <p className="text-sm text-[#1A1D2E] dark:text-[#C2C8E0] leading-relaxed whitespace-pre-wrap bg-[#F8F9FC] dark:bg-[#191A1A] rounded-xl px-4 py-3">
+                {project.description}
+              </p>
+            </div>
+          )}
+
+          {/* Menejer + Yaratuvchi */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Nomi</label>
-              <div className={fCls}>{project.title || project.name || '—'}</div>
-            </div>
-            <div>
-              <label className={labelCls}>Holati</label>
-              <div className={fCls}>{statusLabel}</div>
-            </div>
+            <UserCard label="Menejer" info={project.manager_info} />
+            <UserCard label="Yaratuvchi" info={project.created_by_info} />
           </div>
 
-          {/* Tavsifi */}
-          <div>
-            <label className={labelCls}>Tavsifi</label>
-            <div className={fCls + ' min-h-[80px] whitespace-pre-wrap leading-relaxed'}>
-              {project.description || '—'}
-            </div>
-          </div>
-
-          {/* Menejer + Menejer bonusi */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Menejer</label>
-              <div className={fCls}>{managerName}</div>
-            </div>
-            <div>
-              <label className={labelCls}>Menejer bonusi (UZS)</label>
-              <div className={fCls + ' text-right'}>{project.manager_bonus || '—'}</div>
-            </div>
+          {/* Moliya bloki */}
+          <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8F9FC] dark:bg-[#191A1A]">
+            <InfoRow label="Loyiha narxi" value={fmtNum(project.project_price)} />
+            <InfoRow label="Menejer bonusi" value={fmtNum(project.manager_bonus)} />
+            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : '—'} />
+            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : '—'} />
           </div>
 
           {/* Xodimlar */}
           <div>
-            <label className={labelCls}>Xodimlar</label>
-            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
-              {project.employees_info?.length > 0
-                ? project.employees_info.map(e => (
-                    <span key={e.id} className={tagCls}>{e.username}</span>
-                  ))
-                : project.employees?.length > 0
-                  ? project.employees.map((e, i) => (
-                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
-                    ))
-                  : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
-              }
-            </div>
+            <p className="text-xs text-[#8F95A8] mb-2">Xodimlar <span className="text-[#B6BCCB]">({project.employees_info?.length || 0})</span></p>
+            {project.employees_info?.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {project.employees_info.map(e => (
+                  <span key={e.id} className={tagCls}>{e.username}</span>
+                ))}
+              </div>
+            ) : <p className="text-sm text-[#8F95A8]">—</p>}
           </div>
 
           {/* Sinovchilar */}
           <div>
-            <label className={labelCls}>Sinovchilar</label>
-            <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
-              {project.testers_info?.length > 0
-                ? project.testers_info.map(e => (
-                    <span key={e.id} className={tagCls}>{e.username}</span>
-                  ))
-                : project.testers?.length > 0
-                  ? project.testers.map((e, i) => (
-                      <span key={i} className={tagCls}>{e.username || e.name || e}</span>
-                    ))
-                  : <span className="text-[#8F95A8] dark:text-[#5B6078] text-sm self-center">—</span>
-              }
-            </div>
+            <p className="text-xs text-[#8F95A8] mb-2">Sinovchilar <span className="text-[#B6BCCB]">({project.testers_info?.length || 0})</span></p>
+            {project.testers_info?.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {project.testers_info.map(e => (
+                  <span key={e.id} className={tagCls}>{e.username}</span>
+                ))}
+              </div>
+            ) : <p className="text-sm text-[#8F95A8]">—</p>}
           </div>
 
-          {/* Muddati */}
-          <div>
-            <label className={labelCls}>Muddati</label>
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-              <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{fmtDeadline(project.deadline)}</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
-              </svg>
-            </div>
+          {/* Vaqtlar */}
+          <div className="grid grid-cols-3 gap-4 pt-2 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+            <InfoRow label="Muddati" value={fmtDtFull(project.deadline)} />
+            <InfoRow label="Yaratilgan" value={fmtDtFull(project.created_at)} />
+            <InfoRow label="Yangilangan" value={fmtDtFull(project.updated_at)} />
           </div>
 
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-between border-t border-[#F1F3F9] dark:border-[#292A2A]">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
-            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_active !== false ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.is_active !== false ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </div>
-          </div>
+        <div className="px-7 py-4 border-t border-[#F1F3F9] dark:border-[#292A2A] flex justify-end">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
               text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
@@ -1053,246 +1121,275 @@ function DetailModal({ project, onClose }) {
   )
 }
 /* ── EditProjectModal ── */
-function EditProjectModal({ project, onClose, onSave }) {
+function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
   const dateRef = useRef(null)
   const timeRef = useRef(null)
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
+  const fmtNum = (raw) => {
+    if (!raw) return ''
+    const n = Math.abs(Number(String(raw).replace(/\s/g, '')))
+    if (isNaN(n)) return ''
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  }
   const fmtBonus = (raw) => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 
+  const initManager   = project.manager_info ? { id: project.manager_info.id, username: project.manager_info.username } : null
+  const initEmployees = (project.employees_info || []).map(u => ({ id: u.id, username: u.username }))
+  const initTesters   = (project.testers_info   || []).map(u => ({ id: u.id, username: u.username }))
+
   const [form, setForm] = useState({
-    title:       project.title       || project.name  || '',
-    prefix:      project.prefix      || '',
-    status:      project.status      || '',
-    description: project.description || '',
-    manager:     project.manager_info?.username || project.manager || '',
-    bonus:       project.manager_bonus || '',
-    employees:   project.employees   || [],
-    testers:     project.testers     || [],
-    deadline:    project.deadline ? project.deadline.slice(0, 10) : '',
-    time:        project.deadline ? project.deadline.slice(11, 16) : '',
-    active:      project.is_active !== undefined ? project.is_active : true,
+    title:              project.title       || '',
+    prefix:             project.prefix      || '',
+    status:             project.status      || '',
+    description:        project.description || '',
+    manager:            initManager,
+    manager_bonus:      fmtNum(project.manager_bonus),
+    project_price:      fmtNum(project.project_price),
+    penalty_percentage: project.penalty_percentage
+      ? (() => { const n = parseFloat(String(project.penalty_percentage).replace(/[^\d.]/g, '')); return isNaN(n) ? '' : String(Math.min(100, Math.max(0, n))) })()
+      : '',
+    employees:          initEmployees,
+    testers:            initTesters,
+    deadline:           project.deadline ? project.deadline.slice(0, 10) : '',
+    time:               project.deadline ? project.deadline.slice(11, 16) : '',
+    is_active:          project.is_active !== undefined ? project.is_active : true,
   })
   const [errors, setErrors] = useState({})
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const [loading, setLoading] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(null)
+
+  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const validate = () => {
     const e = {}
-    if (!form.name.trim()) e.name = true
-    if (!form.status) e.status = true
+    if (!form.title.trim())       e.title       = true
+    if (!form.prefix.trim())      e.prefix      = true
+    if (!form.status)             e.status      = true
+    if (!form.description.trim()) e.description = true
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
+  const handleSubmit = async () => {
+    if (!validate()) return
+    setLoading(true)
+    try {
+      const body = {
+        title:       form.title.trim(),
+        prefix:      form.prefix.trim().toUpperCase(),
+        status:      form.status,
+        description: form.description.trim(),
+        is_active:   form.is_active,
+        employees:   form.employees.map(u => u.id),
+        testers:     form.testers.map(u => u.id),
+      }
+      if (form.manager !== null && form.manager !== undefined) body.manager = form.manager.id
+      if (form.manager_bonus !== '')    body.manager_bonus      = form.manager_bonus.replace(/\s/g, '')
+      if (form.project_price !== '')    body.project_price      = form.project_price.replace(/\s/g, '')
+      if (form.penalty_percentage !== '') body.penalty_percentage = String(form.penalty_percentage).replace(/[^\d.]/g, '')
+      if (form.deadline) {
+        const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
+        body.deadline = dt
+      }
+      await onSave(project.id, body)
+      onClose()
+    } catch (err) {
+      const details = err?.response?.data?.error?.details
+      const errorMsg = err?.response?.data?.error?.errorMsg || 'Loyiha yangilashda xatolik yuz berdi'
+      if (details && typeof details === 'object') {
+        const newErrors = {}
+        if (details.title)       newErrors.title       = Array.isArray(details.title) ? details.title[0] : true
+        if (details.prefix)      newErrors.prefix      = Array.isArray(details.prefix) ? details.prefix[0] : true
+        if (details.status)      newErrors.status      = Array.isArray(details.status) ? details.status[0] : true
+        if (details.description) newErrors.description = Array.isArray(details.description) ? details.description[0] : true
+        if (Object.keys(newErrors).length) setErrors(newErrors)
+        const msgs = Object.entries(details).map(([, v]) => Array.isArray(v) ? v[0] : v).filter(Boolean).join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
+      } else {
+        toast.error('Xatolik', errorMsg)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-white text-[#1A1D2E] placeholder-[#8F95A8]
-    dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]
-    ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078] ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+
+  const STATUS_API = [
+    { label: 'Rejalashtirilmoqda', value: 'planning' },
+    { label: 'Faol',               value: 'active' },
+    { label: 'Yakunlangan',        value: 'completed' },
+    { label: 'Bekor qilingan',     value: 'cancelled' },
+  ]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 bg-black/60" />
+        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-      
-
-        <div className="px-7 pt-7 pb-4">
-          <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
-              <FaArrowLeft size={17} />
-            </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha tahrirlash</h2>
-          </div>
-          <p className="text-sm text-[#1A1D2E] ">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
-        </div>
-
-        <div className="px-7 pb-4 flex flex-col gap-4">
-          {/* Nomi + Holati */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Nomi</label>
-              <input value={form.name} onChange={e => set('name', e.target.value)}
-                placeholder="Nomi kiriting" className={inputCls(errors.name)} />
+        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+          <div className="px-7 pt-7 pb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha tahrirlash</h2>
             </div>
-            <div ref={statusRef}>
-              <label className={labelCls}>Holati</label>
+            <p className="text-sm text-[#5B6078]">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
+          </div>
+          <div className="px-7 pb-4 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Nomi</label>
+                <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Nomi kiriting" className={inputCls(errors.title)} />
+                {errors.title && <p className="text-xs text-red-500 mt-1">{typeof errors.title === 'string' ? errors.title : '*Bu maydon majburiy'}</p>}
+              </div>
+              <div ref={statusRef}>
+                <label className={labelCls}>Holati</label>
+                <div className="relative">
+                  <button type="button" onClick={() => setStatusOpen(o => !o)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+                    <span>{STATUS_API.find(s => s.value === form.status)?.label || 'Holati tanlang'}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {form.status && <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
+                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
+                  {errors.status && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+                  {statusOpen && (
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                      {STATUS_API.map((s, i) => (
+                        <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Tavsifi</label>
               <div className="relative">
-                <button type="button" onClick={() => setStatusOpen(o => !o)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-                    bg-white dark:bg-[#191A1A]
-                    ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-                    ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
-                  <span>{form.status || 'Holati tanlang'}</span>
-                  <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {statusOpen && (
-                  <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden
-                    bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-                    {STATUSES.map((s, i) => (
-                      <button key={s} type="button" onClick={() => { set('status', s); setStatusOpen(false) }}
-                        className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
-                          ${i < STATUSES.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                          ${form.status === s ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder="Tavsifni yozing" rows={3} className={inputCls(errors.description) + ' resize-none'} />
+                {form.description && <button type="button" onClick={() => set('description', '')} className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={12} /></button>}
+              </div>
+              {errors.description && <p className="text-xs text-red-500 mt-1">{typeof errors.description === 'string' ? errors.description : '*Bu maydon majburiy'}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div ref={mgrRef}>
+                <label className={labelCls}>Menejer</label>
+                <div className="relative">
+                  <button type="button" onClick={() => setMgrOpen(o => !o)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
+                    <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>{form.manager?.username || 'Menejer tanlang'}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {form.manager && <span onMouseDown={e => { e.stopPropagation(); set('manager', null) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
+                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
+                  {mgrOpen && (
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                      {allUsers.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
+                        <button key={u.id} type="button" onClick={() => { set('manager', { id: u.id, username: u.username }); setMgrOpen(false) }}
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">{u.username?.slice(0, 2).toUpperCase()}</div>
+                          <p className="truncate">{u.username}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Menejer bonusi (UZS)</label>
+                <input value={form.manager_bonus} onChange={e => set('manager_bonus', fmtBonus(e.target.value))} placeholder="0" className={inputCls(false) + ' text-right'} />
               </div>
             </div>
-          </div>
-
-          {/* Tavsifi */}
-          <div>
-            <label className={labelCls}>Tavsifi</label>
-            <div className="relative">
-              <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                placeholder="Tavsifni yozing" rows={3}
-                className={inputCls(false) + ' resize-none'} />
-              {form.description && (
-                <button type="button" onClick={() => set('description', '')}
-                  className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
-                  <FaXmark size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Menejer + Bonus */}
-          <div className="grid grid-cols-2 gap-4">
-            <div ref={mgrRef}>
-              <label className={labelCls}>Menejer</label>
-              <div className="relative">
-                <button type="button" onClick={() => setMgrOpen(o => !o)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-                    bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]">
-                  <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
-                    {form.manager || 'Menejer tanlang'}
-                  </span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {form.manager && (
-                      <span onMouseDown={e => { e.stopPropagation(); set('manager', '') }}
-                        className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                    )}
-                    <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </button>
-                {mgrOpen && (
-                  <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44
-                    bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-                    {MANAGERS.map((m, i) => (
-                      <button key={m} type="button" onClick={() => { set('manager', m); setMgrOpen(false) }}
-                        className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
-                          ${i < MANAGERS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                          ${form.manager === m ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Titul</label>
+                <input value={form.prefix} onChange={e => set('prefix', e.target.value.toUpperCase().slice(0, 5))} placeholder="PRJ" className={inputCls(errors.prefix)} />
+                {errors.prefix && <p className="text-xs text-red-500 mt-1">{typeof errors.prefix === 'string' ? errors.prefix : '*Bu maydon majburiy'}</p>}
+              </div>
+              <div>
+                <label className={labelCls}>Jarima foizi (%)</label>
+                <input type="text" inputMode="numeric" value={form.penalty_percentage}
+                  onChange={e => { const d = e.target.value.replace(/\D/g, ''); if (!d) { set('penalty_percentage', ''); return } set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(d, 10))))) }}
+                  placeholder="0" className={inputCls(false)} />
               </div>
             </div>
             <div>
-              <label className={labelCls}>Menejer bonusi (UZS)</label>
-              <input value={form.bonus} onChange={e => set('bonus', fmtBonus(e.target.value))}
-                placeholder="Loyiha uchun: 0,0"
-                className={inputCls(false) + ' text-right'} />
+              <label className={labelCls}>Loyiha narxi (UZS)</label>
+              <input type="text" inputMode="numeric" value={form.project_price} onChange={e => set('project_price', fmtBonus(e.target.value))} placeholder="0" className={inputCls(false) + ' text-right'} />
             </div>
-          </div>
-
-          {/* Xodimlar */}
-          <div>
-            <label className={labelCls}>Xodimlar</label>
-            <MultiSelect placeholder="Xodim tanlang" options={EMPLOYEES} selected={form.employees} onChange={v => set('employees', v)} />
-          </div>
-
-          {/* Sinovchilar */}
-          <div>
-            <label className={labelCls}>Sinovchilar</label>
-            <MultiSelect placeholder="Sinovchilar tanlang" options={EMPLOYEES} selected={form.testers} onChange={v => set('testers', v)} />
-          </div>
-
-          {/* Muddati + Vaqti */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Muddati</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
-                <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
-                  className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
-                    ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                </button>
+            <SelectedUsersField label="Xodimlar" selected={form.employees} onOpen={() => setPickerOpen('employees')} onRemove={id => set('employees', form.employees.filter(u => u.id !== id))} />
+            <SelectedUsersField label="Sinovchilar" selected={form.testers} onOpen={() => setPickerOpen('testers')} onRemove={id => set('testers', form.testers.filter(u => u.id !== id))} />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Muddat sanasi</label>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                  <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
+                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
+                  <button type="button" onClick={() => dateRef.current?.showPicker?.()} className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  </button>
+                </div>
               </div>
-            </div>
-            <div>
-              <label className={labelCls}>Vaqti</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-                bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ">
-                <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
-                  step="60"
-                  className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden
-                    ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                </button>
+              <div>
+                <label className={labelCls}>Soati</label>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
+                  <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)} step="60"
+                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
+                  <button type="button" onClick={() => timeRef.current?.showPicker?.()} className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
-            <button type="button" onClick={() => set('active', !form.active)}
-              className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.active ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-              <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </button>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
-              <FaXmark size={13} /> Yopish
-            </button>
-            <button onClick={() => {
-              if (!validate()) return
-              const body = {
-                title:       form.title.trim(),
-                status:      form.status,
-                description: form.description.trim(),
-                is_active:   form.active,
-              }
-              if (form.prefix)   body.prefix        = form.prefix.trim().toUpperCase()
-              if (form.manager)  body.manager_name  = form.manager
-              if (form.bonus)    body.manager_bonus = form.bonus.replace(/\s/g, '')
-              if (form.deadline) {
-                const dt = form.time ? `${form.deadline}T${form.time}:00` : `${form.deadline}T00:00:00`
-                body.deadline = dt
-              }
-              onSave(project.id, body)
-              onClose()
-            }}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
-              <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Tahrirlash
-            </button>
+          <div className="px-7 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
+              <button type="button" onClick={() => set('is_active', !form.is_active)}
+                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_active ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                <FaXmark size={13} /> Yopish
+              </button>
+              <button onClick={handleSubmit} disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                {loading ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                Saqlash
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {pickerOpen === 'employees' && (
+        <UserPickerModal title="Xodim tanlang" selected={form.employees}
+          users={allUsers.filter(u => u.roles?.includes('employee'))}
+          onClose={() => setPickerOpen(null)}
+          onConfirm={list => { set('employees', list); setPickerOpen(null) }} />
+      )}
+      {pickerOpen === 'testers' && (
+        <UserPickerModal title="Sinovchi tanlang" selected={form.testers}
+          users={allUsers.filter(u => u.roles?.includes('manager') || u.roles?.includes('employee'))}
+          onClose={() => setPickerOpen(null)}
+          onConfirm={list => { set('testers', list); setPickerOpen(null) }} />
+      )}
+    </>
   )
 }
+
 
 /* ── RowMenu ── */
 function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
@@ -1300,38 +1397,38 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
   return (
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
+        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer
           text-[#8F95A8] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-2xl shadow-2xl border overflow-hidden
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-          {/* Batafsil — hammaga */}
           <button onClick={() => { onDetail?.(); setOpen(false) }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
-              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
+              hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
             </svg>
-            Batafsil
+            Ko'rish
           </button>
-          {/* Tahrirlash + O'chirish — faqat admin */}
           {canEdit && (
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-                  hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#5B6078] dark:text-[#C2C8E0]">
-                  <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
+                  hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
                 Tahrirlash
               </button>
               <button onClick={() => { onDelete?.(); setOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E02D2D]
-                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                  <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#E02D2D]
+                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                 </svg>
                 O'chirish
               </button>
@@ -1364,9 +1461,9 @@ export default function ProjectsPage() {
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
   const [users, setUsers] = useState([])
+  const [projectLoading, setProjectLoading] = useState(false)
   const scrollRef = useRef(null)
 
-  // ── API funksiyalari ──
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
     if (q) p.search = q
@@ -1399,7 +1496,6 @@ export default function ProjectsPage() {
     }
   }, [buildParams])
 
-  // Users yuklash (menejer va xodim tanlash uchun)
   useEffect(() => {
     axiosAPI.get('/users/', { params: { page_size: 100 } })
       .then(res => {
@@ -1414,7 +1510,6 @@ export default function ProjectsPage() {
     loadProjects()
   }, [])
 
-  // Scroll pagination
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -1454,6 +1549,21 @@ export default function ProjectsPage() {
     setData(prev => [created, ...prev])
   }
 
+  // API dan to'liq loyiha ma'lumotini olish
+  const loadProjectDetail = async (id, mode = 'detail') => {
+    setProjectLoading(true)
+    try {
+      const res = await axiosAPI.get(`/projects/${id}/`)
+      const project = res.data?.data ?? res.data
+      if (mode === 'edit') setEditProject(project)
+      else setDetailProject(project)
+    } catch (err) {
+      toast.error('Xatolik', "Loyiha ma'lumotlarini yuklashda xatolik")
+    } finally {
+      setProjectLoading(false)
+    }
+  }
+
   const handleEdit = async (id, body) => {
     try {
       const res = await axiosAPI.put(`/projects/${id}/`, body)
@@ -1461,7 +1571,18 @@ export default function ProjectsPage() {
       setData(prev => prev.map(p => p.id === id ? updated : p))
       toast.success("Loyiha yangilandi", "O'zgarishlar saqlandi.")
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "Yangilashda xatolik")
+      const errData = err?.response?.data
+      const details = errData?.error?.details
+      const errorMsg = errData?.error?.errorMsg || errData?.detail || "Loyiha yangilashda xatolik"
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
+      } else {
+        toast.error('Xatolik', errorMsg)
+      }
+      throw err
     }
   }
 
@@ -1471,114 +1592,127 @@ export default function ProjectsPage() {
       setData(prev => prev.filter(p => p.id !== id))
       toast.delete("Loyiha o'chirildi", "Loyiha chiqindi qutisiga yuborildi.")
     } catch (err) {
-      const msg = err?.response?.data?.error?.errorMsg
-        || err?.response?.data?.detail
-        || "O'chirishda xatolik yuz berdi"
+      const errData = err?.response?.data
+      const msg = errData?.error?.errorMsg || errData?.detail || "O'chirishda xatolik"
       toast.error('Xatolik', msg)
     }
   }
 
   return (
     <div className="flex flex-col h-full gap-4">
+      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Loyihalar</h1>
 
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white shrink-0">Loyihalar</h1>
-
-      {/* Toolbar */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2">
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-          <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
+          <input type="text" placeholder="Izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
-            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
+            className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none w-[200px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
         </div>
-
         <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
-            bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
-            dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-          <LuFilter size={13} />
-          Filtrlash
+          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border cursor-pointer
+            bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+          <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
         </button>
-
         {/* View toggle */}
-        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl bg-[#F1F3F9] dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#474848]">
+        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[#E2E6F2] bg-[#F1F3F9] dark:bg-[#222323] dark:border-[#474848]">
           <button onClick={() => setViewMode('table')}
-            className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'table' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18" />
-            </svg>
+            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#2A2B2B] text-[#3F57B3] dark:text-[#7F95E6] shadow-sm' : 'text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#3F57B3]'}`}>
+            <LuLayoutList size={16} />
           </button>
-          <button onClick={() => setViewMode('grid')}
-            className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'grid' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="8" height="8" rx="1" /><rect x="13" y="3" width="8" height="8" rx="1" />
-              <rect x="3" y="13" width="8" height="8" rx="1" /><rect x="13" y="13" width="8" height="8" rx="1" />
-            </svg>
+          <button onClick={() => setViewMode('card')}
+            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'card' ? 'bg-white dark:bg-[#2A2B2B] text-[#3F57B3] dark:text-[#7F95E6] shadow-sm' : 'text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#3F57B3]'}`}>
+            <LuLayoutGrid size={16} />
           </button>
         </div>
       </div>
 
-      {/* Table */}
-      {viewMode === 'table' && (
-        <div ref={scrollRef} className="flex-1 overflow-auto">
-          <table className="w-full text-sm whitespace-nowrap">
-            <thead>
-              <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Menejer</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Boshlanish sanasi</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
-                <th className="px-4 py-3 w-10" />
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
-                    {[1,2,3,4,5,6,7].map(j => (
-                      <td key={j} className="px-4 py-3">
-                        <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                data.map((p, idx) => (
-                  <tr key={p.id}
-                    onClick={() => setDetailProject(p)}
-                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || p.manager || '—'}</td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">{STATUS_LABEL[p.status] || p.status}</span>
-                    </td>
-                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
-                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.deadline)}</td>
-                    <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          {!loading && data.length === 0 && (
-            <EmptyState
-              icon="/imgs/loyhalarIcon.svg"
-              title="Hozircha loyihalar yo'q"
-              description="Yangi loyiha qo'shish orqali ishni boshlang"
-            />
+      {/* ── CARD VIEW ── */}
+      {viewMode === 'card' ? (
+        <div className="flex-1 overflow-auto">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#1C1D1D] p-4 flex flex-col gap-3">
+                  <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-3/4" />
+                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-1/2" />
+                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : data.length === 0 ? (
+            <EmptyState icon="/imgs/loyhalarIcon.svg" title="Loyihalar topilmadi" description="Yangi loyiha yarating yoki filtrlarni tekshiring" />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {data.map(p => {
+                const statusColors = {
+                  active:    { bg: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+                  planning:  { bg: 'bg-[#F1F3F9] text-[#5B6078] dark:bg-[#292A2A] dark:text-[#C2C8E0]' },
+                  completed: { bg: 'bg-[#EEF1FB] text-[#526ED3] dark:bg-[#1e2340] dark:text-[#7F95E6]' },
+                  overdue:   { bg: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
+                  cancelled: { bg: 'bg-[#FEF2F2] text-[#DC2626] dark:bg-[#2A1A1A] dark:text-[#F87171]' },
+                }
+                const sc = statusColors[p.status] || statusColors.planning
+                return (
+                  <div key={p.id}
+                    onClick={() => loadProjectDetail(p.id, 'detail')}
+                    className="rounded-2xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#1C1D1D]
+                      p-4 flex flex-col gap-3 cursor-pointer hover:border-[#526ED3]/50 hover:shadow-md transition-all">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-bold text-[#1A1D2E] dark:text-white leading-snug truncate flex-1">
+                        {p.title || p.name}
+                      </p>
+                      <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${sc.bg}`}>
+                        {STATUS_LABEL[p.status] || p.status}
+                      </span>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="flex items-center gap-2 text-xs text-[#8F95A8]">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                      <span>{fmtDt(p.created_at)}</span>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mx-0.5">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                      <span>{fmtDt(p.deadline)}</span>
+                    </div>
+
+                    {/* Manager */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
+                          {(p.manager_info?.username || '?').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || '—'}</p>
+                          <p className="text-[10px] text-[#8F95A8]">Menejer</p>
+                        </div>
+                      </div>
+                      <div onClick={e => e.stopPropagation()}>
+                        <RowMenu
+                          onDetail={() => loadProjectDetail(p.id, 'detail')}
+                          onEdit={() => loadProjectDetail(p.id, 'edit')}
+                          onDelete={() => setDeleteProject(p)}
+                          canEdit={canEdit}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
           {loadingMore && (
             <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
@@ -1590,130 +1724,111 @@ export default function ProjectsPage() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Grid */}
-      {viewMode === 'grid' && (
-        <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.map(p => {
-            const statusMap = {
-              'Faol':               { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
-              'active':             { label: 'Faol',               bg: 'bg-[#22c55e]',  text: 'text-white' },
-              'Rejalashtirilmoqda': { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]',  text: 'text-[#5B6078]' },
-              'planning':           { label: 'Rejalashtirilmoqda', bg: 'bg-[#E2E6F2]',  text: 'text-[#5B6078]' },
-              'Yakunlangan':        { label: 'Yakunlangan',        bg: 'bg-[#526ED3]',  text: 'text-white' },
-              'completed':          { label: 'Yakunlangan',        bg: 'bg-[#526ED3]',  text: 'text-white' },
-              'cancelled':          { label: 'Bekor qilingan',     bg: 'bg-[#E02D2D]',  text: 'text-white' },
-            }
-            const st = statusMap[p.status] || statusMap['Rejalashtirilmoqda']
-            const managerName = p.manager_info?.username || p.manager || '—'
-            const managerRole = p.manager_info?.position || 'Menejer'
-            const managerInitials = managerName.slice(0, 2).toUpperCase()
-            const fmtDt = (iso) => {
-              if (!iso) return '—'
-              if (iso.includes('T')) {
-                const d = new Date(iso)
-                return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-              }
-              return iso
-            }
-            return (
-              <div key={p.id}
-                onClick={() => setDetailProject(p)}
-                className="rounded-2xl border p-4 cursor-pointer transition-all
-                  bg-white border-[#E2E6F2] hover:border-[#C2C8E0] hover:shadow-sm
-                  dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:hover:border-[#474848]">
-
-                {/* Title + Status */}
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <h3 className="text-[14px] font-bold text-[#1A1D2E] dark:text-white leading-snug truncate flex-1">{p.title || p.name}</h3>
-                  <span className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold ${st.bg} ${st.text}`}>
-                    {st.label}
-                  </span>
-                </div>
-
-                {/* Dates */}
-                <div className="flex items-center gap-1.5 text-[11px] text-[#5B6078] dark:text-[#8F95A8] mb-3">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                  </svg>
-                  <span className="truncate">{fmtDt(p.created_at || p.startDate)}</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mx-0.5">
-                    <path d="m9 18 6-6-6-6"/>
-                    <path d="m15 18 6-6-6-6"/>
-                  </svg>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                  </svg>
-                  <span className="truncate">{fmtDt(p.deadline)}</span>
-                </div>
-
-                {/* Manager + Menu */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
-                      {managerInitials}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-semibold text-[#1A1D2E] dark:text-white truncate">{managerName}</p>
-                      <p className="text-[10px] text-[#8F95A8] dark:text-[#5B6078]">{managerRole}</p>
-                    </div>
-                  </div>
-                  <div onClick={e => e.stopPropagation()}>
-                    <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-          {!loading && data.length === 0 && (
-            <div className="col-span-3">
-              <EmptyState
-                icon="/imgs/loyhalarIcon.svg"
-                title="Hozircha loyihalar yo'q"
-                description="Yangi loyiha qo'shish orqali ishni boshlang"
-              />
-            </div>
-          )}
-        </div>
-        </div>
+      ) : (
+        <div ref={scrollRef} className="flex-1 overflow-auto">
+        <table className="w-full text-sm whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Menejer</span>
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
+              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan</th>
+              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+              <th className="px-4 py-3 w-10" />
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                  {[1,2,3,4,5,6,7].map(j => (
+                    <td key={j} className="px-4 py-3">
+                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              data.map((p, idx) => (
+                <tr key={p.id}
+                  onClick={() => loadProjectDetail(p.id, 'detail')}
+                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
+                  <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{p.uid || idx + 1}</td>
+                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || '—'}</td>
+                  <td className="px-4 py-3 text-right">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]`}>
+                      {STATUS_LABEL[p.status] || p.status || '—'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
+                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.deadline)}</td>
+                  <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                    <RowMenu
+                      onDetail={() => loadProjectDetail(p.id, 'detail')}
+                      onEdit={() => loadProjectDetail(p.id, 'edit')}
+                      onDelete={() => setDeleteProject(p)}
+                      canEdit={canEdit}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        {!loading && data.length === 0 && (
+          <EmptyState
+            icon="/imgs/loyhalarIcon.svg"
+            title="Loyihalar topilmadi"
+            description="Yangi loyiha yarating yoki filtrlarni tekshiring"
+          />
+        )}
+        {loadingMore && (
+          <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+            <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            Yuklanmoqda...
+          </div>
+        )}
+      </div>
       )}
 
       {showFilter && (
-        <ProjectFilterModal initial={filters} onClose={() => setShowFilter(false)} onApply={handleApplyFilter} users={users} />
+        <ProjectFilterModal onClose={() => setShowFilter(false)} onApply={handleApplyFilter} initial={filters} users={users} />
       )}
-
       {showAdd && (
-        <AddProjectModal
-          onClose={() => setShowAdd(false)}
-          onAdd={handleAdd}
-          users={users}
-        />
+        <AddProjectModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />
       )}
-
       {editProject && (
         <EditProjectModal
           project={editProject}
-          onClose={() => setEditProject(null)}
-          onSave={(id, body) => handleEdit(id, body)}
           users={users}
+          onClose={() => setEditProject(null)}
+          onSave={handleEdit}
         />
       )}
-
       {detailProject && (
-        <DetailModal
-          project={detailProject}
-          onClose={() => setDetailProject(null)}
-        />
+        <DetailModal project={detailProject} onClose={() => setDetailProject(null)} />
       )}
-
       {deleteProject && (
         <DeleteConfirmModal
           project={deleteProject}
           onClose={() => setDeleteProject(null)}
-          onConfirm={id => handleDelete(id)}
+          onConfirm={handleDelete}
         />
+      )}
+      {projectLoading && (
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
+          <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+        </div>
       )}
     </div>
   )

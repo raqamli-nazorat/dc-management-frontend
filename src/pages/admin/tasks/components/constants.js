@@ -26,8 +26,10 @@ export const EMPLOYEES_LIST = [
 
 export const PROJECTS  = PROJECTS_LIST.map(p => p.name)
 export const ASSIGNEES = EMPLOYEES_LIST.map(e => e.name)
-export const LEVELS    = ['Past', "O'rta", 'Yuqori', 'Kritik']
-export const TYPES     = ['Xatoli', "Qo'shimcha", 'Tadqiqot', 'Yangi funksiya']
+export const LEVELS    = ['low', 'medium', 'high', 'critical']
+export const LEVEL_LABELS = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
+export const TYPES     = ['bug', 'feature', 'improvement']
+export const TYPE_LABELS = { bug: 'Xato', feature: 'Yangi funksiya', improvement: "Qo'shimcha" }
 export const STATUSES  = ['Jarayonda', 'Bajarildi', 'Kutilmoqda', 'Bekor qilindi']
 
 export const EMPTY_FILTER = { project: '', level: '', type: '', status: '', assignee: '' }
