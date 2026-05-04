@@ -1255,7 +1255,7 @@ export default function MeetingsPage() {
                   return (
                     <tr key={m.id}
                       className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
-                      onClick={() => loadMeetingDetail(m.id, 'detail')}>
+                      onClick={() => loadMeetingDetail(m.id, 'edit')}>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '—'}</td>
                       <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
@@ -1276,7 +1276,7 @@ export default function MeetingsPage() {
                       <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                         {!isAuditor && (
                           <RowMenu
-                            onDetail={() => loadMeetingDetail(m.id, 'detail')}
+                            onDetail={() => loadMeetingDetail(m.id, 'edit')}
                             onEdit={() => loadMeetingDetail(m.id, 'edit')}
                             onCloseMeeting={() => handleClose(m.id)}
                             onDelete={() => handleDelete(m.id)}

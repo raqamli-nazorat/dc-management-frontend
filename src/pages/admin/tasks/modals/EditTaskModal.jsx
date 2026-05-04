@@ -336,9 +336,10 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ maxHeight: '90vh' }}>
 
-          <div className="px-7 pt-7 pb-4">
+          {/* ── Header (qotgan) ── */}
+          <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">
@@ -350,7 +351,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             </p>
           </div>
 
-          <div className="px-7 pb-4 flex flex-col gap-4">
+          {/* ── Scroll qilinadigan content ── */}
+          <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4">
 
             {/* Loyiha + Nomi */}
             <div className="grid grid-cols-2 gap-4">
@@ -470,7 +472,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
 
           </div>
 
-          <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+          {/* ── Footer (qotgan) ── */}
+          <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
