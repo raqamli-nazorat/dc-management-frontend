@@ -112,7 +112,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const stsDd = useDropdown()
 
   const STATUS_API = [
-    { label: 'Rejalashtirilmoqda', value: 'planning' },
+    { label: 'Rejalashtirilmoqda', value: 'planning' }, 
     { label: 'Faol',               value: 'active' },
     { label: 'Yakunlangan',        value: 'completed' },
     { label: 'Bekor qilingan',     value: 'cancelled' },
@@ -1450,16 +1450,8 @@ export default function ProjectsPage() {
     loadProjects(f, search, 1)
   }
 
-  const handleAdd = async (body) => {
-    try {
-      const res = await axiosAPI.post('/projects/', body)
-      const created = res.data?.data ?? res.data
-      setData(prev => [created, ...prev])
-      toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
-    } catch (err) {
-      const msg = err?.response?.data?.detail || err?.response?.data?.title?.[0] || "Loyiha yaratishda xatolik"
-      toast.error('Xatolik', msg)
-    }
+  const handleAdd = (created) => {
+    setData(prev => [created, ...prev])
   }
 
   const handleEdit = async (id, body) => {

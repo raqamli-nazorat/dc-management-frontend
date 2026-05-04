@@ -32,25 +32,25 @@ const PH = (title) => <PlaceholderPage title={title} />
 
 // Umumiy sahifalar — barcha rollarda ishlatiladi
 const commonRoutes = (prefix) => [
-  <Route key="payments"       path="payments"              element={<AdminPayments />} />,
-  <Route key="finance"        path="finance"               element={<AdminSalary />} />,
-  <Route key="finance-hist"   path="finance/history"       element={<AdminFinanceHistory />} />,
-  <Route key="projects"       path="projects"              element={<AdminProjects />} />,
-  <Route key="tasks"          path="tasks"                 element={<AdminTasks />} />,
-  <Route key="meetings"       path="meetings"              element={<AdminMeetings />} />,
-  <Route key="trash"          path="trash"                 element={<TrashPage />} />,
-  <Route key="profile"        path="profile"               element={<ProfilePage />} />,
-  <Route key="rep-employee"   path="reports/employee"      element={<Employee />} />,
-  <Route key="rep-project"    path="reports/project"       element={<Project />} />,
-  <Route key="rep-cost"       path="reports/cost_inquiries" element={<CostInquiries />} />,
-  <Route key="rep-salary"     path="reports/salary"        element={<Salary />} />,
-  <Route key="rep-tasks"      path="reports/by_tasks"      element={<ByTasks />} />,
-  <Route key="applications"   path="applications"          element={<AdminApplications />} />,
-  <Route key="app-detail"     path="applications/detail/:id" element={<AdminApplicationDetail />} />,
-  <Route key="app-positions"  path="applications/positions" element={<AdminPositions />} />,
-  <Route key="app-regions"    path="applications/regions"  element={<AdminRegions />} />,
-  <Route key="users"          path="users"                 element={<AdminUsers />} />,
-  <Route key="user-detail"    path="users/detail/:id"      element={<AdminUserDetail />} />,
+  <Route key="payments" path="payments" element={<AdminPayments />} />,
+  <Route key="finance" path="finance" element={<AdminSalary />} />,
+  <Route key="finance-hist" path="finance/history" element={<AdminFinanceHistory />} />,
+  <Route key="projects" path="projects" element={<AdminProjects />} />,
+  <Route key="tasks" path="tasks" element={<AdminTasks />} />,
+  <Route key="meetings" path="meetings" element={<AdminMeetings />} />,
+  <Route key="trash" path="trash" element={<TrashPage />} />,
+  <Route key="profile" path="profile" element={<ProfilePage />} />,
+  <Route key="rep-employee" path="reports/employee" element={<Employee />} />,
+  <Route key="rep-project" path="reports/project" element={<Project />} />,
+  <Route key="rep-cost" path="reports/cost_inquiries" element={<CostInquiries />} />,
+  <Route key="rep-salary" path="reports/salary" element={<Salary />} />,
+  <Route key="rep-tasks" path="reports/by_tasks" element={<ByTasks />} />,
+  <Route key="applications" path="applications" element={<AdminApplications />} />,
+  <Route key="app-detail" path="applications/detail/:id" element={<AdminApplicationDetail />} />,
+  <Route key="app-positions" path="applications/positions" element={<AdminPositions />} />,
+  <Route key="app-regions" path="applications/regions" element={<AdminRegions />} />,
+  <Route key="users" path="users" element={<AdminUsers />} />,
+  <Route key="user-detail" path="users/detail/:id" element={<AdminUserDetail />} />,
 ]
 
 function App() {
@@ -94,9 +94,9 @@ function App() {
               </Route>
 
               {/* ── Eski URL lar uchun redirect ── */}
-              <Route path="/menager/*"    element={<Navigate to="/manager/dashboard" replace />} />
-              <Route path="/xodim/*"      element={<Navigate to="/employee/dashboard" replace />} />
-              <Route path="/hisobchi/*"   element={<Navigate to="/accountant/dashboard" replace />} />
+              <Route path="/menager/*" element={<Navigate to="/manager/dashboard" replace />} />
+              <Route path="/xodim/*" element={<Navigate to="/employee/dashboard" replace />} />
+              <Route path="/hisobchi/*" element={<Navigate to="/accountant/dashboard" replace />} />
               <Route path="/nazoratchi/*" element={<Navigate to="/auditor/dashboard" replace />} />
 
               <Route path="*" element={<Navigate to="/login" replace />} />
