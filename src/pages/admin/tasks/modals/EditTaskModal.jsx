@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { labelCls, PROJECTS_LIST } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
@@ -35,30 +35,32 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-function SelectDropdown({ label, value, onChange, options, placeholder, error }) {
+function SelectDropdown({ label, value, onChange, options, placeholder, error, disabled }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = options.find(o => o.value === value)
   return (
     <div ref={ref}>
       {label && <label className={labelCls}>{label}</label>}
-      <div className='relative'>
-        <button type='button' onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-            bg-white dark:bg-[#191A1A]
+      <div className="relative">
+        <button type="button" onClick={() => !disabled && setOpen(o => !o)}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
+            ${disabled ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A]'}
             ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078]'}`}>
-          <span className='flex-1 text-left truncate'>{selected?.label || placeholder}</span>
-          <div className='flex items-center gap-1.5 shrink-0 ml-1'>
-            {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className='text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer'><FaXmark size={11} /></span>}
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
-          </div>
+            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078] dark:text-[#5B6078]'}`}>
+          <span className="flex-1 text-left truncate">{selected?.label || placeholder}</span>
+          {!disabled && (
+            <div className="flex items-center gap-1.5 shrink-0 ml-1">
+              {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
+              <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+            </div>
+          )}
         </button>
-        {error && <p className='text-xs text-red-500 mt-1'>*Bu maydon majburiy</p>}
-        {open && (
-          <div className='absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'>
+        {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+        {open && !disabled && (
+          <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
+            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {options.map((o, i) => (
-              <button key={o.value} type='button' onClick={() => { onChange(o.value); setOpen(false) }}
+              <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer
                   ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === o.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
@@ -72,31 +74,33 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error })
   )
 }
 
-function ProjectDropdownLocal({ value, onChange, error, projects }) {
+function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => String(p.id) === String(value))
   return (
     <div ref={ref}>
       <label className={labelCls}>Loyiha</label>
-      <div className='relative'>
-        <button type='button' onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-            bg-white dark:bg-[#191A1A]
+      <div className="relative">
+        <button type="button" onClick={() => !disabled && setOpen(o => !o)}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
+            ${disabled ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A]'}
             ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
             ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078]'}`}>
-          <span className='flex-1 text-left truncate'>{selected?.title || selected?.name || 'Loyiha tanlang'}</span>
-          <div className='flex items-center gap-1.5 shrink-0 ml-1'>
-            {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className='text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer'><FaXmark size={11} /></span>}
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
-          </div>
+          <span className="flex-1 text-left truncate">{selected?.title || selected?.name || 'Loyiha tanlang'}</span>
+          {!disabled && (
+            <div className="flex items-center gap-1.5 shrink-0 ml-1">
+              {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
+              <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+            </div>
+          )}
         </button>
-        {error && <p className='text-xs text-red-500 mt-1'>*Bu maydon majburiy</p>}
-        {open && (
-          <div className='absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'>
+        {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+        {open && !disabled && (
+          <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
+            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {projects.map((p, i) => (
-              <button key={p.id} type='button' onClick={() => { onChange(String(p.id)); setOpen(false) }}
-                className={`w-full px-4 py-3 text-left cursor-pointer
+              <button key={p.id} type="button" onClick={() => { onChange(String(p.id)); setOpen(false) }}
+                className={`w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer
                   ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${String(value) === String(p.id) ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                 <p className={`text-sm font-medium truncate ${String(value) === String(p.id) ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>
@@ -117,23 +121,24 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const filtered = users.filter(u => (u.username ?? '').toLowerCase().includes(search.toLowerCase()))
   const toggle = (u) => setTemp(prev => prev.find(x => x.id === u.id) ? prev.filter(x => x.id !== u.id) : [...prev, u])
   return (
-    <div className='fixed inset-0 z-[60] flex items-center justify-center px-4'>
-      <div className='fixed inset-0 bg-black/60' />
-      <div className='relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]'>
-        <div className='px-6 pt-6 pb-4 shrink-0'>
-          <div className='flex items-center gap-3 mb-4'>
-            <button onClick={onClose} className='text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer'><FaArrowLeft size={16} /></button>
-            <h2 className='text-lg font-extrabold text-[#1A1D2E] dark:text-white'>{title}</h2>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/60" />
+      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <div className="flex items-center gap-3 mb-4">
+            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
+            <h2 className="text-lg font-extrabold text-[#1A1D2E] dark:text-white">{title}</h2>
           </div>
-          <div className='relative'>
-            <svg className='absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/>
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
-            <input type='text' placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-              className='w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]' />
+            <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
           </div>
         </div>
-        <div className='flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2'>
+        <div className="flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2">
+          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
           {filtered.map(u => {
             const isSel = temp.find(x => x.id === u.id)
             return (
@@ -141,26 +146,26 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left
                   ${isSel ? 'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[#3F57B3]' : 'bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'}`}>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
-                  {isSel && <FaCheck size={9} className='text-white' />}
+                  {isSel && <FaCheck size={9} className="text-white" />}
                 </div>
-                <div className='w-9 h-9 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0'>
+                <div className="w-9 h-9 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
                 </div>
-                <div className='min-w-0 flex-1'>
-                  <p className='text-sm font-semibold text-[#1A1D2E] dark:text-white truncate'>{u.username}</p>
-                  <p className='text-xs text-[#8F95A8] truncate'>{u.position_info?.name || u.roles?.[0] || '—'}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
+                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || '—'}</p>
                 </div>
               </button>
             )
           })}
         </div>
-        <div className='px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0'>
-          <span className='text-sm text-[#5B6078] dark:text-[#C2C8E0]'>{temp.length} ta tanlangan</span>
-          <div className='flex items-center gap-3'>
-            <button onClick={() => setTemp([])} className='flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]'>
+        <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
+          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setTemp([])} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
-            <button onClick={() => onConfirm(temp)} className='flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]'>
+            <button onClick={() => onConfirm(temp)} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
               <FaCheck size={12} /> Qo'shish
             </button>
           </div>
@@ -170,13 +175,13 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   )
 }
 
-export default function EditTaskModal({ task, onClose, onSave }) {
+export default function EditTaskModal({ task, onClose, onSave, canEdit = true }) {
   const dateRef = useRef(null)
   const [projects, setProjects] = useState([])
-  const [users, setUsers] = useState([])
+  const [users, setUsers]       = useState([])
   const [positions, setPositions] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]   = useState(false)
 
   useEffect(() => {
     axiosAPI.get('/projects/', { params: { page_size: 100 } })
@@ -184,13 +189,11 @@ export default function EditTaskModal({ task, onClose, onSave }) {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setProjects(Array.isArray(list) ? list : PROJECTS_LIST)
       }).catch(() => setProjects(PROJECTS_LIST))
-
     axiosAPI.get('/users/', { params: { page_size: 200 } })
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setUsers(Array.isArray(list) ? list : [])
       }).catch(() => {})
-
     axiosAPI.get('/applications/positions/', { params: { page_size: 100 } })
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
@@ -198,34 +201,54 @@ export default function EditTaskModal({ task, onClose, onSave }) {
       }).catch(() => {})
   }, [])
 
-  // deadline dan sana ajratib olish
-  const initDeadline = task.deadline ? task.deadline.slice(0, 10) : ''
-  // estimated_minutes dan soat va daqiqa
-  const initHours = task.estimated_minutes ? String(Math.floor(task.estimated_minutes / 60)) : ''
-  const initMins  = task.estimated_minutes ? String(task.estimated_minutes % 60) : ''
-  // assignee
+  const initDeadline  = task.deadline ? task.deadline.slice(0, 10) : ''
+  const initHours     = task.estimated_minutes ? String(Math.floor(task.estimated_minutes / 60)) : ''
+  const initMins      = task.estimated_minutes ? String(task.estimated_minutes % 60) : ''
   const initAssignees = task.assignee_info ? [task.assignee_info] : []
-  // project
-  const initProject = task.project ? String(task.project) : ''
+  const initProject   = task.project
+    ? String(task.project)
+    : (task.project_info && typeof task.project_info === 'object' ? String(task.project_info.id) : '')
+
+  const fmtPrice = (val) => {
+    if (!val) return ''
+    const n = Math.abs(Number(String(val).replace(/\s/g, '')))
+    if (isNaN(n)) return ''
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  }
 
   const [form, setForm] = useState({
-    project:              initProject,
-    title:                task.title        || '',
-    description:          task.description  || '',
-    priority:             task.priority     || 'low',
-    type:                 task.type         || 'task',
-    status:               task.status       || 'todo',
-    assignees:            initAssignees,
-    position:             task.position_info ? String(task.position_info.id) : '',
-    sprint:               task.sprint       ? String(task.sprint) : '',
-    task_price:           task.task_price   || '',
-    penalty_percentage:   task.penalty_percentage || '',
-    deadline:             initDeadline,
-    estimated_hours:      initHours,
-    estimated_minutes:    initMins,
+    project:            initProject,
+    title:              task.title              || '',
+    description:        task.description        || '',
+    priority:           task.priority           || 'low',
+    type:               task.type               || 'bug',
+    status:             task.status             || 'todo',
+    assignees:          initAssignees,
+    position:           task.position_info      ? String(task.position_info.id) : '',
+    sprint:             task.sprint             ? String(task.sprint) : '',
+    task_price:         fmtPrice(task.task_price),
+    penalty_percentage: task.penalty_percentage ? String(Math.abs(parseFloat(task.penalty_percentage))) : '',
+    deadline:           initDeadline,
+    estimated_hours:    initHours,
+    estimated_minutes:  initMins,
   })
   const [errors, setErrors] = useState({})
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: false })) }
+
+  const formatPrice = (val) => {
+    const digits = val.replace(/\D/g, '').slice(0, 12)
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  }
+  const handlePenalty = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (!digits) { set('penalty_percentage', ''); return }
+    set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+  }
+  const handleSprint = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (!digits) { set('sprint', ''); return }
+    set('sprint', String(Math.min(10, Math.max(1, parseInt(digits, 10)))))
+  }
 
   const validate = () => {
     const e = {}
@@ -233,15 +256,15 @@ export default function EditTaskModal({ task, onClose, onSave }) {
     if (!form.title.trim()) e.title    = true
     if (!form.priority)     e.priority = true
     if (!form.type)         e.type     = true
-    if (form.sprint && (isNaN(Number(form.sprint)) || Number(form.sprint) > 10 || Number(form.sprint) < 0)) {
-      e.sprint = "Sprint 0 dan 10 gacha bo'lishi kerak"
-    }
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
-  const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+  const inputCls = (err, ro) =>
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[#1A1D2E] placeholder-[#5B6078] dark:text-white dark:placeholder-[#5B6078]
+    ${ro ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B] cursor-default' : 'bg-white dark:bg-[#191A1A]'}
+    ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
+    ${!ro ? 'focus:border-[#526ED3]' : ''}`
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -271,11 +294,9 @@ export default function EditTaskModal({ task, onClose, onSave }) {
       onClose()
     } catch (err) {
       const details = err?.response?.data?.error?.details
-      const errorMsg = err?.response?.data?.error?.errorMsg || "Vazifa yangilashda xatolik"
+      const errorMsg = err?.response?.data?.error?.errorMsg || 'Vazifa yangilashda xatolik'
       if (details && typeof details === 'object') {
-        const msgs = Object.entries(details)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
-          .join('\n')
+        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join('\n')
         toast.error('Xatolik', msgs || errorMsg)
       } else {
         toast.error('Xatolik', errorMsg)
@@ -286,47 +307,53 @@ export default function EditTaskModal({ task, onClose, onSave }) {
   }
 
   const positionOptions = positions.map(p => ({ label: p.name, value: String(p.id) }))
-  const assigneeLabel = form.assignees.map(u => u.username).join(', ')
+  const assigneeLabel   = form.assignees.map(u => u.username).join(', ')
+  const ro = !canEdit
 
   return (
     <>
-      <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
-        <div className='fixed inset-0 bg-black/60' />
-        <button onClick={onClose} className='fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]'>
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 bg-black/60" />
+        <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className='relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]'>
+        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
 
-          <div className='px-7 pt-7 pb-4'>
-            <div className='flex items-center gap-3 mb-1'>
-              <button onClick={onClose} className='text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0'><FaArrowLeft size={17} /></button>
-              <h2 className='text-[20px] font-extrabold text-[#1A1D2E] dark:text-white'>Vazifa tahrirlash</h2>
+          <div className="px-7 pt-7 pb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">
+                {canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
+              </h2>
             </div>
-            <p className='text-sm text-[#5B6078] ml-8'>Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
+            <p className="text-sm text-[#5B6078] ml-8">
+              {canEdit ? "Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting" : "Vazifa haqida batafsil ma'lumot"}
+            </p>
           </div>
 
-          <div className='px-7 pb-4 flex flex-col gap-4'>
+          <div className="px-7 pb-4 flex flex-col gap-4">
 
             {/* Loyiha + Nomi */}
-            <div className='grid grid-cols-2 gap-4'>
-              <ProjectDropdownLocal value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} />
+            <div className="grid grid-cols-2 gap-4">
+              <ProjectDropdownLocal value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} disabled={ro} />
               <div>
                 <label className={labelCls}>Nomi</label>
-                <input value={form.title} onChange={e => set('title', e.target.value)}
-                  placeholder='Nomi yozing' className={inputCls(errors.title)} />
-                {errors.title && <p className='text-xs text-red-500 mt-1'>*Bu maydon majburiy</p>}
+                <input value={form.title} onChange={e => !ro && set('title', e.target.value)}
+                  readOnly={ro} placeholder="Nomi yozing" className={inputCls(errors.title, ro)} />
+                {errors.title && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
             </div>
 
             {/* Tavsifi */}
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className='relative'>
-                <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder='Tavsifni yozing' rows={3} className={inputCls(false) + ' resize-none pr-8'} />
-                {form.description && (
-                  <button type='button' onClick={() => set('description', '')}
-                    className='absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer'>
+              <div className="relative">
+                <textarea value={form.description} onChange={e => !ro && set('description', e.target.value)}
+                  readOnly={ro} placeholder="Tavsifni yozing" rows={3}
+                  className={inputCls(false, ro) + ' resize-none pr-8'} />
+                {form.description && !ro && (
+                  <button type="button" onClick={() => set('description', '')}
+                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
@@ -334,103 +361,118 @@ export default function EditTaskModal({ task, onClose, onSave }) {
             </div>
 
             {/* Holati + Darajasi + Turi */}
-            <div className='grid grid-cols-3 gap-4'>
-              <SelectDropdown label='Holati'   value={form.status}   onChange={v => set('status', v)}   options={STATUS_OPTIONS}   placeholder='Holati' />
-              <SelectDropdown label='Darajasi' value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder='Daraja' error={errors.priority} />
-              <SelectDropdown label='Turi'     value={form.type}     onChange={v => set('type', v)}     options={TYPE_OPTIONS}     placeholder='Turi'   error={errors.type} />
+            <div className="grid grid-cols-3 gap-4">
+              <SelectDropdown label="Holati"   value={form.status}   onChange={v => set('status', v)}   options={STATUS_OPTIONS}   placeholder="Holati"  disabled={ro} />
+              <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder="Daraja"  disabled={ro} error={errors.priority} />
+              <SelectDropdown label="Turi"     value={form.type}     onChange={v => set('type', v)}     options={TYPE_OPTIONS}     placeholder="Turi"    disabled={ro} error={errors.type} />
             </div>
 
             {/* Topshiruvchi */}
             <div>
               <label className={labelCls}>Topshiruvchi</label>
-              <button type='button' onClick={() => setPickerOpen(true)}
-                className='w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[#526ED3]'>
+              <button type="button" onClick={() => !ro && setPickerOpen(true)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
+                  ${ro ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]'}
+                  border-[#E2E6F2] dark:border-[#292A2A]`}>
                 <span className={assigneeLabel ? 'text-[#1A1D2E] dark:text-white flex-1 text-left truncate' : 'text-[#5B6078] flex-1 text-left'}>
                   {assigneeLabel || 'Topshiruvchi tanlang'}
                 </span>
-                <div className='flex items-center gap-1.5 shrink-0 ml-1'>
-                  {form.assignees.length > 0 && (
-                    <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className='text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer'>
-                      <FaXmark size={11} />
-                    </span>
-                  )}
-                  <FaChevronDown size={11} className='text-[#8F95A8]' />
-                </div>
+                {!ro && (
+                  <div className="flex items-center gap-1.5 shrink-0 ml-1">
+                    {form.assignees.length > 0 && (
+                      <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                        <FaXmark size={11} />
+                      </span>
+                    )}
+                    <FaChevronDown size={11} className="text-[#8F95A8]" />
+                  </div>
+                )}
               </button>
             </div>
 
             {/* Lavozim + Sprint */}
-            <div className='grid grid-cols-2 gap-4'>
-              <SelectDropdown label='Lavozim' value={form.position} onChange={v => set('position', v)} options={positionOptions} placeholder='Lavozim tanlang' />
+            <div className="grid grid-cols-2 gap-4">
+              <SelectDropdown label="Lavozim" value={form.position} onChange={v => set('position', v)} options={positionOptions} placeholder="Lavozim tanlang" disabled={ro} />
               <div>
-                <label className={labelCls}>Sprint raqami</label>
-                <input type='number' min='0' max='10' value={form.sprint} onChange={e => set('sprint', e.target.value)}
-                  placeholder='0' className={inputCls(errors.sprint)} />
-                {errors.sprint && <p className='text-xs text-red-500 mt-1'>{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
+                <label className={labelCls}>Sprint raqami <span className="text-[#8F95A8] font-normal">(1–10)</span></label>
+                <input type="text" inputMode="numeric" value={form.sprint}
+                  onChange={e => !ro && handleSprint(e.target.value)}
+                  readOnly={ro} placeholder="1" className={inputCls(errors.sprint, ro)} />
+                {errors.sprint && <p className="text-xs text-red-500 mt-1">{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
               </div>
             </div>
 
             {/* Vazifa narxi + Jarima */}
-            <div className='grid grid-cols-2 gap-4'>
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Vazifa narxi (UZS)</label>
-                <input value={form.task_price} onChange={e => set('task_price', e.target.value.replace(/[^\d.]/g, ''))}
-                  placeholder='0.00' className={inputCls(false) + ' text-right'} />
+                <input type="text" inputMode="numeric" value={form.task_price}
+                  onChange={e => !ro && set('task_price', formatPrice(e.target.value))}
+                  readOnly={ro} placeholder="0" className={inputCls(false, ro) + ' text-right'} />
               </div>
               <div>
-                <label className={labelCls}>Jarima foizi (%)</label>
-                <input value={form.penalty_percentage} onChange={e => set('penalty_percentage', e.target.value.replace(/[^\d.]/g, ''))}
-                  placeholder='0' className={inputCls(false)} />
+                <label className={labelCls}>Jarima foizi (%) <span className="text-[#8F95A8] font-normal">(0–100)</span></label>
+                <input type="text" inputMode="numeric" value={form.penalty_percentage}
+                  onChange={e => !ro && handlePenalty(e.target.value)}
+                  readOnly={ro} placeholder="0" className={inputCls(false, ro)} />
               </div>
             </div>
 
             {/* Muddati + Taxminiy vaqt */}
-            <div className='grid grid-cols-2 gap-4'>
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <div className='flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]'>
-                  <input ref={dateRef} type='date' value={form.deadline} onChange={e => set('deadline', e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type='button' onClick={() => dateRef.current?.showPicker?.()}
-                    className='shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]'>
-                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><rect x='3' y='4' width='18' height='18' rx='2'/><path d='M16 2v4M8 2v4M3 10h18'/></svg>
-                  </button>
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] ${ro ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]'}`}>
+                  <input ref={dateRef} type="date" value={form.deadline}
+                    onChange={e => !ro && set('deadline', e.target.value)}
+                    readOnly={ro}
+                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'} ${ro ? 'cursor-default' : 'cursor-pointer'}`} />
+                  {!ro && (
+                    <button type="button" onClick={() => dateRef.current?.showPicker?.()}
+                      className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
                 <label className={labelCls}>Taxminiy vaqt (soat : daqiqa)</label>
-                <div className='grid grid-cols-2 gap-2'>
-                  <input type='number' min='0' value={form.estimated_hours} onChange={e => set('estimated_hours', e.target.value)}
-                    placeholder='0 soat' className={inputCls(false)} />
-                  <input type='number' min='0' max='59' value={form.estimated_minutes} onChange={e => set('estimated_minutes', e.target.value)}
-                    placeholder='0 daqiqa' className={inputCls(false)} />
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="number" min="0" value={form.estimated_hours}
+                    onChange={e => !ro && set('estimated_hours', e.target.value)}
+                    readOnly={ro} placeholder="0 soat" className={inputCls(false, ro)} />
+                  <input type="number" min="0" max="59" value={form.estimated_minutes}
+                    onChange={e => !ro && set('estimated_minutes', e.target.value)}
+                    readOnly={ro} placeholder="0 daqiqa" className={inputCls(false, ro)} />
                 </div>
               </div>
             </div>
 
           </div>
 
-          <div className='px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]'>
+          <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
             <button onClick={onClose}
-              className='flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]'>
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
             </button>
-            <button onClick={handleSubmit} disabled={loading}
-              className='flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60'>
-              {loading
-                ? <svg className='animate-spin w-4 h-4' viewBox='0 0 24 24' fill='none'><circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'/><path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z'/></svg>
-                : <svg width='13' height='13' viewBox='0 0 12 12' fill='none'><path d='M2 6l3 3 5-5' stroke='white' strokeWidth='1.8' strokeLinecap='round' strokeLinejoin='round'/></svg>
-              }
-              Saqlash
-            </button>
+            {canEdit && (
+              <button onClick={handleSubmit} disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                {loading
+                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                }
+                Saqlash
+              </button>
+            )}
           </div>
 
         </div>
       </div>
 
-      {pickerOpen && (
+      {pickerOpen && !ro && (
         <UserPickerModal
-          title='Topshiruvchi tanlang'
+          title="Topshiruvchi tanlang"
           selected={form.assignees}
           users={users}
           onClose={() => setPickerOpen(false)}

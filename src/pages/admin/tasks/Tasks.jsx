@@ -182,7 +182,10 @@ function KanbanColumn({ col, cards }) {
 export default function TasksPage() {
   const { registerAction, clearAction, registerNavbarExtra, clearNavbarExtra, registerSidebarClick, clearSidebarClick } = usePageAction()
   const { user } = useAuth()
-  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
+  const activeRole = user?.active_role || user?.roles?.[0]
+  const isAuditor  = activeRole === 'auditor'
+  const isEmployee = activeRole === 'employee'
+  const canEdit    = activeRole === 'admin' || activeRole === 'superadmin' || activeRole === 'manager'
 
   const [viewMode, setViewMode]       = useState('table')
   const [search, setSearch]           = useState('')
@@ -195,6 +198,7 @@ export default function TasksPage() {
   const [hasMore, setHasMore]         = useState(false)
   const [page, setPage]               = useState(1)
   const [editTask, setEditTask]       = useState(null)
+  const [taskLoading, setTaskLoading] = useState(false)
   const [cards, setCards]             = useState(INITIAL_CARDS)
   const scrollRef = useRef(null)
 
@@ -284,8 +288,21 @@ export default function TasksPage() {
     }
   }
 
-  const switchToKanban = () => setViewMode('kanban')
+  // Task ni API dan to'liq yuklash
+  const loadTaskDetail = async (id) => {
+    setTaskLoading(true)
+    try {
+      const res = await axiosAPI.get(`/tasks/${id}/`)
+      const task = res.data?.data ?? res.data
+      setEditTask(task)
+    } catch (err) {
+      toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
+    } finally {
+      setTaskLoading(false)
+    }
+  }
   const switchToTable  = () => setViewMode('table')
+  const switchToKanban = () => setViewMode('kanban')
 
   const onDragEnd = ({ destination, source, draggableId }) => {
     if (!destination) return
@@ -309,7 +326,7 @@ export default function TasksPage() {
   }
 
   useEffect(() => {
-    if (!isAuditor) {
+    if (!isAuditor && !isEmployee) {
       registerAction({
         label: "Vazifa qo'shish",
         icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
@@ -452,6 +469,7 @@ export default function TasksPage() {
             ) : (
               data.map((t, idx) => (
                 <tr key={t.id}
+                  onClick={() => loadTaskDetail(t.id)}
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title || t.name}</td>
@@ -462,10 +480,15 @@ export default function TasksPage() {
                   <td className="px-4 py-3 text-right font-medium text-[#1A1D2E] dark:text-white">{PRIORITY_LABEL[t.priority] || t.level || '—'}</td>
                   <td className="px-4 py-3 text-right font-medium text-[#1A1D2E] dark:text-white">{TASK_STATUS_LABEL[t.status] || t.status || '—'}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtTaskDt(t.deadline)}</td>
-                  <td className="px-4 py-3">
-                    {!isAuditor && (
+                  <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                    {!isAuditor && canEdit && (
                       <TaskRowMenu
-                        onEdit={() => setEditTask(t)}
+                        onEdit={() => loadTaskDetail(t.id)}
+                        onDelete={() => handleDelete(t.id)}
+                      />
+                    )}
+                    {!isAuditor && !canEdit && (
+                      <TaskRowMenu
                         onDelete={() => handleDelete(t.id)}
                       />
                     )}
@@ -501,8 +524,21 @@ export default function TasksPage() {
         <AddTaskModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />
       )}
       {editTask && (
-        <EditTaskModal task={editTask} onClose={() => setEditTask(null)}
-          onSave={(id, body) => handleEdit(id, body)} />
+        <EditTaskModal
+          task={editTask}
+          canEdit={canEdit}
+          onClose={() => setEditTask(null)}
+          onSave={(id, body) => handleEdit(id, body)}
+        />
+      )}
+
+      {taskLoading && (
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
+          <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+        </div>
       )}
 
     </div>

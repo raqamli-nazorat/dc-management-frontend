@@ -209,14 +209,36 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [errors, setErrors] = useState({})
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: false })) }
 
+  // Narxni formatlash: faqat raqam, max 12 xona, minglik ajratgich
+  const formatPrice = (val) => {
+    const digits = val.replace(/\D/g, '').slice(0, 12)
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  }
+
+  // Foiz: 0–100
+  const handlePenalty = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (digits === '') { set('penalty_percentage', ''); return }
+    const num = Math.min(100, Math.max(0, parseInt(digits, 10)))
+    set('penalty_percentage', String(num))
+  }
+
+  // Sprint: 1–10
+  const handleSprint = (val) => {
+    const digits = val.replace(/\D/g, '')
+    if (digits === '') { set('sprint', ''); return }
+    const num = Math.min(10, Math.max(1, parseInt(digits, 10)))
+    set('sprint', String(num))
+  }
+
   const validate = () => {
     const e = {}
     if (!form.project)      e.project  = true
     if (!form.title.trim()) e.title    = true
     if (!form.priority)     e.priority = true
     if (!form.type)         e.type     = true
-    if (form.sprint && (isNaN(Number(form.sprint)) || Number(form.sprint) > 10 || Number(form.sprint) < 0)) {
-      e.sprint = 'Sprint 0 dan 10 gacha bo\'lishi kerak'
+    if (form.sprint && (isNaN(Number(form.sprint)) || Number(form.sprint) > 10 || Number(form.sprint) < 1)) {
+      e.sprint = "Sprint 1 dan 10 gacha bo'lishi kerak"
     }
     setErrors(e)
     return Object.keys(e).length === 0
@@ -347,9 +369,15 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <SelectDropdown label="Lavozim" value={form.position} onChange={v => set("position", v)} options={positionOptions} placeholder="Lavozim tanlang" />
               <div>
-                <label className={labelCls}>Sprint raqami</label>
-                <input type="number" min="0" max="10" value={form.sprint} onChange={e => set("sprint", e.target.value)}
-                  placeholder="0" className={inputCls(errors.sprint)} />
+                <label className={labelCls}>Sprint raqami <span className="text-[#8F95A8] font-normal">(1–10)</span></label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.sprint}
+                  onChange={e => handleSprint(e.target.value)}
+                  placeholder="1"
+                  className={inputCls(errors.sprint)}
+                />
                 {errors.sprint && <p className="text-xs text-red-500 mt-1">{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
               </div>
             </div>
@@ -358,13 +386,25 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Vazifa narxi (UZS)</label>
-                <input value={form.task_price} onChange={e => set("task_price", e.target.value.replace(/[^\d.]/g, ''))}
-                  placeholder="0.00" className={inputCls(false) + " text-right"} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.task_price}
+                  onChange={e => set('task_price', formatPrice(e.target.value))}
+                  placeholder="0"
+                  className={inputCls(false) + " text-right"}
+                />
               </div>
               <div>
-                <label className={labelCls}>Jarima foizi (%)</label>
-                <input value={form.penalty_percentage} onChange={e => set("penalty_percentage", e.target.value.replace(/[^\d.]/g, ''))}
-                  placeholder="0" className={inputCls(false)} />
+                <label className={labelCls}>Jarima foizi (%) <span className="text-[#8F95A8] font-normal">(0–100)</span></label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.penalty_percentage}
+                  onChange={e => handlePenalty(e.target.value)}
+                  placeholder="0"
+                  className={inputCls(false)}
+                />
               </div>
             </div>
 
