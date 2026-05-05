@@ -3,7 +3,9 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker } from 'antd'
+import { DatePicker, ConfigProvider, theme } from 'antd'
+import { useTheme } from '../../../context/ThemeContext'
+import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
 import { toast } from '../../../Toast/ToastProvider'
@@ -15,6 +17,9 @@ import { saveAs } from 'file-saver'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
+import { FiCalendar } from 'react-icons/fi'
+import { IoCloseCircle } from 'react-icons/io5'
+import { MdExpandMore } from 'react-icons/md'
 
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
@@ -39,6 +44,7 @@ const initialFilters = {
 }
 
 const Employee = () => {
+  const { isDark } = useTheme()
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
   const [filterModal, setFilterModal] = useState(false)
@@ -651,7 +657,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none transition-colors bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -667,7 +673,7 @@ const Employee = () => {
               e.preventDefault()
               setFilterModal(prev => !prev)
             }}
-            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
+            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-white! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
             Filtrlash
@@ -677,7 +683,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-red-100 text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-[#1E2021] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -698,156 +704,179 @@ const Employee = () => {
       <div
         className={`transition-all duration-300 ease-in-out w-full ${filterModal ? 'max-h-[1200px] opacity-100 pointer-events-auto' : 'max-h-0 opacity-0 pointer-events-none'} mt-4`}
       >
-        {/* Row 1 */}
-        <div className="grid grid-cols-4 gap-4 mb-3">
-          <div className="col-span-4 lg:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muddati</label>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  format="DD.MM.YYYY HH:mm"
-                  value={filters.deadline_min}
-                  onChange={(value) => handleFilterChange('deadline_min', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                  placeholder='Boshlanish sanasi'
-                />
+        <ConfigProvider
+          theme={{
+            algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+            token: {
+              borderRadius: 12,
+              colorPrimary: '#7186ED',
+              motion: false,
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+            },
+            components: {
+              Select: {
+                selectorBg: isDark ? '#222323' : '#ffffff',
+                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
+                optionActiveBg: isDark ? '#222323' : '#F8F9FC',
+              }
+            }
+          }}
+        >
+          {/* Row 1 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div className="col-span-4 lg:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muddati</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    format="DD.MM.YYYY HH:mm"
+                    value={filters.deadline_min}
+                    onChange={(value) => handleFilterChange('deadline_min', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Boshlanish sanasi'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    value={filters.deadline_max}
+                    format="DD.MM.YYYY HH:mm"
+                    onChange={(value) => handleFilterChange('deadline_max', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Tugash sana'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
               </div>
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  value={filters.deadline_max}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('deadline_max', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400 transition-colors hover:border-slate-200!"
-                  placeholder='Tugash sana'
-                />
+            </div>
+
+            <div className="col-span-4 lg:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Boshqaruvchi bonusi</label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <FilterInput
+                    label="dan"
+                    className='bg-white'
+                    value={filters.price_min}
+                    onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
+                  />
+                </div>
+
+                <div className="relative">
+                  <FilterInput
+                    label="gacha"
+                    className='bg-white'
+                    value={filters.price_max}
+                    onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="col-span-4 lg:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Boshqaruvchi bonusi</label>
+          {/* Row 2 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muallif</label>
+              <button
+                type="button"
+                onClick={() => setSelectAuthor(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative">
-                <FilterInput
-                  label="dan"
-                  className='bg-white'
-                  value={filters.price_min}
-                  onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
-                />
-              </div>
+                  {filters.created_by && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('created_by', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Boshqaruvchi</label>
+              <button
+                type="button"
+                onClick={() => setSelectManager(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.manager ? `${filters.manager.split(',').filter(Boolean).length} ta boshqaruvchi` : 'Boshqaruvchi tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
 
-              <div className="relative">
-                <FilterInput
-                  label="gacha"
-                  className='bg-white'
-                  value={filters.price_max}
-                  onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
-                />
-              </div>
+                  {filters.manager && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('manager', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
+              <button
+                type="button"
+                onClick={() => setSelectUser(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.employees ? `${filters.employees.split(',').filter(Boolean).length} ta xodim` : 'Xodimlar tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
+
+                  {filters.employees && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('employees', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Sinovchilar</label>
+              <button
+                type="button"
+                onClick={() => setSelectTester(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.testers ? `${filters.testers.split(',').filter(Boolean).length} ta sinovchi` : 'Sinovchilar tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
+
+                  {filters.testers && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('testers', '') }}
+                    />
+                  )}
+                </div>
+              </button>
             </div>
           </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="grid grid-cols-4 gap-4 mb-3">
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muallif</label>
-            <button
-              type="button"
-              onClick={() => setSelectAuthor(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.created_by && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('created_by', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Boshqaruvchi</label>
-            <button
-              type="button"
-              onClick={() => setSelectManager(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.manager ? `${filters.manager.split(',').filter(Boolean).length} ta boshqaruvchi` : 'Boshqaruvchi tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.manager && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('manager', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
-            <button
-              type="button"
-              onClick={() => setSelectUser(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.employees ? `${filters.employees.split(',').filter(Boolean).length} ta xodim` : 'Xodimlar tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.employees && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('employees', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Sinovchilar</label>
-            <button
-              type="button"
-              onClick={() => setSelectTester(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.testers ? `${filters.testers.split(',').filter(Boolean).length} ta sinovchi` : 'Sinovchilar tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.testers && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('testers', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-        </div>
+        </ConfigProvider>
       </div>
 
       {/* Table Section */}

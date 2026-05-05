@@ -151,8 +151,7 @@ function Breadcrumb() {
               <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
             )}
             <span
-              className="text-[13px] font-medium"
-              style={{ color: isLast ? '#5B6078' : '#5B6078' }}
+              className={`text-[13px] font-medium ${isLast ? 'text-[#5B6078] dark:text-white' : 'text-[#c2c8e0]'}`}
             >
               {label}
             </span>
@@ -165,7 +164,6 @@ function Breadcrumb() {
 
 export default function Layout() {
   const { action, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
-  const { isDark, toggleTheme } = useTheme()
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifs, setNotifs] = useState(NOTIFS_DATA)
   const [downloadOpen, setDownloadOpen] = useState(false)
@@ -204,7 +202,7 @@ export default function Layout() {
                 {breadcrumbExtra && (
                   <>
                     <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
-                    <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0]">
+                    <span className="text-[13px] font-medium text-[#5B6078] dark:text-white">
                       {breadcrumbExtra}
                     </span>
                   </>
@@ -230,7 +228,7 @@ export default function Layout() {
             {print && (
               <button
                 onClick={print.onClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer  bg-[#e9eeff] text-[#1A1D2E] "
+                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer  bg-[#e9eeff] dark:bg-[#303131] dark:text-white text-[#1A1D2E] "
                 style={{ fontSize: 13, fontWeight: 800 }}
               >
                 <MdOutlinePrint size={20} />
