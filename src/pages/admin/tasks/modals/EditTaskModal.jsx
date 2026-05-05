@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { labelCls, PROJECTS_LIST } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
+import { DateTimeBox } from '../../Components/DateTimeBox'
 
 const PRIORITY_OPTIONS = [
   { label: 'Past',    value: 'low' },
@@ -123,7 +124,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
@@ -176,7 +177,6 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
 }
 
 export default function EditTaskModal({ task, onClose, onSave, canEdit = true }) {
-  const dateRef = useRef(null)
   const [projects, setProjects] = useState([])
   const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
@@ -336,7 +336,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ maxHeight: '90vh' }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* ── Header (qotgan) ── */}
           <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
@@ -444,18 +444,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] ${ro ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]'}`}>
-                  <input ref={dateRef} type="date" value={form.deadline}
-                    onChange={e => !ro && set('deadline', e.target.value)}
-                    readOnly={ro}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'} ${ro ? 'cursor-default' : 'cursor-pointer'}`} />
-                  {!ro && (
-                    <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                      className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    </button>
-                  )}
-                </div>
+                <DateTimeBox
+                  type="date"
+                  placeholder="KK/OO/YYYY"
+                  value={form.deadline}
+                  onChange={v => !ro && set('deadline', v)}
+                />
               </div>
               <div>
                 <label className={labelCls}>Taxminiy vaqt (soat : daqiqa)</label>
