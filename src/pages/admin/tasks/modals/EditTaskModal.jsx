@@ -116,11 +116,13 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
   )
 }
 
+// Bitta topshiruvchi tanlash (radio)
 function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const [search, setSearch] = useState('')
-  const [temp, setTemp] = useState(selected ? [...selected] : [])
+  // selected — array, lekin faqat birinchisi ishlatiladi
+  const [temp, setTemp] = useState(selected?.length > 0 ? selected[0] : null)
   const filtered = users.filter(u => (u.username ?? '').toLowerCase().includes(search.toLowerCase()))
-  const toggle = (u) => setTemp(prev => prev.find(x => x.id === u.id) ? prev.filter(x => x.id !== u.id) : [...prev, u])
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
@@ -141,13 +143,15 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
         <div className="flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2">
           {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
           {filtered.map(u => {
-            const isSel = temp.find(x => x.id === u.id)
+            const isSel = temp?.id === u.id
             return (
-              <button key={u.id} onClick={() => toggle(u)}
+              <button key={u.id} onClick={() => setTemp(isSel ? null : u)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left
-                  ${isSel ? 'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[#3F57B3]' : 'bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'}`}>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
-                  {isSel && <FaCheck size={9} className="text-white" />}
+                  ${isSel ? 'bg-[#EEF1FB] border-[#526ED3] dark:bg-[#292A2A] dark:border-[#3F57B3]' : 'bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'}`}>
+                {/* Radio circle */}
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
+                  ${isSel ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
+                  {isSel && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
                 <div className="w-9 h-9 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
@@ -161,13 +165,13 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
           })}
         </div>
         <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
+          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => setTemp([])} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
-            <button onClick={() => onConfirm(temp)} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
-              <FaCheck size={12} /> Qo'shish
+            <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              <FaCheck size={12} /> Tanlash
             </button>
           </div>
         </div>
@@ -465,15 +469,23 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             {/* Topshiruvchi */}
             <div>
               <label className={labelCls}>Topshiruvchi</label>
+              {/* in_progress statusida topshiruvchi o'zgartirilmaydi */}
+              {form.status === 'in_progress' && !ro && (
+                <p className="text-xs text-amber-500 dark:text-amber-400 mb-1.5">
+                  ⚠ Jarayondagi vazifada topshiruvchi o'zgartirilmaydi
+                </p>
+              )}
               <button type="button"
-                onClick={() => !ro && form.project ? setPickerOpen(true) : null}
+                onClick={() => !ro && form.project && form.status !== 'in_progress' ? setPickerOpen(true) : null}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-                  ${ro || !form.project ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]'}
+                  ${ro || !form.project || form.status === 'in_progress'
+                    ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]'
+                    : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]'}
                   border-[#E2E6F2] dark:border-[#292A2A]`}>
                 <span className={assigneeLabel ? 'text-[#1A1D2E] dark:text-white flex-1 text-left truncate' : 'text-[#5B6078] flex-1 text-left'}>
                   {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
                 </span>
-                {!ro && form.project && (
+                {!ro && form.project && form.status !== 'in_progress' && (
                   <div className="flex items-center gap-1.5 shrink-0 ml-1">
                     {form.assignees.length > 0 && (
                       <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
