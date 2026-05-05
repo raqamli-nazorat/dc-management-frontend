@@ -1,6 +1,6 @@
 ﻿import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react-icons/fa6'
-import { labelCls, PROJECTS_LIST } from '../components/constants'
+import { labelCls } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import { DateTimeBox } from '../../Components/DateTimeBox'
@@ -20,7 +20,7 @@ const STATUS_OPTIONS = [
   { label: 'Bajarilishi kerak', value: 'todo' },
   { label: 'Jarayonda',         value: 'in_progress' },
   { label: 'Bajarilgan',        value: 'done' },
-  { label: 'Ishga tushirilgan', value: 'deployed' },
+  { label: 'Ishga tushirilgan', value: 'production' },
   { label: 'Tekshirilgan',      value: 'reviewed' },
   { label: 'Rad etilgan',       value: 'rejected' },
 ]
@@ -182,8 +182,8 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
 
 export default function EditTaskModal({ task, onClose, onSave, canEdit = true }) {
   const [projects, setProjects] = useState([])
-  const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
+  const [projectEmployees, setProjectEmployees] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   // Existing attachments from the task
@@ -195,21 +195,40 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   const fileInputRef = useRef(null)
 
   useEffect(() => {
-    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+    // project-shorts — tezroq endpoint (faqat ro'yxat uchun)
+    axiosAPI.get('/project-shorts/', { params: { page_size: 200 } })
       .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setProjects(Array.isArray(list) ? list : PROJECTS_LIST)
-      }).catch(() => setProjects(PROJECTS_LIST))
-    axiosAPI.get('/users/', { params: { page_size: 200 } })
-      .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setAllUsers(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setProjects(Array.isArray(list) ? list : [])
+      }).catch(() => {
+        axiosAPI.get('/projects/', { params: { page_size: 100 } })
+          .then(res => {
+            const payload = res.data?.data ?? res.data
+            const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+            setProjects(Array.isArray(list) ? list : [])
+          }).catch(() => setProjects([]))
+      })
     axiosAPI.get('/applications/positions/', { params: { page_size: 100 } })
       .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
       }).catch(() => {})
+  }, [])
+
+  // Mavjud task ning loyihasidan xodimlarni yuklash
+  useEffect(() => {
+    const projId = initProject
+    if (projId) {
+      axiosAPI.get(`/projects/${projId}/`)
+        .then(res => {
+          const proj = res.data?.data ?? res.data
+          const emps = proj?.employees_info ?? []
+          setProjectEmployees(Array.isArray(emps) ? emps : [])
+        })
+        .catch(() => {})
+    }
   }, [])
 
   // Parse deadline: date = slice(0,10), time = local HH:MM from Date object
@@ -268,6 +287,16 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     if (k === 'project') {
       setForm(p => ({ ...p, project: v, assignees: [] }))
       setErrors(p => ({ ...p, project: false }))
+      setProjectEmployees([])
+      if (v) {
+        axiosAPI.get(`/projects/${v}/`)
+          .then(res => {
+            const proj = res.data?.data ?? res.data
+            const emps = proj?.employees_info ?? []
+            setProjectEmployees(Array.isArray(emps) ? emps : [])
+          })
+          .catch(() => {})
+      }
       return
     }
     setForm(p => ({ ...p, [k]: v }))
@@ -287,15 +316,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
       }
     }
   }, [projects])
-
-  const projectEmployees = (() => {
-    if (!selectedProject) return []
-    if (selectedProject.employees_info?.length) return selectedProject.employees_info
-    if (selectedProject.employees?.length) {
-      return allUsers.filter(u => selectedProject.employees.includes(u.id))
-    }
-    return []
-  })()
 
   const formatPrice = (val) => {
     const clean = val.replace(/[^\d.]/g, '').replace(/^(\d*\.?\d{0,2}).*$/, '$1')

@@ -92,3 +92,8 @@ input[type="time"]::-webkit-datetime-edit-minute-field {
 .dark input[type="time"]::-webkit-datetime-edit-minute-field {
   color: #FFFFFF;
 }
+
+/* Kanban ustun ichidagi scroll ko'rinmasin */
+.kanban-col-scroll::-webkit-scrollbar {
+  display: none;
+}

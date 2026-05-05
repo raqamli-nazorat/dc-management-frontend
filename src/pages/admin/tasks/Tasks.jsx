@@ -16,9 +16,15 @@ import { toast } from '../../../Toast/ToastProvider'
 const TYPE_LABEL = { bug: 'Xato', feature: 'Yangi funksiya', improvement: "Qo'shimcha" }
 const PRIORITY_LABEL = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
 const TASK_STATUS_LABEL = {
-  todo: 'Bajarilishi kerak', in_progress: 'Jarayonda', done: 'Bajarilgan',
-  deployed: 'Ishga tushirilgan', reviewed: 'Tekshirilgan',
-  rejected: 'Rad etilgan', overdue: "Muddati o'tgan", cancelled: 'Bekor qilingan',
+  todo:        'Bajarilishi kerak',
+  in_progress: 'Jarayonda',
+  done:        'Bajarilgan',
+  production:  'Ishga tushirilgan',
+  deployed:    'Ishga tushirilgan',
+  reviewed:    'Tekshirilgan',
+  rejected:    'Rad etilgan',
+  overdue:     "Muddati o'tgan",
+  cancelled:   'Bekor qilingan',
 }
 const fmtTaskDt = (iso) => {
   if (!iso) return '—'
@@ -30,27 +36,39 @@ const fmtTaskDt = (iso) => {
 
 // ── Status → Column mapping ──
 const STATUS_TO_COL = {
-  todo: 'todo',
+  todo:        'todo',
   in_progress: 'in_progress',
-  done: 'done',
-  deployed: 'deployed',
-  reviewed: 'reviewed',
-  rejected: 'rejected',
-  overdue: 'overdue',
-  cancelled: 'cancelled',
+  done:        'done',
+  production:  'production',
+  deployed:    'deployed',
+  reviewed:    'reviewed',
+  rejected:    'rejected',
+  overdue:     'overdue',
+  cancelled:   'cancelled',
 }
 
 /* ── Columns ── */
-// droppable: false — bu ustunGA boshqa joydan tashlab bo'lmaydi
 const COLUMNS = [
-  { id: 'todo', label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1', droppable: true },
-  { id: 'in_progress', label: 'Jarayonda', color: '#3B82F6', bg: '#E3F2FD', droppable: true },
-  { id: 'done', label: 'Bajarilgan', color: '#8B5CF6', bg: '#EDE7F6', droppable: true },
-  { id: 'deployed', label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9', droppable: false },
-  { id: 'reviewed', label: 'Tekshirilgan', color: '#06B6D4', bg: '#E0FFF9', droppable: true },
-  { id: 'rejected', label: 'Rad etilgan', color: '#EF4444', bg: '#FFEBEE', droppable: true },
-  { id: 'overdue', label: "Muddati o'tgan", color: '#9CA3AF', bg: '#F5F5F5', droppable: false },
+  { id: 'todo',        label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1' },
+  { id: 'in_progress', label: 'Jarayonda',          color: '#3B82F6', bg: '#E3F2FD' },
+  { id: 'done',        label: 'Bajarilgan',         color: '#8B5CF6', bg: '#EDE7F6' },
+  { id: 'production',  label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9' },
+  { id: 'reviewed',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9' },
+  { id: 'rejected',    label: 'Rad etilgan',        color: '#EF4444', bg: '#FFEBEE' },
+  { id: 'overdue',     label: "Muddati o'tgan",     color: '#9CA3AF', bg: '#F5F5F5' },
 ]
+
+// Qaysi ustundan qaysi ustunga o'tish mumkin
+const ALLOWED_TRANSITIONS = {
+  todo:        ['in_progress', 'done'],
+  in_progress: ['todo', 'done', 'reviewed'],
+  done:        ['in_progress', 'production', 'reviewed'],
+  production:  ['rejected', 'reviewed'],
+  reviewed:    ['done', 'production'],
+  rejected:    [],
+  overdue:     ['in_progress'],
+  cancelled:   [],
+}
 
 /* ── helpers ── */
 const fmtDate = (iso) => {
@@ -68,9 +86,9 @@ const fmtDate = (iso) => {
 
 const PRIORITY_DOT = { low: '#22c55e', medium: '#f59e0b', high: '#f97316', critical: '#ef4444' }
 
-/* ── Countdown hook ── */
-function useCountdown(deadline) {
-  const calc = () => {
+/* ── Countdown hook — drag paytida to'xtatiladi ── */
+function useCountdown(deadline, paused) {
+  const calc = useCallback(() => {
     if (!deadline) return null
     const diff = new Date(deadline) - new Date()
     if (diff <= 0) return null
@@ -78,18 +96,19 @@ function useCountdown(deadline) {
     const m = Math.floor((diff % 3600000) / 60000)
     const s = Math.floor((diff % 60000) / 1000)
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-  }
+  }, [deadline])
+
   const [tick, setTick] = useState(calc)
   useEffect(() => {
-    if (!deadline) return
+    if (!deadline || paused) return
     const id = setInterval(() => setTick(calc()), 1000)
     return () => clearInterval(id)
-  }, [deadline])
+  }, [deadline, paused, calc])
   return tick
 }
 
 /* ── KanbanCard ── */
-function KanbanCard({ card, index, onOpen, colColor }) {
+function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
   const now = new Date()
   const deadline = card.deadline ? new Date(card.deadline) : null
   const isOverdue = deadline && deadline < now &&
@@ -104,9 +123,9 @@ function KanbanCard({ card, index, onOpen, colColor }) {
     ? `${estimatedH ? estimatedH + 'h ' : ''}${estimatedM ? estimatedM + 'min' : ''}`.trim()
     : null
 
-  // Countdown faqat muddati yaqin (24 soat ichida) va overdue bo'lmagan vazifalar uchun
   const showCountdown = deadline && !isOverdue && (deadline - now) < 86400000
-  const countdown = useCountdown(showCountdown ? card.deadline : null)
+  // drag paytida countdown to'xtatiladi — re-render bo'lmasin
+  const countdown = useCountdown(showCountdown ? card.deadline : null, isDraggingGlobal)
 
   return (
     <Draggable draggableId={String(card.id)} index={index}>
@@ -115,27 +134,25 @@ function KanbanCard({ card, index, onOpen, colColor }) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          onClick={() => onOpen(card.id)}
+          onClick={() => !snapshot.isDragging && onOpen(card.id)}
           style={{
             ...provided.draggableProps.style,
-            opacity: snapshot.isDragging ? 0.92 : 1,
-            transform: snapshot.isDragging
-              ? `${provided.draggableProps.style?.transform} scale(1.02)`
-              : provided.draggableProps.style?.transform,
+            // transition ni drag paytida o'chiramiz — freeze oldini olish
+            transition: snapshot.isDragging
+              ? provided.draggableProps.style?.transition
+              : undefined,
+            opacity: snapshot.isDragging ? 0.95 : 1,
             boxShadow: snapshot.isDragging
-              ? '0 12px 32px rgba(0,0,0,0.15)'
-              : '0 1px 4px rgba(0,0,0,0.06)',
+              ? '0 8px 20px rgba(0,0,0,0.15)'
+              : '0 1px 3px rgba(0,0,0,0.05)',
           }}
-          className={`w-full rounded-xl bg-white dark:bg-[#1E1F1F] select-none cursor-grab active:cursor-grabbing overflow-hidden
-            border transition-all duration-150
+          className={`w-full shrink-0 rounded-xl bg-white dark:bg-[#1E1F1F] select-none cursor-grab active:cursor-grabbing overflow-hidden border
             ${snapshot.isDragging
               ? 'border-[#526ED3]'
-              : 'border-[#E8EBF4] dark:border-[#2A2B2B] hover:shadow-md'}`}
+              : 'border-[#E8EBF4] dark:border-[#2A2B2B]'}`}
         >
           <div className="flex">
-
-
-            <div className="flex-1 px-2 py-1.5 flex flex-col gap-1.5">
+  <div className="flex-1 px-2 py-1.5 flex flex-col gap-1.5">
 
               {/* Title */}
               <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
@@ -144,7 +161,6 @@ function KanbanCard({ card, index, onOpen, colColor }) {
 
               {/* UID (flag icon) */}
               <div className="flex items-center gap-1">
-                {/* Flag icon */}
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
                 </svg>
@@ -154,7 +170,6 @@ function KanbanCard({ card, index, onOpen, colColor }) {
               {/* Deadline */}
               {deadline && (
                 <div className="flex items-center gap-1">
-                  {/* Calendar icon */}
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
                     <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                   </svg>
@@ -169,7 +184,6 @@ function KanbanCard({ card, index, onOpen, colColor }) {
                 <div className="flex items-center gap-2">
                   {durationStr && (
                     <div className="flex items-center gap-1">
-                      {/* Clock icon */}
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
                         <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                       </svg>
@@ -178,7 +192,6 @@ function KanbanCard({ card, index, onOpen, colColor }) {
                   )}
                   {countdown && (
                     <div className="flex items-center gap-1">
-                      {/* Hourglass icon */}
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" className="shrink-0">
                         <path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
                       </svg>
@@ -214,6 +227,8 @@ function KanbanCard({ card, index, onOpen, colColor }) {
               </div>
 
             </div>
+
+
           </div>
         </div>
       )}
@@ -339,18 +354,18 @@ function RejectionModal({ task, onClose, onConfirm }) {
 }
 
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
-  const isDisabled = !col.droppable
+function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget, isDraggingGlobal }) {
   return (
     <div
-      className="flex flex-col  transition-opacity duration-150 min-w-0"
+      className="flex flex-col min-w-0"
       style={{
         flex: '1 1 0',
-        opacity: isDimmed ? 0.3 : 1,
+        opacity: isDimmed ? 0.35 : 1,
+        willChange: isDraggingGlobal ? 'opacity' : 'auto',
       }}
     >
-      {/* Header — ustun nomi alohida, ustida */}
-      <div className="flex mb-5 text-center justify-center items-center gap-2  px-1">
+      {/* Header */}
+      <div className="flex  mb-2 justify-center items-center gap-2 px-1">
         <span className="text-[12px] font-bold text-[#1A1D2E] dark:text-white whitespace-nowrap truncate">{col.label}</span>
         <span
           className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
@@ -360,22 +375,23 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
         </span>
       </div>
 
-      {/* Cards area — vertikal scroll */}
-      <Droppable droppableId={col.id} isDropDisabled={isDisabled}>
+      {/* Cards area */}
+      <Droppable droppableId={col.id}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col gap-2 rounded-2xl p-1.5 transition-colors duration-150 overflow-y-auto"
+            className="kanban-col-scroll flex flex-col gap-2 rounded-2xl p-1.5 overflow-y-auto"
             style={{
               flex: '1 1 0',
               minHeight: 80,
-              backgroundColor: snapshot.isDraggingOver && !isDisabled
-                ? col.color + '18'
+              backgroundColor: snapshot.isDraggingOver
+                ? col.color + '22'
                 : col.bg,
-              outline: isDragTarget && !isDisabled ? `2px solid ${col.color}` : 'none',
+              outline: isDragTarget ? `2px solid ${col.color}` : 'none',
               outlineOffset: '-2px',
-              scrollbarWidth: 'thin',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
             }}
           >
             {cards.map((card, index) => (
@@ -385,6 +401,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
                 index={index}
                 onOpen={onOpen}
                 colColor={col.color}
+                isDraggingGlobal={isDraggingGlobal}
               />
             ))}
             {provided.placeholder}
@@ -418,11 +435,12 @@ export default function TasksPage() {
   const [taskLoading, setTaskLoading] = useState(false)
   const [cards, setCards] = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
-  const [draggingOver, setDraggingOver] = useState(null) // hozir ustida turgan col id
+  const [draggingOver, setDraggingOver] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
   const [rejectionPending, setRejectionPending] = useState(null) // { taskId, draggableId, sourceColId }
   const scrollRef = useRef(null)
 
-  const hasFilter = filters.projects?.length > 0 || filters.authors?.length > 0 ||
+  const hasFilter = filters.projects?.length > 0 ||
     !!filters.holat || !!filters.daraja || !!filters.turi ||
     !!filters.deadFromD || !!filters.deadToD || filters.myTasks
 
@@ -434,7 +452,6 @@ export default function TasksPage() {
     if (f.turi) p.type = f.turi
     if (f.myTasks) p.my_tasks = true
     if (f.projects?.length) p.project = f.projects.map(pr => pr.id || pr).join(',')
-    if (f.authors?.length) p.assignee = f.authors.map(a => a.id || a).join(',')
     if (f.deadFromD) p.deadline_from = f.deadFromD
     if (f.deadToD) p.deadline_to = f.deadToD
     return p
@@ -480,7 +497,6 @@ export default function TasksPage() {
     try {
       const res = await axiosAPI.post('/tasks/', body)
       const created = res.data?.data ?? res.data
-      setData(prev => [created, ...prev])
       toast.success("Vazifa yaratildi", "Yangi vazifa muvaffaqiyatli qo'shildi")
       return created
     } catch (err) {
@@ -530,8 +546,10 @@ export default function TasksPage() {
     setTaskLoading(true)
     try {
       const res = await axiosAPI.get(`/tasks/${id}/`)
+      // API: { data: {...task}, error, success } yoki to'g'ridan task object
       const task = res.data?.data ?? res.data
-      // project_info string bo'lsa, project ID ni data dan olish
+
+      // project_info object bo'lsa — project ID ni olish
       if (!task.project && task.project_info) {
         if (typeof task.project_info === 'object' && task.project_info?.id) {
           task.project = task.project_info.id
@@ -542,11 +560,10 @@ export default function TasksPage() {
       const status = err?.response?.status
       if (status === 404) {
         toast.error('Topilmadi', "Bu vazifa mavjud emas yoki o'chirilgan")
-        // Listdan ham olib tashlaymiz
         setData(prev => prev.filter(t => t.id !== id))
         setCards(prev => prev.filter(c => c.id !== id))
       } else if (status === 403) {
-        toast.error('Ruxsat yo\'q', "Bu vazifani ko'rish uchun ruxsatingiz yo'q")
+        toast.error("Ruxsat yo'q", "Bu vazifani ko'rish uchun ruxsatingiz yo'q")
       } else {
         toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
       }
@@ -566,7 +583,6 @@ export default function TasksPage() {
       if (f.turi) params.type = f.turi
       if (f.myTasks) params.my_tasks = true
       if (f.projects?.length) params.project = f.projects.map(pr => pr.id || pr).join(',')
-      if (f.authors?.length) params.assignee = f.authors.map(a => a.id || a).join(',')
       if (f.deadFromD) params.deadline_from = f.deadFromD
       if (f.deadToD) params.deadline_to = f.deadToD
       const res = await axiosAPI.get('/tasks/', { params })
@@ -584,25 +600,32 @@ export default function TasksPage() {
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
     setDraggingOver(null)
+    setIsDragging(false)
     if (!destination) return
     if (destination.droppableId === source.droppableId && destination.index === source.index) return
 
     const newStatus = destination.droppableId
+    const srcStatus = source.droppableId
     const taskId = Number(draggableId)
+    const draggedCard = cards.find(c => String(c.id) === String(draggableId))
 
-    // droppable: false bo'lgan ustunlarga tashlab bo'lmaydi
-    const destCol = COLUMNS.find(c => c.id === newStatus)
-    if (!destCol?.droppable) return
+    // Ruxsat etilgan o'tishlarni tekshirish
+    const allowed = ALLOWED_TRANSITIONS[srcStatus] || []
+    if (!allowed.includes(newStatus)) {
+      toast.error(
+        "O'tkazib bo'lmaydi",
+        `"${COLUMNS.find(c => c.id === srcStatus)?.label}" dan "${COLUMNS.find(c => c.id === newStatus)?.label}" ga o'tkazib bo'lmaydi`
+      )
+      return
+    }
 
-    // rejected ga tushganda — faqat deployed statusidagi vazifani rad etish mumkin
+    // rejected ga tushganda — sabab so'rash (faqat production dan)
     if (newStatus === 'rejected') {
-      const draggedCard = cards.find(c => String(c.id) === String(draggableId))
-      // source ustun deployed bo'lsa yoki karta deployed statusida bo'lsa ruxsat
-      if (draggedCard?.status !== 'deployed' && source.droppableId !== 'deployed') {
+      if (draggedCard?.status !== 'production' && srcStatus !== 'production') {
         toast.error("Rad etib bo'lmaydi", "Faqat 'Ishga tushirilgan' holatidagi vazifanigina rad etish mumkin.")
         return
       }
-      setRejectionPending({ taskId, draggableId, sourceColId: source.droppableId })
+      setRejectionPending({ taskId, draggableId, sourceColId: srcStatus })
       return
     }
 
@@ -614,7 +637,7 @@ export default function TasksPage() {
       setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
     } catch (err) {
       // Rollback
-      setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: source.droppableId } : c))
+      setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: srcStatus } : c))
       const errMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Holat yangilashda xatolik"
       const details = err?.response?.data?.error?.details
       if (details) {
@@ -628,6 +651,10 @@ export default function TasksPage() {
 
   const onDragUpdate = ({ destination }) => {
     setDraggingOver(destination?.droppableId || null)
+  }
+
+  const onDragStart = () => {
+    setIsDragging(true)
   }
 
   useEffect(() => {
@@ -679,7 +706,7 @@ export default function TasksPage() {
   /* ── KANBAN VIEW ── */
   if (viewMode === 'kanban') {
     return (
-      <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
+      <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate} onDragStart={onDragStart}>
         <div
           className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]"
           style={{ height: 'calc(100vh - 57px)' }}
@@ -702,8 +729,9 @@ export default function TasksPage() {
                   col={col}
                   cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
                   onOpen={loadTaskDetail}
-                  isDimmed={draggingOver !== null && draggingOver !== col.id}
+                  isDimmed={isDragging && draggingOver !== null && draggingOver !== col.id}
                   isDragTarget={draggingOver === col.id}
+                  isDraggingGlobal={isDragging}
                 />
               ))}
             </div>
@@ -883,7 +911,11 @@ export default function TasksPage() {
           onApply={handleApplyFilter} />
       )}
       {showAdd && (
-        <AddTaskModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />
+        <AddTaskModal onClose={() => setShowAdd(false)} onAdd={async (body) => {
+          const created = await handleAdd(body)
+          loadTasks(filters, search, 1)
+          return created
+        }} />
       )}
       {editTask && (
         <EditTaskModal

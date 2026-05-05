@@ -2,27 +2,24 @@
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
-import { LEVELS, TYPES, LEVEL_LABELS, TYPE_LABELS } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 
 /* ─── constants ─── */
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 
-const LEVEL_COLORS = {
-  low:      '#9CA3AF',
-  medium:   '#F59E0B',
-  high:     '#3B82F6',
-  critical: '#EF4444',
-}
-
 const HOLAT_LIST = [
-  'Kutilmoqda', 'Jarayonda', "Muddati o'tgan",
-  'Bajarilgan', 'Ishga tushirildi', 'Tekshirildi', 'Rad etildi',
+  { label: 'Bajarilishi kerak', value: 'todo' },
+  { label: 'Jarayonda',         value: 'in_progress' },
+  { label: "Muddati o'tgan",    value: 'overdue' },
+  { label: 'Bajarilgan',        value: 'done' },
+  { label: 'Ishga tushirilgan', value: 'production' },
+  { label: 'Tekshirilgan',      value: 'reviewed' },
+  { label: 'Rad etilgan',       value: 'rejected' },
+  { label: 'Bekor qilingan',    value: 'cancelled' },
 ]
 
 export const TASK_EMPTY_FILTER = {
   projects:  [],
-  authors:   [],
   holat:     '',
   daraja:    '',
   turi:      '',
@@ -33,7 +30,7 @@ export const TASK_EMPTY_FILTER = {
   myTasks:   false,
 }
 
-/* ─── SimpleDropdown ─── */
+/* ─── SimpleDropdown — { label, value } yoki string options ─── */
 function SimpleDropdown({ label, value, onChange, options, placeholder, renderOption }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -44,6 +41,14 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
     return () => document.removeEventListener('mousedown', h)
   }, [])
 
+  // options { label, value } yoki string bo'lishi mumkin
+  const getVal = o => (typeof o === 'object' ? o.value : o)
+  const getLabel = o => (typeof o === 'object' ? o.label : (renderOption ? renderOption(o) : o))
+  const selectedLabel = (() => {
+    const found = options.find(o => getVal(o) === value)
+    return found ? getLabel(found) : null
+  })()
+
   return (
     <div>
       {label && <label className={labelCls}>{label}</label>}
@@ -51,21 +56,17 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
             bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
             ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}
         >
           <span className="flex-1 text-left truncate">
-            {value
-              ? (renderOption ? renderOption(value) : value)
-              : placeholder}
+            {selectedLabel || placeholder}
           </span>
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
             {value && (
-              <span
-                onMouseDown={e => { e.stopPropagation(); onChange('') }}
-                className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"
-              >
+              <span onMouseDown={e => { e.stopPropagation(); onChange('') }}
+                className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
                 <FaXmark size={11} />
               </span>
             )}
@@ -78,16 +79,16 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {options.map((o, i) => (
               <button
-                key={o}
+                key={getVal(o)}
                 type="button"
-                onClick={() => { onChange(o); setOpen(false) }}
-                className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm  cursor-pointer
+                onClick={() => { onChange(getVal(o)); setOpen(false) }}
+                className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm cursor-pointer
                   ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                  ${value === o
+                  ${value === getVal(o)
                     ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
                     : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}
               >
-                {renderOption ? renderOption(o) : o}
+                {typeof o === 'object' ? o.label : (renderOption ? renderOption(o) : o)}
               </button>
             ))}
           </div>
@@ -371,22 +372,21 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
   const [subModal, setSubModal] = useState(null) // 'project' | 'author'
 
   const [projectsList, setProjectsList] = useState([])
-  const [usersList, setUsersList] = useState([])
 
   useEffect(() => {
-    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+    axiosAPI.get('/project-shorts/', { params: { page_size: 200 } })
       .then(res => {
         const payload = res.data?.data ?? res.data
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setProjectsList(list)
-      }).catch(() => {})
-
-    axiosAPI.get('/users/', { params: { page_size: 200 } })
-      .then(res => {
-        const payload = res.data?.data ?? res.data
-        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
-        setUsersList(list)
-      }).catch(() => {})
+      }).catch(() => {
+        axiosAPI.get('/projects/', { params: { page_size: 100 } })
+          .then(res => {
+            const payload = res.data?.data ?? res.data
+            const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+            setProjectsList(list)
+          }).catch(() => {})
+      })
   }, [])
 
   return (
@@ -425,16 +425,6 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
               placeholder="Loyiha tanlang"
             />
 
-            {/* Muallif */}
-            <MultiChipField
-              label="Muallif"
-              selected={f.authors}
-              onRemove={item => set('authors', f.authors.filter(x => x.name !== item.name))}
-              onClick={() => setSubModal('author')}
-              placeholder="Muallif tanlang"
-              renderChip={item => `${item.name} | ${item.role}`}
-            />
-
             {/* Holati + Darajasi + Turi */}
             <div className="grid grid-cols-3 gap-3">
               <SimpleDropdown
@@ -448,20 +438,23 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
                 label="Darajasi"
                 value={f.daraja}
                 onChange={v => set('daraja', v)}
-                options={LEVELS}
+                options={[
+                  { label: 'Past',    value: 'low' },
+                  { label: "O'rta",   value: 'medium' },
+                  { label: 'Yuqori',  value: 'high' },
+                  { label: 'Kritik',  value: 'critical' },
+                ]}
                 placeholder="Daraja tanlang"
-                renderOption={o => (
-                  <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full shrink-0" style={{ background: LEVEL_COLORS[o] ?? '#9CA3AF' }} />
-                    {o}
-                  </span>
-                )}
               />
               <SimpleDropdown
                 label="Turi"
                 value={f.turi}
                 onChange={v => set('turi', v)}
-                options={TYPES}
+                options={[
+                  { label: 'Xato',           value: 'bug' },
+                  { label: 'Yangi funksiya',  value: 'feature' },
+                  { label: "Qo'shimcha",      value: 'improvement' },
+                ]}
                 placeholder="Turi tanlang"
               />
             </div>
@@ -521,15 +514,6 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           onClose={() => setSubModal(null)}
           onApply={items => { set('projects', items); setSubModal(null) }}
           projectsList={projectsList}
-        />
-      )}
-      {subModal === 'author' && (
-        <AuthorSelectModal
-          title="Muallif tanlang"
-          selected={f.authors}
-          onClose={() => setSubModal(null)}
-          onApply={items => { set('authors', items); setSubModal(null) }}
-          usersList={usersList}
         />
       )}
     </>

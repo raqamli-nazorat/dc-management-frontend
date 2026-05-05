@@ -1,6 +1,6 @@
 ﻿import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
-import { labelCls, PROJECTS_LIST } from "../components/constants"
+import { labelCls } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
 import { toast } from "../../../../Toast/ToastProvider"
 import { DateTimeBox } from "../../Components/DateTimeBox"
@@ -172,27 +172,31 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
 
 export default function AddTaskModal({ onClose, onAdd }) {
   const [projects, setProjects] = useState([])
-  const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
+  const [projectEmployees, setProjectEmployees] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    axiosAPI.get("/projects/", { params: { page_size: 100 } })
+    // project-shorts — tezroq endpoint (faqat ro'yxat uchun)
+    axiosAPI.get("/project-shorts/", { params: { page_size: 200 } })
       .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setProjects(Array.isArray(list) ? list : PROJECTS_LIST)
-      }).catch(() => setProjects(PROJECTS_LIST))
-
-    axiosAPI.get("/users/", { params: { page_size: 200 } })
-      .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setAllUsers(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setProjects(Array.isArray(list) ? list : [])
+      }).catch(() => {
+        axiosAPI.get("/projects/", { params: { page_size: 100 } })
+          .then(res => {
+            const payload = res.data?.data ?? res.data
+            const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+            setProjects(Array.isArray(list) ? list : [])
+          }).catch(() => setProjects([]))
+      })
 
     axiosAPI.get("/applications/positions/", { params: { page_size: 100 } })
       .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        const payload = res.data?.data ?? res.data
+        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
       }).catch(() => {})
   }, [])
@@ -206,26 +210,28 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [attachments, setAttachments] = useState([]) // { file, preview, id? }
   const fileInputRef = useRef(null)
   const set = (k, v) => {
-    // Loyiha o'zgarganda topshiruvchini tozalash
     if (k === 'project') {
       setForm(p => ({ ...p, project: v, assignees: [] }))
       setErrors(p => ({ ...p, project: false }))
+      setProjectEmployees([])
+      if (v) {
+        // Loyiha xodimlarini yuklash
+        axiosAPI.get(`/projects/${v}/`)
+          .then(res => {
+            const proj = res.data?.data ?? res.data
+            const emps = proj?.employees_info ?? []
+            setProjectEmployees(Array.isArray(emps) ? emps : [])
+          })
+          .catch(() => setProjectEmployees([]))
+      }
       return
     }
     setForm(p => ({ ...p, [k]: v }))
     setErrors(p => ({ ...p, [k]: false }))
   }
 
-  // Tanlangan loyihaning xodimlari (topshiruvchi uchun)
-  const selectedProject = projects.find(p => String(p.id) === String(form?.project))
-  const projectEmployees = (() => {
-    if (!selectedProject) return []
-    if (selectedProject.employees_info?.length) return selectedProject.employees_info
-    if (selectedProject.employees?.length) {
-      return allUsers.filter(u => selectedProject.employees.includes(u.id))
-    }
-    return []
-  })()
+  // Topshiruvchi uchun foydalanuvchilar ro'yxati
+  // projectEmployees bo'sh bo'lsa — allUsers ni ko'rsatamiz
 
   // Narxni formatlash: raqam va nuqta, max 12 xona, minglik ajratgich
   const formatPrice = (val) => {
@@ -272,12 +278,13 @@ export default function AddTaskModal({ onClose, onAdd }) {
     if (!validate()) return
     setLoading(true)
     try {
-      // API sxemasiga mos body: status YUBORILMAYDI (default 'todo')
+      // API sxemasiga mos body
       const body = {
         project:  Number(form.project),
         title:    form.title.trim(),
         priority: form.priority,
         type:     form.type,
+        status:   'todo',
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.assignees.length)   body.assignee    = form.assignees[0].id
