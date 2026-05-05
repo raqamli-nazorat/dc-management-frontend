@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FaTimes, FaCheckCircle, FaExclamationCircle, FaTrash, FaInfoCircle } from "react-icons/fa";
 
 let toastListener = null;
+let _toastCounter = 0;
 
 const parseArgs = (type, arg1, arg2) => {
     if (arg2) return { title: arg1, msg: arg2 };
@@ -42,7 +43,7 @@ export const ToastProvider = ({ children }) => {
 
     useEffect(() => {
         toastListener = (t) => {
-            const id = Date.now(); // Har bir toast uchun unikal ID
+            const id = Date.now() + (++_toastCounter); // har doim unikal ID
             setToasts((prev) => [...prev, { ...t, id }]);
 
             // 3 soniyadan keyin avtomatik o'chirish

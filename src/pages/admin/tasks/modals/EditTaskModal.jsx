@@ -228,7 +228,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   const initAssignees = task.assignee_info ? [task.assignee_info] : []
   const initProject   = task.project
     ? String(task.project)
-    : (task.project_info && typeof task.project_info === 'object' ? String(task.project_info.id) : '')
+    : (task.project_info && typeof task.project_info === 'object'
+        ? String(task.project_info.id)
+        : (task.project_info && typeof task.project_info === 'string' && task.project_info
+            ? '' // string bo'lsa ID yo'q
+            : '')
+      )
 
   const fmtPrice = (val) => {
     if (!val) return ''
@@ -270,6 +275,19 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   }
 
   const selectedProject = projects.find(p => String(p.id) === String(form.project))
+
+  // projects yuklanganidan keyin project_info string bo'lsa, title bo'yicha moslashtirish
+  useEffect(() => {
+    if (!form.project && task.project_info && typeof task.project_info === 'string' && projects.length > 0) {
+      const found = projects.find(p =>
+        (p.title || p.name || '').toLowerCase() === task.project_info.toLowerCase()
+      )
+      if (found) {
+        setForm(prev => ({ ...prev, project: String(found.id) }))
+      }
+    }
+  }, [projects])
+
   const projectEmployees = (() => {
     if (!selectedProject) return []
     if (selectedProject.employees_info?.length) return selectedProject.employees_info
@@ -325,15 +343,16 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   }
 
   const handleSubmit = async () => {
+    if (!canEdit) return  // ruxsat yo'q
     if (!validate()) return
     setLoading(true)
     try {
+      // API sxemasiga mos body: status ALOHIDA change-status orqali yuboriladi
       const body = {
         project:  Number(form.project),
         title:    form.title.trim(),
         priority: form.priority,
         type:     form.type,
-        status:   form.status,
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.assignees.length)   body.assignee    = form.assignees[0].id
@@ -343,13 +362,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
         const t = form.deadline_time || '00:00'
-        const now = new Date()
-        const offsetMin = -now.getTimezoneOffset()
-        const sign = offsetMin >= 0 ? '+' : '-'
-        const absMin = Math.abs(offsetMin)
-        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
-        const mm = String(absMin % 60).padStart(2, '0')
-        body.deadline = `${form.deadline}T${t}:00${sign}${hh}:${mm}`
+        body.deadline = `${form.deadline}T${t}:00`
       }
       const hrs  = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
@@ -358,10 +371,20 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         body.estimated_input_minutes = mins
       }
 
-      // 1. Save the task
+      // 1. Asosiy ma'lumotlarni saqlash
       await onSave(task.id, body)
 
-      // 2. Upload new attachments
+      // 2. Agar status o'zgargan bo'lsa — change-status endpoint
+      if (form.status && form.status !== task.status) {
+        try {
+          await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: form.status })
+        } catch (statusErr) {
+          const msg = statusErr?.response?.data?.error?.errorMsg || statusErr?.response?.data?.detail || "Holat yangilashda xatolik"
+          toast.error('Holat xatoligi', msg)
+        }
+      }
+
+      // 3. Yangi fayllarni yuklash
       if (newAttachments.length > 0) {
         await Promise.allSettled(
           newAttachments.map(att => {

@@ -16,15 +16,6 @@ const TYPE_OPTIONS = [
   { label: 'Yangi funksiya', value: 'feature' },
   { label: "Qo'shimcha",    value: 'improvement' },
 ]
-const STATUS_OPTIONS = [
-  { label: 'Bajarilishi kerak', value: 'todo' },
-  { label: 'Jarayonda',         value: 'in_progress' },
-  { label: 'Bajarilgan',        value: 'done' },
-  { label: 'Ishga tushirilgan', value: 'deployed' },
-  { label: 'Tekshirilgan',      value: 'reviewed' },
-  { label: 'Rad etilgan',       value: 'rejected' },
-]
-
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -207,7 +198,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   }, [])
 
   const [form, setForm] = useState({
-    project: "", title: "", description: "", priority: "low", type: "bug", status: "todo",
+    project: "", title: "", description: "", priority: "low", type: "bug",
     assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
     deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
   })
@@ -281,12 +272,12 @@ export default function AddTaskModal({ onClose, onAdd }) {
     if (!validate()) return
     setLoading(true)
     try {
+      // API sxemasiga mos body: status YUBORILMAYDI (default 'todo')
       const body = {
         project:  Number(form.project),
         title:    form.title.trim(),
         priority: form.priority,
         type:     form.type,
-        status:   form.status,
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.assignees.length)   body.assignee    = form.assignees[0].id
@@ -296,13 +287,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
         const t = form.deadline_time || '00:00'
-        const now = new Date()
-        const offsetMin = -now.getTimezoneOffset()
-        const sign = offsetMin >= 0 ? '+' : '-'
-        const absMin = Math.abs(offsetMin)
-        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
-        const mm = String(absMin % 60).padStart(2, '0')
-        body.deadline = `${form.deadline}T${t}:00${sign}${hh}:${mm}`
+        body.deadline = `${form.deadline}T${t}:00`
       }
       const hrs  = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
@@ -330,17 +315,8 @@ export default function AddTaskModal({ onClose, onAdd }) {
       }
 
       onClose()
-    } catch (err) {
-      const details = err?.response?.data?.error?.details
-      const errorMsg = err?.response?.data?.error?.errorMsg || "Vazifa yaratishda xatolik"
-      if (details && typeof details === 'object') {
-        const msgs = Object.entries(details)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
-          .join('\n')
-        toast.error('Xatolik', msgs || errorMsg)
-      } else {
-        toast.error('Xatolik', errorMsg)
-      }
+    } catch {
+      // Xatolik Tasks.jsx handleAdd da ko'rsatiladi
     } finally {
       setLoading(false)
     }

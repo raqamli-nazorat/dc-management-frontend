@@ -4,10 +4,10 @@ import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
-import TaskRowMenu     from './components/TaskRowMenu'
+import TaskRowMenu from './components/TaskRowMenu'
 import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
-import AddTaskModal    from './modals/AddTaskModal'
-import EditTaskModal   from './modals/EditTaskModal'
+import AddTaskModal from './modals/AddTaskModal'
+import EditTaskModal from './modals/EditTaskModal'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
@@ -30,26 +30,26 @@ const fmtTaskDt = (iso) => {
 
 // ── Status → Column mapping ──
 const STATUS_TO_COL = {
-  todo:        'todo',
+  todo: 'todo',
   in_progress: 'in_progress',
-  done:        'done',
-  deployed:    'deployed',
-  reviewed:    'reviewed',
-  rejected:    'rejected',
-  overdue:     'overdue',
-  cancelled:   'cancelled',
+  done: 'done',
+  deployed: 'deployed',
+  reviewed: 'reviewed',
+  rejected: 'rejected',
+  overdue: 'overdue',
+  cancelled: 'cancelled',
 }
 
 /* ── Columns ── */
 // droppable: false — bu ustunGA boshqa joydan tashlab bo'lmaydi
 const COLUMNS = [
-  { id: 'todo',        label: 'Bajarilishi kerak',  color: '#F59E0B', bg: '#FFF8E1',  droppable: true  },
-  { id: 'in_progress', label: 'Jarayonda',           color: '#3B82F6', bg: '#E3F2FD',  droppable: true  },
-  { id: 'done',        label: 'Bajarilgan',          color: '#8B5CF6', bg: '#EDE7F6',  droppable: true  },
-  { id: 'deployed',    label: 'Ishga tushirilgan',   color: '#10B981', bg: '#E8F5E9',  droppable: false },
-  { id: 'reviewed',    label: 'Tekshirilgan',        color: '#06B6D4', bg: '#E0FFF9',  droppable: true  },
-  { id: 'rejected',    label: 'Rad etilgan',         color: '#EF4444', bg: '#FFEBEE',  droppable: true  },
-  { id: 'overdue',     label: "Muddati o'tgan",      color: '#9CA3AF', bg: '#F5F5F5',  droppable: false },
+  { id: 'todo', label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1', droppable: true },
+  { id: 'in_progress', label: 'Jarayonda', color: '#3B82F6', bg: '#E3F2FD', droppable: true },
+  { id: 'done', label: 'Bajarilgan', color: '#8B5CF6', bg: '#EDE7F6', droppable: true },
+  { id: 'deployed', label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9', droppable: false },
+  { id: 'reviewed', label: 'Tekshirilgan', color: '#06B6D4', bg: '#E0FFF9', droppable: true },
+  { id: 'rejected', label: 'Rad etilgan', color: '#EF4444', bg: '#FFEBEE', droppable: true },
+  { id: 'overdue', label: "Muddati o'tgan", color: '#9CA3AF', bg: '#F5F5F5', droppable: false },
 ]
 
 /* ── helpers ── */
@@ -67,17 +67,36 @@ const fmtDate = (iso) => {
 }
 
 const PRIORITY_DOT = { low: '#22c55e', medium: '#f59e0b', high: '#f97316', critical: '#ef4444' }
-const PRIORITY_LABEL_SHORT = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
+
+/* ── Countdown hook ── */
+function useCountdown(deadline) {
+  const calc = () => {
+    if (!deadline) return null
+    const diff = new Date(deadline) - new Date()
+    if (diff <= 0) return null
+    const h = Math.floor(diff / 3600000)
+    const m = Math.floor((diff % 3600000) / 60000)
+    const s = Math.floor((diff % 60000) / 1000)
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  const [tick, setTick] = useState(calc)
+  useEffect(() => {
+    if (!deadline) return
+    const id = setInterval(() => setTick(calc()), 1000)
+    return () => clearInterval(id)
+  }, [deadline])
+  return tick
+}
 
 /* ── KanbanCard ── */
-function KanbanCard({ card, index, onOpen }) {
+function KanbanCard({ card, index, onOpen, colColor }) {
   const now = new Date()
   const deadline = card.deadline ? new Date(card.deadline) : null
-  const isOverdue = deadline && deadline < now && card.status !== 'done' && card.status !== 'deployed' && card.status !== 'rejected'
+  const isOverdue = deadline && deadline < now &&
+    card.status !== 'done' && card.status !== 'deployed' && card.status !== 'rejected'
 
-  const assignee  = card.assignee_info?.username || '—'
-  const position  = card.assignee_info?.position || card.position_info?.name || ''
-  const avatarInitials = assignee !== '—' ? assignee.slice(0, 2).toUpperCase() : '??'
+  const assignee = card.assignee_info?.username || '—'
+  const position = card.assignee_info?.position || card.position_info?.name || ''
 
   const estimatedH = card.estimated_minutes ? Math.floor(card.estimated_minutes / 60) : 0
   const estimatedM = card.estimated_minutes ? card.estimated_minutes % 60 : 0
@@ -85,10 +104,9 @@ function KanbanCard({ card, index, onOpen }) {
     ? `${estimatedH ? estimatedH + 'h ' : ''}${estimatedM ? estimatedM + 'min' : ''}`.trim()
     : null
 
-  const col = COLUMNS.find(c => c.id === (card.status || 'todo'))
-  const projectName = card.project_info
-    ? (typeof card.project_info === 'object' ? card.project_info?.title : card.project_info)
-    : null
+  // Countdown faqat muddati yaqin (24 soat ichida) va overdue bo'lmagan vazifalar uchun
+  const showCountdown = deadline && !isOverdue && (deadline - now) < 86400000
+  const countdown = useCountdown(showCountdown ? card.deadline : null)
 
   return (
     <Draggable draggableId={String(card.id)} index={index}>
@@ -100,92 +118,101 @@ function KanbanCard({ card, index, onOpen }) {
           onClick={() => onOpen(card.id)}
           style={{
             ...provided.draggableProps.style,
-            opacity: snapshot.isDragging ? 0.95 : 1,
+            opacity: snapshot.isDragging ? 0.92 : 1,
             transform: snapshot.isDragging
               ? `${provided.draggableProps.style?.transform} scale(1.02)`
               : provided.draggableProps.style?.transform,
-            boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.12)' : undefined,
+            boxShadow: snapshot.isDragging
+              ? '0 12px 32px rgba(0,0,0,0.15)'
+              : '0 1px 4px rgba(0,0,0,0.06)',
           }}
-          className={`relative rounded-2xl bg-white dark:bg-[#1C1D1D] border select-none cursor-grab active:cursor-grabbing overflow-hidden
+          className={`w-full rounded-xl bg-white dark:bg-[#1E1F1F] select-none cursor-grab active:cursor-grabbing overflow-hidden
+            border transition-all duration-150
             ${snapshot.isDragging
-              ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
-              : 'border-[#E2E6F2] dark:border-[#292A2A] hover:border-[#526ED3]/40 hover:shadow-sm'}`}
+              ? 'border-[#526ED3]'
+              : 'border-[#E8EBF4] dark:border-[#2A2B2B] hover:shadow-md'}`}
         >
-          {/* Status color top bar */}
-          <div className="h-[3px] w-full" style={{ backgroundColor: col?.color || '#B6BCCB' }} />
+          <div className="flex">
 
-          <div className="p-2.5 flex flex-col gap-2">
-            {/* UID + priority dot */}
-            <div className="flex items-center justify-between gap-1">
-              <div className="flex items-center gap-1 min-w-0">
-                {/* Folder icon */}
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+
+            <div className="flex-1 px-2 py-1.5 flex flex-col gap-1.5">
+
+              {/* Title */}
+              <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
+                {card.title}
+              </p>
+
+              {/* UID (flag icon) */}
+              <div className="flex items-center gap-1">
+                {/* Flag icon */}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
                 </svg>
-                <span className="text-[9px] font-mono text-[#B6BCCB] truncate">{card.uid || `T${card.id}`}</span>
+                <span className="text-[10px] text-[#B6BCCB] font-medium">{card.uid || `T${card.id}`}</span>
               </div>
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: PRIORITY_DOT[card.priority] || '#B6BCCB' }}
-                title={PRIORITY_LABEL_SHORT[card.priority]}
-              />
-            </div>
 
-            {/* Title */}
-            <p className="text-[12px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">{card.title}</p>
-
-            {/* Project */}
-            {projectName && (
-              <p className="text-[10px] text-[#8F95A8] truncate">{projectName}</p>
-            )}
-
-            {/* Deadline */}
-            {deadline && (
-              <div className={`flex items-center gap-1 text-[10px] ${isOverdue ? 'text-[#EF4444] font-semibold' : 'text-[#8F95A8]'}`}>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                </svg>
-                <span>{fmtDate(card.deadline)}</span>
-              </div>
-            )}
-
-            {/* Duration */}
-            {durationStr && (
-              <div className={`flex items-center gap-1 text-[10px] ${isOverdue ? 'text-[#EF4444]' : 'text-[#8F95A8]'}`}>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-                </svg>
-                <span>{durationStr}</span>
-                {isOverdue && (
-                  <span className="ml-auto text-[#EF4444] font-bold text-[9px]">
-                    {fmtDate(card.deadline)?.slice(11)}
+              {/* Deadline */}
+              {deadline && (
+                <div className="flex items-center gap-1">
+                  {/* Calendar icon */}
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
+                    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+                  </svg>
+                  <span className={`text-[10px] font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[#8F95A8]'}`}>
+                    {fmtDate(card.deadline)}
                   </span>
-                )}
-              </div>
-            )}
-
-            {/* Assignee */}
-            <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#F1F3F9] dark:border-[#292A2A]">
-              {card.assignee_info?.avatar ? (
-                <img
-                  src={card.assignee_info.avatar}
-                  alt={assignee}
-                  className="w-5 h-5 rounded-full object-cover shrink-0"
-                />
-              ) : (
-                <div className="w-5 h-5 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[8px] font-bold text-[#526ED3] shrink-0">
-                  {avatarInitials}
                 </div>
               )}
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-semibold text-[#1A1D2E] dark:text-white truncate">{assignee}</p>
-                {position && <p className="text-[9px] text-[#8F95A8] truncate">{position}</p>}
-              </div>
-              {card.sprint && (
-                <span className="shrink-0 text-[8px] font-bold text-[#8F95A8] bg-[#F1F3F9] dark:bg-[#292A2A] rounded px-1 py-0.5">
-                  S{card.sprint}
-                </span>
+
+              {/* Duration + countdown */}
+              {(durationStr || countdown) && (
+                <div className="flex items-center gap-2">
+                  {durationStr && (
+                    <div className="flex items-center gap-1">
+                      {/* Clock icon */}
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
+                        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+                      </svg>
+                      <span className="text-[10px] text-[#8F95A8] font-medium">{durationStr}</span>
+                    </div>
+                  )}
+                  {countdown && (
+                    <div className="flex items-center gap-1">
+                      {/* Hourglass icon */}
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" className="shrink-0">
+                        <path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                      </svg>
+                      <span className="text-[10px] font-bold text-[#EF4444]">{countdown}</span>
+                    </div>
+                  )}
+                </div>
               )}
+
+              {/* Divider */}
+              <div className="border-t border-[#F1F3F9] dark:border-[#2A2B2B]" />
+
+              {/* Assignee */}
+              <div className="flex items-center gap-1.5">
+                {card.assignee_info?.avatar ? (
+                  <img src={card.assignee_info.avatar} alt={assignee}
+                    className="w-6 h-6 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-[#EEF1FB] dark:bg-[#292A2A] flex items-center justify-center shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F95A8" strokeWidth="1.8">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white truncate leading-tight">
+                    {assignee}
+                  </p>
+                  <p className="text-[10px] text-[#8F95A8] truncate leading-tight">
+                    {position || 'Dasturchi'}
+                  </p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -254,9 +281,9 @@ function RejectionModal({ task, onClose, onConfirm }) {
                 {f.preview
                   ? <img src={f.preview} alt="" className="w-full h-full object-cover" />
                   : <div className="flex flex-col items-center gap-0.5 px-1">
-                      <FaPaperclip size={14} className="text-[#526ED3]" />
-                      <span className="text-[8px] text-[#5B6078] truncate w-full text-center">{f.file.name}</span>
-                    </div>
+                    <FaPaperclip size={14} className="text-[#526ED3]" />
+                    <span className="text-[8px] text-[#5B6078] truncate w-full text-center">{f.file.name}</span>
+                  </div>
                 }
                 <button type="button" onClick={() => setFiles(p => p.filter((_, j) => j !== i))}
                   className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
@@ -300,7 +327,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
           <button onClick={handleSubmit} disabled={loading}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer bg-[#EF4444] text-white hover:bg-red-600 disabled:opacity-60">
             {loading
-              ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+              ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
               : <FaPaperclip size={12} />
             }
             Rad etish
@@ -316,48 +343,49 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
   const isDisabled = !col.droppable
   return (
     <div
-      className="flex flex-col rounded-2xl transition-opacity duration-150"
+      className="flex flex-col  transition-opacity duration-150 min-w-0"
       style={{
-        width: 200,
-        minWidth: 200,
-        flexShrink: 0,
-        height: '100%',
-        backgroundColor: col.bg,
-        opacity: isDimmed ? 0.35 : 1,
-        outline: isDragTarget && !isDisabled ? `2px solid ${col.color}` : 'none',
-        outlineOffset: '-2px',
+        flex: '1 1 0',
+        opacity: isDimmed ? 0.3 : 1,
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-t-2xl">
-        <span className="text-[11px] font-bold text-[#1A1D2E] text-center leading-tight">{col.label}</span>
+      {/* Header — ustun nomi alohida, ustida */}
+      <div className="flex mb-5 text-center justify-center items-center gap-2  px-1">
+        <span className="text-[12px] font-bold text-[#1A1D2E] dark:text-white whitespace-nowrap truncate">{col.label}</span>
         <span
-          className="shrink-0 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
+          className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
           style={{ backgroundColor: col.color }}
         >
           {cards.length}
         </span>
-        {isDisabled && (
-          <span className="text-[8px] text-[#8F95A8] bg-white/60 rounded px-1 py-0.5 leading-none">
-            auto
-          </span>
-        )}
       </div>
 
-      {/* Droppable area */}
+      {/* Cards area — vertikal scroll */}
       <Droppable droppableId={col.id} isDropDisabled={isDisabled}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col gap-[6px] p-1.5 rounded-b-2xl flex-1"
+            className="flex flex-col gap-2 rounded-2xl p-1.5 transition-colors duration-150 overflow-y-auto"
             style={{
+              flex: '1 1 0',
               minHeight: 80,
-              backgroundColor: snapshot.isDraggingOver && !isDisabled ? col.color + '28' : col.bg,
+              backgroundColor: snapshot.isDraggingOver && !isDisabled
+                ? col.color + '18'
+                : col.bg,
+              outline: isDragTarget && !isDisabled ? `2px solid ${col.color}` : 'none',
+              outlineOffset: '-2px',
+              scrollbarWidth: 'thin',
             }}
           >
             {cards.map((card, index) => (
-              <KanbanCard key={card.id} card={card} index={index} onOpen={onOpen} />
+              <KanbanCard
+                key={card.id}
+                card={card}
+                index={index}
+                onOpen={onOpen}
+                colColor={col.color}
+              />
             ))}
             {provided.placeholder}
           </div>
@@ -372,25 +400,25 @@ export default function TasksPage() {
   const { registerAction, clearAction, registerNavbarExtra, clearNavbarExtra, registerSidebarClick, clearSidebarClick } = usePageAction()
   const { user } = useAuth()
   const activeRole = user?.active_role || user?.roles?.[0]
-  const isAuditor  = activeRole === 'auditor'
+  const isAuditor = activeRole === 'auditor'
   const isEmployee = activeRole === 'employee'
-  const canEdit    = activeRole === 'admin' || activeRole === 'superadmin' || activeRole === 'manager'
+  const canEdit = activeRole === 'admin' || activeRole === 'superadmin' || activeRole === 'manager'
 
-  const [viewMode, setViewMode]       = useState('table')
-  const [search, setSearch]           = useState('')
-  const [showFilter, setShowFilter]   = useState(false)
-  const [showAdd, setShowAdd]         = useState(false)
-  const [filters, setFilters]         = useState(TASK_EMPTY_FILTER)
-  const [data, setData]               = useState([])
-  const [loading, setLoading]         = useState(false)
+  const [viewMode, setViewMode] = useState('table')
+  const [search, setSearch] = useState('')
+  const [showFilter, setShowFilter] = useState(false)
+  const [showAdd, setShowAdd] = useState(false)
+  const [filters, setFilters] = useState(TASK_EMPTY_FILTER)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [hasMore, setHasMore]         = useState(false)
-  const [page, setPage]               = useState(1)
-  const [editTask, setEditTask]       = useState(null)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [editTask, setEditTask] = useState(null)
   const [taskLoading, setTaskLoading] = useState(false)
-  const [cards, setCards]             = useState([])
+  const [cards, setCards] = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
-  const [draggingOver, setDraggingOver]   = useState(null) // hozir ustida turgan col id
+  const [draggingOver, setDraggingOver] = useState(null) // hozir ustida turgan col id
   const [rejectionPending, setRejectionPending] = useState(null) // { taskId, draggableId, sourceColId }
   const scrollRef = useRef(null)
 
@@ -401,14 +429,14 @@ export default function TasksPage() {
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
     if (q) p.search = q
-    if (f.holat)  p.status   = f.holat
+    if (f.holat) p.status = f.holat
     if (f.daraja) p.priority = f.daraja
-    if (f.turi)   p.type     = f.turi
+    if (f.turi) p.type = f.turi
     if (f.myTasks) p.my_tasks = true
     if (f.projects?.length) p.project = f.projects.map(pr => pr.id || pr).join(',')
-    if (f.authors?.length)  p.assignee = f.authors.map(a => a.id || a).join(',')
+    if (f.authors?.length) p.assignee = f.authors.map(a => a.id || a).join(',')
     if (f.deadFromD) p.deadline_from = f.deadFromD
-    if (f.deadToD)   p.deadline_to   = f.deadToD
+    if (f.deadToD) p.deadline_to = f.deadToD
     return p
   }, [filters, search])
 
@@ -456,19 +484,34 @@ export default function TasksPage() {
       toast.success("Vazifa yaratildi", "Yangi vazifa muvaffaqiyatli qo'shildi")
       return created
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "Vazifa yaratishda xatolik")
+      const details = err?.response?.data?.error?.details
+      const errorMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Vazifa yaratishda xatolik"
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
+      } else {
+        toast.error('Xatolik', errorMsg)
+      }
       throw err
     }
   }
 
   const handleEdit = async (id, body) => {
     try {
-      const res = await axiosAPI.put(`/tasks/${id}/`, body)
+      const res = await axiosAPI.patch(`/tasks/${id}/`, body)
       const updated = res.data?.data ?? res.data
-      setData(prev => prev.map(t => t.id === id ? updated : t))
+      setData(prev => prev.map(t => t.id === id ? { ...updated, id } : t))
       toast.success("Vazifa yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "Yangilashda xatolik")
+      const details = err?.response?.data?.error?.details
+      const errorMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Yangilashda xatolik"
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join('\n')
+        toast.error('Xatolik', msgs || errorMsg)
+      } else {
+        toast.error('Xatolik', errorMsg)
+      }
+      throw err
     }
   }
 
@@ -488,9 +531,25 @@ export default function TasksPage() {
     try {
       const res = await axiosAPI.get(`/tasks/${id}/`)
       const task = res.data?.data ?? res.data
+      // project_info string bo'lsa, project ID ni data dan olish
+      if (!task.project && task.project_info) {
+        if (typeof task.project_info === 'object' && task.project_info?.id) {
+          task.project = task.project_info.id
+        }
+      }
       setEditTask(task)
     } catch (err) {
-      toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
+      const status = err?.response?.status
+      if (status === 404) {
+        toast.error('Topilmadi', "Bu vazifa mavjud emas yoki o'chirilgan")
+        // Listdan ham olib tashlaymiz
+        setData(prev => prev.filter(t => t.id !== id))
+        setCards(prev => prev.filter(c => c.id !== id))
+      } else if (status === 403) {
+        toast.error('Ruxsat yo\'q', "Bu vazifani ko'rish uchun ruxsatingiz yo'q")
+      } else {
+        toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
+      }
     } finally {
       setTaskLoading(false)
     }
@@ -502,14 +561,14 @@ export default function TasksPage() {
     try {
       const params = { page_size: 200 }
       if (q) params.search = q
-      if (f.holat)   params.status   = f.holat
-      if (f.daraja)  params.priority = f.daraja
-      if (f.turi)    params.type     = f.turi
+      if (f.holat) params.status = f.holat
+      if (f.daraja) params.priority = f.daraja
+      if (f.turi) params.type = f.turi
       if (f.myTasks) params.my_tasks = true
-      if (f.projects?.length) params.project  = f.projects.map(pr => pr.id || pr).join(',')
-      if (f.authors?.length)  params.assignee = f.authors.map(a => a.id || a).join(',')
+      if (f.projects?.length) params.project = f.projects.map(pr => pr.id || pr).join(',')
+      if (f.authors?.length) params.assignee = f.authors.map(a => a.id || a).join(',')
       if (f.deadFromD) params.deadline_from = f.deadFromD
-      if (f.deadToD)   params.deadline_to   = f.deadToD
+      if (f.deadToD) params.deadline_to = f.deadToD
       const res = await axiosAPI.get('/tasks/', { params })
       const payload = res.data?.data ?? res.data
       const results = Array.isArray(payload) ? payload : (payload.results ?? [])
@@ -520,7 +579,7 @@ export default function TasksPage() {
       setKanbanLoading(false)
     }
   }, [filters, search])
-  const switchToTable  = () => setViewMode('table')
+  const switchToTable = () => setViewMode('table')
   const switchToKanban = () => setViewMode('kanban')
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
@@ -592,7 +651,7 @@ export default function TasksPage() {
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]"
               width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Izlash" value={search} onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
@@ -621,18 +680,21 @@ export default function TasksPage() {
   if (viewMode === 'kanban') {
     return (
       <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
-        <div className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]" style={{ height: 'calc(100vh - 57px)' }}>
+        <div
+          className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]"
+          style={{ height: 'calc(100vh - 57px)' }}
+        >
           {kanbanLoading ? (
             <div className="flex items-center justify-center h-full">
               <svg className="animate-spin w-8 h-8 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
             </div>
           ) : (
             <div
-              className="flex gap-2 px-3 pt-3 pb-3 overflow-y-auto overflow-x-auto h-full items-start"
-              style={{ scrollbarWidth: 'thin' }}
+              className="flex gap-2 px-3 pt-3  bg-white  pb-3 h-full"
+              style={{ overflow: 'hidden' }}
             >
               {COLUMNS.map(col => (
                 <KanbanColumn
@@ -665,6 +727,7 @@ export default function TasksPage() {
             canEdit={canEdit}
             onClose={() => setEditTask(null)}
             onSave={async (id, body) => {
+              if (!canEdit) return
               await handleEdit(id, body)
               loadKanbanTasks(filters, search)
             }}
@@ -689,8 +752,8 @@ export default function TasksPage() {
         {taskLoading && (
           <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
             <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
           </div>
         )}
@@ -708,7 +771,7 @@ export default function TasksPage() {
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" placeholder="Izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
@@ -758,7 +821,7 @@ export default function TasksPage() {
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
-                  {[1,2,3,4,5,6,7,8,9,10].map(j => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(j => (
                     <td key={j} className="px-4 py-3">
                       <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
                     </td>
@@ -807,8 +870,8 @@ export default function TasksPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>
@@ -827,15 +890,19 @@ export default function TasksPage() {
           task={editTask}
           canEdit={canEdit}
           onClose={() => setEditTask(null)}
-          onSave={(id, body) => handleEdit(id, body)}
+          onSave={async (id, body) => {
+            if (!canEdit) return
+            await handleEdit(id, body)
+            loadTasks(filters, search, 1)
+          }}
         />
       )}
 
       {taskLoading && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
           <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
         </div>
       )}
