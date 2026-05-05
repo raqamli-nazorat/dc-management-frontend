@@ -24,9 +24,9 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
       onClick={() => setFocused(true)}
     >
       <span
-        className={`absolute left-4 transition-[top,font-size,color,transform] duration-300 pointer-events-none font-semibold
+        className={`absolute left-4 transition-all duration-200 pointer-events-none font-semibold
           ${isActive
-            ? 'top-1 text-[10px] text-slate-400'
+            ? 'top-1.5 text-[10px] text-slate-400'
             : 'top-1/2 -translate-y-1/2 text-sm text-slate-400'
           }`}
       >
@@ -34,12 +34,12 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
       </span>
 
       <div
-        className={`flex items-center transition-transform duration-300
+        className={`flex items-center transition-all duration-200
           ${isActive
             ? 'translate-y-2'
-            : `ml-[${labelWidth}px]`
+            : ''
           }`}
-        style={{ marginLeft: isActive ? 0 : `${labelWidth}px` }}
+        style={{ paddingLeft: isActive ? 0 : `${labelWidth}px` }}
       >
         {isFine && (hasValue || value === 0) && (
           <span className="text-red-500 font-bold mr-0.5" style={{ fontSize: `${fontSize}px` }}>-</span>

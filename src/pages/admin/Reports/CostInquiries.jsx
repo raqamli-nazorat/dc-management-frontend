@@ -861,11 +861,13 @@ const Employee = () => {
                 <FilterInput
                   label="dan"
                   value={filters.amount_min}
+                  className='bg-white'
                   onChange={(e) => handleFilterChange('amount_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.amount_max}
+                  className='bg-white'
                   onChange={(e) => handleFilterChange('amount_max', formatNum(e.target.value))}
                 />
               </div>
