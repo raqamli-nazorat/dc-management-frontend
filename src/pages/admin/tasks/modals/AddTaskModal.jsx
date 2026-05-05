@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react
 import { labelCls } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
 import { toast } from "../../../../Toast/ToastProvider"
+import { parseApiError } from "../../../../service/parseApiError"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 
 const PRIORITY_OPTIONS = [
@@ -309,7 +310,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
       // 2. Fayllarni yuklash (task yaratilgandan keyin)
       if (taskId && attachments.length > 0) {
-        await Promise.allSettled(
+        const uploadResults = await Promise.allSettled(
           attachments.map(att => {
             const fd = new FormData()
             fd.append('task', taskId)
@@ -319,6 +320,12 @@ export default function AddTaskModal({ onClose, onAdd }) {
             })
           })
         )
+        uploadResults.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            const fname = attachments[i]?.file?.name || 'fayl'
+            toast.error(`"${fname}" yuklanmadi`, parseApiError(result.reason, "Fayl yuklashda xatolik"))
+          }
+        })
       }
 
       onClose()
