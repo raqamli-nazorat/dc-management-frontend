@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark } from 'react-icons/fa6'
+import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -41,14 +41,15 @@ const STATUS_TO_COL = {
 }
 
 /* ── Columns ── */
+// droppable: false — bu ustunGA boshqa joydan tashlab bo'lmaydi
 const COLUMNS = [
-  { id: 'todo',        label: 'Bajarilishi kerak',  color: '#F59E0B', bg: '#FFF8E1' },
-  { id: 'in_progress', label: 'Jarayonda',           color: '#3B82F6', bg: '#E3F2FD' },
-  { id: 'done',        label: 'Bajarilgan',          color: '#8B5CF6', bg: '#EDE7F6' },
-  { id: 'deployed',    label: 'Ishga tushirilgan',   color: '#10B981', bg: '#E8F5E9' },
-  { id: 'reviewed',    label: 'Tekshirilgan',        color: '#06B6D4', bg: '#E0FFF9' },
-  { id: 'rejected',    label: 'Rad etilgan',         color: '#EF4444', bg: '#FFEBEE' },
-  { id: 'overdue',     label: "Muddati o'tgan",      color: '#9CA3AF', bg: '#F5F5F5' },
+  { id: 'todo',        label: 'Bajarilishi kerak',  color: '#F59E0B', bg: '#FFF8E1',  droppable: true  },
+  { id: 'in_progress', label: 'Jarayonda',           color: '#3B82F6', bg: '#E3F2FD',  droppable: true  },
+  { id: 'done',        label: 'Bajarilgan',          color: '#8B5CF6', bg: '#EDE7F6',  droppable: true  },
+  { id: 'deployed',    label: 'Ishga tushirilgan',   color: '#10B981', bg: '#E8F5E9',  droppable: false },
+  { id: 'reviewed',    label: 'Tekshirilgan',        color: '#06B6D4', bg: '#E0FFF9',  droppable: true  },
+  { id: 'rejected',    label: 'Rad etilgan',         color: '#EF4444', bg: '#FFEBEE',  droppable: true  },
+  { id: 'overdue',     label: "Muddati o'tgan",      color: '#9CA3AF', bg: '#F5F5F5',  droppable: false },
 ]
 
 /* ── KanbanCard ── */
@@ -83,11 +84,14 @@ function KanbanCard({ card, index, onOpen }) {
               : provided.draggableProps.style?.transform,
             boxShadow: snapshot.isDragging ? '0 6px 20px rgba(0,0,0,0.10)' : undefined,
           }}
-          className={`rounded-xl bg-white border p-2.5 flex flex-col gap-1.5 select-none cursor-grab active:cursor-grabbing
+          className={`relative rounded-xl bg-white dark:bg-[#1C1D1D] border pt-4 px-2.5 pb-2.5 flex flex-col gap-1.5 select-none cursor-grab active:cursor-grabbing overflow-hidden
             ${snapshot.isDragging
               ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
-              : 'border-[#E2E6F2] hover:border-[#526ED3]/50'}`}
+              : 'border-[#E2E6F2] dark:border-[#292A2A] hover:border-[#526ED3]/50'}`}
         >
+          {/* Status color top bar */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{ backgroundColor: col?.color || '#B6BCCB' }} />
+
           {/* UID + priority dot */}
           <div className="flex items-center justify-between gap-1">
             <span className="text-[9px] font-mono text-[#B6BCCB] truncate">{card.uid || `#${card.id}`}</span>
@@ -143,19 +147,142 @@ function KanbanCard({ card, index, onOpen }) {
   )
 }
 
+/* ── RejectionModal ── */
+function RejectionModal({ task, onClose, onConfirm }) {
+  const [reason, setReason] = useState('')
+  const [files, setFiles] = useState([])
+  const [loading, setLoading] = useState(false)
+  const fileRef = useRef(null)
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      // 1. change-status endpoint orqali rejected + sabab
+      await axiosAPI.patch(`/tasks/${task.id}/change-status/`, {
+        status: 'rejected',
+        rejection_reason: reason.trim() || undefined,
+      })
+
+      // 2. Fayllarni yuklash (task-rejection-files)
+      if (files.length > 0) {
+        await Promise.allSettled(
+          files.map(f => {
+            const fd = new FormData()
+            fd.append('task', task.id)
+            fd.append('file', f.file)
+            return axiosAPI.post('/task-rejection-files/', fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
+          })
+        )
+      }
+
+      onConfirm()
+    } catch (err) {
+      const msg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || 'Xatolik yuz berdi'
+      toast.error('Xatolik', msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] p-7 flex flex-col gap-5">
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] dark:bg-[#292A2A] text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#E2E6F2] cursor-pointer">
+          <FaXmark size={13} />
+        </button>
+
+        <div>
+          <h2 className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-white">Vazifani rad etish</h2>
+          <p className="text-sm text-[#8F95A8] mt-0.5">Rad etish sababini kiriting</p>
+        </div>
+
+        {/* Fayllar */}
+        <div>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {files.map((f, i) => (
+              <div key={i} className="relative w-16 h-16 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                {f.preview
+                  ? <img src={f.preview} alt="" className="w-full h-full object-cover" />
+                  : <div className="flex flex-col items-center gap-0.5 px-1">
+                      <FaPaperclip size={14} className="text-[#526ED3]" />
+                      <span className="text-[8px] text-[#5B6078] truncate w-full text-center">{f.file.name}</span>
+                    </div>
+                }
+                <button type="button" onClick={() => setFiles(p => p.filter((_, j) => j !== i))}
+                  className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
+                  <FaXmark size={8} />
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={() => fileRef.current?.click()}
+              className="w-16 h-16 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-0.5 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors">
+              <FaPaperclip size={14} />
+              <span className="text-[9px]">Rasm</span>
+            </button>
+            <input ref={fileRef} type="file" multiple accept="image/*,.pdf,.doc,.docx" className="hidden"
+              onChange={e => {
+                const added = Array.from(e.target.files || []).map(f => ({
+                  file: f,
+                  preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                }))
+                setFiles(p => [...p, ...added])
+                e.target.value = ''
+              }} />
+          </div>
+        </div>
+
+        {/* Sabab */}
+        <textarea
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          placeholder="Sababini yozing..."
+          rows={4}
+          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
+            bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#B6BCCB] dark:placeholder-[#474848]
+            border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]"
+        />
+
+        <div className="flex items-center justify-end gap-3">
+          <button onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            <FaXmark size={12} /> Bekor qilish
+          </button>
+          <button onClick={handleSubmit} disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer bg-[#EF4444] text-white hover:bg-red-600 disabled:opacity-60">
+            {loading
+              ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+              : <FaPaperclip size={12} />
+            }
+            Rad etish
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onOpen }) {
+function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
+  const isDisabled = !col.droppable
   return (
     <div
-      className="flex flex-col rounded-2xl"
-      style={{ width: 170, minWidth: 175,  flexShrink: 0,height:"100%" ,  backgroundColor: col.bg }}
-    
-
+      className="flex flex-col rounded-2xl transition-opacity duration-150"
+      style={{
+        width: 170,
+        minWidth: 175,
+        flexShrink: 0,
+        height: '100%',
+        backgroundColor: col.bg,
+        opacity: isDimmed ? 0.35 : 1,
+        outline: isDragTarget && !isDisabled ? `2px solid ${col.color}` : 'none',
+        outlineOffset: '-2px',
+      }}
     >
       {/* Header */}
-      <div
-        className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-t-2xl"
-      >
+      <div className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-t-2xl">
         <span className="text-[11px] font-bold text-[#1A1D2E] text-center leading-tight">{col.label}</span>
         <span
           className="shrink-0 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
@@ -163,20 +290,23 @@ function KanbanColumn({ col, cards, onOpen }) {
         >
           {cards.length}
         </span>
+        {isDisabled && (
+          <span className="text-[8px] text-[#8F95A8] bg-white/60 rounded px-1 py-0.5 leading-none">
+            auto
+          </span>
+        )}
       </div>
 
       {/* Droppable area */}
-      <Droppable droppableId={col.id}>
+      <Droppable droppableId={col.id} isDropDisabled={isDisabled}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex flex-col gap-[6px] p-1.5 rounded-b-2xl"
+            className="flex flex-col gap-[6px] p-1.5 rounded-b-2xl flex-1"
             style={{
               minHeight: 80,
-              backgroundColor: snapshot.isDraggingOver ? col.color + '28' : col.bg,
-              outline: snapshot.isDraggingOver ? `2px dashed ${col.color}` : 'none',
-              outlineOffset: '-2px',
+              backgroundColor: snapshot.isDraggingOver && !isDisabled ? col.color + '28' : col.bg,
             }}
           >
             {cards.map((card, index) => (
@@ -213,6 +343,8 @@ export default function TasksPage() {
   const [taskLoading, setTaskLoading] = useState(false)
   const [cards, setCards]             = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
+  const [draggingOver, setDraggingOver]   = useState(null) // hozir ustida turgan col id
+  const [rejectionPending, setRejectionPending] = useState(null) // { taskId, draggableId, sourceColId }
   const scrollRef = useRef(null)
 
   const hasFilter = filters.projects?.length > 0 || filters.authors?.length > 0 ||
@@ -345,26 +477,34 @@ export default function TasksPage() {
   const switchToKanban = () => setViewMode('kanban')
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
+    setDraggingOver(null)
     if (!destination) return
     if (destination.droppableId === source.droppableId && destination.index === source.index) return
 
     const newStatus = destination.droppableId
     const taskId = Number(draggableId)
 
+    // droppable: false bo'lgan ustunlarga tashlab bo'lmaydi
+    const destCol = COLUMNS.find(c => c.id === newStatus)
+    if (!destCol?.droppable) return
+
+    // rejected ga tushganda — faqat deployed statusidagi vazifani rad etish mumkin
+    if (newStatus === 'rejected') {
+      const draggedCard = cards.find(c => String(c.id) === String(draggableId))
+      // source ustun deployed bo'lsa yoki karta deployed statusida bo'lsa ruxsat
+      if (draggedCard?.status !== 'deployed' && source.droppableId !== 'deployed') {
+        toast.error("Rad etib bo'lmaydi", "Faqat 'Ishga tushirilgan' holatidagi vazifanigina rad etish mumkin.")
+        return
+      }
+      setRejectionPending({ taskId, draggableId, sourceColId: source.droppableId })
+      return
+    }
+
     // Optimistic update
     setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: newStatus } : c))
 
-    // API ga yuborish — to'liq task ma'lumotini olib PUT qilish
     try {
-      const res = await axiosAPI.get(`/tasks/${taskId}/`)
-      const task = res.data?.data ?? res.data
-      await axiosAPI.put(`/tasks/${taskId}/`, {
-        ...task,
-        status: newStatus,
-        project: task.project || task.project_info?.id,
-        assignee: task.assignee || task.assignee_info?.id,
-        position: task.position || task.position_info?.id,
-      })
+      await axiosAPI.patch(`/tasks/${taskId}/change-status/`, { status: newStatus })
       setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
     } catch (err) {
       // Rollback
@@ -378,6 +518,10 @@ export default function TasksPage() {
         toast.error('Xatolik', errMsg)
       }
     }
+  }
+
+  const onDragUpdate = ({ destination }) => {
+    setDraggingOver(destination?.droppableId || null)
   }
 
   useEffect(() => {
@@ -429,7 +573,7 @@ export default function TasksPage() {
   /* ── KANBAN VIEW ── */
   if (viewMode === 'kanban') {
     return (
-      <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
         <div className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]" style={{ height: 'calc(100vh - 57px)' }}>
           {kanbanLoading ? (
             <div className="flex items-center justify-center h-full">
@@ -449,6 +593,8 @@ export default function TasksPage() {
                   col={col}
                   cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
                   onOpen={loadTaskDetail}
+                  isDimmed={draggingOver !== null && draggingOver !== col.id}
+                  isDragTarget={draggingOver === col.id}
                 />
               ))}
             </div>
@@ -474,6 +620,22 @@ export default function TasksPage() {
             onSave={async (id, body) => {
               await handleEdit(id, body)
               loadKanbanTasks(filters, search)
+            }}
+          />
+        )}
+        {rejectionPending && (
+          <RejectionModal
+            task={{ id: rejectionPending.taskId }}
+            onClose={() => setRejectionPending(null)}
+            onConfirm={() => {
+              setCards(prev => prev.map(c =>
+                String(c.id) === rejectionPending.draggableId ? { ...c, status: 'rejected' } : c
+              ))
+              setData(prev => prev.map(t =>
+                t.id === rejectionPending.taskId ? { ...t, status: 'rejected' } : t
+              ))
+              setRejectionPending(null)
+              toast.success('Rad etildi', 'Vazifa rad etildi')
             }}
           />
         )}
