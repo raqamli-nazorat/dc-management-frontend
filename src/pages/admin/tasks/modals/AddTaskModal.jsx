@@ -1,5 +1,5 @@
 ﻿import { useState, useRef, useEffect } from "react"
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from "react-icons/fa6"
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
 import { labelCls, PROJECTS_LIST } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
 import { toast } from "../../../../Toast/ToastProvider"
@@ -209,9 +209,11 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [form, setForm] = useState({
     project: "", title: "", description: "", priority: "low", type: "bug", status: "todo",
     assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
-    deadline: "", estimated_hours: "", estimated_minutes: "",
+    deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
   })
   const [errors, setErrors] = useState({})
+  const [attachments, setAttachments] = useState([]) // { file, preview, id? }
+  const fileInputRef = useRef(null)
   const set = (k, v) => {
     // Loyiha o'zgarganda topshiruvchini tozalash
     if (k === 'project') {
@@ -293,7 +295,14 @@ export default function AddTaskModal({ onClose, onAdd }) {
       if (form.task_price)         body.task_price  = form.task_price.replace(/\s/g, '')
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
-        body.deadline = `${form.deadline}T00:00:00.000000+05:00`
+        const t = form.deadline_time || '00:00'
+        const now = new Date()
+        const offsetMin = -now.getTimezoneOffset()
+        const sign = offsetMin >= 0 ? '+' : '-'
+        const absMin = Math.abs(offsetMin)
+        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+        const mm = String(absMin % 60).padStart(2, '0')
+        body.deadline = `${form.deadline}T${t}:00${sign}${hh}:${mm}`
       }
       const hrs  = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
@@ -301,7 +310,25 @@ export default function AddTaskModal({ onClose, onAdd }) {
         body.estimated_input_hours   = hrs
         body.estimated_input_minutes = mins
       }
-      await onAdd(body)
+
+      // 1. Task yaratish
+      const created = await onAdd(body)
+      const taskId = created?.id ?? created?.data?.id
+
+      // 2. Fayllarni yuklash (task yaratilgandan keyin)
+      if (taskId && attachments.length > 0) {
+        await Promise.allSettled(
+          attachments.map(att => {
+            const fd = new FormData()
+            fd.append('task', taskId)
+            fd.append('file', att.file)
+            return axiosAPI.post('/task-attachments/', fd, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            })
+          })
+        )
+      }
+
       onClose()
     } catch (err) {
       const details = err?.response?.data?.error?.details
@@ -444,12 +471,21 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <DateTimeBox
-                  type="date"
-                  placeholder="KK/OO/YYYY"
-                  value={form.deadline}
-                  onChange={v => set("deadline", v)}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <DateTimeBox
+                    type="date"
+                    placeholder="KK/OO/YYYY"
+                    value={form.deadline}
+                    onChange={v => set("deadline", v)}
+                    dropUp
+                  />
+                  <DateTimeBox
+                    type="time"
+                    value={form.deadline_time}
+                    onChange={v => set("deadline_time", v)}
+                    dropUp
+                  />
+                </div>
               </div>
               <div>
                 <label className={labelCls}>Taxminiy vaqt (soat : daqiqa)</label>
@@ -459,6 +495,60 @@ export default function AddTaskModal({ onClose, onAdd }) {
                   <input type="number" min="0" max="59" value={form.estimated_minutes} onChange={e => set("estimated_minutes", e.target.value)}
                     placeholder="0 daqiqa" className={inputCls(false)} />
                 </div>
+              </div>
+            </div>
+
+            {/* Qo'shimcha fayllar */}
+            <div>
+              <label className={labelCls}>Qo'shimcha fayllar</label>
+              <div className="flex flex-wrap gap-2">
+                {/* Yuklangan fayllar */}
+                {attachments.map((att, i) => (
+                  <div key={i} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                    {att.preview ? (
+                      <img src={att.preview} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 px-1">
+                        <FaPaperclip size={16} className="text-[#526ED3]" />
+                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <FaXmark size={9} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Fayl qo'shish tugmasi */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
+                >
+                  <FaPaperclip size={16} />
+                  <span className="text-[10px] font-medium">Fayl</span>
+                </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
+                  className="hidden"
+                  onChange={e => {
+                    const files = Array.from(e.target.files || [])
+                    const newAtts = files.map(f => ({
+                      file: f,
+                      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                    }))
+                    setAttachments(prev => [...prev, ...newAtts])
+                    e.target.value = ''
+                  }}
+                />
               </div>
             </div>
 

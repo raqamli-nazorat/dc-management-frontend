@@ -1,5 +1,5 @@
 ﻿import { useState, useRef, useEffect } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react-icons/fa6'
 import { labelCls, PROJECTS_LIST } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
@@ -124,7 +124,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
@@ -181,7 +181,14 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading] = useState(false)
+  // Existing attachments from the task
+  const [existingAttachments, setExistingAttachments] = useState(
+    Array.isArray(task.attachments) ? task.attachments : []
+  )
+  // New files to upload after save
+  const [newAttachments, setNewAttachments] = useState([])
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     axiosAPI.get('/projects/', { params: { page_size: 100 } })
@@ -201,7 +208,17 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
       }).catch(() => {})
   }, [])
 
-  const initDeadline  = task.deadline ? task.deadline.slice(0, 10) : ''
+  // Parse deadline: date = slice(0,10), time = local HH:MM from Date object
+  const initDeadlineDate = task.deadline ? task.deadline.slice(0, 10) : ''
+  const initDeadlineTime = (() => {
+    if (!task.deadline) return '00:00'
+    const d = new Date(task.deadline)
+    if (isNaN(d.getTime())) return '00:00'
+    const hh = String(d.getHours()).padStart(2, '0')
+    const mm = String(d.getMinutes()).padStart(2, '0')
+    return `${hh}:${mm}`
+  })()
+
   const initHours     = task.estimated_minutes ? String(Math.floor(task.estimated_minutes / 60)) : ''
   const initMins      = task.estimated_minutes ? String(task.estimated_minutes % 60) : ''
   const initAssignees = task.assignee_info ? [task.assignee_info] : []
@@ -211,9 +228,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
 
   const fmtPrice = (val) => {
     if (!val) return ''
-    const n = Math.abs(Number(String(val).replace(/\s/g, '')))
+    const raw = String(val).replace(/[^\d.]/g, '')
+    const n = Math.abs(parseFloat(raw))
     if (isNaN(n)) return ''
-    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    const [int, dec] = String(n).split('.')
+    const formatted = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return dec !== undefined ? `${formatted}.${dec}` : formatted
   }
 
   const [form, setForm] = useState({
@@ -228,11 +248,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     sprint:             task.sprint             ? String(task.sprint) : '',
     task_price:         fmtPrice(task.task_price),
     penalty_percentage: task.penalty_percentage ? String(Math.abs(parseFloat(task.penalty_percentage))) : '',
-    deadline:           initDeadline,
+    deadline:           initDeadlineDate,
+    deadline_time:      initDeadlineTime,
     estimated_hours:    initHours,
     estimated_minutes:  initMins,
   })
   const [errors, setErrors] = useState({})
+
   const set = (k, v) => {
     if (k === 'project') {
       setForm(p => ({ ...p, project: v, assignees: [] }))
@@ -243,7 +265,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     setErrors(p => ({ ...p, [k]: false }))
   }
 
-  // Tanlangan loyihaning xodimlari (topshiruvchi uchun)
   const selectedProject = projects.find(p => String(p.id) === String(form.project))
   const projectEmployees = (() => {
     if (!selectedProject) return []
@@ -255,14 +276,18 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   })()
 
   const formatPrice = (val) => {
-    const digits = val.replace(/\D/g, '').slice(0, 12)
-    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    const clean = val.replace(/[^\d.]/g, '').replace(/^(\d*\.?\d{0,2}).*$/, '$1')
+    const [int, dec] = clean.split('.')
+    const formatted = (int || '').slice(0, 12).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return dec !== undefined ? `${formatted}.${dec}` : formatted
   }
+
   const handlePenalty = (val) => {
     const digits = val.replace(/\D/g, '')
     if (!digits) { set('penalty_percentage', ''); return }
     set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
   }
+
   const handleSprint = (val) => {
     const digits = val.replace(/\D/g, '')
     if (!digits) { set('sprint', ''); return }
@@ -285,6 +310,16 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
     ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
     ${!ro ? 'focus:border-[#526ED3]' : ''}`
 
+  // Delete an existing attachment
+  const handleDeleteAttachment = async (attId) => {
+    try {
+      await axiosAPI.delete(`/task-attachments/${attId}/`)
+      setExistingAttachments(prev => prev.filter(a => a.id !== attId))
+    } catch {
+      toast.error('Xatolik', 'Faylni o\'chirishda xatolik yuz berdi')
+    }
+  }
+
   const handleSubmit = async () => {
     if (!validate()) return
     setLoading(true)
@@ -302,14 +337,40 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
       if (form.sprint)             body.sprint      = Number(form.sprint)
       if (form.task_price)         body.task_price  = form.task_price.replace(/\s/g, '')
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
-      if (form.deadline)           body.deadline    = `${form.deadline}T00:00:00.000000+05:00`
+      if (form.deadline) {
+        const t = form.deadline_time || '00:00'
+        const now = new Date()
+        const offsetMin = -now.getTimezoneOffset()
+        const sign = offsetMin >= 0 ? '+' : '-'
+        const absMin = Math.abs(offsetMin)
+        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+        const mm = String(absMin % 60).padStart(2, '0')
+        body.deadline = `${form.deadline}T${t}:00${sign}${hh}:${mm}`
+      }
       const hrs  = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
       if (hrs || mins) {
         body.estimated_input_hours   = hrs
         body.estimated_input_minutes = mins
       }
+
+      // 1. Save the task
       await onSave(task.id, body)
+
+      // 2. Upload new attachments
+      if (newAttachments.length > 0) {
+        await Promise.allSettled(
+          newAttachments.map(att => {
+            const fd = new FormData()
+            fd.append('task', task.id)
+            fd.append('file', att.file)
+            return axiosAPI.post('/task-attachments/', fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
+          })
+        )
+      }
+
       onClose()
     } catch (err) {
       const details = err?.response?.data?.error?.details
@@ -329,6 +390,19 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
   const assigneeLabel   = form.assignees.map(u => u.username).join(', ')
   const ro = !canEdit
 
+  // Helper: extract filename from URL
+  const getFilename = (url) => {
+    if (!url) return 'fayl'
+    const parts = url.split('/')
+    return decodeURIComponent(parts[parts.length - 1] || 'fayl')
+  }
+
+  // Helper: check if URL is an image
+  const isImage = (url) => {
+    if (!url) return false
+    return /\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(url)
+  }
+
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -338,7 +412,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
-          {/* ── Header (qotgan) ── */}
+          {/* ── Header ── */}
           <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -351,7 +425,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             </p>
           </div>
 
-          {/* ── Scroll qilinadigan content ── */}
+          {/* ── Scrollable content ── */}
           <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4">
 
             {/* Loyiha + Nomi */}
@@ -444,12 +518,23 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <DateTimeBox
-                  type="date"
-                  placeholder="KK/OO/YYYY"
-                  value={form.deadline}
-                  onChange={v => !ro && set('deadline', v)}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <DateTimeBox
+                    type="date"
+                    placeholder="KK/OO/YYYY"
+                    value={form.deadline}
+                    onChange={v => !ro && set('deadline', v)}
+                    disabled={ro}
+                    dropUp
+                  />
+                  <DateTimeBox
+                    type="time"
+                    value={form.deadline_time}
+                    onChange={v => !ro && set('deadline_time', v)}
+                    disabled={ro}
+                    dropUp
+                  />
+                </div>
               </div>
               <div>
                 <label className={labelCls}>Taxminiy vaqt (soat : daqiqa)</label>
@@ -464,9 +549,100 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
               </div>
             </div>
 
+            {/* Qo'shimcha fayllar */}
+            <div>
+              <label className={labelCls}>Qo'shimcha fayllar</label>
+              <div className="flex flex-wrap gap-2">
+
+                {/* Existing attachments */}
+                {existingAttachments.map(att => (
+                  <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                    {isImage(att.file) ? (
+                      <img src={att.file} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 px-1">
+                        <FaPaperclip size={16} className="text-[#526ED3]" />
+                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{getFilename(att.file)}</span>
+                      </div>
+                    )}
+                    {/* View link */}
+                    <a
+                      href={att.file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-10"
+                      onClick={e => e.stopPropagation()}
+                    />
+                    {/* Delete button (edit mode only) */}
+                    {!ro && (
+                      <button
+                        type="button"
+                        onClick={e => { e.preventDefault(); handleDeleteAttachment(att.id) }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-20"
+                      >
+                        <FaXmark size={9} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                {/* New (pending) attachments */}
+                {newAttachments.map((att, i) => (
+                  <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl border border-[#526ED3]/40 dark:border-[#526ED3]/40 overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                    {att.preview ? (
+                      <img src={att.preview} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 px-1">
+                        <FaPaperclip size={16} className="text-[#526ED3]" />
+                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setNewAttachments(prev => prev.filter((_, j) => j !== i))}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <FaXmark size={9} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Add file button (edit mode only) */}
+                {!ro && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
+                    >
+                      <FaPaperclip size={16} />
+                      <span className="text-[10px] font-medium">Fayl</span>
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
+                      className="hidden"
+                      onChange={e => {
+                        const files = Array.from(e.target.files || [])
+                        const added = files.map(f => ({
+                          file: f,
+                          preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                        }))
+                        setNewAttachments(prev => [...prev, ...added])
+                        e.target.value = ''
+                      }}
+                    />
+                  </>
+                )}
+
+              </div>
+            </div>
+
           </div>
 
-          {/* ── Footer (qotgan) ── */}
+          {/* ── Footer ── */}
           <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">

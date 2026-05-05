@@ -14,7 +14,7 @@ const MONTH_NAMES = [
 ]
 const DAY_NAMES = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya']
 
-function CalendarPopover({ value, onChange, onClose, anchorRef }) {
+function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
   const today = new Date()
   const initDate = value ? new Date(value) : today
   const [viewYear, setViewYear]   = useState(initDate.getFullYear())
@@ -79,8 +79,8 @@ function CalendarPopover({ value, onChange, onClose, anchorRef }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] mt-1 rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#2A2B2B] p-3 select-none"
-      style={{ minWidth: 260 }}
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#2A2B2B] p-3 select-none"
+      style={{ minWidth: 260, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2 px-1">
@@ -207,7 +207,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef }) {
 }
 
 // ── Time Picker Popover ───────────────────────────────────────
-function TimePopover({ value, onChange, onClose, anchorRef }) {
+function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
   const popRef = useRef(null)
   const hourRef = useRef(null)
   const minRef  = useRef(null)
@@ -253,8 +253,8 @@ function TimePopover({ value, onChange, onClose, anchorRef }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] mt-1 rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#2A2B2B] p-3 select-none"
-      style={{ minWidth: 160 }}
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#2A2B2B] p-3 select-none"
+      style={{ minWidth: 160, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
       <p className="text-xs font-semibold text-[#5B6078] dark:text-[#C2C8E0] mb-2 text-center">Vaqt tanlang</p>
 
@@ -326,7 +326,7 @@ function TimePopover({ value, onChange, onClose, anchorRef }) {
 }
 
 // ── Main DateTimeBox ──────────────────────────────────────────
-export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, error }) => {
+export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, error, dropUp }) => {
   const inputRef  = useRef(null)
   const iconRef   = useRef(null)
   const wrapRef   = useRef(null)
@@ -467,6 +467,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
             onChange={(v) => { onChange(v); setTimeDisplay(v) }}
             onClose={() => setOpen(false)}
             anchorRef={wrapRef}
+            dropUp={dropUp}
           />
         )}
       </div>
@@ -506,6 +507,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
           onChange={(v) => { onChange(v); setOpen(false) }}
           onClose={() => setOpen(false)}
           anchorRef={wrapRef}
+          dropUp={dropUp}
         />
       )}
     </div>
