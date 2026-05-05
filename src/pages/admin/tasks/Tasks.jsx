@@ -52,20 +52,43 @@ const COLUMNS = [
   { id: 'overdue',     label: "Muddati o'tgan",      color: '#9CA3AF', bg: '#F5F5F5',  droppable: false },
 ]
 
+/* ── helpers ── */
+const fmtDate = (iso) => {
+  if (!iso) return null
+  try {
+    const d = new Date(iso)
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    const hh = String(d.getHours()).padStart(2, '0')
+    const min = String(d.getMinutes()).padStart(2, '0')
+    return `${dd}.${mm}.${yyyy} ${hh}:${min}`
+  } catch { return null }
+}
+
+const PRIORITY_DOT = { low: '#22c55e', medium: '#f59e0b', high: '#f97316', critical: '#ef4444' }
+const PRIORITY_LABEL_SHORT = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
+
 /* ── KanbanCard ── */
 function KanbanCard({ card, index, onOpen }) {
+  const now = new Date()
   const deadline = card.deadline ? new Date(card.deadline) : null
-  const isOverdue = deadline && deadline < new Date() && card.status !== 'done' && card.status !== 'deployed'
-  const assignee = card.assignee_info?.username || '—'
-  const position = card.assignee_info?.position || card.position_info?.name || ''
+  const isOverdue = deadline && deadline < now && card.status !== 'done' && card.status !== 'deployed' && card.status !== 'rejected'
+
+  const assignee  = card.assignee_info?.username || '—'
+  const position  = card.assignee_info?.position || card.position_info?.name || ''
+  const avatarInitials = assignee !== '—' ? assignee.slice(0, 2).toUpperCase() : '??'
+
   const estimatedH = card.estimated_minutes ? Math.floor(card.estimated_minutes / 60) : 0
   const estimatedM = card.estimated_minutes ? card.estimated_minutes % 60 : 0
-  const durationStr = estimatedH || estimatedM
+  const durationStr = (estimatedH || estimatedM)
     ? `${estimatedH ? estimatedH + 'h ' : ''}${estimatedM ? estimatedM + 'min' : ''}`.trim()
     : null
 
   const col = COLUMNS.find(c => c.id === (card.status || 'todo'))
-  const PRIORITY_DOT = { low: '#22c55e', medium: '#f59e0b', high: '#f97316', critical: '#ef4444' }
+  const projectName = card.project_info
+    ? (typeof card.project_info === 'object' ? card.project_info?.title : card.project_info)
+    : null
 
   return (
     <Draggable draggableId={String(card.id)} index={index}>
@@ -77,68 +100,92 @@ function KanbanCard({ card, index, onOpen }) {
           onClick={() => onOpen(card.id)}
           style={{
             ...provided.draggableProps.style,
-            width: 160,
-            opacity: snapshot.isDragging ? 0.92 : 1,
+            opacity: snapshot.isDragging ? 0.95 : 1,
             transform: snapshot.isDragging
               ? `${provided.draggableProps.style?.transform} scale(1.02)`
               : provided.draggableProps.style?.transform,
-            boxShadow: snapshot.isDragging ? '0 6px 20px rgba(0,0,0,0.10)' : undefined,
+            boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.12)' : undefined,
           }}
-          className={`relative rounded-xl bg-white dark:bg-[#1C1D1D] border pt-4 px-2.5 pb-2.5 flex flex-col gap-1.5 select-none cursor-grab active:cursor-grabbing overflow-hidden
+          className={`relative rounded-2xl bg-white dark:bg-[#1C1D1D] border select-none cursor-grab active:cursor-grabbing overflow-hidden
             ${snapshot.isDragging
               ? 'border-[#526ED3] ring-2 ring-[#526ED3]/20'
-              : 'border-[#E2E6F2] dark:border-[#292A2A] hover:border-[#526ED3]/50'}`}
+              : 'border-[#E2E6F2] dark:border-[#292A2A] hover:border-[#526ED3]/40 hover:shadow-sm'}`}
         >
           {/* Status color top bar */}
-          <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{ backgroundColor: col?.color || '#B6BCCB' }} />
+          <div className="h-[3px] w-full" style={{ backgroundColor: col?.color || '#B6BCCB' }} />
 
-          {/* UID + priority dot */}
-          <div className="flex items-center justify-between gap-1">
-            <span className="text-[9px] font-mono text-[#B6BCCB] truncate">{card.uid || `#${card.id}`}</span>
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PRIORITY_DOT[card.priority] || '#B6BCCB' }} />
-          </div>
-
-          {/* Title */}
-          <p className="text-[11px] font-bold text-[#1A1D2E] leading-snug line-clamp-2">{card.title}</p>
-
-          {/* Project */}
-          {card.project_info && (
-            <div className="flex items-center gap-1 text-[10px] text-[#8F95A8]">
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span className="truncate">{typeof card.project_info === 'object' ? card.project_info?.title : card.project_info}</span>
+          <div className="p-2.5 flex flex-col gap-2">
+            {/* UID + priority dot */}
+            <div className="flex items-center justify-between gap-1">
+              <div className="flex items-center gap-1 min-w-0">
+                {/* Folder icon */}
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span className="text-[9px] font-mono text-[#B6BCCB] truncate">{card.uid || `T${card.id}`}</span>
+              </div>
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: PRIORITY_DOT[card.priority] || '#B6BCCB' }}
+                title={PRIORITY_LABEL_SHORT[card.priority]}
+              />
             </div>
-          )}
 
-          {/* Deadline */}
-          {deadline && (
-            <div className={`flex items-center gap-1 text-[10px] ${isOverdue ? 'text-[#EF4444] font-semibold' : 'text-[#8F95A8]'}`}>
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-              </svg>
-              <span>{deadline.toLocaleDateString('ru-RU')}</span>
-            </div>
-          )}
+            {/* Title */}
+            <p className="text-[12px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">{card.title}</p>
 
-          {/* Duration */}
-          {durationStr && (
-            <div className="flex items-center gap-1 text-[10px] text-[#8F95A8]">
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-              </svg>
-              <span>{durationStr}</span>
-            </div>
-          )}
+            {/* Project */}
+            {projectName && (
+              <p className="text-[10px] text-[#8F95A8] truncate">{projectName}</p>
+            )}
 
-          {/* Assignee */}
-          <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#EEF1F7]">
-            <div className="w-4 h-4 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[8px] font-bold text-[#526ED3] shrink-0">
-              {assignee.slice(0, 2).toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-[#1A1D2E] truncate">{assignee}</p>
-              {position && <p className="text-[9px] text-[#8F95A8] truncate">{position}</p>}
+            {/* Deadline */}
+            {deadline && (
+              <div className={`flex items-center gap-1 text-[10px] ${isOverdue ? 'text-[#EF4444] font-semibold' : 'text-[#8F95A8]'}`}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+                <span>{fmtDate(card.deadline)}</span>
+              </div>
+            )}
+
+            {/* Duration */}
+            {durationStr && (
+              <div className={`flex items-center gap-1 text-[10px] ${isOverdue ? 'text-[#EF4444]' : 'text-[#8F95A8]'}`}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+                <span>{durationStr}</span>
+                {isOverdue && (
+                  <span className="ml-auto text-[#EF4444] font-bold text-[9px]">
+                    {fmtDate(card.deadline)?.slice(11)}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Assignee */}
+            <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+              {card.assignee_info?.avatar ? (
+                <img
+                  src={card.assignee_info.avatar}
+                  alt={assignee}
+                  className="w-5 h-5 rounded-full object-cover shrink-0"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[8px] font-bold text-[#526ED3] shrink-0">
+                  {avatarInitials}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold text-[#1A1D2E] dark:text-white truncate">{assignee}</p>
+                {position && <p className="text-[9px] text-[#8F95A8] truncate">{position}</p>}
+              </div>
+              {card.sprint && (
+                <span className="shrink-0 text-[8px] font-bold text-[#8F95A8] bg-[#F1F3F9] dark:bg-[#292A2A] rounded px-1 py-0.5">
+                  S{card.sprint}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -271,8 +318,8 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget }) {
     <div
       className="flex flex-col rounded-2xl transition-opacity duration-150"
       style={{
-        width: 170,
-        minWidth: 175,
+        width: 200,
+        minWidth: 200,
         flexShrink: 0,
         height: '100%',
         backgroundColor: col.bg,
