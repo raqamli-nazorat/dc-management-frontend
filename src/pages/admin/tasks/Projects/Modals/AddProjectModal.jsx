@@ -12,16 +12,6 @@ const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [], onSe
   const [search, setSearch] = useState('')
   const [temp, setTemp] = useState(selected.map(u => u.id))
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (typeof onSearch === 'function') {
-        onSearch(search)
-      }
-    }, 300)
-    return () => clearTimeout(delayDebounce)
-  }, [search, onSearch])
-
-
   const toggle = (id) => setTemp(prev =>
     prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
   )
@@ -38,7 +28,7 @@ const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [], onSe
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+      <div className="relative w-full min-h-[70vh]! max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
@@ -64,7 +54,19 @@ const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [], onSe
                 type="text"
                 placeholder="Ism Sharifi bo'yicha izlash"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={e => {
+                  if (e.target.value.length > 0) {
+                    setSearch(e.target.value)
+                  } else {
+                    setSearch("");
+                    onSearch("");
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    onSearch(search);
+                  }
+                }}
                 className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078] focus:border-[#526ED3]"
               />
             </div>
@@ -160,7 +162,7 @@ const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
   )
 }
 
-const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
+const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
@@ -193,7 +195,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
   }, [])
 
   const [form, setForm] = useState({
-    title: '', prefix: '', status: '', description: '', manager: null,
+    title: '', prefix: '', status: 'active', description: '', manager: null,
     project_price: '', penalty_percentage: '', employees: [], testers: [],
     deadline: '', time: '', is_active: true,
   })
@@ -207,9 +209,14 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
     if (errors[k]) setErrors(p => ({ ...p, [k]: '' }))
   }
 
-  const fmtBonus = (raw) => {
+  const fmtBonus = (raw, key) => {
     if (!raw) return ""
+
     let val = raw.toString().replace(/[^0-9.]/g, "")
+    if (key === "penalty" && Number(val) > 100) {
+      val = "100"
+    }
+
     const dots = val.split(".")
     if (dots.length > 2) {
       val = dots[0] + "." + dots.slice(1).join("")
@@ -225,6 +232,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
     if (!form.prefix?.trim()) e.prefix = true
     if (!form.status) e.status = true
     if (!form.manager) e.manager = true
+    if (!form.project_price) e.project_price = true
     if (!form.penalty_percentage) e.penalty_percentage = true
     if (!form.deadline) e.deadline = true
     if (!form.time) e.time = true
@@ -254,8 +262,9 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
         body.deadline = `${dStr}T${tStr}:00`
       }
       const res = await axiosAPI.post('/projects/', body)
-      const created = res.data?.data ?? res.data
-      onAdd(created)
+
+      if (refreshData) refreshData()
+
       toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
       onClose()
     } catch (err) {
@@ -298,9 +307,9 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
           {/* header */}
-          <div className="px-7 pt-7 pb-4">
+          <div className="px-7 pt-7 pb-4 sticky top-0 bg-white dark:bg-[#111111] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                 <FaArrowLeft size={17} />
@@ -311,7 +320,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
           </div>
 
           {/* body */}
-          <div className="px-7 pb-4 flex flex-col gap-4">
+          <div className="px-7 pb-4 flex flex-col gap-4 overflow-y-auto max-h-[60vh]">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Nomi</label>
@@ -326,8 +335,12 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
               <div ref={statusRef}>
                 <label className={labelCls}>Holati</label>
                 <div className="relative">
-                  <button type="button" onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+                  <button
+                    type="button"
+                    onClick={() => setStatusOpen(o => !o)}
+                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}
+                    disabled
+                  >
                     <span>{currentStatusLabel}</span>
                     <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -401,7 +414,8 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Loyiha narxi (UZS)</label>
                 <input value={form.project_price} onChange={e => set('project_price', fmtBonus(e.target.value))}
                   placeholder="Loyiha uchun: 0,0"
-                  className={inputCls(false)} />
+                  className={inputCls(errors.project_price) + "font-bold"} />
+                {errors.project_price && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>
             </div>
 
@@ -413,6 +427,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
                   onChange={e => set('prefix', e.target.value.toUpperCase())}
                   placeholder="Titul kiriting"
                   className={inputCls(errors.prefix)}
+                  maxLength={3}
                 />
                 {errors.prefix && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>
@@ -421,7 +436,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Jarima foizi (%)</label>
                 <input
                   value={form.penalty_percentage}
-                  onChange={e => set('penalty_percentage', fmtBonus(e.target.value))}
+                  onChange={e => set('penalty_percentage', fmtBonus(e.target.value, "penalty"))}
                   placeholder="0,0"
                   className={inputCls(errors.penalty_percentage)}
                 />
@@ -515,7 +530,7 @@ const AddProjectModal = ({ onClose, onAdd, useDropdown, STATUS_API }) => {
       {pickerOpen === 'testers' && (
         <UserPickerModal title="Sinovchi tanlang"
           selected={form.testers}
-          users={users}
+          users={testers}
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('testers', list); setPickerOpen(null) }}
           onSearch={getTesters}

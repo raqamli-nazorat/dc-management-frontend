@@ -301,7 +301,7 @@ const ProjectsPage = () => {
       {viewMode === 'table' && (
         <div ref={scrollRef} className="flex-1 overflow-auto">
           <table className="w-full text-sm whitespace-nowrap">
-            <thead className="sticky top-0 z-10 bg-white dark:bg-[#111111]">
+            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#111]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
@@ -326,7 +326,7 @@ const ProjectsPage = () => {
               ) : (
                 data.map((p, idx) => (
                   <tr key={p.id}
-                    onClick={() => setDetailProject(p)}
+                    onClick={() => setEditProject(p)}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
@@ -466,6 +466,7 @@ const ProjectsPage = () => {
         <AddProjectModal
           onClose={() => setShowAdd(false)}
           users={users}
+          refreshData={loadProjects}
           useDropdown={useDropdown}
           STATUS_API={STATUS_LABEL}
         />
