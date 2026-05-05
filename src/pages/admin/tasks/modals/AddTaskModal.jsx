@@ -1,8 +1,9 @@
 ﻿import { useState, useRef, useEffect } from "react"
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from "react-icons/fa6"
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
 import { labelCls, PROJECTS_LIST } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
 import { toast } from "../../../../Toast/ToastProvider"
+import { DateTimeBox } from "../../Components/DateTimeBox"
 
 const PRIORITY_OPTIONS = [
   { label: 'Past',    value: 'low' },
@@ -113,17 +114,18 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
 
 function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const [search, setSearch] = useState("")
-  const [temp, setTemp] = useState(selected ? [...selected] : [])
+  // Bitta tanlash — selected[0] yoki null
+  const [temp, setTemp] = useState(selected?.length > 0 ? selected[0] : null)
   const filtered = users.filter(u =>
     (u.username ?? "").toLowerCase().includes(search.toLowerCase())
   )
-  const toggle = (u) => setTemp(prev => prev.find(x => x.id === u.id) ? prev.filter(x => x.id !== u.id) : [...prev, u])
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
-        <div className="px-6 pt-6 pb-4 shrink-0">
-          <div className="flex items-center gap-3 mb-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/70" onClick={onClose} />
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
+          <div className="flex items-center gap-3 mb-3">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
             <h2 className="text-lg font-extrabold text-[#1A1D2E] dark:text-white">{title}</h2>
           </div>
@@ -135,16 +137,19 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
               className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2">
+        {/* List */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-2">
           {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
           {filtered.map(u => {
-            const isSel = temp.find(x => x.id === u.id)
+            const isSel = temp?.id === u.id
             return (
-              <button key={u.id} onClick={() => toggle(u)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left
-                  ${isSel ? "bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[#3F57B3]" : "bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]"}`}>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? "bg-[#3F57B3] border-[#3F57B3]" : "border-[#D0D5E2] dark:border-[#474848]"}`}>
-                  {isSel && <FaCheck size={9} className="text-white" />}
+              <button key={u.id} onClick={() => setTemp(isSel ? null : u)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left transition-colors
+                  ${isSel ? "bg-[#EEF1FB] border-[#526ED3] dark:bg-[#292A2A] dark:border-[#3F57B3]" : "bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]"}`}>
+                {/* Radio circle */}
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
+                  ${isSel ? "bg-[#3F57B3] border-[#3F57B3]" : "border-[#D0D5E2] dark:border-[#474848]"}`}>
+                  {isSel && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
                 <div className="w-9 h-9 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
@@ -157,14 +162,15 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
             )
           })}
         </div>
+        {/* Footer */}
         <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
+          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => setTemp([])} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
-            <button onClick={() => onConfirm(temp)} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
-              <FaCheck size={12} /> Qo'shish
+            <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              <FaCheck size={12} /> Tanlash
             </button>
           </div>
         </div>
@@ -174,7 +180,6 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
 }
 
 export default function AddTaskModal({ onClose, onAdd }) {
-  const dateRef = useRef(null)
   const [projects, setProjects] = useState([])
   const [allUsers, setAllUsers] = useState([])
   const [positions, setPositions] = useState([])
@@ -204,9 +209,11 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [form, setForm] = useState({
     project: "", title: "", description: "", priority: "low", type: "bug", status: "todo",
     assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
-    deadline: "", estimated_hours: "", estimated_minutes: "",
+    deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
   })
   const [errors, setErrors] = useState({})
+  const [attachments, setAttachments] = useState([]) // { file, preview, id? }
+  const fileInputRef = useRef(null)
   const set = (k, v) => {
     // Loyiha o'zgarganda topshiruvchini tozalash
     if (k === 'project') {
@@ -229,10 +236,13 @@ export default function AddTaskModal({ onClose, onAdd }) {
     return []
   })()
 
-  // Narxni formatlash: faqat raqam, max 12 xona, minglik ajratgich
+  // Narxni formatlash: raqam va nuqta, max 12 xona, minglik ajratgich
   const formatPrice = (val) => {
-    const digits = val.replace(/\D/g, '').slice(0, 12)
-    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    // Nuqtadan keyin 2 ta raqam
+    const clean = val.replace(/[^\d.]/g, '').replace(/^(\d*\.?\d{0,2}).*$/, '$1')
+    const [int, dec] = clean.split('.')
+    const formatted = (int || '').slice(0, 12).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return dec !== undefined ? `${formatted}.${dec}` : formatted
   }
 
   // Foiz: 0–100
@@ -285,7 +295,14 @@ export default function AddTaskModal({ onClose, onAdd }) {
       if (form.task_price)         body.task_price  = form.task_price.replace(/\s/g, '')
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
-        body.deadline = `${form.deadline}T00:00:00.000000+05:00`
+        const t = form.deadline_time || '00:00'
+        const now = new Date()
+        const offsetMin = -now.getTimezoneOffset()
+        const sign = offsetMin >= 0 ? '+' : '-'
+        const absMin = Math.abs(offsetMin)
+        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+        const mm = String(absMin % 60).padStart(2, '0')
+        body.deadline = `${form.deadline}T${t}:00${sign}${hh}:${mm}`
       }
       const hrs  = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
@@ -293,7 +310,25 @@ export default function AddTaskModal({ onClose, onAdd }) {
         body.estimated_input_hours   = hrs
         body.estimated_input_minutes = mins
       }
-      await onAdd(body)
+
+      // 1. Task yaratish
+      const created = await onAdd(body)
+      const taskId = created?.id ?? created?.data?.id
+
+      // 2. Fayllarni yuklash (task yaratilgandan keyin)
+      if (taskId && attachments.length > 0) {
+        await Promise.allSettled(
+          attachments.map(att => {
+            const fd = new FormData()
+            fd.append('task', taskId)
+            fd.append('file', att.file)
+            return axiosAPI.post('/task-attachments/', fd, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            })
+          })
+        )
+      }
+
       onClose()
     } catch (err) {
       const details = err?.response?.data?.error?.details
@@ -321,7 +356,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ maxHeight: '90vh' }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* ── Header (qotgan) ── */}
           <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
@@ -361,9 +396,8 @@ export default function AddTaskModal({ onClose, onAdd }) {
               </div>
             </div>
 
-            {/* Holati + Darajasi + Turi */}
-            <div className="grid grid-cols-3 gap-4">
-              <SelectDropdown label="Holati"   value={form.status}   onChange={v => set("status", v)}   options={STATUS_OPTIONS}   placeholder="Holati" />
+            {/* Darajasi + Turi */}
+            <div className="grid grid-cols-2 gap-4">
               <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set("priority", v)} options={PRIORITY_OPTIONS} placeholder="Daraja" error={errors.priority} />
               <SelectDropdown label="Turi"     value={form.type}     onChange={v => set("type", v)}     options={TYPE_OPTIONS}     placeholder="Turi"   error={errors.type} />
             </div>
@@ -437,13 +471,20 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={dateRef} type="date" value={form.deadline} onChange={e => set("deadline", e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? "[&::-webkit-datetime-edit]:opacity-0" : "text-[#1A1D2E] dark:text-white"}`} />
-                  <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <DateTimeBox
+                    type="date"
+                    placeholder="KK/OO/YYYY"
+                    value={form.deadline}
+                    onChange={v => set("deadline", v)}
+                    dropUp
+                  />
+                  <DateTimeBox
+                    type="time"
+                    value={form.deadline_time}
+                    onChange={v => set("deadline_time", v)}
+                    dropUp
+                  />
                 </div>
               </div>
               <div>
@@ -454,6 +495,60 @@ export default function AddTaskModal({ onClose, onAdd }) {
                   <input type="number" min="0" max="59" value={form.estimated_minutes} onChange={e => set("estimated_minutes", e.target.value)}
                     placeholder="0 daqiqa" className={inputCls(false)} />
                 </div>
+              </div>
+            </div>
+
+            {/* Qo'shimcha fayllar */}
+            <div>
+              <label className={labelCls}>Qo'shimcha fayllar</label>
+              <div className="flex flex-wrap gap-2">
+                {/* Yuklangan fayllar */}
+                {attachments.map((att, i) => (
+                  <div key={i} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                    {att.preview ? (
+                      <img src={att.preview} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 px-1">
+                        <FaPaperclip size={16} className="text-[#526ED3]" />
+                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <FaXmark size={9} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Fayl qo'shish tugmasi */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
+                >
+                  <FaPaperclip size={16} />
+                  <span className="text-[10px] font-medium">Fayl</span>
+                </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
+                  className="hidden"
+                  onChange={e => {
+                    const files = Array.from(e.target.files || [])
+                    const newAtts = files.map(f => ({
+                      file: f,
+                      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                    }))
+                    setAttachments(prev => [...prev, ...newAtts])
+                    e.target.value = ''
+                  }}
+                />
               </div>
             </div>
 

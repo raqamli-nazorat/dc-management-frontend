@@ -98,15 +98,6 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
-  const dateFromRef = useRef(null)
-  const timeFromRef = useRef(null)
-  const dateToRef   = useRef(null)
-  const timeToRef   = useRef(null)
-  const deadFromRef = useRef(null)
-  const deadFromTRef = useRef(null)
-  const deadToRef   = useRef(null)
-  const deadToTRef  = useRef(null)
-
   const mgrDd = useDropdown()
   const empDd = useDropdown()
   const stsDd = useDropdown()
@@ -120,7 +111,6 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
 
   const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
   const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
-  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] '
 
   const selectedMgr = users.find(u => u.id === f.manager)
   const selectedEmp = users.find(u => u.id === f.employee)
@@ -234,86 +224,22 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
           {/* Boshlanish sanasi oralig'i */}
           <div>
             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
-            <div className="flex items-center gap-2">
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!f.startFromD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>}
-                <input ref={dateFromRef} type="date" value={f.startFromD} onChange={e => set('startFromD', e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} shrink-0`}>
-                <input ref={timeFromRef} type="time" value={f.startFromT || '00:00'} onChange={e => set('startFromT', e.target.value === '00:00' ? '' : e.target.value)}
-                  step="60"
-                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => timeFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!f.startToD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>}
-                <input ref={dateToRef} type="date" value={f.startToD} onChange={e => set('startToD', e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.startToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} shrink-0`}>
-                <input ref={timeToRef} type="time" value={f.startToT || '00:00'} onChange={e => set('startToT', e.target.value === '00:00' ? '' : e.target.value)}
-                  step="60"
-                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.startToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => timeToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </button>
-              </div>
+            <div className="grid grid-cols-4 gap-2">
+              <DateTimeBox type="date" placeholder="dan"   value={f.startFromD} onChange={v => set('startFromD', v)} />
+              <DateTimeBox type="time"                     value={f.startFromT} onChange={v => set('startFromT', v)} />
+              <DateTimeBox type="date" placeholder="gacha" value={f.startToD}   onChange={v => set('startToD', v)} />
+              <DateTimeBox type="time"                     value={f.startToT}   onChange={v => set('startToT', v)} />
             </div>
           </div>
 
           {/* Muddat oralig'i */}
           <div>
             <label className={labelCls}>Muddat oralig'i</label>
-            <div className="flex items-center gap-2">
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!f.deadFromD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>}
-                <input ref={deadFromRef} type="date" value={f.deadFromD} onChange={e => set('deadFromD', e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadFromD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => deadFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} shrink-0`}>
-                <input ref={deadFromTRef} type="time" value={f.deadFromT || '00:00'} onChange={e => set('deadFromT', e.target.value === '00:00' ? '' : e.target.value)}
-                  step="60"
-                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadFromT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => deadFromTRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!f.deadToD && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>}
-                <input ref={deadToRef} type="date" value={f.deadToD} onChange={e => set('deadToD', e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${f.deadToD ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => deadToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} shrink-0`}>
-                <input ref={deadToTRef} type="time" value={f.deadToT || '00:00'} onChange={e => set('deadToT', e.target.value === '00:00' ? '' : e.target.value)}
-                  step="60"
-                  className={`w-[52px] text-xs outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!f.deadToT ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                <button type="button" onClick={() => deadToTRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3] ">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                </button>
-              </div>
+            <div className="grid grid-cols-4 gap-2">
+              <DateTimeBox type="date" placeholder="dan"   value={f.deadFromD} onChange={v => set('deadFromD', v)} />
+              <DateTimeBox type="time"                     value={f.deadFromT} onChange={v => set('deadFromT', v)} />
+              <DateTimeBox type="date" placeholder="gacha" value={f.deadToD}   onChange={v => set('deadToD', v)} />
+              <DateTimeBox type="time"                     value={f.deadToT}   onChange={v => set('deadToT', v)} />
             </div>
           </div>
         </div>
@@ -364,7 +290,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         {/* Header */}
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
@@ -564,8 +490,6 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
 
 /* ── AddProjectModal ── */
 function AddProjectModal({ onClose, onAdd }) {
-  const dateRef = useRef(null)
-  const timeRef = useRef(null)
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
@@ -679,7 +603,7 @@ function AddProjectModal({ onClose, onAdd }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-4">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
@@ -847,26 +771,21 @@ function AddProjectModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddat sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="date"
+                  placeholder="KK/OO/YYYY"
+                  value={form.deadline}
+                  onChange={v => set('deadline', v)}
+                />
               </div>
               <div>
                 <label className={labelCls}>Soati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)}
-                    step="60"
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="time"
+                  placeholder="SS:DD"
+                  value={form.time}
+                  onChange={v => set('time', v)}
+                />
               </div>
             </div>
           </div>
@@ -1019,7 +938,7 @@ function DetailModal({ project, onClose }) {
         <FaXmark size={14} />
       </button>
 
-      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
         {/* Header */}
         <div className="px-7 pt-7 pb-5 border-b border-[#F1F3F9] dark:border-[#292A2A]">
@@ -1122,8 +1041,6 @@ function DetailModal({ project, onClose }) {
 }
 /* ── EditProjectModal ── */
 function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
-  const dateRef = useRef(null)
-  const timeRef = useRef(null)
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
 
@@ -1232,7 +1149,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-4">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -1332,23 +1249,21 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Muddat sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={dateRef} type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.deadline ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => dateRef.current?.showPicker?.()} className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="date"
+                  placeholder="KK/OO/YYYY"
+                  value={form.deadline}
+                  onChange={v => set('deadline', v)}
+                />
               </div>
               <div>
                 <label className={labelCls}>Soati</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={timeRef} type="time" value={form.time || '00:00'} onChange={e => set('time', e.target.value === '00:00' ? '' : e.target.value)} step="60"
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => timeRef.current?.showPicker?.()} className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="time"
+                  placeholder="SS:DD"
+                  value={form.time}
+                  onChange={v => set('time', v)}
+                />
               </div>
             </div>
           </div>

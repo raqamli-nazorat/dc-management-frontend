@@ -6,6 +6,7 @@ import { useAuth } from '../../../context/AuthContext'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
+import { DateTimeBox } from '../Components/DateTimeBox'
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const DURATION_UNITS = ['Daqiqa', 'Soat']
@@ -171,7 +172,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
       <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
@@ -239,8 +240,6 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 
 /* ── AddMeetingModal ── */
 function AddMeetingModal({ onClose, onAdd, projects, users }) {
-  const dateRef = useRef(null)
-  const timeRef = useRef(null)
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
@@ -325,7 +324,7 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-3">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -377,27 +376,24 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <div className="grid grid-cols-4 gap-3">
               <div className="col-span-2">
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.date ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
-                  <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="date"
+                  placeholder="KK/OO/YYYY"
+                  value={form.date}
+                  onChange={v => set('date', v)}
+                  error={errors.date}
+                />
                 {errors.date && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.time ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
-                  <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
-                    placeholder="00:00" step="60"
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="time"
+                  placeholder="SS:DD"
+                  value={form.time}
+                  onChange={v => set('time', v)}
+                  error={errors.time}
+                />
                 {errors.time && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
               <div>
@@ -470,8 +466,6 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
 
 /* ── EditMeetingModal ── */
 function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
-  const dateRef = useRef(null)
-  const timeRef = useRef(null)
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -543,7 +537,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-3">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -593,26 +587,21 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <div className="grid grid-cols-4 gap-2">
               <div className="col-span-2">
                 <label className={labelCls}>Boshlanish sanasi</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={dateRef} type="date" value={form.date} onChange={e => set('date', e.target.value)}
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.date ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => dateRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="date"
+                  placeholder="KK/OO/YYYY"
+                  value={form.date}
+                  onChange={v => set('date', v)}
+                />
               </div>
               <div>
                 <label className={labelCls}>Vaqti</label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]">
-                  <input ref={timeRef} type="time" value={form.time} onChange={e => set('time', e.target.value)}
-                    placeholder="00:00" step="60"
-                    className={`flex-1 min-w-0 text-sm outline-none bg-transparent cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${!form.time ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#1A1D2E] dark:text-white'}`} />
-                  <button type="button" onClick={() => timeRef.current?.showPicker?.()}
-                    className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  </button>
-                </div>
+                <DateTimeBox
+                  type="time"
+                  placeholder="SS:DD"
+                  value={form.time}
+                  onChange={v => set('time', v)}
+                />
               </div>
               <div>
                 <label className={labelCls}>Davomiyligi</label>
@@ -695,7 +684,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
       <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         <div className="px-7 pt-7 pb-3">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
@@ -819,8 +808,6 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   const [dateFrom,  setDateFrom]  = useState(initial.dateFrom  ?? '')
   const [dateTo,    setDateTo]    = useState(initial.dateTo    ?? '')
 
-  const dateFromRef = useRef(null)
-  const dateToRef   = useRef(null)
   const orgDd  = useDropdown()
   const prjDd  = useDropdown()
   const stsDd  = useDropdown()
@@ -829,7 +816,6 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
   const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
   const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
-  const inputBox = 'flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] '
 
   const STATUS_OPTIONS = [
     { label: 'Tugallangan',   value: 'true' },
@@ -935,25 +921,9 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
           {/* Sana oralig'i */}
           <div>
             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
-            <div className="flex items-center gap-2">
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!dateFrom && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>}
-                <input ref={dateFromRef} type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${dateFrom ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => dateFromRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
-              <div className={`${inputBox} flex-1 min-w-0`}>
-                {!dateTo && <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>}
-                <input ref={dateToRef} type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-                  className={`text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden ${dateTo ? 'flex-1 min-w-0' : 'w-0 opacity-0 pointer-events-none'}`} />
-                <button type="button" onClick={() => dateToRef.current?.showPicker?.()}
-                  className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]  ml-auto">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </button>
-              </div>
+            <div className="grid grid-cols-2 gap-2">
+              <DateTimeBox type="date" placeholder="dan (KK/OO/YYYY)" value={dateFrom} onChange={setDateFrom} />
+              <DateTimeBox type="date" placeholder="gacha (KK/OO/YYYY)" value={dateTo} onChange={setDateTo} />
             </div>
           </div>
         </div>

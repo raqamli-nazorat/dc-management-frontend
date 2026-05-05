@@ -275,8 +275,10 @@ export default function TasksPage() {
       const created = res.data?.data ?? res.data
       setData(prev => [created, ...prev])
       toast.success("Vazifa yaratildi", "Yangi vazifa muvaffaqiyatli qo'shildi")
+      return created
     } catch (err) {
       toast.error('Xatolik', err?.response?.data?.detail || "Vazifa yaratishda xatolik")
+      throw err
     }
   }
 
@@ -459,8 +461,9 @@ export default function TasksPage() {
         )}
         {showAdd && (
           <AddTaskModal onClose={() => setShowAdd(false)} onAdd={async (body) => {
-            await handleAdd(body)
+            const created = await handleAdd(body)
             loadKanbanTasks(filters, search)
+            return created
           }} />
         )}
         {editTask && (
