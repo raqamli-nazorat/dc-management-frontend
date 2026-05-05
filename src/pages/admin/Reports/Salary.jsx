@@ -3,7 +3,8 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker } from 'antd'
+import { DatePicker, ConfigProvider, theme } from 'antd'
+import { useTheme } from '../../../context/ThemeContext'
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -16,6 +17,8 @@ import { saveAs } from 'file-saver'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
+import { FiCalendar } from 'react-icons/fi'
+import { IoCloseCircle } from 'react-icons/io5'
 
 const status_type = [
   { label: "Hisoblangan", value: false },
@@ -60,6 +63,7 @@ const initialFilters = {
 }
 
 const Employee = () => {
+  const { isDark } = useTheme()
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
   const [filterModal, setFilterModal] = useState(false)
@@ -653,6 +657,24 @@ const Employee = () => {
       <div
         className={`transition-all duration-300 ease-in-out w-full ${filterModal ? 'max-h-[1200px] opacity-100 pointer-events-auto' : 'max-h-0 opacity-0 pointer-events-none'} mt-4`}
       >
+        <ConfigProvider
+          theme={{
+            algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+            token: {
+              borderRadius: 12,
+              colorPrimary: '#7186ED',
+              motion: false,
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+            },
+            components: {
+              Select: {
+                selectorBg: isDark ? '#222323' : '#ffffff',
+                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
+                optionActiveBg: isDark ? '#222323' : '#F8F9FC',
+              }
+            }
+          }}
+        >
         {/* Row 1 */}
         <div className="grid grid-cols-4 gap-4 mb-3">
           <div className="col-span-4 lg:col-span-2">
@@ -665,8 +687,10 @@ const Employee = () => {
                   value={filters.created_at_min}
                   onChange={(value) => handleFilterChange('created_at_min', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                   placeholder='Boshlanish sanasi'
+                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
                 />
               </div>
               <div className="relative flex-1">
@@ -676,8 +700,10 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('created_at_max', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                   placeholder='Tugash sana'
+                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
                 />
               </div>
             </div>
@@ -694,8 +720,10 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('confirmed_at_min', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                   placeholder='Boshlanish sanasi'
+                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
                 />
               </div>
 
@@ -706,8 +734,10 @@ const Employee = () => {
                   format="DD.MM.YYYY HH:mm"
                   onChange={(value) => handleFilterChange('confirmed_at_max', value)}
                   getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
+                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                   placeholder='Tugash sanasi'
+                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
                 />
               </div>
             </div>
@@ -862,6 +892,7 @@ const Employee = () => {
           </div>
 
         </div>
+        </ConfigProvider>
       </div>
 
       {/* Table Section */}

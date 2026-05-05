@@ -20,13 +20,13 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
 
   return (
     <div
-      className={`flex-1 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl flex flex-col justify-center px-4 h-11 focus-within:border-blue-400 transition-all duration-300 relative cursor-text group ${className}`}
+      className={`flex-1 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl flex flex-col justify-center px-4 h-11 relative cursor-text group ${className}`}
       onClick={() => setFocused(true)}
     >
       <span
-        className={`absolute left-4 transition-all duration-300 pointer-events-none font-semibold
+        className={`absolute left-4 transition-[top,font-size,color,transform] duration-300 pointer-events-none font-semibold
           ${isActive
-            ? 'top-1.5 text-[10px] text-slate-400'
+            ? 'top-1 text-[10px] text-slate-400'
             : 'top-1/2 -translate-y-1/2 text-sm text-slate-400'
           }`}
       >
@@ -34,9 +34,9 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
       </span>
 
       <div
-        className={`flex items-center transition-all duration-300
+        className={`flex items-center transition-transform duration-300
           ${isActive
-            ? 'mt-3'
+            ? 'translate-y-2'
             : `ml-[${labelWidth}px]`
           }`}
         style={{ marginLeft: isActive ? 0 : `${labelWidth}px` }}
@@ -53,7 +53,7 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
             onChange={onChange}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className={`w-full bg-transparent outline-none font-bold transition-all duration-300 ${isFine ? 'text-red-500!' : 'text-slate-900! dark:text-white!'}`}
+            className={`w-full bg-transparent outline-none font-bold ${isFine ? 'text-red-500!' : 'text-slate-900! dark:text-white!'}`}
             style={{ fontSize: `${fontSize}px` }}
             autoFocus={focused}
             placeholder={focused ? "0" : ""}

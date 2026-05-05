@@ -3,7 +3,8 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, Select } from 'antd'
+import { DatePicker, Select, ConfigProvider, theme } from 'antd'
+import { useTheme } from '../../../context/ThemeContext'
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -18,6 +19,9 @@ import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 import ProjectsStep from './Modals/ProjectsStep'
 import { usePositions } from '../../../MostUsesDates/'
+import { FiCalendar } from 'react-icons/fi'
+import { IoCloseCircle } from 'react-icons/io5'
+import { MdExpandMore } from 'react-icons/md'
 
 const type = [
   { label: "Xatolik", value: "bug" },
@@ -74,7 +78,7 @@ const initialFilters = {
 }
 
 const Employee = () => {
-
+  const { isDark } = useTheme()
   const positions = usePositions()
 
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
@@ -697,265 +701,289 @@ const Employee = () => {
       <div
         className={`transition-all duration-300 ease-in-out w-full ${filterModal ? 'max-h-[1200px] opacity-100 pointer-events-auto' : 'max-h-0 opacity-0 pointer-events-none'} mt-4`}
       >
-        {/* Row 1 */}
-        <div className="grid grid-cols-5 gap-4 mb-3">
-          <div className="col-span-4 lg:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Yaratilgan vaqtdi</label>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  format="DD.MM.YYYY HH:mm"
-                  value={filters.created_at_min}
-                  onChange={(value) => handleFilterChange('created_at_min', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
-                  placeholder='Boshlanish sanasi'
+        <ConfigProvider
+          theme={{
+            algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+            token: {
+              borderRadius: 12,
+              colorPrimary: '#7186ED',
+              motion: false,
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+            },
+            components: {
+              Select: {
+                selectorBg: isDark ? '#222323' : '#ffffff',
+                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
+                optionActiveBg: isDark ? '#222323' : '#F8F9FC',
+              }
+            }
+          }}
+        >
+          {/* Row 1 */}
+          <div className="grid grid-cols-5 gap-4 mb-3">
+            <div className="col-span-4 lg:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Yaratilgan vaqtdi</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    format="DD.MM.YYYY HH:mm"
+                    value={filters.created_at_min}
+                    onChange={(value) => handleFilterChange('created_at_min', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Boshlanish sanasi'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    value={filters.created_at_max}
+                    format="DD.MM.YYYY HH:mm"
+                    onChange={(value) => handleFilterChange('created_at_max', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Tugash sana'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Loyihalar</label>
+              <button
+                type="button"
+                onClick={() => setSelectProject(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.project ? `${filters.project.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <img src="/imgs/Briefcase.svg" alt="Loyiha" size={18} />
+
+                  {filters.project && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('project', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Topshiruvchi</label>
+              <button
+                type="button"
+                onClick={() => setSelectSubmitter(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.assignee ? `${filters.assignee.split(',').filter(Boolean).length} ta topshiruvchi` : 'Topshiruvchi tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
+
+                  {filters.assignee && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('assignee', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muallif</label>
+              <button
+                type="button"
+                onClick={() => setSelectAuthor(true)}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+              >
+                <span className="truncate text-sm font-medium">
+                  {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <PiUsersThreeBold size={18} />
+
+                  {filters.created_by && (
+                    <FaXmark
+                      size={18}
+                      className="text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleFilterChange('created_by', '') }}
+                    />
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Darajasi</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Darajasini tanlang"
+                options={priority_type}
+                value={filters.priority}
+                onChange={(value) => handleFilterChange('priority', value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
+              <Select
+                value={filters.status || undefined}
+                onChange={(value) => handleFilterChange('status', value)}
+                getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                className="w-full py-[10px]! border-slate-200! dark:border-[#292A2A]!"
+                size="middle"
+                allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[#8E95B5]" />}
+                placeholder="Holatini tanlang"
+                optionLabelProp="label"
+                options={[
+                  {
+                    value: 'todo',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>
+                  },
+                  {
+                    value: 'in_progress',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>
+                  },
+                  {
+                    value: 'done',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>
+                  },
+                  {
+                    value: 'production',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>
+                  },
+                  {
+                    value: 'checked',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span> Tekshirilgan</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span>Tekshirilgan</div>
+                  },
+                  {
+                    value: 'rejected',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>
+                  },
+                  {
+                    value: 'overdue',
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>,
+                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>
+                  }
+                ]}
+                optionRender={(option) => option.data.dropdownLabel || option.data.label}
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Turi</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Turini tanlang"
+                options={type}
+                value={filters.type}
+                onChange={(value) => handleFilterChange('type', value)}
+                multiple={true}
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Sprint</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Sprint tanlang"
+                options={sprint}
+                value={filters.sprint}
+                onChange={(value) => handleFilterChange('sprint', value)}
+                multiple={true}
+              />
+            </div>
+          </div>
+
+          {/* Row 3*/}
+          <div className="grid grid-cols-8 gap-4">
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Kim uchun</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Kim uchun"
+                options={positions.map(pos => ({ value: pos.name, label: pos.name }))}
+                value={filters.position}
+                onChange={(value) => handleFilterChange('position', value)}
+                multiple={true}
+              />
+            </div>
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Vazifasi narxi (UZS)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.price_min}
+                  onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.price_max}
+                  onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
                 />
               </div>
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  value={filters.created_at_max}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('created_at_max', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 dark:bg-[#222323] border border-slate-200! dark:border-[#292A2A] rounded-xl! text-sm dark:text-white outline-none focus:border-blue-400  hover:border-slate-200!"
-                  placeholder='Tugash sana'
+            </div>
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jarima foizi (%)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.penalty_min}
+                  onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.penalty_max}
+                  onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
                 />
               </div>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Loyihalar</label>
-            <button
-              type="button"
-              onClick={() => setSelectProject(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.project ? `${filters.project.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <img src="/imgs/Briefcase.svg" alt="Loyiha" size={18} />
-
-                {filters.project && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('project', '') }}
-                  />
-                )}
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Qaytishlar soni</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.reopened_min}
+                  onChange={(e) => handleFilterChange('reopened_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.reopened_max}
+                  onChange={(e) => handleFilterChange('reopened_max', formatNum(e.target.value))}
+                />
               </div>
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Topshiruvchi</label>
-            <button
-              type="button"
-              onClick={() => setSelectSubmitter(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.assignee ? `${filters.assignee.split(',').filter(Boolean).length} ta topshiruvchi` : 'Topshiruvchi tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.assignee && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('assignee', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Muallif</label>
-            <button
-              type="button"
-              onClick={() => setSelectAuthor(true)}
-              className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] transition-colors cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
-            >
-              <span className="truncate text-sm font-medium">
-                {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
-              </span>
-              <div className="flex items-center gap-2">
-                <PiUsersThreeBold size={18} />
-
-                {filters.created_by && (
-                  <FaXmark
-                    size={18}
-                    className="text-red-500"
-                    onClick={(e) => { e.stopPropagation(); handleFilterChange('created_by', '') }}
-                  />
-                )}
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="grid grid-cols-4 gap-4 mb-3">
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Darajasi</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Darajasini tanlang"
-              options={priority_type}
-              value={filters.priority}
-              onChange={(value) => handleFilterChange('priority', value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
-            <Select
-              value={filters.status || undefined}
-              onChange={(value) => handleFilterChange('status', value)}
-              getPopupContainer={(triggerNode) => triggerNode.parentNode}
-              className="w-full custom-antd-select text-sm! py-[11px]! rounded-xl!"
-              size="large"
-              allowClear
-              placeholder="Holatini tanlang"
-              optionLabelProp="label"
-              options={[
-                {
-                  value: 'todo',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>
-                },
-                {
-                  value: 'in_progress',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>
-                },
-                {
-                  value: 'done',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilfab</div>
-                },
-                {
-                  value: 'production',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>
-                },
-                {
-                  value: 'checked',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span> Tekshirilgan</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span>Tekshirilgan</div>
-                },
-                {
-                  value: 'rejected',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>
-                },
-                {
-                  value: 'overdue',
-                  label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>,
-                  dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>
-                }
-              ]}
-              optionRender={(option) => option.data.dropdownLabel || option.data.label}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Turi</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Turini tanlang"
-              options={type}
-              value={filters.type}
-              onChange={(value) => handleFilterChange('type', value)}
-              multiple={true}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Sprint</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Sprint tanlang"
-              options={sprint}
-              value={filters.sprint}
-              onChange={(value) => handleFilterChange('sprint', value)}
-              multiple={true}
-            />
-          </div>
-        </div>
-
-        {/* Row 3*/}
-        <div className="grid grid-cols-8 gap-4">
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Kim uchun</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Kim uchun"
-              options={positions.map(pos => ({ value: pos.name, label: pos.name }))}
-              value={filters.position}
-              onChange={(value) => handleFilterChange('position', value)}
-              multiple={true}
-            />
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Vazifasi narxi (UZS)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.price_min}
-                onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.price_max}
-                onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
-              />
             </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jarima foizi (%)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.penalty_min}
-                onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.penalty_max}
-                onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Qaytishlar soni</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.reopened_min}
-                onChange={(e) => handleFilterChange('reopened_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.reopened_max}
-                onChange={(e) => handleFilterChange('reopened_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
 
-        </div>
+          </div>
+        </ConfigProvider>
       </div>
 
       {/* Table Section */}
@@ -1110,56 +1138,3 @@ const Employee = () => {
 }
 
 export default Employee
-
-const customSelectStyles = `
-      .custom-antd-select .ant-select-selector {
-        border - radius: 12px !important;
-      border-color: #e2e8f0 !important;
-      height: 44px !important;
-      display: flex !important;
-      align-items: center !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      outline: none !important;
-  }
-      .custom-antd-select.ant-select-focused .ant-select-selector {
-        border - color: #e2e8f0 !important;
-      box-shadow: none !important;
-  }
-      .dark .custom-antd-select .ant-select-selector {
-        border - color: #292A2A !important;
-      background: #222323 !important;
-      color: white !important;
-  }
-      .dark .custom-antd-select.ant-select-focused .ant-select-selector {
-        border - color: #292A2A !important;
-  }
-      .custom-antd-select .ant-select-selection-item {
-        display: flex !important;
-      align-items: center !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-  }
-      .dark .custom-antd-select .ant-select-selection-item {
-        color: white !important;
-  }
-      .dark .ant-select-dropdown {
-        background - color: #1C1D1D !important;
-      border: 1px solid #292A2A !important;
-  }
-      .dark .ant-select-item {
-        color: white !important;
-  }
-      .dark .ant-select-item-option-active {
-        background - color: #222323 !important;
-  }
-      .dark .ant-select-item-option-selected {
-        background - color: #303131 !important;
-  }
-      `
-
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style')
-  style.innerHTML = customSelectStyles
-  document.head.appendChild(style)
-}

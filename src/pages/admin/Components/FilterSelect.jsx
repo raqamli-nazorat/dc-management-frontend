@@ -89,7 +89,7 @@ const FilterSelect = ({
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#191a1a] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323]! dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
@@ -115,7 +115,7 @@ const FilterSelect = ({
                         size={16}
                         className={`absolute transition-all duration-300 ease-in-out ${(hasValue && isBtnHovered) ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
                             } ${open ? 'rotate-180' : ''}`}
-                        style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
+                        style={{ color: isDark ? '#8E95B5' : '#8F95A8' }}
                     />
 
                     <MdCancel
