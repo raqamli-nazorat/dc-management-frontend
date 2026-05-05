@@ -399,14 +399,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
         try {
           await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: form.status })
         } catch (statusErr) {
-          const msg = statusErr?.response?.data?.error?.errorMsg || statusErr?.response?.data?.detail || "Holat yangilashda xatolik"
-          toast.error('Holat xatoligi', msg)
+          toast.error('Holat xatoligi', parseApiError(statusErr, "Holat yangilashda xatolik"))
         }
       }
 
       // 3. Yangi fayllarni yuklash
       if (newAttachments.length > 0) {
-        await Promise.allSettled(
+        const uploadResults = await Promise.allSettled(
           newAttachments.map(att => {
             const fd = new FormData()
             fd.append('task', task.id)
@@ -416,18 +415,22 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
             })
           })
         )
+        // Har bir fayl uchun xatolikni ko'rsatish
+        uploadResults.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            const fname = newAttachments[i]?.file?.name || 'fayl'
+            toast.error(`"${fname}" yuklanmadi`, parseApiError(result.reason, "Fayl yuklashda xatolik"))
+          }
+        })
       }
 
       onClose()
     } catch (err) {
-      const details = err?.response?.data?.error?.details
-      const errorMsg = err?.response?.data?.error?.errorMsg || 'Vazifa yangilashda xatolik'
-      if (details && typeof details === 'object') {
-        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join('\n')
-        toast.error('Xatolik', msgs || errorMsg)
-      } else {
-        toast.error('Xatolik', errorMsg)
-      }
+      toast.error('Xatolik', parseApiError(err, 'Vazifa yangilashda xatolik'))
+    } finally {
+      setLoading(false)
+    }
+  }
     } finally {
       setLoading(false)
     }
