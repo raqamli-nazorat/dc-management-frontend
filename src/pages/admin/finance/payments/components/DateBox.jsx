@@ -8,6 +8,7 @@ export function DateBox({ type, value, onChange, placeholder }) {
       placeholder={placeholder || (type === 'time' ? 'SS:DD' : 'KK/OO/YYYY')}
       value={value}
       onChange={onChange}
+      dropUp
     />
   )
 }
@@ -20,19 +21,19 @@ export function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT
         {/* Dan */}
         <div className="flex gap-1.5">
           <div className="flex-1">
-            <DateTimeBox type="date" placeholder="dan (KK/OO/YYYY)" value={dateFromD} onChange={onDateFromD} />
+            <DateTimeBox type="date" placeholder="dan" value={dateFromD} onChange={onDateFromD} dropUp />
           </div>
           <div className="w-[100px]">
-            <DateTimeBox type="time" placeholder="SS:DD" value={dateFromT} onChange={onTimeFromD} />
+            <DateTimeBox type="time" placeholder="SS:DD" value={dateFromT} onChange={onTimeFromD} dropUp />
           </div>
         </div>
         {/* Gacha */}
         <div className="flex gap-1.5">
           <div className="flex-1">
-            <DateTimeBox type="date" placeholder="gacha (KK/OO/YYYY)" value={dateToD} onChange={onDateToD} />
+            <DateTimeBox type="date" placeholder="gacha" value={dateToD} onChange={onDateToD} dropUp />
           </div>
           <div className="w-[100px]">
-            <DateTimeBox type="time" placeholder="SS:DD" value={dateToT} onChange={onTimeToD} />
+            <DateTimeBox type="time" placeholder="SS:DD" value={dateToT} onChange={onTimeToD} dropUp />
           </div>
         </div>
       </div>

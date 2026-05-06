@@ -448,6 +448,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
           disabled={disabled}
           maxLength={5}
           className={inputCls}
+          style={{ width: '3.2rem', minWidth: '3.2rem', flexShrink: 0 }}
         />
         <button
           ref={iconRef}
@@ -488,6 +489,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
         disabled={disabled}
         maxLength={10}
         className={inputCls}
+        style={{ width: '6rem', minWidth: '6rem', flexShrink: 0 }}
       />
       <button
         ref={iconRef}

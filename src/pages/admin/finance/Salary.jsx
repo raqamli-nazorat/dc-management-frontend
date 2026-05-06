@@ -1,10 +1,11 @@
-﻿import { useState, useEffect, useRef } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays, FaClock } from 'react-icons/fa6'
+import { useState, useEffect, useRef } from 'react'
+import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
+import { DateTimeBox } from '../Components/DateTimeBox'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
@@ -62,35 +63,6 @@ function useDropdown() {
     return () => document.removeEventListener('mousedown', h)
   }, [])
   return { open, setOpen, ref }
-}
-
-// -- DateBox --------------------------------------------------
-function DateBox({ type, value, onChange, icon, placeholder }) {
-  const ref = useRef(null)
-  const isEmpty = !value
-  return (
-    <div className="flex items-center gap-1.5 px-3 py-2.5 border border-[#E2E6F2] dark:border-[#292A2A]
-      rounded-xl bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] cursor-text">
-      {placeholder && (
-        <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
-          {placeholder}:
-        </span>
-      )}
-      <input ref={ref} type={type} value={value} onChange={e => onChange(e.target.value)}
-        placeholder={type === 'time' ? '00:00' : ''}
-        step={type === 'time' ? '60' : undefined}
-        className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
-          placeholder-[#B6BCCB] dark:placeholder-[#474848]
-          [&::-webkit-calendar-picker-indicator]:hidden
-          ${type === 'date' && !value ? '[&::-webkit-datetime-edit]:opacity-0' : 'text-[#1A1D2E] dark:text-[#FFFFFF]'}
-        `}
-      />
-      <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#B6BCCB] dark:text-[#474848] hover:text-[#526ED3] transition-colors">
-        {icon}
-      </button>
-    </div>
-  )
 }
 
 // -- Toggle ---------------------------------------------------
@@ -177,21 +149,21 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
           {/* Yaratilgan vaqti oralig'i */}
           <div>
             <label className={labelCls}>Yaratilgan vaqti oralig'i</label>
-            <div className=" grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <div className="flex gap-1.5">
                 <div className="flex-1">
-                  <DateBox type="date" value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} placeholder="dan" icon={<FaCalendarDays size={11} />} />
+                  <DateTimeBox type="date" placeholder="dan" value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} dropUp />
                 </div>
                 <div className="w-[90px]">
-                  <DateBox type="time" value={f.created_at__time__gte || '00:00'} onChange={v => set('created_at__time__gte', v)} icon={<FaClock size={11} />} />
+                  <DateTimeBox type="time" value={f.created_at__time__gte || '00:00'} onChange={v => set('created_at__time__gte', v)} dropUp />
                 </div>
               </div>
               <div className="flex gap-1.5">
                 <div className="flex-1">
-                  <DateBox type="date" value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} placeholder="gacha" icon={<FaCalendarDays size={11} />} />
+                  <DateTimeBox type="date" placeholder="gacha" value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} dropUp />
                 </div>
                 <div className="w-[90px]">
-                  <DateBox type="time" value={f.created_at__time__lte || '00:00'} onChange={v => set('created_at__time__lte', v)} icon={<FaClock size={11} />} />
+                  <DateTimeBox type="time" value={f.created_at__time__lte || '00:00'} onChange={v => set('created_at__time__lte', v)} dropUp />
                 </div>
               </div>
             </div>
@@ -367,7 +339,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <Field label="KPI bonus" value={fmt(user.kpi_bonus)} />
             <Field label="Yaratilgan vaqti" value={fmtDate(user.created_at)} />
             <Field label="Oy" value={user.month_display ?? ''} />
-            <Field label="Jarima miqdori (UZS)" value={`-${fmt(user.penalty_amount)}`} red right />
+            <Field label="Jarima miqdori (UZS)" value={parseFloat(user.penalty_amount) > 0 ? `-${fmt(user.penalty_amount)}` : fmt(user.penalty_amount)} red right />
             <Field label="Jami miqdori (UZS)" value={fmt(user.total_amount)} right />
           </div>
 
@@ -424,8 +396,8 @@ export default function SalaryPage() {
     else setLoadingMore(true)
     try {
       const params = { page: pg, page_size: 20 }
-      if (q) params.search = q
-      if (f.month) params.month = f.month
+      if (q)                     params.search              = q
+      if (f.month)               params.month               = monthToApi(f.month)
       if (f.created_at__date__gte) {
         const t = f.created_at__time__gte || '00:00'
         params.created_at__gte = `${f.created_at__date__gte}T${t}:00`
@@ -434,8 +406,8 @@ export default function SalaryPage() {
         const t = f.created_at__time__lte || '00:00'
         params.created_at__lte = `${f.created_at__date__lte}T${t}:59`
       }
-      if (f.total_amount__gte) params.total_amount__gte = f.total_amount__gte
-      if (f.total_amount__lte) params.total_amount__lte = f.total_amount__lte
+      if (f.total_amount__gte)   params.total_amount__gte   = f.total_amount__gte
+      if (f.total_amount__lte)   params.total_amount__lte   = f.total_amount__lte
       if (f.penalty_amount__gte) params.penalty_amount__gte = f.penalty_amount__gte
       if (f.penalty_amount__lte) params.penalty_amount__lte = f.penalty_amount__lte
       const { results, next } = await apiGetPayrolls(params)
@@ -620,7 +592,9 @@ export default function SalaryPage() {
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{u.month_display ?? ''}</td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.fixed_salary)}</td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.kpi_bonus)}</td>
-                  <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">-{fmt(u.penalty_amount)}</td>
+                  <td className="px-4 py-3 text-right font-medium text-[#E02D2D] dark:text-[#FA5252]">
+                    {parseFloat(u.penalty_amount) > 0 ? `-${fmt(u.penalty_amount)}` : fmt(u.penalty_amount)}
+                  </td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(u.total_amount)}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(u.created_at)}</td>
                   <td className="px-4 py-3 text-center sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A] group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] transition-colors" onClick={e => e.stopPropagation()}>
