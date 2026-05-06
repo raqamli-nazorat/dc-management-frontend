@@ -6,6 +6,7 @@ import { useAuth } from '../../../context/AuthContext'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
+import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
@@ -239,9 +240,11 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* ── AddMeetingModal ── */
-function AddMeetingModal({ onClose, onAdd, projects, users }) {
+function AddMeetingModal({ onClose, onAdd, projects }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [projectMembers, setProjectMembers] = useState([])
+  const [membersLoading, setMembersLoading] = useState(false)
   const [form, setForm] = useState({
     project: null, title: '', fine: '', link: '', description: '',
     date: '', time: '', durationVal: '',
@@ -257,25 +260,27 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
     set('fine', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
   }
 
-  // Loyha o'zgarganda qatnashchilarni tozalash
+  // Loyha o'zgarganda qatnashchilarni tozalash va xodimlarni yuklash
   const handleProjectChange = (v) => {
     setForm(p => ({ ...p, project: v, participants: [] }))
     setErrors(p => ({ ...p, project: '' }))
+    setProjectMembers([])
+    if (v) {
+      setMembersLoading(true)
+      axiosAPI.get(`/projects/${v}/`)
+        .then(res => {
+          const proj = res.data?.data ?? res.data
+          const emps = proj?.employees_info ?? []
+          const testers = proj?.testers_info ?? []
+          const manager = proj?.manager_info ? [proj.manager_info] : []
+          const all = [...emps, ...testers, ...manager]
+          const seen = new Set()
+          setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
+        })
+        .catch(() => setProjectMembers([]))
+        .finally(() => setMembersLoading(false))
+    }
   }
-
-  // Faqat tanlangan loyha azolari
-  const projectMembers = (() => {
-    if (!form.project) return users
-    const proj = projects.find(p => p.id === form.project)
-    if (!proj) return users
-    const memberIds = new Set([
-      ...(proj.employees || []),
-      ...(proj.testers || []),
-      proj.manager,
-    ].filter(Boolean).map(x => typeof x === 'object' ? x.id : x))
-    const filtered = users.filter(u => memberIds.has(u.id))
-    return filtered.length > 0 ? filtered : users
-  })()
 
   const validate = () => {
     const e = {}
@@ -305,13 +310,15 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim())        body.link         = form.link.trim()
-      if (form.fine)               body.penalty_percentage = `-${form.fine}`
+      if (form.fine)               body.penalty_percentage = form.fine
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = parseInt(form.durationVal, 10)
       if (mins && !isNaN(mins)) body.duration_minutes = mins
       await onAdd(body)
       onClose()
+    } catch (err) {
+      toast.error('Xatolik', parseApiError(err, "Yig'ilish yaratishda xatolik"))
     } finally {
       setLoading(false)
     }
@@ -325,7 +332,9 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
-          <div className="px-7 pt-7 pb-3">
+
+          {/* ── Header (qotgan) ── */}
+          <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilish qo'shish</h2>
@@ -333,7 +342,8 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
             <p className="text-sm text-[#8F95A8] ml-8">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
-          <div className="px-7 pb-2 flex flex-col gap-3">
+          {/* ── Scroll qilinadigan content ── */}
+          <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
             <ProjectDropdown value={form.project} onChange={handleProjectChange} error={errors.project} projects={projects} />
 
             <div className="grid grid-cols-2 gap-3">
@@ -421,16 +431,22 @@ function AddMeetingModal({ onClose, onAdd, projects, users }) {
                   ))}
                 </div>
               )}
-              <button type="button" onClick={() => setShowParticipants(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
-                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                Qatnashchilarni qo'shish
+              <button type="button" onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed text-sm transition-colors
+                  ${!form.project || membersLoading
+                    ? 'border-[#E2E6F2] dark:border-[#292A2A] text-[#C2C8E0] dark:text-[#474848] cursor-default'
+                    : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer'}`}>
+                {membersLoading
+                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                }
+                {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Qatnashchilarni qo'shish"}
               </button>
             </div>
           </div>
 
-          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+          {/* ── Footer (qotgan) ── */}
+          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
@@ -518,13 +534,15 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim())        body.link         = form.link.trim()
-      if (form.fine)               body.penalty_percentage = `-${form.fine}`
+      if (form.fine)               body.penalty_percentage = form.fine
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = durationToMinutes(form.durationVal, form.durationUnit)
       if (mins) body.duration_minutes = mins
       await onSave(meeting.id, body)
       onClose()
+    } catch (err) {
+      toast.error('Xatolik', parseApiError(err, "Yig'ilish yangilashda xatolik"))
     } finally {
       setLoading(false)
     }
@@ -538,7 +556,9 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
-          <div className="px-7 pt-7 pb-3">
+
+          {/* ── Header (qotgan) ── */}
+          <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilishni tahrirlash</h2>
@@ -546,7 +566,8 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <p className="text-sm text-[#8F95A8] ml-8">Yig'ilish ma'lumotlarini yangilang</p>
           </div>
 
-          <div className="px-7 pb-2 flex flex-col gap-3">
+          {/* ── Scroll qilinadigan content ── */}
+          <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
             <ProjectDropdown value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} />
 
             <div className="grid grid-cols-2 gap-3">
@@ -638,7 +659,8 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             </div>
           </div>
 
-          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+          {/* ── Footer (qotgan) ── */}
+          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
