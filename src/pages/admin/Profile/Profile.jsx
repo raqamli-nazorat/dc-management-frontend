@@ -310,6 +310,20 @@ const fmtNum = (v) => {
   return n.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+/* ── Role Labels ── */
+const ROLE_LABELS = {
+  admin:       'Administrator',
+  superadmin:  'Administrator',
+  manager:     'Menejer',
+  menager:     'Menejer',
+  employee:    'Xodim',
+  xodim:       'Xodim',
+  auditor:     'Nazoratchi',
+  nazoratchi:  'Nazoratchi',
+  accountant:  'Hisobchi',
+  hisobchi:    'Hisobchi',
+}
+
 /* ── Role Dropdown ── */
 function RoleDropdown({ roles, activeRole, onChangeRole }) {
   const [open, setOpen] = useState(false)
@@ -334,7 +348,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
         localStorage.setItem('user', JSON.stringify(u))
       }
       onChangeRole(role)
-      toast.success("Rol o'zgartirildi", `Faol rol: ${role}`)
+      toast.success("Rol o'zgartirildi", `Faol rol: ${ROLE_LABELS[role] || role}`)
       setOpen(false)
       setTimeout(() => window.location.reload(), 800)
     } catch (err) {
@@ -345,14 +359,14 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
   }
 
   return (
-    <div className="relative" ref={dropRef}>
+    <div className="relative w-full" ref={dropRef}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
         className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 cursor-pointer hover:border-[#526ED3] transition-colors w-full'}
       >
-        <span className="text-sm">{activeRole}</span>
+        <span className="text-sm">{ROLE_LABELS[activeRole] || activeRole}</span>
         {loading
           ? <svg className="animate-spin w-3.5 h-3.5 text-[#8F95A8] shrink-0" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
@@ -379,7 +393,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
                   : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'
                 }`}
             >
-              <span>{r}</span>
+              <span>{ROLE_LABELS[r] || r}</span>
               {r === activeRole && (
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -494,6 +508,10 @@ export default function ProfilePage() {
       </div>
 
       {/* Telefon + Karta */}
+      <div className={rowCls}>
+        <Field label="Telefon raqami" value={data.phone_number || '—'} />
+        <Field label="Karta raqami" value={data.card_number || '—'} />
+      </div>
 
       {/* GitHub + LinkedIn + Telegram */}
       <div className="grid grid-cols-3 gap-4">
@@ -516,21 +534,14 @@ export default function ProfilePage() {
       </div>
 
       {/* Lavozim + Rol */}
-      <div className="flex items-center gap-6">
-        <div className="flex-1 flex justify-between  gap-1.5">
-          <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center  gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
-            Lavozimi
-          </span>
-          <div className={boxCls + ' min-h-[42px] flex items-center max-w-50  w-40 bg-red-500'}>
-            {data.position ?? ''}
+      <div className={rowCls}>
+        <Field label="Lavozimi">
+          <div className={boxCls + ' min-h-[42px] flex items-center gap-2'}>
+            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+            <span className="text-sm">{data.position ?? '—'}</span>
           </div>
-        </div>
-        <div className="flex-1 flex gap-1.5 justify-between">
-          <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-            Rolli
-          </span>
+        </Field>
+        <Field label="Rolli">
           {data.roles?.length > 1 ? (
             <RoleDropdown
               roles={data.roles}
@@ -538,11 +549,12 @@ export default function ProfilePage() {
               onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
             />
           ) : (
-            <div className={boxCls + ' min-h-[42px] flex items-center'}>
-              {data.active_role || data.roles?.[0] || role}
+            <div className={boxCls + ' min-h-[42px] flex items-center gap-2'}>
+              <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+              <span className="text-sm">{ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role}</span>
             </div>
           )}
-        </div>
+        </Field>
       </div>
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
