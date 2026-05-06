@@ -11,6 +11,7 @@ import EditTaskModal from './modals/EditTaskModal'
 import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
+import { parseApiError } from '../../../service/parseApiError'
 
 // ── Label maps ──
 const TYPE_LABEL = { bug: 'Xato', feature: 'Yangi funksiya', improvement: "Qo'shimcha" }
@@ -535,9 +536,11 @@ export default function TasksPage() {
     try {
       await axiosAPI.delete(`/tasks/${id}/`)
       setData(prev => prev.filter(t => t.id !== id))
+      setCards(prev => prev.filter(c => c.id !== id))
       toast.delete("Vazifa o'chirildi", "Vazifa chiqindi qutisiga yuborildi.")
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "O'chirishda xatolik")
+      const msg = parseApiError(err, "O'chirishda xatolik")
+      toast.error('Xatolik', msg)
     }
   }
 

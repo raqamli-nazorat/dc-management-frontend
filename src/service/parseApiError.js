@@ -6,7 +6,11 @@
 export function parseApiError(err, fallback = 'Xatolik yuz berdi') {
   const error = err?.response?.data?.error
   if (!error) return err?.response?.data?.detail || fallback
-  const { errorMsg, details } = error
+  const { errorMsg, details, isFriendly } = error
+
+  // isFriendly bo'lsa — errorMsg ni to'g'ridan-to'g'ri qaytaramiz
+  if (isFriendly && errorMsg) return errorMsg
+
   if (details) {
     if (Array.isArray(details) && details.length > 0) {
       return details.join('\n')
