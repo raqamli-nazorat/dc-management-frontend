@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { axiosAPI } from '../service/axiosAPI'
 
 const AuthContext = createContext(null)
@@ -8,6 +8,23 @@ export function AuthProvider({ children }) {
     const saved = localStorage.getItem('user')
     return saved ? JSON.parse(saved) : null
   })
+
+  useEffect(() => {
+    const token = localStorage.getItem('access')
+    if (user && token) {
+      axiosAPI.get('/users/me/')
+        .then(res => {
+          const fetchedUser = res.data?.data ?? res.data
+          if (fetchedUser) {
+            setUser(fetchedUser)
+            localStorage.setItem('user', JSON.stringify(fetchedUser))
+          }
+        })
+        .catch(err => {
+          console.error('User sync failed', err)
+        })
+    }
+  }, [])
 
   const login = async (login, parol) => {
     try {

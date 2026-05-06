@@ -312,8 +312,11 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
           type="button"
           onClick={() => {
             const now = new Date()
-            selectHour(now.getHours())
-            selectMin(now.getMinutes())
+            const h = now.getHours()
+            const m = now.getMinutes()
+            setHour(h)
+            setMin(m)
+            apply(h, m)
             onClose()
           }}
           className="text-xs text-[#3F57B3] dark:text-[#7F95E6] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A] font-semibold"
@@ -448,7 +451,6 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
           disabled={disabled}
           maxLength={5}
           className={inputCls}
-          style={{ width: '3.2rem', minWidth: '3.2rem', flexShrink: 0 }}
         />
         <button
           ref={iconRef}
@@ -489,7 +491,6 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
         disabled={disabled}
         maxLength={10}
         className={inputCls}
-        style={{ width: '6rem', minWidth: '6rem', flexShrink: 0 }}
       />
       <button
         ref={iconRef}
