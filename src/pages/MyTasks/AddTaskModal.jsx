@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { FaArrowLeft, FaRegStar, FaStar, FaXmark } from 'react-icons/fa6'
-import { FaRegBookmark } from 'react-icons/fa6'
+import { FaArrowLeft, FaRegStar, FaStar, FaXmark, FaRegBookmark } from 'react-icons/fa6'
 
 const COLORS = [
   { id: 'red',    hex: '#FF2E2E' },
@@ -9,13 +8,24 @@ const COLORS = [
   { id: 'blue',   hex: '#005FF9' },
 ]
 
-export default function AddTaskModal({ onClose, onAdd }) {
-  const [title, setTitle] = useState('')
-  const [subtasks, setSubtasks] = useState(['', '', '', '', ''])
-  const [selectedColor, setSelectedColor] = useState('blue')
-  const [isStarred, setIsStarred] = useState(false)
+/* task prop berilsa — tahrirlash rejimi, aks holda — yaratish */
+export default function AddTaskModal({ onClose, onSave, task = null }) {
+  const isEdit = !!task
 
-  /* Subtask matnini yangilash; oxirgi bo'sh bo'lmasa yangi qator qo'shish */
+  const [title, setTitle]               = useState(task?.title || '')
+  const [deadline] = useState(task?.deadline || null)
+  const [selectedColor, setSelectedColor] = useState(task?.color || 'blue')
+  const [isStarred, setIsStarred]       = useState(false)
+  const [loading, setLoading]           = useState(false)
+
+  /* Subtasklar: tahrirlashda mavjud items, yaratishda 5 ta bo'sh qator */
+  const [subtasks, setSubtasks] = useState(
+    isEdit
+      ? (task.items || []).map(i => i.title)
+      : ['', '', '', '', '']
+  )
+
+  /* Subtask matnini yangilash; oxirgi to'ldirilsa yangi qator qo'shish */
   const handleSubtaskChange = (value, index) => {
     const updated = [...subtasks]
     updated[index] = value
@@ -25,23 +35,31 @@ export default function AddTaskModal({ onClose, onAdd }) {
     setSubtasks(updated)
   }
 
-  const handleSubmit = () => {
-    const filteredSubs = subtasks.filter(s => s.trim() !== '')
-    const newTask = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString('uz-UZ', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }),
-      color: selectedColor,
-      title: title.trim() || 'Yangi vazifa',
-      status: 'Bajarildi',
-      subtasks: filteredSubs.map((s, i) => ({ id: i + 1, text: s, done: false })),
+  const handleSubmit = async () => {
+    if (!title.trim()) return
+    setLoading(true)
+    try {
+      const body = {
+        title: title.trim(),
+        color: selectedColor,
+        is_done: task?.is_done ?? false,
+      }
+
+      /* Subtask nomlarini items sifatida yuborish (faqat yaratishda) */
+      if (!isEdit) {
+        const items = subtasks
+          .filter(s => s.trim() !== '')
+          .map(s => s.trim())          // faqat string title — MyTasks.jsx da todo.id bilan POST qilinadi
+        if (items.length > 0) body.items = items
+      }
+
+      await onSave(body)
+      onClose()
+    } catch {
+      /* xato toast MyTasks.jsx da ko'rsatiladi */
+    } finally {
+      setLoading(false)
     }
-    onAdd(newTask)
-    onClose()
   }
 
   return (
@@ -56,6 +74,16 @@ export default function AddTaskModal({ onClose, onAdd }) {
       {/* Modal */}
       <div className="relative w-full max-w-[640px] bg-white dark:bg-[#1C1D1D] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
 
+        {/* X tugmasi */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full
+            bg-[#F1F3F9] dark:bg-[#292A2A] text-[#5B6078] dark:text-[#C2C8E0]
+            hover:bg-[#E2E6F2] dark:hover:bg-[#333435] transition-colors cursor-pointer"
+        >
+          <FaXmark size={13} />
+        </button>
+
         {/* ── Header ── */}
         <div className="flex items-start justify-between mb-6">
           <div>
@@ -67,7 +95,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 <FaArrowLeft className="text-[#1A1D2E] dark:text-white" size={18} />
               </button>
               <h2 className="text-[22px] font-bold text-[#1A1D2E] dark:text-white">
-                Vazifa qo'shish
+                {isEdit ? "Vazifani tahrirlash" : "Vazifa qo'shish"}
               </h2>
             </div>
             <p className="text-[14px] text-[#8F95A8] dark:text-[#8E95B5] mt-1 ml-10">
@@ -88,9 +116,10 @@ export default function AddTaskModal({ onClose, onAdd }) {
         </div>
 
         {/* ── Form tanasi ── */}
-        <div className="flex gap-5 mb-10">
+        <div className="flex gap-5 mb-8">
           {/* Vazifa nomi + subtasklar */}
           <div className="flex-1 bg-[#F8F9FC] dark:bg-[#222323] rounded-[24px] p-6 flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
+            {/* Vazifa nomi */}
             <input
               type="text"
               placeholder="Vazifa nomi"
@@ -101,22 +130,49 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 placeholder:text-[#B6BCCB] dark:placeholder:text-[#474848]"
             />
 
-            <div className="flex flex-col gap-4 mt-1">
-              {subtasks.map((sub, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-[22px] h-[22px] rounded-full bg-[#E2E6F2] dark:bg-[#3A3B3B] shrink-0" />
-                  <input
-                    type="text"
-                    value={sub}
-                    onChange={e => handleSubtaskChange(e.target.value, i)}
-                    placeholder=""
-                    className="flex-1 bg-transparent outline-none text-[13px]
-                      text-[#5B6078] dark:text-[#C2C8E0]
-                      placeholder:text-[#D0D5E2] dark:placeholder:text-[#4A4B4B]"
-                  />
-                </div>
-              ))}
-            </div>
+            {/* Subtasklar (faqat yaratishda) */}
+            {!isEdit && (
+              <div className="flex flex-col gap-4 mt-1">
+                {subtasks.map((sub, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-[22px] h-[22px] rounded-full bg-[#E2E6F2] dark:bg-[#3A3B3B] shrink-0" />
+                    <input
+                      type="text"
+                      value={sub}
+                      onChange={e => handleSubtaskChange(e.target.value, i)}
+                      placeholder={i === 0 ? "Subtask qo'shing..." : ''}
+                      className="flex-1 bg-transparent outline-none text-[13px]
+                        text-[#5B6078] dark:text-[#C2C8E0]
+                        placeholder:text-[#D0D5E2] dark:placeholder:text-[#4A4B4B]"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tahrirlashda items ro'yxati (faqat ko'rish) */}
+            {isEdit && task?.items?.length > 0 && (
+              <div className="flex flex-col gap-3 mt-1">
+                <p className="text-[11px] text-[#B6BCCB] dark:text-[#474848] font-medium uppercase tracking-wide">
+                  Subtasklar (tahrirlash uchun kartadan bosing)
+                </p>
+                {task.items.map(item => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0
+                      ${item.is_done ? 'bg-[#4A65D8]' : 'bg-[#E2E6F2] dark:bg-[#3A3B3B]'}`}>
+                      {item.is_done && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className={`text-[13px] font-medium ${item.is_done ? 'text-[#5B6078] line-through' : 'text-[#8F95A8] dark:text-[#8E95B5]'}`}>
+                      {item.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Rang tanlash */}
@@ -126,13 +182,9 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 key={c.id}
                 onClick={() => setSelectedColor(c.id)}
                 className="w-11 h-11 rounded-full flex items-center justify-center
-                  transition-transform hover:scale-110 cursor-pointer shadow-sm"
+                  transition-transform hover:scale-110 cursor-pointer"
                 style={{
                   backgroundColor: c.hex,
-                  outline: selectedColor === c.id
-                    ? `3px solid ${c.hex}`
-                    : 'none',
-                  outlineOffset: selectedColor === c.id ? '3px' : '0',
                   boxShadow: selectedColor === c.id
                     ? `0 0 0 2px white, 0 0 0 4px ${c.hex}`
                     : '0 2px 6px rgba(0,0,0,0.15)',
@@ -155,12 +207,20 @@ export default function AddTaskModal({ onClose, onAdd }) {
           </button>
           <button
             onClick={handleSubmit}
+            disabled={loading || !title.trim()}
             className="flex items-center gap-2 px-8 py-3.5 rounded-[16px] font-bold cursor-pointer
               bg-[#3F57B3] text-white hover:bg-[#4A65D8] transition-colors
-              shadow-lg shadow-[#3F57B3]/20"
+              shadow-lg shadow-[#3F57B3]/20 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <FaRegBookmark size={14} />
-            Vazifa qo'shish
+            {loading ? (
+              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+            ) : (
+              <FaRegBookmark size={14} />
+            )}
+            {isEdit ? "Saqlash" : "Vazifa qo'shish"}
           </button>
         </div>
       </div>
