@@ -230,6 +230,31 @@ function Field({ label, value, children }) {
   )
 }
 
+/* ── Format helpers ── */
+const formatPhone = (v) => {
+  if (!v) return null
+  // Faqat raqamlarni olish
+  const digits = v.replace(/\D/g, '')
+  // +998XXXXXXXXX → +998 XX XXX XX XX
+  if (digits.length === 12 && digits.startsWith('998')) {
+    return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 10)} ${digits.slice(10, 12)}`
+  }
+  if (digits.length === 9) {
+    return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`
+  }
+  return v
+}
+
+const formatCard = (v) => {
+  if (!v) return null
+  const digits = v.replace(/\D/g, '')
+  // 16 raqam → XXXX XXXX XXXX XXXX
+  if (digits.length === 16) {
+    return `${digits.slice(0, 4)} ${digits.slice(4, 8)} ${digits.slice(8, 12)} ${digits.slice(12, 16)}`
+  }
+  return v
+}
+
 /* ── Social Field with copy ── */
 function SocialField({ label, value, icon }) {
   const [copied, setCopied] = useState(false)
@@ -491,26 +516,30 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <button
-              onClick={() => setPassportOpen(true)}
-              className={boxCls + ' flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity min-h-[42px] w-full text-left'}
+            <a
+              href={data.passport_image}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full px-4 py-2.5 rounded-xl text-sm border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1C1D1D] transition-colors min-h-[42px]"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#526ED3] shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6078" strokeWidth="2" className="shrink-0 dark:stroke-[#8F95A8]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
               </svg>
-              <span className="flex-1 truncate text-sm">Passport fayli</span>
-            </button>
+              <span className="font-medium text-[#5B6078] dark:text-[#8F95A8]">
+                {data.passport_image.split('/').pop() || "Ma'lumot.pdf"}
+              </span>
+            </a>
           ) : (
-            <div className={boxCls + ' min-h-[42px]'} />
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px]" />
           )}
         </Field>
       </div>
 
       {/* Telefon + Karta */}
       <div className={rowCls}>
-        <Field label="Telefon raqami" value={data.phone_number || '—'} />
-        <Field label="Karta raqami" value={data.card_number || '—'} />
+        <SocialField label="Telefon raqami" value={formatPhone(data.phone_number)} />
+        <SocialField label="Karta raqami" value={formatCard(data.card_number)} />
       </div>
 
       {/* GitHub + LinkedIn + Telegram */}

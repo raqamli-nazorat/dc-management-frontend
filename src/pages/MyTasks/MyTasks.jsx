@@ -15,13 +15,14 @@ const COLOR_MAP = {
   red:    { bg: '#FF2E2E', text: '#ffffff' },
 }
 
-/* Sana formatlash */
+/* Sana formatlash — "Dushanbi, 6-May 2026" */
 const fmtDate = (iso) => {
   if (!iso) return ''
   try {
-    return new Date(iso).toLocaleDateString('uz-UZ', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    })
+    const d = new Date(iso)
+    const days = ['Yakshanba', 'Dushanbi', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba']
+    const months = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
+    return `${days[d.getDay()]}, ${d.getDate()}-${months[d.getMonth()]} ${d.getFullYear()}`
   } catch { return iso }
 }
 
