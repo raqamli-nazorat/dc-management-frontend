@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react-icons/fa6'
 import { labelCls } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
@@ -22,7 +22,7 @@ const STATUS_OPTIONS = [
   { label: 'Jarayonda',         value: 'in_progress' },
   { label: 'Bajarilgan',        value: 'done' },
   { label: 'Ishga tushirilgan', value: 'production' },
-  { label: 'Tekshirilgan',      value: 'reviewed' },
+  { label: 'Tekshirilgan',      value: 'checked' },
   { label: 'Rad etilgan',       value: 'rejected' },
 ]
 
