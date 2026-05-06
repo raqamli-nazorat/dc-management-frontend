@@ -15,8 +15,8 @@ import {
 function IconApplications({ size = 20, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M5.83334 2.5H14.1667C15.0871 2.5 15.8333 3.24619 15.8333 4.16667V17.5L10 15L4.16667 17.5V4.16667C4.16667 3.24619 4.91286 2.5 5.83334 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-      <path d="M7.5 7.5H12.5M7.5 10.8333H10.8333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M5.83334 2.5H14.1667C15.0871 2.5 15.8333 3.24619 15.8333 4.16667V17.5L10 15L4.16667 17.5V4.16667C4.16667 3.24619 4.91286 2.5 5.83334 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M7.5 7.5H12.5M7.5 10.8333H10.8333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -33,8 +33,8 @@ const menuByRole = {
     {
       label: 'Vazifalar boshqaruvi', icon: IconFolder,
       children: [
-        { label: 'Loyihalar',    path: '/admin/projects' },
-        { label: 'Vazifalar',   path: '/admin/tasks' },
+        { label: 'Loyihalar', path: '/admin/projects' },
+        { label: 'Vazifalar', path: '/admin/tasks' },
         { label: "Yig'ilishlar", path: '/admin/meetings' },
       ],
     },
@@ -42,24 +42,24 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/admin/payments' },
-        { label: 'Ish haqi',           path: '/admin/finance' },
-        { label: 'Tarix',              path: '/admin/finance/history' },
+        { label: 'Ish haqi', path: '/admin/finance' },
+        { label: 'Tarix', path: '/admin/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
-        { label: "Xodim bo'yicha",              path: '/admin/reports/employee' },
-        { label: "Loyihalar bo'yicha",           path: '/admin/reports/project' },
-        { label: "Xarajat so'rovlari bo'yicha",  path: '/admin/reports/cost_inquiries' },
-        { label: "Ish haqi bo'yicha",            path: '/admin/reports/salary' },
-        { label: "Vazifalar bo'yicha",           path: '/admin/reports/by_tasks' },
+        { label: "Xodim bo'yicha", path: '/admin/reports/employee' },
+        { label: "Loyihalar bo'yicha", path: '/admin/reports/project' },
+        { label: "Xarajat so'rovlari bo'yicha", path: '/admin/reports/cost_inquiries' },
+        { label: "Ish haqi bo'yicha", path: '/admin/reports/salary' },
+        { label: "Vazifalar bo'yicha", path: '/admin/reports/by_tasks' },
       ],
     },
     {
       label: 'Arizalar', icon: IconApplications,
       children: [
-        { label: 'Arizalar',   path: '/admin/applications' },
+        { label: 'Arizalar', path: '/admin/applications' },
         { label: 'Lavozimlar', path: '/admin/applications/positions' },
         { label: 'Viloyatlar', path: '/admin/applications/regions' },
       ],
@@ -71,8 +71,8 @@ const menuByRole = {
     {
       label: 'Vazifalar boshqaruvi', icon: IconFolder,
       children: [
-        { label: 'Loyihalar',    path: '/manager/projects' },
-        { label: 'Vazifalar',   path: '/manager/tasks' },
+        { label: 'Loyihalar', path: '/manager/projects' },
+        { label: 'Vazifalar', path: '/manager/tasks' },
         { label: "Yig'ilishlar", path: '/manager/meetings' },
       ],
     },
@@ -80,14 +80,14 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/manager/payments' },
-        { label: 'Ish haqi',           path: '/manager/finance' },
-        { label: 'Tarix',              path: '/manager/finance/history' },
+        { label: 'Ish haqi', path: '/manager/finance' },
+        { label: 'Tarix', path: '/manager/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
-        { label: "Xodim bo'yicha",    path: '/manager/reports/employee' },
+        { label: "Xodim bo'yicha", path: '/manager/reports/employee' },
         { label: "Loyihalar bo'yicha", path: '/manager/reports/project' },
         { label: "Vazifalar bo'yicha", path: '/manager/reports/by_tasks' },
       ],
@@ -99,8 +99,8 @@ const menuByRole = {
     {
       label: 'Vazifalar boshqaruvi', icon: IconFolder,
       children: [
-        { label: 'Vazifalar',   path: '/employee/tasks' },
-        { label: 'Loyihalar',   path: '/employee/projects' },
+        { label: 'Loyihalar', path: '/employee/projects' },
+        { label: 'Vazifalar', path: '/employee/tasks' },
         { label: "Yig'ilishlar", path: '/employee/meetings' },
       ],
     },
@@ -108,14 +108,14 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/employee/payments' },
-        { label: 'Ish haqi',           path: '/employee/finance' },
-        { label: 'Tarix',              path: '/employee/finance/history' },
+        { label: 'Ish haqi', path: '/employee/finance' },
+        { label: 'Tarix', path: '/employee/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
-        { label: "Xodim bo'yicha",    path: '/employee/reports/employee' },
+        { label: "Xodim bo'yicha", path: '/employee/reports/employee' },
         { label: "Loyihalar bo'yicha", path: '/employee/reports/project' },
         { label: "Vazifalar bo'yicha", path: '/employee/reports/by_tasks' },
       ],
@@ -133,8 +133,8 @@ const menuByRole = {
     {
       label: 'Vazifalar boshqaruvi', icon: IconFolder,
       children: [
-        { label: 'Loyihalar',    path: '/auditor/projects' },
-        { label: 'Vazifalar',   path: '/auditor/tasks' },
+        { label: 'Loyihalar', path: '/auditor/projects' },
+        { label: 'Vazifalar', path: '/auditor/tasks' },
         { label: "Yig'ilishlar", path: '/auditor/meetings' },
       ],
     },
@@ -142,24 +142,24 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/auditor/payments' },
-        { label: 'Ish haqi',           path: '/auditor/finance' },
-        { label: 'Tarix',              path: '/auditor/finance/history' },
+        { label: 'Ish haqi', path: '/auditor/finance' },
+        { label: 'Tarix', path: '/auditor/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
-        { label: "Xodim bo'yicha",              path: '/auditor/reports/employee' },
-        { label: "Loyihalar bo'yicha",           path: '/auditor/reports/project' },
-        { label: "Xarajat so'rovlari bo'yicha",  path: '/auditor/reports/cost_inquiries' },
-        { label: "Ish haqi bo'yicha",            path: '/auditor/reports/salary' },
-        { label: "Vazifalar bo'yicha",           path: '/auditor/reports/by_tasks' },
+        { label: "Xodim bo'yicha", path: '/auditor/reports/employee' },
+        { label: "Loyihalar bo'yicha", path: '/auditor/reports/project' },
+        { label: "Xarajat so'rovlari bo'yicha", path: '/auditor/reports/cost_inquiries' },
+        { label: "Ish haqi bo'yicha", path: '/auditor/reports/salary' },
+        { label: "Vazifalar bo'yicha", path: '/auditor/reports/by_tasks' },
       ],
     },
     {
       label: 'Arizalar', icon: IconApplications,
       children: [
-        { label: 'Arizalar',   path: '/auditor/applications' },
+        { label: 'Arizalar', path: '/auditor/applications' },
         { label: 'Lavozimlar', path: '/auditor/applications/positions' },
         { label: 'Viloyatlar', path: '/auditor/applications/regions' },
       ],
@@ -172,37 +172,37 @@ const menuByRole = {
       label: 'Moliya', icon: IconBriefcaseDollar,
       children: [
         { label: "Xarajat so'rovlari", path: '/accountant/payments' },
-        { label: 'Ish haqi',           path: '/accountant/finance' },
-        { label: 'Tarix',              path: '/accountant/finance/history' },
+        { label: 'Ish haqi', path: '/accountant/finance' },
+        { label: 'Tarix', path: '/accountant/finance/history' },
       ],
     },
     {
       label: 'Hisobotlar', icon: IconAnalytics,
       children: [
         { label: "Xarajat so'rovlari bo'yicha", path: '/accountant/reports/cost_inquiries' },
-        { label: "Ish haqi bo'yicha",           path: '/accountant/reports/salary' },
+        { label: "Ish haqi bo'yicha", path: '/accountant/reports/salary' },
       ],
     },
   ],
 
   // ── Eski nomlar (backward compat) ────────────────────────────
-  menager:   [],
-  xodim:     [],
-  nazoratchi:[],
-  hisobchi:  [],
+  menager: [],
+  xodim: [],
+  nazoratchi: [],
+  hisobchi: [],
 }
 
 const roleLabels = {
-  admin:       'Administrator',
-  superadmin:  'Administrator',
-  manager:     'Menejer',
-  menager:     'Menejer',
-  employee:    'Xodim',
-  xodim:       'Xodim',
-  auditor:     'Nazoratchi',
-  nazoratchi:  'Nazoratchi',
-  accountant:  'Hisobchi',
-  hisobchi:    'Hisobchi',
+  admin: 'Administrator',
+  superadmin: 'Administrator',
+  manager: 'Menejer',
+  menager: 'Menejer',
+  employee: 'Xodim',
+  xodim: 'Xodim',
+  auditor: 'Nazoratchi',
+  nazoratchi: 'Nazoratchi',
+  accountant: 'Hisobchi',
+  hisobchi: 'Hisobchi',
 }
 
 export default function Sidebar({ forceCollapsed = false, onForceClick }) {
@@ -211,7 +211,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [collapsed, setCollapsed]   = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [openGroups, setOpenGroups] = useState({ 0: true })
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
@@ -221,7 +221,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   useEffect(() => {
     const h = (e) => {
       const clickedTrigger = profileRef.current && profileRef.current.contains(e.target)
-      const clickedPopup   = popupRef.current   && popupRef.current.contains(e.target)
+      const clickedPopup = popupRef.current && popupRef.current.contains(e.target)
       if (!clickedTrigger && !clickedPopup) setProfileOpen(false)
     }
     document.addEventListener('mousedown', h)
@@ -234,7 +234,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   // URL dan prefix olish — eng ishonchli usul
   const urlPrefix = location.pathname.split('/')[1] || routeRole
   const menu = menuByRole[routeRole] || []
-  const toggleGroup   = (i) => setOpenGroups(prev => ({ [i]: !prev[i] }))
+  const toggleGroup = (i) => setOpenGroups(prev => ({ [i]: !prev[i] }))
   const isGroupActive = (group) => group.children?.some(c => location.pathname === c.path)
   const handleDashboard = () => navigate(`/${urlPrefix}/dashboard`)
 
@@ -315,8 +315,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
       >
         {menu.map((group, i) => {
           const active = isGroupActive(group)
-          const open   = openGroups[i]
-          const Icon   = group.icon
+          const open = openGroups[i]
+          const Icon = group.icon
 
           return (
             <div key={i} className="flex flex-col gap-1.5">
@@ -526,9 +526,9 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
               >
                 <div className="flex items-center gap-2.5">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#5B6078] dark:text-[#C2C8E0]">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                   <span className="text-[13px] font-medium text-[#1A1D2E] dark:text-white">Shaxsiy kabinet</span>
                 </div>
@@ -539,14 +539,14 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center justify-end  gap-2.5 px-4 py-3
-                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A]  cursor-pointer" 
+                  hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A]  cursor-pointer"
               >
-                  <span className="text-[13px] font-semibold text-[#E02D2D]">Chiqish</span>
+                <span className="text-[13px] font-semibold text-[#E02D2D]">Chiqish</span>
                 <FaArrowRightFromBracket size={14} className="text-[#E02D2D]" />
-              
+
               </button>
             </div>
-          , document.body)}
+            , document.body)}
         </div>
       </div>
     </aside>

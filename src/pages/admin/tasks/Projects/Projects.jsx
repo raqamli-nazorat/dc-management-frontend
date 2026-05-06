@@ -31,7 +31,7 @@ const fmtDt = (iso) => {
   } catch { return iso }
 }
 
-function useDropdown() {
+const useDropdown = () => {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   useEffect(() => {
@@ -43,7 +43,7 @@ function useDropdown() {
 }
 
 /* ── DeleteConfirmModal ── */
-function DeleteConfirmModal({ project, onClose, onConfirm }) {
+const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
@@ -80,7 +80,7 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
 }
 
 /* ── RowMenu ── */
-function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
+const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
   const { open, setOpen, ref } = useDropdown()
   return (
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
@@ -101,6 +101,7 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
             </svg>
             Batafsil
           </button>
+
           {/* Tahrirlash + O'chirish — faqat admin */}
           {canEdit && (
             <>
@@ -131,10 +132,10 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
 /* ── Main Page ── */
 const ProjectsPage = () => {
   const { registerAction, clearAction } = usePageAction()
+
   const { user } = useAuth()
-  const roles = user?.roles ?? []
-  const canEdit = roles.includes('admin') || roles.includes('superadmin')
-  const isAuditor = user?.active_role === 'auditor' || (roles.includes('auditor') && !user?.active_role)
+  const is_admin = user.active_role === 'superadmin' || user.active_role === 'admin'
+
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
@@ -214,7 +215,7 @@ const ProjectsPage = () => {
   }, [hasMore, loadingMore, page, filters, search])
 
   useEffect(() => {
-    if (isAuditor) return
+    if (!is_admin) return
     registerAction({
       label: "Loyiha qo'shish",
       icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
@@ -301,7 +302,7 @@ const ProjectsPage = () => {
       {viewMode === 'table' && (
         <div ref={scrollRef} className="flex-1 overflow-auto">
           <table className="w-full text-sm whitespace-nowrap">
-            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#111]">
+            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#222323]">
               <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
@@ -326,7 +327,13 @@ const ProjectsPage = () => {
               ) : (
                 data.map((p, idx) => (
                   <tr key={p.id}
-                    onClick={() => setEditProject(p)}
+                    onClick={() => {
+                      if (!is_admin) {
+                        setDetailProject(p.id)
+                        return
+                      }
+                      setEditProject(p.id)
+                    }}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
                     <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{idx + 1}</td>
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
@@ -337,7 +344,7 @@ const ProjectsPage = () => {
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
                     <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin} />
                     </td>
                   </tr>
                 ))
@@ -391,7 +398,13 @@ const ProjectsPage = () => {
               }
               return (
                 <div key={p.id}
-                  onClick={() => setDetailProject(p)}
+                  onClick={() => {
+                    if (!is_admin) {
+                      setDetailProject(p.id)
+                      return
+                    }
+                    setEditProject(p.id)
+                  }}
                   className="rounded-2xl border p-4 cursor-pointer transition-all
                   bg-white border-[#E2E6F2] hover:border-[#C2C8E0] hover:shadow-sm
                   dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:hover:border-[#474848]">
@@ -432,7 +445,7 @@ const ProjectsPage = () => {
                       </div>
                     </div>
                     <div onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p)} onDetail={() => setDetailProject(p)} onDelete={() => setDeleteProject(p)} canEdit={canEdit} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin} />
                     </div>
                   </div>
                 </div>
@@ -474,7 +487,7 @@ const ProjectsPage = () => {
 
       {editProject && (
         <EditProjectModal
-          project={editProject}
+          id={editProject}
           onClose={() => setEditProject(null)}
           refreshData={loadProjects}
           users={users}
@@ -485,7 +498,7 @@ const ProjectsPage = () => {
 
       {detailProject && (
         <DetailModal
-          project={detailProject}
+          id={detailProject}
           onClose={() => setDetailProject(null)}
         />
       )}

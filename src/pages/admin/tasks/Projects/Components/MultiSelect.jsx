@@ -55,10 +55,10 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
               bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
               ${open ? 'border-[#526ED3] dark:border-[#526ED3]' : ''}`}>
                 {selected.map(s => (
-                    <span key={s.username}
+                    <span key={s.username || Math.random()}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
                   bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]">
-                        {s?.username} | {Roles[s?.roles[0]]}
+                        {s?.username || '—'} | {Roles[s?.roles?.[0]] || '—'}
                         <button type="button" onMouseDown={e => { e.stopPropagation(); remove(s.username) }}
                             className="hover:opacity-70 cursor-pointer ml-0.5">
                             <FaXmark size={9} />
@@ -100,11 +100,11 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
                       ${isSelected ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}>
                                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors
                       ${isSelected ? 'bg-[#3F57B3] text-white' : 'bg-[#526ED3]/20 text-[#526ED3]'}`}>
-                                        {isSelected ? <FaCheck size={10} /> : o?.username?.slice(0, 2).toUpperCase()}
+                                        {isSelected ? <FaCheck size={10} /> : (o?.username || '??').slice(0, 2).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm font-medium leading-tight truncate ${isSelected ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{o?.username}</p>
-                                        <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{o?.roles?.map(r => Roles[r])?.join(', ')}</p>
+                                        <p className={`text-sm font-medium leading-tight truncate ${isSelected ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{o?.username || '—'}</p>
+                                        <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{Array.isArray(o?.roles) ? o.roles.map(r => Roles[r] || r).join(', ') : '—'}</p>
                                     </div>
                                     {isSelected && (
                                         <div className="text-[#3F57B3] dark:text-[#7F95E6]">
