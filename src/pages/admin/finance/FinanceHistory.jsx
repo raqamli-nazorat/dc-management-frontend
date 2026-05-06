@@ -1,10 +1,11 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCalendarDays } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
+import { DateTimeBox } from '../Components/DateTimeBox'
 
 // ── Constants ────────────────────────────────────────────────
 const TRANSACTION_TYPE_OPTIONS = [
@@ -124,53 +125,6 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
   )
 }
 
-// ── DateBox ──────────────────────────────────────────────────
-function DateBox({ value, onChange, placeholder }) {
-  const ref = useRef(null)
-  const isEmpty = !value
-  return (
-    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text">
-      {placeholder && (
-        <span className={`text-xs shrink-0 select-none ${isEmpty ? 'text-[#B6BCCB] dark:text-[#474848]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}`}>
-          {placeholder}:
-        </span>
-      )}
-      <input ref={ref} type="date" value={value} onChange={e => onChange(e.target.value)}
-        className={`flex-1 min-w-0 text-xs outline-none bg-transparent cursor-pointer
-          [&::-webkit-calendar-picker-indicator]:hidden
-          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : '[&::-webkit-datetime-edit]:opacity-0'}
-        `}
-      />
-      <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] ">
-        <FaCalendarDays size={12} />
-      </button>
-    </div>
-  )
-}
-
-// ── TimeBox ──────────────────────────────────────────────────
-function TimeBox({ value, onChange }) {
-  const ref = useRef(null)
-  return (
-    <div className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A]
-      bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3]  cursor-text w-[90px]">
-      <input ref={ref} type="time" value={value || '00:00'} onChange={e => onChange(e.target.value)}
-        step="60"
-        className="flex-1 min-w-0 text-xs outline-none bg-transparent text-[#1A1D2E] dark:text-[#FFFFFF] cursor-pointer
-          [&::-webkit-calendar-picker-indicator]:hidden"
-      />
-      <button type="button" onClick={() => ref.current?.showPicker?.()}
-        className="shrink-0 cursor-pointer text-[#8F95A8] dark:text-[#C2C8E0] hover:text-[#526ED3] ">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-        </svg>
-      </button>
-    </div>
-  )
-}
-
 function HistoryFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
@@ -211,12 +165,20 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
             <label className={labelCls}>Sana oralig'i</label>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex gap-1.5">
-                <DateBox value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} placeholder="dan" />
-                <TimeBox value={f.created_at__time__gte} onChange={v => set('created_at__time__gte', v)} />
+                <div className="flex-1">
+                  <DateTimeBox type="date" placeholder="dan" value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} dropUp />
+                </div>
+                <div className="w-[90px]">
+                  <DateTimeBox type="time" value={f.created_at__time__gte || '00:00'} onChange={v => set('created_at__time__gte', v)} dropUp />
+                </div>
               </div>
               <div className="flex gap-1.5">
-                <DateBox value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} placeholder="gacha" />
-                <TimeBox value={f.created_at__time__lte} onChange={v => set('created_at__time__lte', v)} />
+                <div className="flex-1">
+                  <DateTimeBox type="date" placeholder="gacha" value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} dropUp />
+                </div>
+                <div className="w-[90px]">
+                  <DateTimeBox type="time" value={f.created_at__time__lte || '00:00'} onChange={v => set('created_at__time__lte', v)} dropUp />
+                </div>
               </div>
             </div>
           </div>

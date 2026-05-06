@@ -966,8 +966,8 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
           <div>
             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
             <div className="grid grid-cols-2 gap-2">
-              <DateTimeBox type="date" placeholder="dan (KK/OO/YYYY)" value={dateFrom} onChange={setDateFrom} />
-              <DateTimeBox type="date" placeholder="gacha (KK/OO/YYYY)" value={dateTo} onChange={setDateTo} />
+              <DateTimeBox type="date" placeholder="dan" value={dateFrom} onChange={setDateFrom} />
+              <DateTimeBox type="date" placeholder="gacha" value={dateTo} onChange={setDateTo} />
             </div>
           </div>
         </div>
