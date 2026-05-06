@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -22,7 +22,7 @@ const TASK_STATUS_LABEL = {
   done:        'Bajarilgan',
   production:  'Ishga tushirilgan',
   deployed:    'Ishga tushirilgan',
-  reviewed:    'Tekshirilgan',
+  checked:    'Tekshirilgan',
   rejected:    'Rad etilgan',
   overdue:     "Muddati o'tgan",
   cancelled:   'Bekor qilingan',
@@ -42,7 +42,7 @@ const STATUS_TO_COL = {
   done:        'done',
   production:  'production',
   deployed:    'deployed',
-  reviewed:    'reviewed',
+  checked:    'checked',
   rejected:    'rejected',
   overdue:     'overdue',
   cancelled:   'cancelled',
@@ -54,7 +54,7 @@ const COLUMNS = [
   { id: 'in_progress', label: 'Jarayonda',          color: '#3B82F6', bg: '#E3F2FD' },
   { id: 'done',        label: 'Bajarilgan',         color: '#8B5CF6', bg: '#EDE7F6' },
   { id: 'production',  label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9' },
-  { id: 'reviewed',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9' },
+  { id: 'checked',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9' },
   { id: 'rejected',    label: 'Rad etilgan',        color: '#EF4444', bg: '#FFEBEE' },
   { id: 'overdue',     label: "Muddati o'tgan",     color: '#9CA3AF', bg: '#F5F5F5' },
 ]
@@ -62,10 +62,10 @@ const COLUMNS = [
 // Qaysi ustundan qaysi ustunga o'tish mumkin
 const ALLOWED_TRANSITIONS = {
   todo:        ['in_progress', 'done'],
-  in_progress: ['todo', 'done', 'reviewed'],
-  done:        ['in_progress', 'production', 'reviewed'],
-  production:  ['rejected', 'reviewed'],
-  reviewed:    ['done', 'production'],
+  in_progress: ['todo', 'done', 'checked'],
+  done:        ['in_progress', 'production', 'checked'],
+  production:  ['rejected', 'checked'],
+  checked:    ['done', 'production'],
   rejected:    [],
   overdue:     ['in_progress'],
   cancelled:   [],

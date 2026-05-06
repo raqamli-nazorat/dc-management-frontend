@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
@@ -13,7 +13,7 @@ const HOLAT_LIST = [
   { label: "Muddati o'tgan",    value: 'overdue' },
   { label: 'Bajarilgan',        value: 'done' },
   { label: 'Ishga tushirilgan', value: 'production' },
-  { label: 'Tekshirilgan',      value: 'reviewed' },
+  { label: 'Tekshirilgan',      value: 'checked' },
   { label: 'Rad etilgan',       value: 'rejected' },
   { label: 'Bekor qilingan',    value: 'cancelled' },
 ]
