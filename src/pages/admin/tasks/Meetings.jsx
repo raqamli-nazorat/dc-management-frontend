@@ -40,9 +40,14 @@ const fromIso = (iso) => {
   if (!iso) return { date: '', time: '' }
   try {
     const d = new Date(iso)
-    const date = d.toISOString().slice(0, 10)
-    const time = d.toISOString().slice(11, 16)
-    return { date, time }
+    if (isNaN(d.getTime())) return { date: '', time: '' }
+    // Local vaqtni ishlatamiz (UTC emas)
+    const yyyy = d.getFullYear()
+    const mm   = String(d.getMonth() + 1).padStart(2, '0')
+    const dd   = String(d.getDate()).padStart(2, '0')
+    const hh   = String(d.getHours()).padStart(2, '0')
+    const min  = String(d.getMinutes()).padStart(2, '0')
+    return { date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` }
   } catch { return { date: '', time: '' } }
 }
 
@@ -310,7 +315,8 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim())        body.link         = form.link.trim()
-      if (form.fine)               body.penalty_percentage = form.fine
+      const fineNum = parseInt(form.fine, 10)
+      if (fineNum > 0)             body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = parseInt(form.durationVal, 10)
@@ -392,6 +398,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                   value={form.date}
                   onChange={v => set('date', v)}
                   error={errors.date}
+                  dropUp
                 />
                 {errors.date && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
@@ -403,6 +410,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                   value={form.time}
                   onChange={v => set('time', v)}
                   error={errors.time}
+                  dropUp
                 />
                 {errors.time && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
@@ -529,17 +537,29 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
       const body = {
         project:      form.project,
         title:        form.title.trim(),
-        is_completed: form.is_completed,
         participants: form.participants.map(u => u.id),
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim())        body.link         = form.link.trim()
-      if (form.fine)               body.penalty_percentage = form.fine
+      const fineNum = parseInt(form.fine, 10)
+      if (fineNum > 0)             body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = durationToMinutes(form.durationVal, form.durationUnit)
       if (mins) body.duration_minutes = mins
+
       await onSave(meeting.id, body)
+
+      // is_completed true bo'lsa — /close/ endpoint orqali yopamiz
+      // faqat avval yopilmagan bo'lsa
+      if (form.is_completed && !meeting.is_completed) {
+        try {
+          await axiosAPI.post(`/meetings/${meeting.id}/close/`)
+        } catch (closeErr) {
+          toast.error('Yopishda xatolik', parseApiError(closeErr, "Yig'ilishni yopishda xatolik"))
+        }
+      }
+
       onClose()
     } catch (err) {
       toast.error('Xatolik', parseApiError(err, "Yig'ilish yangilashda xatolik"))
@@ -613,6 +633,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                   placeholder="KK/OO/YYYY"
                   value={form.date}
                   onChange={v => set('date', v)}
+                  dropUp
                 />
               </div>
               <div>
@@ -622,6 +643,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                   placeholder="SS:DD"
                   value={form.time}
                   onChange={v => set('time', v)}
+                  dropUp
                 />
               </div>
               <div>
@@ -999,11 +1021,6 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Tahrirlash
           </button>
-          <button onClick={() => { onCloseMeeting(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
-            <FaCheck size={13} />
-            Yakunlash
-          </button>
           <button onClick={() => { onDelete(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer ">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -1104,8 +1121,9 @@ export default function MeetingsPage() {
     try {
       const res = await axiosAPI.post('/meetings/', body)
       const created = res.data?.data ?? res.data
-      setData(prev => [created, ...prev])
       toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
+      loadMeetings(filters, search, 1)
+      return created
     } catch (err) {
       const errData = err?.response?.data
       const details = errData?.error?.details
@@ -1130,12 +1148,9 @@ export default function MeetingsPage() {
       const updated = res.data?.data ?? res.data
       setData(prev => prev.map(m => m.id === id ? updated : m))
       toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
+      loadMeetings(filters, search, 1)
     } catch (err) {
-      const errData = err?.response?.data
-      const msg = errData?.detail
-        || (typeof errData === 'object' ? Object.entries(errData).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join(', ') : null)
-        || "Yangilashda xatolik"
-      toast.error('Xatolik', msg)
+      toast.error('Xatolik', parseApiError(err, "Yangilashda xatolik"))
       throw err
     }
   }
@@ -1146,8 +1161,9 @@ export default function MeetingsPage() {
       const updated = res.data?.data ?? res.data
       setData(prev => prev.map(m => m.id === id ? { ...m, is_completed: true, ...updated } : m))
       toast.success("Yig'ilish yakunlandi", "Yig'ilish muvaffaqiyatli yakunlandi")
+      loadMeetings(filters, search, 1)
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "Yakunlashda xatolik")
+      toast.error('Xatolik', parseApiError(err, "Yakunlashda xatolik"))
     }
   }
 
@@ -1156,8 +1172,9 @@ export default function MeetingsPage() {
       await axiosAPI.delete(`/meetings/${id}/`)
       setData(prev => prev.filter(m => m.id !== id))
       toast.delete("Yig'ilish o'chirildi", "Yig'ilish chiqindi qutisiga yuborildi")
+      loadMeetings(filters, search, 1)
     } catch (err) {
-      toast.error('Xatolik', err?.response?.data?.detail || "O'chirishda xatolik")
+      toast.error('Xatolik', parseApiError(err, "O'chirishda xatolik"))
     }
   }
 
