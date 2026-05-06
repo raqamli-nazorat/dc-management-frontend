@@ -4,7 +4,7 @@ import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { axiosAPI } from "../../../service/axiosAPI"
-import { FaFileLines, FaXmark } from "react-icons/fa6"
+import { FaArrowsRotate, FaFileLines, FaXmark } from "react-icons/fa6"
 import { FiGithub } from "react-icons/fi"
 import { CiLinkedin } from "react-icons/ci"
 import { PiTelegramLogo } from "react-icons/pi"
@@ -20,6 +20,46 @@ const Roles = {
     accountant: 'Hisobchi',
 }
 
+const formatPhone = (val) => {
+    let digits = val.replace(/\D/g, '');
+    if (digits.length < 3) return '+998';
+    if (!digits.startsWith('998')) digits = '998' + digits;
+
+    digits = digits.slice(0, 12);
+    let res = '+' + digits.slice(0, 3);
+    if (digits.length > 3) res += ' ' + digits.slice(3, 5);
+    if (digits.length > 5) res += ' ' + digits.slice(5, 8);
+    if (digits.length > 8) res += ' ' + digits.slice(8, 10);
+    if (digits.length > 10) res += ' ' + digits.slice(10, 12);
+    return res;
+}
+
+const formatNum = (val) => {
+    if (!val && val !== 0) return '';
+
+    let cleanVal = val.toString().replace(/[^\d.]/g, '');
+
+    let [integerPart, decimalPart] = cleanVal.split('.');
+
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+    if (decimalPart !== undefined) {
+        const sliced = decimalPart.slice(0, 2);
+        if (sliced === '00') {
+            return integerPart === '0' ? '' : integerPart;
+        }
+        return `${integerPart}.${sliced}`;
+    }
+
+    return integerPart === '0' ? '' : integerPart;
+}
+
+const formatCard = (val) => {
+    if (!val) return '';
+    let digits = val.replace(/\D/g, '').slice(0, 16);
+    return digits.match(/.{1,4}/g)?.join(' ') || digits;
+}
+
 const UserDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -31,22 +71,25 @@ const UserDetail = () => {
     const [positions, setPositions] = useState([])
 
     const [form, setForm] = useState({})
-    const [isDirty, setIsDirty] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
 
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                setLoading(true)
-                const { data } = await axiosAPI.get(`users/${id}`)
-                setUser(data.data)
-                setLoading(false)
-            } catch (error) {
-                console.error(error)
-                setLoading(false)
+    const getUser = async (refresh = false) => {
+        try {
+            if (!refresh) setLoading(true)
+            const { data } = await axiosAPI.get(`users/${id}`)
+            setUser(data.data)
+            if (!refresh) setLoading(false)
+                 
+            if (refresh) {
+                toast.success("Ma'lumotlar yangilandi!")
             }
+        } catch (error) {
+            console.error(error)
+            setLoading(false)
         }
+    }
 
+    useEffect(() => {
         getUser()
     }, [id])
 
@@ -89,6 +132,8 @@ const UserDetail = () => {
                 password: '',
                 fixed_salary: userData.fixed_salary ?? '',
                 balance: userData.balance ?? '',
+                phone_number: formatPhone(userData.phone_number || ''),
+                card_number: formatCard(userData.card_number || ''),
                 region_info: userData.region_info || null,
                 district_info: userData.district_info || null,
                 position_info: userData.position_info || null,
@@ -113,7 +158,7 @@ const UserDetail = () => {
         }
     }, [user, registerBreadcrumb, clearBreadcrumb])
 
-    const set = (k, v) => { setForm(prev => ({ ...prev, [k]: v })); setIsDirty(true) }
+    const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
     const initial = user ? (() => {
         const userData = user.data || user;
@@ -124,6 +169,8 @@ const UserDetail = () => {
             password: '',
             fixed_salary: userData.fixed_salary ?? '',
             balance: userData.balance ?? '',
+            phone_number: formatPhone(userData.phone_number || ''),
+            card_number: formatCard(userData.card_number || ''),
             region_info: userData.region_info || null,
             district_info: userData.district_info || null,
             position_info: userData.position_info || null,
@@ -138,7 +185,7 @@ const UserDetail = () => {
         }
     })() : {}
 
-    const handleCancel = () => { setForm(initial); setIsDirty(false) }
+    const handleCancel = () => setForm(initial)
 
     const handleSave = async () => {
         try {
@@ -193,6 +240,20 @@ const UserDetail = () => {
                 formData.append('passport_series', (form.passportSeria || '') + (form.passportRaqam || ''))
             }
 
+            // Telefon raqami o'zgargan bo'lsa
+            if (form.phone_number !== initial.phone_number) {
+                formData.append('phone_number', form.phone_number?.replace(/\s/g, ''))
+            }
+
+            // Karta raqami o'zgargan bo'lsa
+            if (form.card_number !== initial.card_number) {
+                if (form.card_number?.replace(/\s/g, '')?.length < 16) {
+                    toast.error("Karta raqami 16 xonadan kam bo'lishi mumkin emas!")
+                    return
+                }
+                formData.append('card_number', form.card_number?.replace(/\s/g, ''))
+            }
+
             // Ijtimoiy tarmoqlar o'zgargan bo'lsa
             if (form.github !== initial.github || form.linkedin !== initial.linkedin || form.telegram !== initial.telegram) {
                 formData.append("social_links", JSON.stringify({
@@ -205,7 +266,6 @@ const UserDetail = () => {
             const { data } = await axiosAPI.patch(`users/${id}/`, formData);
 
             setUser(data);
-            setIsDirty(false);
             toast.success("Ma'lumotlar saqlandi");
         } catch (error) {
             console.error(error)
@@ -237,26 +297,6 @@ const UserDetail = () => {
         }
     }
 
-    const formatNum = (val) => {
-        if (!val && val !== 0) return '';
-
-        let cleanVal = val.toString().replace(/[^\d.]/g, '');
-
-        let [integerPart, decimalPart] = cleanVal.split('.');
-
-        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
-        if (decimalPart !== undefined) {
-            const sliced = decimalPart.slice(0, 2);
-            if (sliced === '00') {
-                return integerPart === '0' ? '' : integerPart;
-            }
-            return `${integerPart}.${sliced}`;
-        }
-
-        return integerPart === '0' ? '' : integerPart;
-    }
-
     if (loading) return <span>Loading...</span>
     if (!user) return <span>User not found</span>
 
@@ -267,7 +307,7 @@ const UserDetail = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 pr-4">
                 {/* Confirm Delete Modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -320,61 +360,60 @@ const UserDetail = () => {
                 </div>
 
                 {/* Avatar */}
-                <div className="relative overflow-hidden avatar w-[80px] h-[80px] rounded-xl">
-                    {form.avatar ? (
-                        <img
-                            src={typeof form.avatar === 'string' ? form.avatar : URL.createObjectURL(form.avatar)}
-                            alt={form.name}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div
-                            className="w-full h-full rounded-xl bg-gradient-to-br from-[#bdc4eb] to-[#a1abf7] flex items-center justify-center  cursor-pointer"
-                            onClick={() => document.getElementById('avatar-input').click()}
-                        >
-                            <FaUser color="#fff" size={50} />
+                <div className="flex justify-between w-full items-center">
+                    <div className="flex items-center gap-5">
+                        <div className="relative overflow-hidden avatar w-[80px] h-[80px] rounded-xl">
+                            {form.avatar ? (
+                                <img
+                                    src={typeof form.avatar === 'string' ? form.avatar : URL.createObjectURL(form.avatar)}
+                                    alt={form.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div
+                                    className="w-full h-full rounded-xl bg-gradient-to-br from-[#bdc4eb] to-[#a1abf7] flex items-center justify-center  cursor-pointer"
+                                    onClick={() => document.getElementById('avatar-input').click()}
+                                >
+                                    <FaUser color="#fff" size={50} />
+                                </div>
+                            )}
+                            <label>
+                                <span className="bg-[#3F67FF] rounded-full p-1.5 absolute left-[55px] bottom-0 cursor-pointer cam">
+                                    <FaCamera className="text-white" size={13} />
+                                </span>
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    id='avatar-input'
+                                    onChange={e => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                            set('avatar', file)
+                                        }
+                                    }}
+                                />
+                            </label>
                         </div>
-                    )}
-                    <label>
-                        <span className="bg-[#3F67FF] rounded-full p-1.5 absolute left-[55px] bottom-0 cursor-pointer cam">
-                            <FaCamera className="text-white" size={13} />
-                        </span>
-                        <input
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            id='avatar-input'
-                            onChange={e => {
-                                const file = e.target.files?.[0]
-                                if (file) {
-                                    set('avatar', file)
-                                }
-                            }}
-                        />
-                    </label>
+
+                        <h2 className="text-2xl font-extrabold text-[#1A1D2E] dark:text-white">
+                            {form.name}
+                        </h2>
+                    </div>
+
+                    <FaArrowsRotate onClick={() => getUser(true)} className="text-[#5B6078] cursor-pointer hover:opacity-90" size={20} />
                 </div>
 
                 {/* Form */}
                 <div className="flex flex-col gap-4">
 
-                    {/* Ism */}
-                    <div>
-                        <label className={labelCls}>Ism Sharifi</label>
-                        <input className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} />
-                    </div>
-
-                    {/* Parol + Maosh + Balans */}
+                    {/* row - 1*/}
                     <div className="grid grid-cols-3 gap-3">
                         <div>
-                            <label className={labelCls}>Parol</label>
-                            <input
-                                className={inputCls}
-                                type="password"
-                                placeholder="Yangi parol"
-                                value={form.password}
-                                onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }}
-                            />
+                            <label className={labelCls}>Ism Sharifi</label>
+                            <input className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} />
                         </div>
+
                         <div>
                             <label className={labelCls}>Oylik maosh (UZS)</label>
                             <input
@@ -386,6 +425,7 @@ const UserDetail = () => {
                                 onChange={e => set('fixed_salary', formatNum(e.target.value))}
                             />
                         </div>
+
                         <div>
                             <label className={labelCls}>Balansi (UZS)</label>
                             <input
@@ -397,6 +437,33 @@ const UserDetail = () => {
                                 disabled
                             />
                         </div>
+
+                    </div>
+
+                    {/* row - 2 */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className={labelCls}>Telefon raqami</label>
+                            <input
+                                className={inputCls}
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="+998 99 999 99 99"
+                                value={form.phone_number}
+                                onChange={e => set('phone_number', formatPhone(e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelCls}>Karta raqami</label>
+                            <input
+                                className={inputCls}
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="0000 0000 0000 0000"
+                                value={form.card_number || ''}
+                                onChange={e => set('card_number', formatCard(e.target.value))}
+                            />
+                        </div>
                     </div>
 
                     {/* Viloyat + Tuman */}
@@ -404,24 +471,27 @@ const UserDetail = () => {
                         <div>
                             <label className={labelCls}>Viloyat</label>
                             <FilterSelect
-                                options={['Viloyatni tanlang', ...regions.map(r => r.name)]}
-                                value={form.region_info?.name || 'Viloyatni tanlang'}
+                                options={regions.map(r => r.name)}
+                                value={form.region_info?.name || ''}
                                 onChange={v => {
                                     const selectedRegion = regions.find(r => r.name === v);
                                     set('region_info', selectedRegion || null);
                                     if (!selectedRegion) set('district_info', null);
                                 }}
+                                placeholder='Viloyatni tanlang'
+                                padding="11px 11px"
                             />
                         </div>
                         <div>
                             <label className={labelCls}>Tuman</label>
                             <FilterSelect
-                                options={['Tuman tanlang', ...districts.map(d => d.name)]}
-                                value={form.district_info?.name || 'Tuman tanlang'}
+                                options={districts.map(d => d.name)}
+                                value={form.district_info?.name || ''}
                                 onChange={v => {
                                     const selectedDistrict = districts.find(d => d.name === v);
                                     set('district_info', selectedDistrict || null);
                                 }}
+                                padding="11px 11px"
                                 disabled={!form.region_info}
                             />
                         </div>
@@ -478,54 +548,58 @@ const UserDetail = () => {
                         </div>
                     </div>
 
-                    {/* Social links */}
-                    <div className="grid grid-cols-3 gap-3">
-                        {[
-                            { key: 'github', label: 'GitHub', Icon: FiGithub, placeholder: 'Github havola' },
-                            { key: 'linkedin', label: 'Linkedin', Icon: CiLinkedin, placeholder: 'Linkedin havola' },
-                            { key: 'telegram', label: 'Telegram', Icon: PiTelegramLogo, placeholder: 'Telegram havola' },
-                        ].map(({ key, label, Icon, placeholder }) => (
-                            <div key={key}>
-                                <label className={labelCls + ' flex items-center gap-1.5'}>
-                                    {label} <Icon size={14} className="text-[#5B6078] dark:text-[#C2C8E0]" />
-                                </label>
-                                <input className={inputCls} placeholder={placeholder}
-                                    value={form[key] || ''} onChange={e => set(key, e.target.value)} />
-                            </div>
-                        ))}
-                    </div>
+                    {/* Social Links + Lavozim + Rol */}
+                    <div className="grid grid-cols-4 gap-3">
+                        <div className="col-span-2 grid grid-cols-3 gap-3">
+                            {[
+                                { key: 'github', label: '1.Havola', placeholder: 'Github havola' },
+                                { key: 'linkedin', label: '2.Havola', placeholder: 'Linkedin havola' },
+                                { key: 'telegram', label: '3.Havola', placeholder: 'Telegram havola' },
+                            ].map(({ key, label, placeholder }) => (
+                                <div key={key} className="flex-1">
+                                    <label className={labelCls}>{label}</label>
+                                    <input className={inputCls} placeholder={placeholder}
+                                        value={form[key] || ''} onChange={e => set(key, e.target.value)} />
+                                </div>
+                            ))}
+                        </div>
 
-                    {/* Lavozim + Rol — space-between */}
-                    <div className="flex items-center justify-between gap-5">
-                        <div className="flex items-center gap-2 justify-between w-[50%]">
-                            <div className='flex items-center gap-2'>
-                                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 " />
-                                <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#FFFFFF] shrink-0">Lavozimi</span>
+                        <div className="flex items-center justify-between mt-5">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                </div>
+                                <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Lavozimi</span>
                             </div>
+
                             <Dropdown
-                                width={200}
-                                label="Tanlash"
+                                width={180}
                                 options={positions.map(p => p.name)}
                                 value={form.position_info?.name || ''}
                                 onChange={v => {
                                     const selectedPosition = positions.find(p => p.name === v);
                                     set('position_info', selectedPosition || null);
                                 }}
+                                placeholder='Lavozimni tanlang'
+                                padding="10px 12px"
                             />
                         </div>
-                        <div className="flex items-center gap-2 justify-between w-[50%]">
-                            <div className='flex items-center gap-2'>
-                                <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                                <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#FFFFFF] shrink-0">Rolli</span>
+                        <div className="flex items-center gap-3 mt-5">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+                                </div>
+                                <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Roli</span>
                             </div>
 
                             <Dropdown
-                                width={200}
-                                label="Tanlash"
+                                width={170}
                                 options={Object.values(Roles)}
                                 value={form.roles}
                                 onChange={v => set('roles', v)}
                                 multiple
+                                placeholder='Rolni tanlang'
+                                padding="10px 12px"
                             />
                         </div>
                     </div>
