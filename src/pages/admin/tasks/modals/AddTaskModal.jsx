@@ -358,7 +358,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
           </div>
 
           {/* ── Scroll qilinadigan content ── */}
-          <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4">
+          <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
 
             {/* Loyiha + Nomi */}
             <div className="grid grid-cols-2 gap-4">

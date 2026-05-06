@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react
 import { labelCls } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
+import { parseApiError } from '../../../../service/parseApiError'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 
 const PRIORITY_OPTIONS = [
@@ -431,10 +432,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
       setLoading(false)
     }
   }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const positionOptions = positions.map(p => ({ label: p.name, value: String(p.id) }))
   const assigneeLabel   = form.assignees.map(u => u.username).join(', ')
@@ -476,7 +473,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
           </div>
 
           {/* ── Scrollable content ── */}
-          <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4">
+          <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
 
             {/* Loyiha + Nomi */}
             <div className="grid grid-cols-2 gap-4">
