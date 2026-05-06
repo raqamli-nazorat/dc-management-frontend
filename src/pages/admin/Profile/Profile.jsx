@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { getErrorMessage } from '../../../service/getErrorMessage'
@@ -195,8 +195,8 @@ function PassportViewer({ url, onClose }) {
         ) : (
           <div className="bg-white dark:bg-[#1C1D1D] rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#526ED3]">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
             </svg>
             <p className="text-[#1A1D2E] dark:text-white font-semibold text-sm">Fayl brauzerda ochiladi</p>
             <a
@@ -217,13 +217,14 @@ function PassportViewer({ url, onClose }) {
 
 const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
 
-function Field({ label, value, children }) {
+function Field({ label, value, children, align = 'right', rightIcon }) {
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8]">{label}</span>
       {children ?? (
-        <div className={boxCls + ' text-right min-h-[42px] flex items-center justify-end'}>
-          {value ?? ''}
+        <div className={boxCls + ` min-h-[42px] flex items-center ${align === 'left' ? 'justify-between text-left' : 'justify-end text-right'}`}>
+          <span>{value ?? ''}</span>
+          {rightIcon && <span className="shrink-0">{rightIcon}</span>}
         </div>
       )}
     </div>
@@ -256,7 +257,7 @@ const formatCard = (v) => {
 }
 
 /* ── Social Field with copy ── */
-function SocialField({ label, value, icon }) {
+function SocialField({ label, value, icon, placeholder }) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -274,12 +275,14 @@ function SocialField({ label, value, icon }) {
         {label}
       </span>
       <div className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 group'}>
-        <span className="flex-1 truncate text-sm">{value ?? ''}</span>
+        <span className={`flex-1 truncate text-sm text-left ${!value ? 'text-[#B6BCCB] dark:text-[#474848]' : ''}`}>
+          {value || placeholder}
+        </span>
         {value && (
           <button
             onClick={handleCopy}
             title="Nusxa olish"
-            className="shrink-0 cursor-pointer  text-[#8F95A8] hover:text-[#526ED3]"
+            className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]"
           >
             {copied ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#22c55e]">
@@ -337,16 +340,16 @@ const fmtNum = (v) => {
 
 /* ── Role Labels ── */
 const ROLE_LABELS = {
-  admin:       'Administrator',
-  superadmin:  'Administrator',
-  manager:     'Menejer',
-  menager:     'Menejer',
-  employee:    'Xodim',
-  xodim:       'Xodim',
-  auditor:     'Nazoratchi',
-  nazoratchi:  'Nazoratchi',
-  accountant:  'Hisobchi',
-  hisobchi:    'Hisobchi',
+  admin: 'Administrator',
+  superadmin: 'Administrator',
+  manager: 'Menejer',
+  menager: 'Menejer',
+  employee: 'Xodim',
+  xodim: 'Xodim',
+  auditor: 'Nazoratchi',
+  nazoratchi: 'Nazoratchi',
+  accountant: 'Hisobchi',
+  hisobchi: 'Hisobchi',
 }
 
 /* ── Role Dropdown ── */
@@ -384,27 +387,26 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
   }
 
   return (
-    <div className="relative w-full" ref={dropRef}>
+    <div className="relative" ref={dropRef}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 cursor-pointer hover:border-[#526ED3] transition-colors w-full'}
+        className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[#526ED3] transition-colors"
       >
-        <span className="text-sm">{ROLE_LABELS[activeRole] || activeRole}</span>
+        <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">
+          {ROLE_LABELS[activeRole] || activeRole || 'Tanlash'}
+        </span>
         {loading
-          ? <svg className="animate-spin w-3.5 h-3.5 text-[#8F95A8] shrink-0" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-            </svg>
-          : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-              className={`text-[#8F95A8] transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}>
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
+          ? <svg className="animate-spin w-2.5 h-2.5 text-[#8F95A8] shrink-0" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+          </svg>
+          : <FaChevronDown className={`w-2.5 h-2.5 text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
         }
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
+        <div className="absolute bottom-full right-0 mb-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden
           bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           {roles.map((r, i) => (
             <button
@@ -421,7 +423,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
               <span>{ROLE_LABELS[r] || r}</span>
               {r === activeRole && (
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </button>
@@ -498,8 +500,8 @@ export default function ProfilePage() {
 
       {/* Viloyat + Tuman */}
       <div className={rowCls}>
-        <Field label="Viloyat" value={data.region} />
-        <Field label="Tuman" value={data.district} />
+        <Field label="Viloyat" value={data.region || 'Viloyat tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[#8F95A8]" />} />
+        <Field label="Tuman" value={data.district || 'Tuman tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[#8F95A8]" />} />
       </div>
 
       {/* Passport + Passport rasmi */}
@@ -516,22 +518,30 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <a
-              href={data.passport_image}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full px-4 py-2.5 rounded-xl text-sm border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1C1D1D] transition-colors min-h-[42px]"
-            >
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6078" strokeWidth="2" className="shrink-0 dark:stroke-[#8F95A8]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
               </svg>
-              <span className="font-medium text-[#5B6078] dark:text-[#8F95A8]">
+              <a
+                href={data.passport_image}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-[#5B6078] dark:text-[#8F95A8] hover:underline truncate max-w-[200px]"
+              >
                 {data.passport_image.split('/').pop() || "Ma'lumot.pdf"}
-              </span>
-            </a>
+              </a>
+              <span className="text-xs text-[#B6BCCB] shrink-0 ml-1">1487 KB</span>
+            </div>
           ) : (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px]" />
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px] flex items-center justify-start gap-2 text-[#B6BCCB]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              <span>Ma'lumot.pdf</span>
+              <span className="text-xs ml-1 shrink-0">1487 KB</span>
+            </div>
           )}
         </Field>
       </div>
@@ -546,31 +556,40 @@ export default function ProfilePage() {
       <div className="grid grid-cols-3 gap-4">
         {[
           {
-            key: 'github', label: 'GitHub', value: social.github,
-            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#1A1D2E] dark:text-white shrink-0"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            key: 'github', label: 'GitHub', value: social.github, placeholder: 'Github havola',
+            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#1A1D2E] dark:text-white shrink-0"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" /></svg>
           },
           {
-            key: 'linkedin', label: 'LinkedIn', value: social.linkedin,
-            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#0077B5] shrink-0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            key: 'linkedin', label: 'LinkedIn', value: social.linkedin, placeholder: 'Linkedin havola',
+            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#0077B5] shrink-0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
           },
           {
-            key: 'telegram', label: 'Telegram', value: social.telegram,
-            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#229ED9] shrink-0"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            key: 'telegram', label: 'Telegram', value: social.telegram, placeholder: 'Telegram havola',
+            icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#229ED9] shrink-0"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
           },
-        ].map(({ key, label, value, icon }) => (
-          <SocialField key={key} label={label} value={value} icon={icon} />
+        ].map(({ key, label, value, icon, placeholder }) => (
+          <SocialField key={key} label={label} value={value} icon={icon} placeholder={placeholder} />
         ))}
       </div>
 
       {/* Lavozim + Rol */}
       <div className={rowCls}>
-        <Field label="Lavozimi">
-          <div className={boxCls + ' min-h-[42px] flex items-center gap-2'}>
-            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-            <span className="text-sm">{data.position ?? '—'}</span>
+        <div className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FC]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+            <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Lavozimi</span>
           </div>
-        </Field>
-        <Field label="Rolli">
+          <div className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+            <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">{data.position || 'Admin'}</span>
+            <FaChevronDown className="w-2.5 h-2.5 text-[#8F95A8]" />
+          </div>
+        </div>
+
+        <div className="w-full px-4 py-2.5 rounded-xl  bg-[#F8F9FC]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+            <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Roli</span>
+          </div>
           {data.roles?.length > 1 ? (
             <RoleDropdown
               roles={data.roles}
@@ -578,12 +597,14 @@ export default function ProfilePage() {
               onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
             />
           ) : (
-            <div className={boxCls + ' min-h-[42px] flex items-center gap-2'}>
-              <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-              <span className="text-sm">{ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role}</span>
+            <div className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+              <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">
+                {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
+              </span>
+              <FaChevronDown className="w-2.5 h-2.5 text-[#8F95A8]" />
             </div>
           )}
-        </Field>
+        </div>
       </div>
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
