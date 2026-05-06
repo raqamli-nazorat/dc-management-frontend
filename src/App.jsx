@@ -27,6 +27,7 @@ import Project from './pages/admin/Reports/Project'
 import Salary from './pages/admin/Reports/Salary'
 import TrashPage from './pages/admin/Trash/Trash'
 import ProfilePage from './pages/admin/Profile/Profile'
+import MyTasks from './pages/MyTasks/MyTasks'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -51,6 +52,7 @@ const commonRoutes = (prefix) => [
   <Route key="app-regions" path="applications/regions" element={<AdminRegions />} />,
   <Route key="users" path="users" element={<AdminUsers />} />,
   <Route key="user-detail" path="users/detail/:id" element={<AdminUserDetail />} />,
+  <Route key="my-tasks" path="my-tasks" element={<MyTasks />} />,
 ]
 
 function App() {

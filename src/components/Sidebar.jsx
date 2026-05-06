@@ -1,6 +1,6 @@
-﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MdExpandMore, MdExpandLess } from 'react-icons/md'
-import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket } from 'react-icons/fa6'
+import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -11,6 +11,7 @@ import {
   IconUserGroup, IconFolder, IconBriefcaseDollar,
   IconAnalytics, IconSidebarLeft,
 } from './icons'
+import { toast } from '../Toast/ToastProvider'
 
 function IconApplications({ size = 20, className = '' }) {
   return (
@@ -228,6 +229,35 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
     return () => document.removeEventListener('mousedown', h)
   }, [])
 
+  // Check for role change notification on mount
+  useEffect(() => {
+    const changedRole = localStorage.getItem('roleChanged')
+    if (changedRole) {
+      const roleMessages = {
+        admin: { title: "Administrator roliga o'tildi.", desc: "Siz endi administrator sifatida ishlayapsiz." },
+        superadmin: { title: "Administrator roliga o'tildi.", desc: "Siz endi administrator sifatida ishlayapsiz." },
+        manager: { title: "Menejer roliga o'tildi.", desc: "Siz endi menejer sifatida ishlayapsiz." },
+        menager: { title: "Menejer roliga o'tildi.", desc: "Siz endi menejer sifatida ishlayapsiz." },
+        accountant: { title: "Hisobchi roliga o'tildi.", desc: "Siz endi hisobchi sifatida ishlayapsiz." },
+        hisobchi: { title: "Hisobchi roliga o'tildi.", desc: "Siz endi hisobchi sifatida ishlayapsiz." },
+        auditor: { title: "Kuzatuvchi roliga o'tildi.", desc: "Siz endi kuzatuvchi sifatida tizimni ko'rishingiz mumkin." },
+        nazoratchi: { title: "Kuzatuvchi roliga o'tildi.", desc: "Siz endi kuzatuvchi sifatida tizimni ko'rishingiz mumkin." },
+        employee: { title: "Xodim roliga o'tildi.", desc: "Siz endi xodim sifatida ishlayapsiz." },
+        xodim: { title: "Xodim roliga o'tildi.", desc: "Siz endi xodim sifatida ishlayapsiz." },
+      }
+      const msg = roleMessages[changedRole] || { 
+        title: `${roleLabels[changedRole] || changedRole} roliga o'tildi.`, 
+        desc: `Siz endi ${(roleLabels[changedRole] || changedRole).toLowerCase()} sifatida ishlayapsiz.` 
+      }
+      
+      setTimeout(() => {
+        toast.success(msg.title, msg.desc)
+      }, 300)
+      
+      localStorage.removeItem('roleChanged')
+    }
+  }, [])
+
   const isCollapsed = forceCollapsed || collapsed
 
   const routeRole = getRouteRole(user)
@@ -390,6 +420,30 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           isCollapsed ? 'px-[10px] py-3 items-center' : 'px-3 py-3',
         ].join(' ')}
       >
+        {/* Mening vazifalarim */}
+        {isCollapsed ? (
+          <button
+            onClick={() => navigate(`/${urlPrefix}/my-tasks`)}
+            title="Mening vazifalarim"
+            className={iconBtn(location.pathname.includes('my-tasks'))}
+          >
+            <FaRegCalendarCheck size={16} />
+          </button>
+        ) : (
+          <NavLink
+            to={`/${urlPrefix}/my-tasks`}
+            className={({ isActive }) => [
+              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
+              isActive
+                ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
+                : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
+            ].join(' ')}
+          >
+            <FaRegCalendarCheck size={16} className="shrink-0" />
+            <span>Mening vazifalarim</span>
+          </NavLink>
+        )}
+
         {routeRole !== 'accountant' && routeRole !== 'auditor' && (isCollapsed ? (
           /* Yopilgan: Chiqindi qutisi ikonka */
           <button
@@ -471,6 +525,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                             u.active_role = role
                             localStorage.setItem('user', JSON.stringify(u))
                           }
+                          localStorage.setItem('roleChanged', role)
                           window.location.reload()
                         } catch { /* silent */ }
                       }}
