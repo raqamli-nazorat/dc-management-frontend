@@ -112,7 +112,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     </button>
                                     {mgrDd.open && (
                                         <div className={ddList}>
-                                            {(user.active_role === "manager" ? [user] : user.active_role === "employees" ? employees : managers).map((u, i, arr) => (
+                                            {(user.active_role === "manager" ? [user] : user.active_role === "employee" ? employees : managers).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
                                                     className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                                                     <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
@@ -165,7 +165,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     </button>
                                     {empDd.open && (
                                         <div className={ddList}>
-                                            {(user.active_role === "manager" ? employees : users).map((u, i, arr) => (
+                                            {(user.active_role === "manager" ? employees : user.active_role === "employee" ? [user] : users).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
                                                     className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                                                     <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
