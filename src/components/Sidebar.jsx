@@ -365,10 +365,10 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   onClick={() => toggleGroup(i)}
                   className={[
                     'w-full flex items-center gap-2.5 px-4 py-3 rounded-lg  cursor-pointer',
-                    'text-[13px] font-medium',
+                    'text-[13px] font-medium border',
                     active
-                      ? 'bg-[#D8DCF0] text-[#1A1D2E] border border-[#C8CEEA] font-semibold dark:bg-[#303131] dark:text-white dark:border-[#474848]'
-                      : 'text-[#5B6078] border border-transparent hover:bg-[#E2E6F2] hover:text-[#1A1D2E] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:hover:text-white dark:hover:border-[#474848]',
+                      ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] font-semibold dark:bg-[#303131] dark:text-white dark:border-[#474848]'
+                      : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:text-[#1A1D2E] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:hover:text-white dark:hover:border-[#474848]',
                   ].join(' ')}
                 >
                   <Icon size={18} className="shrink-0" />
@@ -398,7 +398,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                         className={() => [
                           'block px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
                           childActive
-                            ? 'bg-[#DDE1EF] text-[#1A1D2E] border-[#D0D5E8] font-semibold dark:bg-[#303131] dark:text-white! dark:border-[#474848]'
+                            ? 'bg-[#E9ECF5] text-[#1A1D2E] border-[#E2E6F2] font-semibold dark:bg-[#292A2A] dark:text-white! dark:border-[#292A2A]'
                             : 'text-[#5B6078] border-transparent hover:bg-[#E9ECF5] hover:text-[#1A1D2E] hover:border-[#E2E6F2] dark:text-[#C2C8E0]! dark:hover:text-white! dark:hover:bg-[#292A2A] dark:hover:border-[#292A2A]',
                         ].join(' ')}
                       >
