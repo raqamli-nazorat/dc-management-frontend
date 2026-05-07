@@ -178,7 +178,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                       e.stopPropagation()
                       navigator.clipboard.writeText(card.uid || `T${card.id}`).then(() => {
                         toast.success('Nusxa olindi', card.uid || `T${card.id}`)
-                      }).catch(() => {})
+                      }).catch(() => { })
                     }}
                     title="Nusxa olish"
                   >{card.uid || `T${card.id}`}</span>
@@ -225,32 +225,32 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 </div>
               )}
 
-           <div className='mt-auto'>
-               {/* Divider */}
-              <div className="border-t  mb-2 border-[#F1F3F9] dark:border-[#333535]" />
+              <div className='mt-auto'>
+                {/* Divider */}
+                <div className="border-t  mb-2 border-[#F1F3F9] dark:border-[#333535]" />
 
-              {/* Assignee */}
-              <div className="flex  mt-auto  items-center gap-1.5">
-                {card.assignee_info?.avatar ? (
-                  <img src={card.assignee_info.avatar} alt={assignee}
-                    className="w-6 h-6 rounded-full object-cover shrink-0" />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#EEF1FB] dark:bg-[#333535] flex items-center justify-center shrink-0">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F95A8" strokeWidth="1.8">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                    </svg>
+                {/* Assignee */}
+                <div className="flex  mt-auto  items-center gap-1.5">
+                  {card.assignee_info?.avatar ? (
+                    <img src={card.assignee_info.avatar} alt={assignee}
+                      className="w-6 h-6 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-[#EEF1FB] dark:bg-[#333535] flex items-center justify-center shrink-0">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F95A8" strokeWidth="1.8">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white truncate leading-tight">
+                      {assignee}
+                    </p>
+                    <p className="text-[10px] text-[#8F95A8] truncate leading-tight">
+                      {position || 'Dasturchi'}
+                    </p>
                   </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white truncate leading-tight">
-                    {assignee}
-                  </p>
-                  <p className="text-[10px] text-[#8F95A8] truncate leading-tight">
-                    {position || 'Dasturchi'}
-                  </p>
                 </div>
               </div>
-           </div>
 
             </div>
 
@@ -892,6 +892,7 @@ export default function TasksPage() {
           <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#222323]">
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Loyiha</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratuvchi</th>
@@ -924,6 +925,7 @@ export default function TasksPage() {
                 <tr key={t.id}
                   onClick={() => loadTaskDetail(t.id)}
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
+                  <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title || t.name}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || t.project || '—')}</td>
