@@ -323,7 +323,11 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   <label className={labelCls}>Muddat sanasi</label>
                   <DatePicker
                     value={form.deadline ? dayjs(form.deadline) : null}
-                    onChange={(val) => set('deadline', val)}
+                    onChange={(val) => setForm(p => ({
+                      ...p,
+                      deadline: val,
+                      time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
+                    }))}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
                     className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}

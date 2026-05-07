@@ -104,7 +104,7 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Menejer + Menejer bonusi */}
+                        {/* Menejer + Loyiha narxi */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className={labelCls}>Menejer</label>
@@ -112,11 +112,23 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                             <div>
                                 <label className={labelCls}>Loyiha narxi (UZS)</label>
-                                <div className={fCls + ' text-right'}>
+                                <div className={fCls + ' text-right font-bold'}>
                                     {project.project_price !== undefined
                                         ? Number(project.project_price).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(',', '.')
                                         : '—'}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Titul + Jarima foizi */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelCls}>Titul</label>
+                                <div className={fCls}>{project.prefix || '—'}</div>
+                            </div>
+                            <div>
+                                <label className={labelCls}>Jarima foizi (%)</label>
+                                <div className={fCls}>{project.penalty_percentage || '0'}</div>
                             </div>
                         </div>
 
@@ -154,14 +166,29 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Muddati */}
-                        <div>
-                            <label className={labelCls}>Muddati</label>
-                            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                                <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">{dayjs(project.deadline).format('DD.MM.YYYY HH:mm')}</span>
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
-                                </svg>
+                        {/* Muddati split */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelCls}>Muddat sanasi</label>
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+                                    <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">
+                                        {project.deadline ? dayjs(project.deadline).format('DD.MM.YYYY') : '—'}
+                                    </span>
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <label className={labelCls}>Soati</label>
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+                                    <span className="flex-1 text-sm text-[#1A1D2E] dark:text-white">
+                                        {project.deadline ? dayjs(project.deadline).format('HH:mm') : '—'}
+                                    </span>
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#8F95A8] shrink-0">
+                                        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 

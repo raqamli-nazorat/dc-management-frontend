@@ -23,8 +23,11 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
 
     return (
         <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
-            <div className="fixed inset-0 bg-black/60" />
-            <div className="relative w-full min-h-[70vh]! max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[80vh]">
+            <div className="fixed inset-0 bg-black/10" />
+            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                <FaXmark size={16} />
+            </button>
+            <div className="relative w-full min-h-[90vh]! max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4 shrink-0">
                     <div className="flex items-center gap-3 mb-4">

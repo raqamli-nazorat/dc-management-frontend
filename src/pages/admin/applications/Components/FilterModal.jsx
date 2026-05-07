@@ -1,7 +1,7 @@
 import { FaXmark } from "react-icons/fa6"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 import { FaArrowLeft } from "react-icons/fa"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Status, useDistricts, usePositions, useRegions } from "../../../../MostUsesDates"
 import FilterSelect from "../../Components/FilterSelect"
 
@@ -60,11 +60,26 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
         setF({ ...EMPTY_FILTER })
     }
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
+
+
     return (
         <>
             {show && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                     <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+                    <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                        <FaXmark size={16} />
+                    </button>
+
                     <div className="relative w-full max-w-[620px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
 
                         {/* Header */}

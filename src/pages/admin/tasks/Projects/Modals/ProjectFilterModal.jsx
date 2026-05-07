@@ -80,7 +80,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                 <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
                     <FaXmark size={14} />
                 </button>
-                <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+                <div className="relative w-full max-w-[660px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
 
                     {/* Header */}
                     <div className="px-7 pt-7 pb-3">
@@ -183,54 +183,58 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                         {/* Boshlanish sanasi oralig'i */}
                         <div>
                             <label className={labelCls}>Boshlanish sanasi oralig'i</label>
-                            <div className="flex items-center gap-2">
-                                <div className={`${inputBox} flex-1 min-w-0`}>
-                                    <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
-                                    <DatePicker
-                                        format="YYYY-MM-DD"
-                                        placeholder=""
-                                        value={f.startFromD ? dayjs(f.startFromD) : null}
-                                        onChange={(v) => set('startFromD', v ? v.format('YYYY-MM-DD') : '')}
-                                        variant="borderless"
-                                        className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
-                                    />
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="flex items-center gap-2">
+                                    <div className={`${inputBox} flex-1 min-w-0`}>
+                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
+                                        <DatePicker
+                                            format="YYYY-MM-DD"
+                                            placeholder=""
+                                            value={f.startFromD ? dayjs(f.startFromD) : null}
+                                            onChange={(v) => set('startFromD', v ? v.format('YYYY-MM-DD') : '')}
+                                            variant="borderless"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
+                                        />
+                                    </div>
+                                    <div className={`${inputBox} shrink-0`}>
+                                        <TimePicker
+                                            format="HH:mm"
+                                            placeholder="Vaqt"
+                                            value={f.startFromT ? dayjs(f.startFromT, 'HH:mm') : null}
+                                            onChange={(v) => set('startFromT', v ? v.format('HH:mm') : '')}
+                                            variant="borderless"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
+                                            showNow={false}
+                                        />
+                                    </div>
                                 </div>
-                                <div className={`${inputBox} shrink-0`}>
-                                    <TimePicker
-                                        format="HH:mm"
-                                        placeholder="Vaqt"
-                                        value={f.startFromT ? dayjs(f.startFromT, 'HH:mm') : null}
-                                        onChange={(v) => set('startFromT', v ? v.format('HH:mm') : '')}
-                                        variant="borderless"
-                                        className="w-[70px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
-                                        showNow={false}
-                                    />
-                                </div>
-                                <div className={`${inputBox} flex-1 min-w-0`}>
-                                    <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
-                                    <DatePicker
-                                        format="YYYY-MM-DD"
-                                        placeholder=""
-                                        value={f.startToD ? dayjs(f.startToD) : null}
-                                        onChange={(v) => set('startToD', v ? v.format('YYYY-MM-DD') : '')}
-                                        variant="borderless"
-                                        className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
-                                    />
-                                </div>
-                                <div className={`${inputBox} shrink-0`}>
-                                    <TimePicker
-                                        format="HH:mm"
-                                        placeholder="Vaqt"
-                                        value={f.startToT ? dayjs(f.startToT, 'HH:mm') : null}
-                                        onChange={(v) => set('startToT', v ? v.format('HH:mm') : '')}
-                                        variant="borderless"
-                                        className="w-[70px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
-                                        showNow={false}
-                                    />
+                                <div className="flex items-center gap-2">
+                                    <div className={`${inputBox} flex-1 min-w-0`}>
+                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
+                                        <DatePicker
+                                            format="YYYY-MM-DD"
+                                            placeholder=""
+                                            value={f.startToD ? dayjs(f.startToD) : null}
+                                            onChange={(v) => set('startToD', v ? v.format('YYYY-MM-DD') : '')}
+                                            variant="borderless"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
+                                        />
+                                    </div>
+                                    <div className={`${inputBox} shrink-0`}>
+                                        <TimePicker
+                                            format="HH:mm"
+                                            placeholder="Vaqt"
+                                            value={f.startToT ? dayjs(f.startToT, 'HH:mm') : null}
+                                            onChange={(v) => set('startToT', v ? v.format('HH:mm') : '')}
+                                            variant="borderless"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
+                                            showNow={false}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -238,54 +242,58 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                         {/* Muddat oralig'i */}
                         <div>
                             <label className={labelCls}>Muddat oralig'i</label>
-                            <div className="flex items-center gap-2">
-                                <div className={`${inputBox} flex-1 min-w-0`}>
-                                    <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
-                                    <DatePicker
-                                        format="YYYY-MM-DD"
-                                        placeholder=""
-                                        value={f.deadFromD ? dayjs(f.deadFromD) : null}
-                                        onChange={(v) => set('deadFromD', v ? v.format('YYYY-MM-DD') : '')}
-                                        variant="borderless"
-                                        className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
-                                    />
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="flex items-center gap-2">
+                                    <div className={`${inputBox} flex-1 min-w-0`}>
+                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
+                                        <DatePicker
+                                            format="YYYY-MM-DD"
+                                            placeholder=""
+                                            value={f.deadFromD ? dayjs(f.deadFromD) : null}
+                                            onChange={(v) => set('deadFromD', v ? v.format('YYYY-MM-DD') : '')}
+                                            variant="borderless"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
+                                        />
+                                    </div>
+                                    <div className={`${inputBox} shrink-0`}>
+                                        <TimePicker
+                                            format="HH:mm"
+                                            placeholder="Vaqt"
+                                            value={f.deadFromT ? dayjs(f.deadFromT, 'HH:mm') : null}
+                                            onChange={(v) => set('deadFromT', v ? v.format('HH:mm') : '')}
+                                            variant="borderless"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
+                                            showNow={false}
+                                        />
+                                    </div>
                                 </div>
-                                <div className={`${inputBox} shrink-0`}>
-                                    <TimePicker
-                                        format="HH:mm"
-                                        placeholder="Vaqt"
-                                        value={f.deadFromT ? dayjs(f.deadFromT, 'HH:mm') : null}
-                                        onChange={(v) => set('deadFromT', v ? v.format('HH:mm') : '')}
-                                        variant="borderless"
-                                        className="w-[70px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
-                                        showNow={false}
-                                    />
-                                </div>
-                                <div className={`${inputBox} flex-1 min-w-0`}>
-                                    <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
-                                    <DatePicker
-                                        format="YYYY-MM-DD"
-                                        placeholder=""
-                                        value={f.deadToD ? dayjs(f.deadToD) : null}
-                                        onChange={(v) => set('deadToD', v ? v.format('YYYY-MM-DD') : '')}
-                                        variant="borderless"
-                                        className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
-                                    />
-                                </div>
-                                <div className={`${inputBox} shrink-0`}>
-                                    <TimePicker
-                                        format="HH:mm"
-                                        placeholder="Vaqt"
-                                        value={f.deadToT ? dayjs(f.deadToT, 'HH:mm') : null}
-                                        onChange={(v) => set('deadToT', v ? v.format('HH:mm') : '')}
-                                        variant="borderless"
-                                        className="w-[70px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
-                                        suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
-                                        showNow={false}
-                                    />
+                                <div className="flex items-center gap-2">
+                                    <div className={`${inputBox} flex-1 min-w-0`}>
+                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
+                                        <DatePicker
+                                            format="YYYY-MM-DD"
+                                            placeholder=""
+                                            value={f.deadToD ? dayjs(f.deadToD) : null}
+                                            onChange={(v) => set('deadToD', v ? v.format('YYYY-MM-DD') : '')}
+                                            variant="borderless"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
+                                        />
+                                    </div>
+                                    <div className={`${inputBox} shrink-0`}>
+                                        <TimePicker
+                                            format="HH:mm"
+                                            placeholder="Vaqt"
+                                            value={f.deadToT ? dayjs(f.deadToT, 'HH:mm') : null}
+                                            onChange={(v) => set('deadToT', v ? v.format('HH:mm') : '')}
+                                            variant="borderless"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
+                                            showNow={false}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

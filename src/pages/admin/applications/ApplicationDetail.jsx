@@ -4,10 +4,9 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
-import { FaFileLines } from 'react-icons/fa6'
+import { FaFileLines, FaXmark, FaArrowLeft, FaCheck } from 'react-icons/fa6'
 import { CopyIcon } from '../../../components/icons'
 import { Alert } from '../Components/Alert'
-import { FaCheck } from 'react-icons/fa6'
 
 const ApplicationDetail = () => {
   const { id } = useParams()
@@ -17,6 +16,11 @@ const ApplicationDetail = () => {
   const [loading, setLoading] = useState(true)
 
   const [conclusion, setConclusion] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalStatus, setModalStatus] = useState(null)
+  const [modalConclusion, setModalConclusion] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -62,8 +66,47 @@ const ApplicationDetail = () => {
       } else if (typeof error?.response?.data === 'string') {
         errMsg = error.response.data;
       }
-      
+
       toast.error('Yangilanishda xatolik', errMsg);
+    }
+  }
+
+  const openModal = (status) => {
+    setModalStatus(status)
+    setModalConclusion(conclusion || '')
+    setIsModalOpen(true)
+    setError('')
+  }
+
+  const handleStatusUpdate = async () => {
+    if (!modalConclusion.trim()) {
+      setError('Xulosa kiritishingiz shart!')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      const { data } = await axiosAPI.patch(`applications/${id}/`, {
+        status: modalStatus,
+        conclusion: modalConclusion
+      })
+      setApplication(prev => ({ ...prev, status: modalStatus }))
+      setConclusion(modalConclusion)
+      setIsModalOpen(false)
+      toast.success("Muvaffaqiyatli", "Holat muvaffaqiyatli o'zgartirildi")
+    } catch (error) {
+      console.error(error)
+      const errData = error?.response?.data?.error;
+      let errMsg = "Xatolik yuz berdi";
+      if (errData?.details && typeof errData.details === 'object') {
+        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        if (detailMsgs) errMsg = detailMsgs;
+      } else if (errData?.errorMsg) {
+        errMsg = errData.errorMsg;
+      }
+      toast.error('Xatolik', errMsg);
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -239,19 +282,95 @@ const ApplicationDetail = () => {
             value={conclusion}
             onChange={(e) => setConclusion(e.target.value)}
           />
-          <div className="flex justify-end mt-1">
-            <button
-              onClick={handleSave}
-              style={{ fontSize: 14, color: '#FFFFFF' }}
-              className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! disabled:text-gray-500!"
-              disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
-            >
-              <FaCheck size={15} />
-              Saqlash
-            </button>
+          <div className="flex items-center justify-end mt-1 gap-4">
+            {application?.status !== 'accepted' && application?.status !== 'rejected' ? (
+              <>
+                <button
+                  onClick={() => openModal('rejected')}
+                  style={{ fontSize: 14, color: '#FFFFFF' }}
+                  className="px-4 py-2.5 rounded-xl bg-[#fa5252] font-semibold  hover:opacity-80 flex items-center gap-2"
+                >
+                  <FaXmark size={15} />
+                  Rad etildi
+                </button>
+                <button
+                  onClick={() => openModal('accepted')}
+                  style={{ fontSize: 14, color: '#FFFFFF' }}
+                  className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2"
+                >
+                  <FaCheck size={15} />
+                  Qabul qilindi
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleSave}
+                style={{ fontSize: 14, color: '#FFFFFF' }}
+                className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! dark:disabled:bg-[#222323]! disabled:text-gray-500!"
+                disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
+              >
+                <FaCheck size={15} />
+                Saqlash
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="fixed inset-0 bg-black/70" onClick={() => setIsModalOpen(false)} />
+          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-[#141414] p-6 border border-white/5">
+            <div className="flex items-center gap-3 mb-5">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-white hover:opacity-70 cursor-pointer"
+              >
+                <FaArrowLeft size={18} />
+              </button>
+              <h2 className="text-xl font-bold text-white">
+                Xulosa kiriting
+              </h2>
+            </div>
+
+            <div className="relative mb-5">
+              <textarea
+                value={modalConclusion}
+                onChange={(e) => {
+                  setModalConclusion(e.target.value)
+                  if (e.target.value.trim()) setError('')
+                }}
+                className={`w-full h-[150px] p-4 rounded-xl bg-transparent border ${error ? 'border-[#fa5252]' : 'border-white/10'} text-white text-sm outline-none resize-none placeholder-white/20 focus:border-white/30 transition-colors`}
+                placeholder="Xulosangizni shu yerga yozing..."
+              />
+              {error && (
+                <span className="absolute -bottom-5 left-1 text-[#fa5252] text-xs font-medium">
+                  {error}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end mt-6">
+              <button
+                onClick={handleStatusUpdate}
+                disabled={isSubmitting}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 ${modalStatus === 'accepted' ? 'bg-[#3F57B3]' : 'bg-[#fa5252]'}`}
+              >
+                {isSubmitting ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    {modalStatus === 'accepted' ? <FaCheck size={16} /> : <FaXmark size={16} />}
+                    {modalStatus === 'accepted' ? 'Qabul qilindi' : 'Rad etildi'}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Alert
         show={copyText}
         message={'Nusxa olindi'}
@@ -261,7 +380,7 @@ const ApplicationDetail = () => {
 
       <style>{`
         body{
-          overflow: hidden !important;
+          overflow: ${isModalOpen ? 'hidden' : 'auto'} !important;
         }
       `}</style>
     </>

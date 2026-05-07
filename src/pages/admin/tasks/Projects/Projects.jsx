@@ -13,7 +13,19 @@ import ProjectFilterModal from "./Modals/ProjectFilterModal"
 import dayjs from 'dayjs'
 import AddProjectModal from './Modals/AddProjectModal'
 
-const EMPTY_FILTER = { manager: '', status: '', employee: '', startFromD: '', startFromT: '', startToD: '', startToT: '', deadFromD: '', deadFromT: '', deadToD: '', deadToT: '' }
+const EMPTY_FILTER = {
+  manager: '',
+  status: '',
+  employee: '',
+  startFromD: dayjs().startOf('month').format('YYYY-MM-DD'),
+  startFromT: '00:00',
+  startToD: dayjs().endOf('month').format('YYYY-MM-DD'),
+  startToT: '23:59',
+  deadFromD: '',
+  deadFromT: '',
+  deadToD: '',
+  deadToT: ''
+}
 
 const STATUS_LABEL = {
   planning: 'Rejalashtirilmoqda',

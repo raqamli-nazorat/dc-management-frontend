@@ -47,9 +47,14 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         getProject()
     }, [id])
 
-    const fmtBonus = (raw) => {
+    const fmtBonus = (raw, key) => {
         if (!raw) return ""
+
         let val = raw.toString().replace(/[^0-9.]/g, "")
+        if (key === "penalty" && Number(val) > 100) {
+            val = "100"
+        }
+
         const dots = val.split(".")
         if (dots.length > 2) {
             val = dots[0] + "." + dots.slice(1).join("")
@@ -67,6 +72,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         manager: '',
         manager_id: null,
         bonus: '',
+        penalty_percentage: '',
         employees: [],
         testers: [],
         deadline: '',
@@ -84,6 +90,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 manager: project?.manager_info?.username || '',
                 manager_id: project?.manager_info?.id || null,
                 bonus: project?.project_price ? fmtBonus(project.project_price) : '',
+                penalty_percentage: project?.penalty_percentage ? fmtBonus(project.penalty_percentage, "penalty") : '',
                 employees: project?.employees_info || [],
                 testers: project?.testers_info || [],
                 deadline: project?.deadline ? project.deadline.slice(0, 10) : '',
@@ -98,8 +105,11 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     const validate = () => {
         const e = {}
         if (!form.title.trim()) e.title = true
+        if (!form.prefix?.trim()) e.prefix = true
         if (!form.status) e.status = true
         if (!form.manager) e.manager = true
+        if (!form.bonus) e.bonus = true
+        if (!form.penalty_percentage) e.penalty_percentage = true
         if (!form.deadline) e.deadline = true
         if (!form.time) e.time = true
         setErrors(e)
@@ -115,7 +125,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 status: form.status,
                 description: form.description,
                 manager: form.manager_id,
-                project_price: Number(form.bonus.replace(/\s/g, '')) || 0,
+                project_price: Number(form.bonus.toString().replace(/\s/g, '')) || 0,
+                penalty_percentage: Number(form.penalty_percentage.toString().replace(/\s/g, '')) || 0,
                 employees: form.employees?.map((emp) => emp.id),
                 testers: form.testers?.map((tst) => tst.id),
                 deadline: form.deadline && form.time ? dayjs(dayjs(form.deadline).format('YYYY-MM-DD') + ' ' + (typeof form.time === 'string' ? form.time : form.time.format('HH:mm'))).toISOString() : form.deadline,
@@ -183,8 +194,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                 <div className="fixed inset-0 bg-black/60" />
-                <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
-                    <FaXmark size={14} />
+                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                    <FaXmark size={16} />
                 </button>
                 <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#111111]">
 
@@ -314,7 +325,33 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <label className={labelCls}>Loyiha narxi (UZS)</label>
                                     <input value={form.bonus} onChange={e => set('bonus', fmtBonus(e.target.value))}
                                         placeholder="Loyiha uchun: 0,0"
-                                        className={inputCls(false) + ' text-right'} />
+                                        className={inputCls(errors.bonus) + ' text-right font-bold'} />
+                                    {errors.bonus && <p className="text-red-500 text-xs mt-1 ml-1">* Ushbu maydonni to'ldirish majburiy</p>}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={labelCls}>Titul</label>
+                                    <input
+                                        value={form.prefix}
+                                        onChange={e => set('prefix', e.target.value.toUpperCase())}
+                                        placeholder="Titul kiriting"
+                                        className={inputCls(errors.prefix)}
+                                        maxLength={3}
+                                    />
+                                    {errors.prefix && <p className="text-red-500 text-xs mt-1 ml-1">* Ushbu maydonni to'ldirish majburiy</p>}
+                                </div>
+
+                                <div>
+                                    <label className={labelCls}>Jarima foizi (%)</label>
+                                    <input
+                                        value={form.penalty_percentage}
+                                        onChange={e => set('penalty_percentage', fmtBonus(e.target.value, "penalty"))}
+                                        placeholder="0,0"
+                                        className={inputCls(errors.penalty_percentage)}
+                                    />
+                                    {errors.penalty_percentage && <p className="text-red-500 text-xs mt-1 ml-1">* Ushbu maydonni to'ldirish majburiy</p>}
                                 </div>
                             </div>
 
@@ -351,7 +388,11 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         <label className={labelCls}>Muddati</label>
                                         <DatePicker
                                             value={form.deadline ? dayjs(form.deadline) : null}
-                                            onChange={(val) => set('deadline', val)}
+                                            onChange={(val) => setForm(p => ({
+                                                ...p,
+                                                deadline: val,
+                                                time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
+                                            }))}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
                                             className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                                             suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}

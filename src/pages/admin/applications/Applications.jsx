@@ -20,6 +20,7 @@ const ApplicationsPage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
 
+  const [loading, setLoading] = useState(false)
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
   const [applicationsNextURL, setApplicationsNextURL] = useState(null)
@@ -30,6 +31,7 @@ const ApplicationsPage = () => {
   const [confirmApplication, setConfirmApplication] = useState(null)
 
   const fetchApplications = async (params = {}) => {
+    setLoading(true)
     try {
       const { data } = await axiosAPI.get('applications/', { params })
       setApplications(data.data.results)
@@ -37,6 +39,8 @@ const ApplicationsPage = () => {
     } catch (error) {
       console.error('Error fetching applications:', error)
       toast.error(error.data.error.errorMsg || 'Arizalar yuklanmadi')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -280,9 +284,11 @@ const ApplicationsPage = () => {
                 ))}
               </tbody>
             </table>
-            {applications.length === 0 && (
+            {applications.length === 0 && !loading ? (
               <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Arizalar topilmadi</div>
-            )}
+            ) : loading ? (
+              <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Arizalar yuklanmoqda...</div>
+            ) : null}
           </div>
         </div>
       </div>
