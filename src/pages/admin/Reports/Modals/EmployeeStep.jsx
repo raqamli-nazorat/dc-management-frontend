@@ -9,8 +9,11 @@ import {
 import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { LuCheckCheck } from "react-icons/lu";
+import { useAuth } from "../../../../context/AuthContext";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang", param = {} }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", type = "", title = "Boshqaruvchi tanlang", param = {} }) => {
+    const { user } = useAuth();
+
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const normalizeSelectedList = (list) => {
@@ -37,7 +40,14 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
         setLoading(true);
         try {
-            const { data } = await axiosAPI.get(employee_role === "tester" ? "reports/projects/all-testers/" : "users/", { params });
+            if (user.active_role === "employee" && type === "employee") {
+                setEmployees([user]);
+                return;
+            }
+
+            const end_point = employee_role === "tester" ? "reports/projects/all-testers/" : type === "creator" && user.active_role === "employee" ? "project-managers/" : "users/"
+
+            const { data } = await axiosAPI.get(end_point, { params });
 
             const response = employee_role === "tester" ? data.data : data?.data?.results || [];
 
@@ -51,6 +61,10 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     };
 
     useEffect(() => {
+        // if (user.active_role === "employee") {
+        //     setEmployees([user]);
+        //     return;
+        // }
         const timer = setTimeout(() => {
             getEmployee({ search: searchTerm });
         }, 300);
@@ -128,7 +142,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     </div>
 
                     {/* Employee List */}
-                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-3 min-h-[400px] max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {employees?.map((emp) => {
                             const isSelected = selectedIds.includes(emp.id);
                             return (
@@ -161,7 +175,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                                             {emp.username}
                                         </h4>
                                         <p className="text-[13px] text-[#9CA3AF] dark:text-[#8E95B5] mt-0.5 truncate">
-                                            {emp.position_info?.name || "Lavozim ko'rsatilmadi"}
+                                            {emp.position_info?.name || emp.position || "Lavozim ko'rsatilmadi"}
                                         </p>
                                     </div>
                                 </div>

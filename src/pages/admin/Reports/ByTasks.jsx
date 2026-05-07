@@ -1130,6 +1130,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.assignee ? filters.assignee.split(',') : []}
           title="Topshiruvchi tanlang"
+          type='employee'
           onConfirm={handleSelectEmployeeConfirm}
           onClose={() => setSelectSubmitter(false)}
         />
@@ -1140,6 +1141,7 @@ const Employee = () => {
           selectedList={filters.created_by ? filters.created_by.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
           title="Muallif tanlang"
+          type='creator'
           onClose={() => setSelectAuthor(false)}
         />
       )}

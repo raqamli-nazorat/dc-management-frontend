@@ -118,6 +118,8 @@ const menuByRole = {
       children: [
         { label: "Xodim bo'yicha", path: '/employee/reports/employee' },
         { label: "Loyihalar bo'yicha", path: '/employee/reports/project' },
+        { label: "Xarajat so'rovlari bo'yicha", path: '/employee/reports/cost_inquiries' },
+        { label: "Ish haqi bo'yicha", path: '/employee/reports/salary' },
         { label: "Vazifalar bo'yicha", path: '/employee/reports/by_tasks' },
       ],
     },
@@ -245,15 +247,15 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         employee: { title: "Xodim roliga o'tildi.", desc: "Siz endi xodim sifatida ishlayapsiz." },
         xodim: { title: "Xodim roliga o'tildi.", desc: "Siz endi xodim sifatida ishlayapsiz." },
       }
-      const msg = roleMessages[changedRole] || { 
-        title: `${roleLabels[changedRole] || changedRole} roliga o'tildi.`, 
-        desc: `Siz endi ${(roleLabels[changedRole] || changedRole).toLowerCase()} sifatida ishlayapsiz.` 
+      const msg = roleMessages[changedRole] || {
+        title: `${roleLabels[changedRole] || changedRole} roliga o'tildi.`,
+        desc: `Siz endi ${(roleLabels[changedRole] || changedRole).toLowerCase()} sifatida ishlayapsiz.`
       }
-      
+
       setTimeout(() => {
         toast.success(msg.title, msg.desc)
       }, 300)
-      
+
       localStorage.removeItem('roleChanged')
     }
   }, [])

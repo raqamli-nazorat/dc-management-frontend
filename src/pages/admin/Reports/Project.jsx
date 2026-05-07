@@ -896,7 +896,7 @@ const Employee = () => {
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 h-[76vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
@@ -1026,7 +1026,8 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.employees ? filters.employees.split(',') : []}
           onConfirm={handleSelectUserConfirm}
-          title="Muaillif tanlang"
+          title="Xodimlar tanlang"
+          type="employee"
           onClose={() => setSelectUser(false)}
         />
       )}
@@ -1037,6 +1038,7 @@ const Employee = () => {
           onConfirm={handleSelectManagerConfirm}
           title="Boshqaruvchi tanlang"
           employee_role='accountant'
+          type="creator"
           onClose={() => setSelectManager(false)}
         />
       )}
@@ -1045,7 +1047,8 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.created_by ? filters.created_by.split(',') : []}
           onConfirm={handleSelectAuthorConfirm}
-          title="Xodimlar tanlang"
+          title="Muallif tanlang"
+          type='creator'
           onClose={() => setSelectAuthor(false)}
         />
       )}

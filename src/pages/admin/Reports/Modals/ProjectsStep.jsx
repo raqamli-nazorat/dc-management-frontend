@@ -74,7 +74,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           >
                <div
-                    className="w-full max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[#292A2A]"
+                    className="w-full max-w-[600px] max-h-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[#292A2A]"
                     onClick={(e) => e.stopPropagation()}
                >
                     <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
@@ -112,7 +112,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                          </div>
 
                          {/* Project List */}
-                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                         <div className="space-y-3 h-[360px] overflow-y-auto pr-2 custom-scrollbar">
                               {Projects?.map((project) => {
                                    const projectDate = project.created_at ? dayjs(project.created_at).format('DD.MM.YYYY') : '';
                                    const initials = project.title ? project.title.substring(0, 2).toUpperCase() : project.uid?.substring(0, 2)?.toUpperCase() || 'PR';
@@ -168,7 +168,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                          </div>
 
                          {/* Footer */}
-                         <div className="flex items-center justify-between mt-8 pt-2">
+                         <div className="flex items-center justify-between pt-2">
                               <span className="text-gray-500 dark:text-[#8E95B5] font-medium text-sm">{selectedIds.length} ta tanlangan</span>
                               <div className="flex gap-3">
                                    <button
