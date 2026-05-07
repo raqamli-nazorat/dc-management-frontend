@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MdArrowForward, MdDelete, MdExpandMore, MdCheck } from 'react-icons/md'
 import { FaCamera, FaArrowLeft } from 'react-icons/fa'
 import { FaXmark, FaTrash, FaFileLines } from 'react-icons/fa6'

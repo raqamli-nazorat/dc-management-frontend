@@ -154,7 +154,7 @@ const ProjectsPage = () => {
 
   // ── API funksiyalari ──
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
-    const p = { page: pg, page_size: 20 }
+    const p = { page: pg }
     if (q) p.search = q
     if (f.status) p.status = f.status
     if (f.manager) p.manager = f.manager
@@ -188,14 +188,15 @@ const ProjectsPage = () => {
 
   // Users yuklash (menejer va xodim tanlash uchun)
   useEffect(() => {
-    axiosAPI.get('/users/', { params: { page_size: 100 } })
+    if (user.active_role !== "admin" && user.active_role !== "superadmin") return;
+    axiosAPI.get('users/')
       .then(res => {
         const payload = res.data?.data ?? res.data
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setUsers(list)
       })
       .catch(() => { })
-  }, [])
+  }, [user])
 
   useEffect(() => {
     loadProjects()
@@ -225,11 +226,6 @@ const ProjectsPage = () => {
   }, [])
 
   const hasFilter = Object.values(filters).some(v => v)
-
-  const handleSearch = (val) => {
-    setSearch(val)
-    loadProjects(filters, val, 1)
-  }
 
   const handleApplyFilter = (f) => {
     setFilters(f)
@@ -262,8 +258,16 @@ const ProjectsPage = () => {
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Izlash..." value={search}
-            onChange={e => handleSearch(e.target.value)}
+          <input
+            type="text"
+            placeholder="Izlash..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && search.trim()) {
+                loadProjects(filters, search, 1)
+              }
+            }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />

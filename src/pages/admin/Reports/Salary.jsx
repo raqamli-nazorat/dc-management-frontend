@@ -614,7 +614,7 @@ const Employee = () => {
               className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && search.trim()) {
                   e.preventDefault();
                   handleSearch();
                 }
@@ -637,7 +637,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-red-100 text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-[#222323] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -921,56 +921,54 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2000px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2] text-center">№</th>
-                  <th className="p-3 text-xs w-[150px] sticky left-[60px] z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2] text-start">Ism Sharifi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[100px] border-[#e2e6f2] text-start">Oy</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Oylik maosh</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">KPI bonus</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Jarima miqdori</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Jami miqdori</th>
-                  <th className="p-3 text-xs font-bold border-r w-[120px] border-[#e2e6f2] text-center">Holati</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-center">Hisoblangan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-center">Tasdiqlangan vaqti</th>
-                  <th className="p-3 text-xs font-bold sticky right-0 bg-[#7186ED] dark:bg-[#1E2021] z-10! border-r w-[150px] border-[#e2e6f2] text-center">Hisobchi</th>
+                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED]  dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2] text-center">№</th>
+                  <th className="p-3 text-xs w-[150px] sticky left-[60px] z-20! bg-[#7186ED]  dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2] text-start">Ism Sharifi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[100px] border-[#e2e6f2] dark:border-[#292A2A] text-start">Oy</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Oylik maosh</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">KPI bonus</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Jarima miqdori</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Jami miqdori</th>
+                  <th className="p-3 text-xs font-bold border-r w-[120px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Holati</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisoblangan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Tasdiqlangan vaqti</th>
+                  <th className="p-3 text-xs font-bold sticky right-0 bg-[#7186ED] dark:bg-[#1E2021] z-10! border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisobchi</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] " key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#1E2021]">
+                    <td className="p-3 text-xs text-slate-500 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#292A2A]">
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[60px] z-10! bg-slate-50 dark:bg-[#1E2021]">
-                      {item?.user?.first_name ? `${item.user.first_name} ${item.user.last_name || ''}` : item?.user?.username || item?.user?.name || 'Noma\'lum'}
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[60px] z-10! bg-slate-50 dark:bg-[#292A2A]">
+                      {item?.user || "-"}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {months.find(m => m.value === item?.month)?.label || item?.month || '-'}
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
+                      {dayjs(item?.month).format("DD.MM.YYYY") || '-'}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.salary || 0)}
+                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {formatNum(item?.fixed_salary) || "-"}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.kpi || 0)}
+                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {formatNum(item?.kpi_bonus) || "-"}
                     </td>
-                    <td className="p-3 text-xs font-bold text-red-500 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.penalty || 0)}
+                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {formatNum(item?.penalty_amount) || "-"}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {formatNum(item?.total_amount || 0)}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      <span className={`px-2 py-1 rounded-md text-[10px] font-bold ${item?.is_confirmed ? 'bg-green-100 text-green-600 dark:bg-green-900/30' : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30'}`}>
-                        {item?.is_confirmed ? 'Tasdiqlangan' : 'Hisoblangan'}
-                      </span>
+                      {item?.status || "-"}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}
+                      {dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') || '-'}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
                       {item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}
                     </td>
                     <td className="p-3 text-xs sticky right-0 bg-slate-50 dark:bg-[#1E2021] text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.accountant?.first_name ? `${item.accountant.first_name} ${item.accountant.last_name || ''}` : item?.accountant?.username || item?.accountant?.name || '-'}
+                      {item?.accountant || "-"}
                     </td>
                   </tr>
                 ))}

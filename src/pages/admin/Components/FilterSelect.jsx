@@ -12,7 +12,8 @@ const FilterSelect = ({
     error = false,
     padding = '6px 12px',
     radius = '12px',
-    placeholder
+    placeholder,
+    className
 }) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
@@ -89,7 +90,7 @@ const FilterSelect = ({
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323]! dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >

@@ -10,7 +10,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { LuCheckCheck } from "react-icons/lu";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang" }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang", param = {} }) => {
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const normalizeSelectedList = (list) => {
@@ -29,7 +29,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     // Ma'lumotlarni yuklash
     const getEmployee = async ({ search }) => {
 
-        const params = { search };
+        const params = { ...param, search };
 
         if (employee_role !== "all" && employee_role !== "tester") {
             params.roles = employee_role;

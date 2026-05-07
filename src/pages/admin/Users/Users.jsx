@@ -305,7 +305,10 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{u.name || u.username || '—'}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>{positions?.find(p => p.id === u.position_info?.id)?.name || '—'}</td>
-                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>
+                  <td
+                    className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}
+                    title={u?.roles?.map(r => Roles[r])?.join(', ')}
+                  >
                     {statuses(u.roles)}
                   </td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>

@@ -85,8 +85,9 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <FilterSelect
                                     value={f.status}
                                     onChange={v => set('status', v)}
-                                    options={["Holati", ...Object.values(Status)]}
+                                    options={Object.values(Status)}
                                     placeholder="Holatini tanlang"
+                                    padding="11px 11px"
                                 />
                             </div>
 
@@ -95,8 +96,9 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <FilterSelect
                                     value={f.position}
                                     onChange={v => set('position', v)}
-                                    options={["Lavozim", ...positions.map(p => p.name)]}
+                                    options={positions.map(p => p.name)}
                                     placeholder="Lavozimini tanlang"
+                                    padding="11px 11px"
                                 />
                             </div>
 
@@ -105,8 +107,9 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <FilterSelect
                                     value={f.region}
                                     onChange={v => set('region', v)}
-                                    options={["Viloyat", ...regions.map(e => e.name)]}
+                                    options={regions.map(e => e.name)}
                                     placeholder="Viloyat tanlang"
+                                    padding="11px 11px"
                                 />
                             </div>
 
@@ -115,9 +118,10 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <FilterSelect
                                     value={f.district}
                                     onChange={v => set('district', v)}
-                                    options={["Tuman", ...districts.map(e => e.name)]}
+                                    options={districts.map(e => e.name)}
                                     placeholder="Tuman tanlang"
                                     disabled={!f.region}
+                                    padding="11px 11px"
                                 />
                             </div>
 

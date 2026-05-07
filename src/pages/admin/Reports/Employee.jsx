@@ -694,7 +694,7 @@ const Employee = () => {
               className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && search.trim()) {
                   e.preventDefault();
                   handleSearch();
                 }
@@ -1110,66 +1110,66 @@ const Employee = () => {
         </div>
       ) : (
         <div
-          className="mt-6 overflow-auto h-[76vh] border border-slate-200 dark:border-[#292A2A]"
+          className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
           onScroll={handleMoreReportsScroll}
         >
           <table className="text-left border-collapse w-[4500px]">
             <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
               <tr>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2]">№</th>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[200px] left-[45px] z-10! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2]">Ism Sharifi</th>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[180px] left-[240px] z-10! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2] text-center">Lavozim</th>
-                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center">Viloyati</th>
-                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center">Tumani</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center">Telefon raqami</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center">Oylik maosh (UZS)</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center">Balans (UZS)</th>
-                <th colSpan={6} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2]">Loyihalar</th>
-                <th colSpan={8} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2]">Vazifalar</th>
-                <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2]">Yig'ilishlar</th>
-                <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2]">Xarajat so'rovlari (UZS)</th>
-                <th colSpan={3} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2]">Ish haqi (UZS)</th>
-                <th rowSpan={2} className="p-2 text-xs sticky right-0 z-10! bg-[#7186ED] font-bold border-r-1! text-center border-b border-[#e2e6f2]">Ishga kirgan vaqti</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r-1! border-[#e2e6f2] dark:border-[#292A2A]">№</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[200px] left-[45px] z-10! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r-1! border-[#e2e6f2] dark:border-[#292A2A]">Ism Sharifi</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[180px] left-[240px] z-10! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2] text-center dark:bg-[#1e2021] dark:border-[#292A2A]">Lavozim</th>
+                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Viloyati</th>
+                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Tumani</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Telefon raqami</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Oylik maosh (UZS)</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Balans (UZS)</th>
+                <th colSpan={6} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Loyihalar</th>
+                <th colSpan={8} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Vazifalar</th>
+                <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Yig'ilishlar</th>
+                <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Xarajat so'rovlari (UZS)</th>
+                <th colSpan={3} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Ish haqi (UZS)</th>
+                <th rowSpan={2} className="p-2 text-xs sticky right-0 z-10! bg-[#7186ED] font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:bg-[#1e2021]! dark:border-[#292A2A]">Ishga kirgan vaqti</th>
               </tr>
-              <tr className="bg-[#8999EF] text-[10px] text-center">
-                <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Tugatilgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jarayonda</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Bekor qilingan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Muddati o'tgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Rejalashtirilayotgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Qilish kerak</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jarayonda</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Muddati o'tgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Bajarilgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Ishga tushurilgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Tekshirilgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Rad etilgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Qatnashgan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Qatnashmaagan "sababli"</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Qatnashmagan "sababsiz"</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Kutilmoqda</th>
-                <th className="p-2 border-r border-[#e2e6f2]">To'landi</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Tasdiqlangan</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jami</th>
-                <th className="p-2 border-r border-[#e2e6f2]">KPI bonusi</th>
-                <th className="p-2 border-r border-[#e2e6f2]">Jarima miqdori</th>
+              <tr className="bg-[#8999EF] dark:bg-[#1E2021] text-[10px] text-center">
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Tugatilgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jarayonda</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Bekor qilingan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Muddati o'tgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Rejalashtirilayotgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Qilish kerak</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jarayonda</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Muddati o'tgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Bajarilgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Ishga tushurilgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Tekshirilgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Rad etilgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Qatnashgan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Qatnashmaagan "sababli"</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Qatnashmagan "sababsiz"</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Kutilmoqda</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">To'landi</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Tasdiqlangan</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">KPI bonusi</th>
+                <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jarima miqdori</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
               {UserReports.map((item, index) => (
                 <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
                   <td
-                    className="p-3 text-xs text-slate-500 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
+                    className="p-3 text-xs text-slate-500 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#292A2A]">
                     {index + 1}
                   </td>
-                  <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky left-[44px] z-10! bg-slate-50">
+                  <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky left-[44px] z-10! bg-slate-50 dark:bg-[#292A2A]">
                     {item.username}
                   </td>
-                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[243px] z-10! bg-slate-50">
+                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[243px] z-10! bg-slate-50 dark:bg-[#292A2A]!">
                     {item.position || "-"}
                   </td>
                   <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">{item.region || "-"}</td>
@@ -1224,7 +1224,7 @@ const Employee = () => {
                   <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
                     {Number(item?.report?.payroll_amount?.penalty_amount || 0).toLocaleString("uz-UZ")}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] dark:bg-white/5 sticky right-0 z-10! bg-slate-50!">
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] dark:bg-[#292A2A]! sticky right-0 z-10! bg-slate-50!">
                     {dayjs(item?.created_at || "2026-04-30T03:23:39+05:00").format('DD.MM.YYYY')}
                   </td>
                 </tr>
