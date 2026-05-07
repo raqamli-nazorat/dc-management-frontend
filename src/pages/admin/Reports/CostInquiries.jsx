@@ -688,7 +688,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-red-100 text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 text-sm font-semibold cursor-pointer dark:bg-[#222323]`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -1022,37 +1022,37 @@ const Employee = () => {
             className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
             onScroll={handleMoreReportsScroll}
           >
-            <table className="text-left border-collapse w-full min-w-[2000px]">
+            <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2]">№</th>
-                  <th className="p-3 text-xs w-[150px] sticky left-[40px] z-10! bg-[#7186ED] font-bold border-r border-[#e2e6f2]">Ism Sharifi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] sticky left-[140px] z-10! bg-[#7186ED] border-[#e2e6f2] text-center">Loyiha nomi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">Xarajat turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] text-end">Toifa</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Miqdori (UZS)</th>
-                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] text-end">To'lov turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] text-end">Holati</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">So'rov sababi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[190px] border-[#e2e6f2] text-end">So'ralgan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] text-end">To'langan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] text-center">Tasdiqlangan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] text-end">Hisobchi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] text-start">Bekor qilingan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] text-end">Bekor sababi</th>
-                  <th className="p-3 text-xs sticky right-0 z-10! w-[280px] bg-[#7186ED] font-bold border-l border-[#e2e6f2] text-end">Kart raqami</th>
+                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2]">№</th>
+                  <th className="p-3 text-xs w-[180px] sticky left-[40px] z-10! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2]">Ism Sharifi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] sticky left-[215px] z-10! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] border-[#e2e6f2] text-center">Loyiha nomi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Xarajat turi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Toifa</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Miqdori (UZS)</th>
+                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] dark:border-[#292A2A] text-end">To'lov turi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
+                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'rov sababi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[190px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'ralgan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] dark:border-[#292A2A] text-end">To'langan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Tasdiqlangan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisobchi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilingan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor sababi</th>
+                  <th className="p-3 text-xs w-[180px] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-l border-[#e2e6f2] text-end">Kart raqami</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
-                    <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
+                    <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:bg-[#252626] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[40px] z-10! bg-slate-50">{
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#252626] dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[40px] z-10! bg-slate-50">{
                       item.user}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[140px] z-10! bg-slate-50">{
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#252626] dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[215px] z-10! bg-slate-50">{
                       item.project || "-"}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
@@ -1061,22 +1061,22 @@ const Employee = () => {
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {cost_type.find((t) => t.value === item.type)?.label || '-'}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {Number(item.amount || 0).toLocaleString('uz-UZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-'}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? 'To\'langan' : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.reason || '-'}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-'}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
@@ -1087,13 +1087,13 @@ const Employee = () => {
                       {item.accountant ? item.accountant : '-'}
                     </td>
 
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-'}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
                       {item.cancel_reason || '-'}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-l border-[#e2e6f2] dark:border-[#292A2A] text-center sticky right-0 z-10! bg-slate-50">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-l border-[#e2e6f2] dark:border-[#292A2A] text-center">
                       {item.card_number ? String(item.card_number).replace(/\\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'}
                     </td>
                   </tr>
@@ -1123,6 +1123,7 @@ const Employee = () => {
           selectedList={filters.user ? filters.user.split(',') : []}
           onConfirm={handleSelectEmployeeConfirm}
           title="Xodimlar tanlang"
+          param={{ roles: "employee" }}
           onClose={() => setSelectEmployee(false)}
         />
       )}

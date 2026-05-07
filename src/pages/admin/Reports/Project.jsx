@@ -660,7 +660,7 @@ const Employee = () => {
               className="pl-8 pr-3 outline-none bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && search.trim()) {
                   e.preventDefault();
                   handleSearch();
                 }
@@ -905,28 +905,28 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2500px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2] text-center">№</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[100px] sticky left-[40px] z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2] text-start">Titul</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[200px] sticky left-[115px] z-20! bg-[#7186ED] font-bold border-r border-[#e2e6f2] text-end">Nomi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[250px] font-bold border-r border-[#e2e6f2] text-end">Ta'rifi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[180px] font-bold border-r border-[#e2e6f2] text-end">Muddati</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[120px] font-bold border-r border-[#e2e6f2] text-end">Holati</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] text-end">Boshqaruvchi bonusi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] text-end">Muallif</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] text-end">Boshqaruvchi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] text-end">Xodimlar</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] text-end">Sinovchilar</th>
-                  <th colSpan={8} className="py-2 px-3 text-xs font-bold border-b border-[#e2e6f2] text-center">Vazifalar</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-center">№</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[100px] sticky left-[40px] z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-start">Titul</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[200px] sticky left-[115px] z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-end">Nomi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[250px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Ta'rifi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[180px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muddati</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[120px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi bonusi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Xodimlar</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Sinovchilar</th>
+                  <th colSpan={8} className="py-2 px-3 text-xs font-bold border-b border-[#e2e6f2] dark:border-[#292A2A] text-center">Vazifalar</th>
                 </tr>
                 <tr>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Jami</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Qilish kerak</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Jarayonda</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Muddati o'tgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Bajarilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Ishga tushurilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Tekshirilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-t border-[#e2e6f2] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Rad etilgan</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#292A2A] min-w-[140px] max-w-[200px]">Jami</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Qilish kerak</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Jarayonda</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Muddati o'tgan</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Bajarilgan</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Ishga tushurilgan</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Tekshirilgan</th>
+                  <th className="py-2 px-3 text-xs font-bold border-t border-[#e2e6f2] text-center dark:border-[#292A2A] bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Rad etilgan</th> 
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
@@ -965,7 +965,7 @@ const Employee = () => {
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
                       {item?.testers_names || '-'}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 dark:bg-[#292A2A] border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
                       {item?.task_stats?.total || 0}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
