@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  XAxis, YAxis, CartesianGrid, Tooltip, LabelList, ResponsiveContainer
 } from 'recharts'
 import { useTheme } from '../../../context/ThemeContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -47,6 +47,13 @@ const PERIODS = [
   { label: '6 oy',  value: '6m' },
   { label: '1 yil', value: '1y' },
 ]
+
+const PERIOD_ALIASES = {
+  '1m': ['1m', 'month', '1_month'],
+  '3m': ['3m', 'quarter', '3_months'],
+  '6m': ['6m', 'half_year', '6_months'],
+  '1y': ['1y', 'year', '12_months'],
+}
 
 // ── Custom Tooltip ────────────────────────────────────────────
 function CustomTooltip({ active, payload, label, isDark }) {
@@ -95,9 +102,15 @@ export default function AnalyticsPage() {
   const { isDark } = useTheme()
   const [period, setPeriod] = useState('1m')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   // Stats
-  const [stats, setStats] = useState({ tasks: 0, projects: 0, meetings: 0, users: 0 })
+  const [stats, setStats] = useState({
+    tasks: 0,
+    projects: 0,
+    meetings: 0,
+    taskCompletionRate: 0,
+  })
 
   // Chart data
   const [taskData, setTaskData]       = useState([])
@@ -110,117 +123,80 @@ export default function AnalyticsPage() {
 
   const fetchAll = async () => {
     setLoading(true)
+    setError('')
     try {
-      await Promise.allSettled([
-        fetchTasks(),
-        fetchProjects(),
-        fetchMeetings(),
-        fetchUsers(),
+      const periodCandidates = PERIOD_ALIASES[period] ?? [period]
+      const paramCandidates = [
+        ...periodCandidates.map((v) => ({ period: v })),
+        ...periodCandidates.map((v) => ({ range: v })),
+      ]
+      let res = null
+      for (const params of paramCandidates) {
+        try {
+          const attempt = await axiosAPI.get('/users/me/period-statistics/', { params })
+          if ((attempt.data?.success ?? true) && attempt.data?.data) {
+            res = attempt
+            break
+          }
+        } catch {
+          // keyingi parametr varianti bilan davom etamiz
+        }
+      }
+      if (!res) {
+        throw new Error('No working period parameter')
+      }
+      const payload = res.data?.data ?? {}
+      const taskStats = payload.tasks ?? {}
+      const projectStats = payload.projects ?? {}
+      const meetingStats = payload.meetings ?? {}
+
+      setTaskData([
+        { name: 'Qilish kerak', value: taskStats.todo ?? 0 },
+        { name: 'Jarayonda', value: taskStats.in_progress ?? 0 },
+        { name: 'Bajarilgan', value: taskStats.done ?? 0 },
+        { name: 'Ishga tushurilgan', value: taskStats.production ?? 0 },
+        { name: 'Tekshirilgan', value: taskStats.checked ?? 0 },
+        { name: 'Rad etilgan', value: taskStats.rejected_tasks ?? 0 },
+        { name: "Muddati o'tgan", value: taskStats.overdue ?? 0 },
       ])
+
+      setProjectData([
+        { name: 'Tugatilgan', value: projectStats.completed ?? 0 },
+        { name: 'Jarayonda', value: projectStats.active ?? 0 },
+        { name: 'Bekor', value: projectStats.cancelled ?? 0 },
+        { name: 'Muddati', value: projectStats.overdue ?? 0 },
+        { name: 'Rejalashtirilgan', value: projectStats.planning ?? 0 },
+      ])
+
+      setMeetingData([
+        { name: 'Qatnashdi', value: meetingStats.attended ?? 0 },
+        { name: 'Sababli', value: meetingStats.with_reason ?? 0 },
+        { name: 'Sababsiz', value: meetingStats.unexcused ?? 0 },
+      ])
+
+      setStats({
+        tasks: taskStats.total ?? 0,
+        projects: projectStats.total ?? 0,
+        meetings: meetingStats.total ?? 0,
+        taskCompletionRate: taskStats.completion_rate ?? 0,
+      })
+    } catch {
+      setError("Analitika ma'lumotlarini yuklab bo'lmadi")
+      setTaskData([])
+      setProjectData([])
+      setMeetingData([])
     } finally {
       setLoading(false)
     }
-  }
-
-  const fetchTasks = async () => {
-    try {
-      const res = await axiosAPI.get('/tasks/', { params: { page_size: 200 } })
-      const payload = res.data?.data ?? res.data
-      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
-
-      const counts = {
-        'Bajarilishi kerak': 0,
-        'Jarayonda': 0,
-        'Bajarilgan': 0,
-        'Ishga tushirilgan': 0,
-        'Tekshirilgan': 0,
-        'Rad etilgan': 0,
-        "Muddati o'tgan": 0,
-      }
-      const statusMap = {
-        todo: 'Bajarilishi kerak',
-        in_progress: 'Jarayonda',
-        done: 'Bajarilgan',
-        production: 'Ishga tushirilgan',
-        checked: 'Tekshirilgan',
-        rejected: 'Rad etilgan',
-        overdue: "Muddati o'tgan",
-      }
-      list.forEach(t => {
-        const key = statusMap[t.status]
-        if (key) counts[key]++
-      })
-
-      setTaskData(Object.entries(counts).map(([name, value]) => ({ name, value })))
-      setStats(prev => ({ ...prev, tasks: list.length }))
-    } catch {}
-  }
-
-  const fetchProjects = async () => {
-    try {
-      const res = await axiosAPI.get('/projects/', { params: { page_size: 200 } })
-      const payload = res.data?.data ?? res.data
-      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
-
-      const counts = {
-        'Tugallangan': 0,
-        'Jarayonda': 0,
-        'Bekor': 0,
-        'Muddati': 0,
-        'Rejalashtirilgan': 0,
-      }
-      const statusMap = {
-        completed: 'Tugallangan',
-        active: 'Jarayonda',
-        cancelled: 'Bekor',
-        overdue: 'Muddati',
-        planning: 'Rejalashtirilgan',
-      }
-      list.forEach(p => {
-        const key = statusMap[p.status]
-        if (key) counts[key]++
-      })
-
-      setProjectData(Object.entries(counts).map(([name, value]) => ({ name, value })))
-      setStats(prev => ({ ...prev, projects: list.length }))
-    } catch {}
-  }
-
-  const fetchMeetings = async () => {
-    try {
-      const res = await axiosAPI.get('/meetings/', { params: { page_size: 200 } })
-      const payload = res.data?.data ?? res.data
-      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
-
-      // Yig'ilish qatnashish statistikasi
-      let attended = 0, excused = 0, unexcused = 0
-      list.forEach(m => {
-        if (m.is_completed) attended++
-        else unexcused++
-      })
-
-      setMeetingData([
-        { name: 'Qatnashdi',  value: attended  || list.length },
-        { name: 'Sababli',    value: excused },
-        { name: 'Sababsiz',   value: unexcused },
-      ])
-      setStats(prev => ({ ...prev, meetings: list.length }))
-    } catch {}
-  }
-
-  const fetchUsers = async () => {
-    try {
-      const res = await axiosAPI.get('/users/', { params: { page_size: 1 } })
-      const payload = res.data?.data ?? res.data
-      const count = Array.isArray(payload) ? payload.length : (payload.count ?? 0)
-      setStats(prev => ({ ...prev, users: count }))
-    } catch {}
   }
 
   // Recharts uchun ranglar
   const axisColor  = isDark ? '#474848' : '#E2E6F2'
   const textColor  = isDark ? '#8F95A8' : '#8F95A8'
   const gridColor  = isDark ? '#292A2A' : '#F1F3F9'
+  const projectMax = Math.max(20, ...projectData.map((item) => Number(item.value) || 0))
+  const projectTop = Math.ceil(projectMax / 5) * 5
+  const projectTicks = Array.from({ length: projectTop / 5 + 1 }, (_, i) => i * 5)
 
   return (
     <div className="flex flex-col gap-5">
@@ -244,6 +220,18 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <StatCard label="Vazifalar jami" value={stats.tasks} color={COLORS.primary} icon="📝" />
+        <StatCard label="Loyihalar jami" value={stats.projects} color={COLORS.amber} icon="📁" />
+        <StatCard label="Yig'ilishlar jami" value={stats.meetings} color={COLORS.green} icon="📅" />
+        <StatCard label="Vazifa bajarilish foizi" value={`${stats.taskCompletionRate}%`} color={COLORS.purple} icon="📈" />
+      </div>
+
+      {error ? (
+        <div className="rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] dark:bg-[#2A1D1D] dark:border-[#4C2B2B] dark:text-[#F8B4B4] px-4 py-3 text-sm">
+          {error}
+        </div>
+      ) : null}
 
       {/* ── Vazifalar Line Chart ── */}
       <ChartCard title="Vazifalar holati bo'yicha">
@@ -278,7 +266,15 @@ export default function AnalyticsPage() {
                 strokeWidth={2.5}
                 dot={{ fill: '#fff', stroke: COLORS.primary, strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: COLORS.primary }}
-              />
+              >
+                <LabelList
+                  dataKey="value"
+                  position="top"
+                  offset={8}
+                  fill={isDark ? '#D6DBEA' : '#5B647D'}
+                  fontSize={12}
+                />
+              </Line>
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -310,6 +306,8 @@ export default function AnalyticsPage() {
                   tick={{ fill: textColor, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
+                  domain={[0, projectTop]}
+                  ticks={projectTicks}
                   allowDecimals={false}
                 />
                 <Tooltip content={<CustomTooltip isDark={isDark} />} />

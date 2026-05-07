@@ -88,15 +88,18 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
                       Y
                     </div>
                     {/* Badge */}
-                    {n.read ? (
+                    {!n.read ? (
+                      <span
+                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FF7A45] flex items-center justify-center text-white font-semibold"
+                        style={{ fontSize: 11 }}
+                      >
+                        1
+                      </span>
+                    ) : (
                       <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#526ED3] flex items-center justify-center">
                         <MdCheck size={10} color="white" />
                       </span>
-                    ) : n.urgent ? (
-                      <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#E02D2D] flex items-center justify-center text-white font-bold" style={{ fontSize: 9 }}>
-                        !
-                      </span>
-                    ) : null}
+                    )}
                   </div>
 
                   {/* Content */}
