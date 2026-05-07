@@ -749,7 +749,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             {task.status === 'rejected' && (task.rejection_reason || (task.rejection_files && task.rejection_files.length > 0)) && (
               <div>
                 <label className="block text-sm font-extrabold text-[#1A1D2E] dark:text-white mb-2">Rad etilish sababi</label>
-                <div className="rounded-2xl border border-[#FECACA] dark:border-[#7F1D1D] bg-[#FFF5F5] dark:bg-[#1C0A0A] p-4 flex flex-col gap-3">
+                <div className="rounded-2xl border border-[#E2E6F2] dark:border-[#292A2A] bg-[#FFFFFF] dark:bg-[#1C0A0A] p-4 flex flex-col gap-3">
                   {/* Rejection files */}
                   {task.rejection_files && task.rejection_files.length > 0 && (
                     <div className="flex flex-wrap gap-2">
@@ -759,7 +759,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                           href={rf.file}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="relative w-16 h-16 rounded-xl border border-[#FECACA] dark:border-[#7F1D1D] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
+                          className="relative w-16 h-16 rounded-xl border 
+                          border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
                         >
                           {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
                             <img src={rf.file} alt="" className="w-full h-full object-cover" />
