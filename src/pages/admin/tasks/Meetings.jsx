@@ -10,11 +10,11 @@ import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
-const DURATION_UNITS = ['Daqiqa', 'Soat']
+const DURATION_UNITS = ['daqiqa', 'soat']
 
 /* -- helpers -- */
 const fmtDt = (iso) => {
-  if (!iso) return '�'
+  if (!iso) return ''
   try {
     const d = new Date(iso)
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -43,10 +43,10 @@ const fromIso = (iso) => {
     if (isNaN(d.getTime())) return { date: '', time: '' }
     // Local vaqtni ishlatamiz (UTC emas)
     const yyyy = d.getFullYear()
-    const mm   = String(d.getMonth() + 1).padStart(2, '0')
-    const dd   = String(d.getDate()).padStart(2, '0')
-    const hh   = String(d.getHours()).padStart(2, '0')
-    const min  = String(d.getMinutes()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    const hh = String(d.getHours()).padStart(2, '0')
+    const min = String(d.getMinutes()).padStart(2, '0')
     return { date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` }
   } catch { return { date: '', time: '' } }
 }
@@ -54,12 +54,12 @@ const fromIso = (iso) => {
 const durationToMinutes = (val, unit) => {
   const n = parseInt(val, 10)
   if (!n || isNaN(n)) return null
-  return unit === 'Soat' ? n * 60 : n
+  return unit === 'soat' ? n * 60 : n
 }
 
 const minutesToDisplay = (mins) => {
   if (!mins) return { val: '', unit: 'Daqiqa' }
-  if (mins >= 60 && mins % 60 === 0) return { val: String(mins / 60), unit: 'Soat' }
+  if (mins >= 60 && mins % 60 === 0) return { val: String(mins / 60), unit: 'soat' }
   return { val: String(mins), unit: 'Daqiqa' }
 }
 
@@ -75,7 +75,7 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-/* -- ProjectDropdown � real API -- */
+/* -- ProjectDropdown  real API -- */
 function ProjectDropdown({ value, onChange, error, projects = [] }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => p.id === value)
@@ -155,7 +155,7 @@ function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
   )
 }
 
-/* -- ParticipantsModal � real users API -- */
+/* -- ParticipantsModal  real users API -- */
 function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
   const [search, setSearch] = useState('')
   const [sel, setSel] = useState(new Set(selected.map(u => u.id ?? u)))
@@ -188,12 +188,12 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
             <button onClick={toggleAll}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E2E6F2] dark:border-[#292A2A]
                 text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
               Barchasini tanlash
             </button>
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Ism bo'yicha izlash"
                 className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs outline-none border border-[#E2E6F2] dark:border-[#292A2A]
@@ -289,12 +289,12 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 
   const validate = () => {
     const e = {}
-    if (!form.project)            e.project     = true
-    if (!form.title.trim())       e.title       = true
+    if (!form.project) e.project = true
+    if (!form.title.trim()) e.title = true
     if (!form.description.trim()) e.description = true
-    if (!form.link.trim())        e.link        = true
-    if (!form.date)               e.date        = true
-    if (!form.time)               e.time        = true
+    if (!form.link.trim()) e.link = true
+    if (!form.date) e.date = true
+    if (!form.time) e.time = true
     if (!form.durationVal || isNaN(parseInt(form.durationVal, 10))) e.durationVal = true
     setErrors(e)
     return Object.keys(e).length === 0
@@ -308,15 +308,15 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
     setLoading(true)
     try {
       const body = {
-        project:      form.project,
-        title:        form.title.trim(),
+        project: form.project,
+        title: form.title.trim(),
         is_completed: form.is_completed,
         participants: form.participants.map(u => u.id),
       }
       if (form.description.trim()) body.description = form.description.trim()
-      if (form.link.trim())        body.link         = form.link.trim()
+      if (form.link.trim()) body.link = form.link.trim()
       const fineNum = parseInt(form.fine, 10)
-      if (fineNum > 0)             body.penalty_percentage = String(fineNum)
+      if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = parseInt(form.durationVal, 10)
@@ -340,12 +340,12 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
           {/* -- Header (qotgan) -- */}
-          <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
+          <div className="px-7 pt-7 pb-3 shrink-0 ">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilish qo'shish</h2>
             </div>
-            <p className="text-sm text-[#8F95A8] ml-8">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
+            <p className="text-sm text-[#8F95A8] ">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
           {/* -- Scroll qilinadigan content -- */}
@@ -427,41 +427,44 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
             </div>
 
             <div>
-              <label className={labelCls}>Qatnashchilar</label>
-              {form.participants.length > 0 && (
-                <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 mb-2">
-                  {form.participants.map(u => (
-                    <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
-                      {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
-                      <button type="button" onMouseDown={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
-                        className="hover:opacity-70 cursor-pointer ml-0.5"><FaXmark size={9} /></button>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <button type="button" onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
-                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed text-sm transition-colors
+              <label className={labelCls}>Yig’ilish qatnashchilarini qo’shish</label>
+              <div className=' border border-[#E2E6F2] dark:border-[#292A2A] rounded-xl '>
+                {form.participants.length > 0 && (
+                  <div className="px-3 py-2.5  bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 mb-2">
+                    {form.participants.map(u => (
+                      <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
+                        {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
+                        <button type="button" onMouseDown={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
+                          className="hover:opacity-70 cursor-pointer ml-0.5"><FaXmark size={9} /></button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <button type="button" onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
+                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed text-sm transition-colors
                   ${!form.project || membersLoading
-                    ? 'border-[#E2E6F2] dark:border-[#292A2A] text-[#C2C8E0] dark:text-[#474848] cursor-default'
-                    : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer'}`}>
-                {membersLoading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                }
-                {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Qatnashchilarni qo'shish"}
-              </button>
+                      ? 'border-[#E2E6F2] dark:border-[#292A2A] text-[#C2C8E0] dark:text-[#474848] cursor-default'
+                      : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer'}`}>
+                  {membersLoading
+                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                  }
+                  {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Qatnashchilarni qo'shish"}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* -- Footer (qotgan) -- */}
-          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
-            <div className="flex items-center gap-2.5">
+          <div className="px-7 py-5 flex items-center justify-end gap-3 shrink-0 bg-white dark:bg-[#111111]">
+            
+            {/* <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
                 className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
-            </div>
+            </div> */}
             <div className="flex items-center gap-3">
               <button onClick={onClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
@@ -470,8 +473,8 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
               <button onClick={handleSubmit} disabled={loading}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 }
                 Qo'shish
               </button>
@@ -497,14 +500,14 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
   const { val: initDurVal, unit: initDurUnit } = minutesToDisplay(meeting.duration_minutes)
 
   const [form, setForm] = useState({
-    project:      meeting.project ?? null,
-    title:        meeting.title ?? '',
-    fine:         meeting.penalty_percentage ? String(Math.abs(parseFloat(meeting.penalty_percentage))) : '',
-    link:         meeting.link ?? '',
-    description:  meeting.description ?? '',
-    date:         initDate,
-    time:         initTime,
-    durationVal:  initDurVal,
+    project: meeting.project ?? null,
+    title: meeting.title ?? '',
+    fine: meeting.penalty_percentage ? String(Math.abs(parseFloat(meeting.penalty_percentage))) : '',
+    link: meeting.link ?? '',
+    description: meeting.description ?? '',
+    date: initDate,
+    time: initTime,
+    durationVal: initDurVal,
     durationUnit: initDurUnit,
     participants: meeting.participants_info ?? [],
     is_completed: meeting.is_completed ?? false,
@@ -521,8 +524,8 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
 
   const validate = () => {
     const e = {}
-    if (!form.project)      e.project = true
-    if (!form.title.trim()) e.title   = true
+    if (!form.project) e.project = true
+    if (!form.title.trim()) e.title = true
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -535,14 +538,14 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
     setLoading(true)
     try {
       const body = {
-        project:      form.project,
-        title:        form.title.trim(),
+        project: form.project,
+        title: form.title.trim(),
         participants: form.participants.map(u => u.id),
       }
       if (form.description.trim()) body.description = form.description.trim()
-      if (form.link.trim())        body.link         = form.link.trim()
+      if (form.link.trim()) body.link = form.link.trim()
       const fineNum = parseInt(form.fine, 10)
-      if (fineNum > 0)             body.penalty_percentage = String(fineNum)
+      if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
       const mins = durationToMinutes(form.durationVal, form.durationUnit)
@@ -550,7 +553,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
 
       await onSave(meeting.id, body)
 
-      // is_completed true bo'lsa � /close/ endpoint orqali yopamiz
+      // is_completed true bo'lsa  /close/ endpoint orqali yopamiz
       // faqat avval yopilmagan bo'lsa
       if (form.is_completed && !meeting.is_completed) {
         try {
@@ -653,7 +656,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                     placeholder="40"
                     className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
                   <span className="flex items-center px-2 text-xs text-[#5B6078] dark:text-[#C2C8E0] border-l border-[#E2E6F2] dark:border-[#292A2A] whitespace-nowrap">
-                    {form.durationUnit === 'Soat' ? 'Soat' : 'Daqiqa'}
+                    {form.durationUnit === 'soat' ? 'soat' : 'saqiqa'}
                   </span>
                 </div>
               </div>
@@ -675,7 +678,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               <button type="button" onClick={() => setShowParticipants(true)}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
                   text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer ">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
                 Qatnashchilarni qo'shish
               </button>
             </div>
@@ -698,7 +701,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               <button onClick={handleSubmit} disabled={loading}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                 {loading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                   : <FaCheck size={13} />
                 }
                 Saqlash
@@ -743,7 +746,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           <div>
             <label className={labelCls}>Loyiha</label>
             <div className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-              <span className="flex-1 truncate">{project?.title || '�'}</span>
+              <span className="flex-1 truncate">{project?.title || ''}</span>
               <FaChevronDown size={11} className="text-[#8F95A8] shrink-0 ml-2" />
             </div>
           </div>
@@ -752,7 +755,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Nomi</label>
               <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                {meeting.title || <span className="text-[#8F95A8]">�</span>}
+                {meeting.title || <span className="text-[#8F95A8]"></span>}
               </div>
             </div>
             <div>
@@ -760,7 +763,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
               <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
                 {meeting.penalty_percentage
                   ? `${Math.abs(parseFloat(meeting.penalty_percentage))} %`
-                  : <span className="text-[#8F95A8]">�</span>}
+                  : <span className="text-[#8F95A8]"></span>}
               </div>
             </div>
           </div>
@@ -770,15 +773,15 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
               {meeting.link
                 ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                    className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline truncate block">{meeting.link}</a>
-                : <span className="text-[#8F95A8]">�</span>}
+                  className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline truncate block">{meeting.link}</a>
+                : <span className="text-[#8F95A8]"></span>}
             </div>
           </div>
 
           <div>
             <label className={labelCls}>Tavsifi</label>
             <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] min-h-[80px] whitespace-pre-wrap text-[#1A1D2E] dark:text-white">
-              {meeting.description || <span className="text-[#8F95A8]">�</span>}
+              {meeting.description || <span className="text-[#8F95A8]"></span>}
             </div>
           </div>
 
@@ -786,25 +789,25 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className="col-span-2">
               <label className={labelCls}>Boshlanish sanasi</label>
               <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startDate ? startDate.split('-').reverse().join('.') : '�'}</span>
+                <span>{startDate ? startDate.split('-').reverse().join('.') : ''}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                  <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
               </div>
             </div>
             <div>
               <label className={labelCls}>Vaqti</label>
               <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startTime || '�'}</span>
+                <span>{startTime || ''}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                  <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                 </svg>
               </div>
             </div>
             <div>
               <label className={labelCls}>Davomiyligi</label>
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || '�'}</span>
+                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || ''}</span>
                 {meeting.duration_minutes && (
                   <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
                 )}
@@ -817,10 +820,10 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 min-h-[44px] items-start">
               {meeting.participants_info?.length > 0
                 ? meeting.participants_info.map(u => (
-                    <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
-                      {u.username}{u.position ? ` | ${u.position}` : ''}
-                    </span>
-                  ))
+                  <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
+                    {u.username}{u.position ? ` | ${u.position}` : ''}
+                  </span>
+                ))
                 : <span className="text-sm text-[#8F95A8]">Qatnashchilar yo'q</span>
               }
             </div>
@@ -847,14 +850,14 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
 /* -- FilterModal -- */
 function FilterModal({ onClose, onApply, initial, users, projects }) {
   const [organizer, setOrganizer] = useState(initial.organizer ?? '')
-  const [project,   setProject]   = useState(initial.project   ?? '')
-  const [status,    setStatus]    = useState(initial.status    ?? '')
-  const [dateFrom,  setDateFrom]  = useState(initial.dateFrom  ?? '')
-  const [dateTo,    setDateTo]    = useState(initial.dateTo    ?? '')
+  const [project, setProject] = useState(initial.project ?? '')
+  const [status, setStatus] = useState(initial.status ?? '')
+  const [dateFrom, setDateFrom] = useState(initial.dateFrom ?? '')
+  const [dateTo, setDateTo] = useState(initial.dateTo ?? '')
 
-  const orgDd  = useDropdown()
-  const prjDd  = useDropdown()
-  const stsDd  = useDropdown()
+  const orgDd = useDropdown()
+  const prjDd = useDropdown()
+  const stsDd = useDropdown()
 
   const reset = () => { setOrganizer(''); setProject(''); setStatus(''); setDateFrom(''); setDateTo('') }
 
@@ -862,7 +865,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
 
   const STATUS_OPTIONS = [
-    { label: 'Tugallangan',   value: 'true' },
+    { label: 'Tugallangan', value: 'true' },
     { label: 'Tugallanmagan', value: 'false' },
   ]
 
@@ -980,7 +983,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
           <button onClick={() => onApply({ organizer, project, status, dateFrom, dateTo })}
             className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             Qidirish
           </button>
@@ -1006,24 +1009,24 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
       <button onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
         className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[#8F95A8] cursor-pointer ">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+          <circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" />
         </svg>
       </button>
       {open && (
         <div className="absolute top-full right-0 mt-1 z-50 w-44 rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           <button onClick={() => { onDetail(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
             Ko'rish
           </button>
           <button onClick={() => { onEdit(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
             Tahrirlash
           </button>
           <button onClick={() => { onDelete(); setOpen(false) }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
             O'chirish
           </button>
         </div>
@@ -1038,20 +1041,20 @@ export default function MeetingsPage() {
   const { user } = useAuth()
   const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
 
-  const [data, setData]             = useState([])
-  const [loading, setLoading]       = useState(false)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [hasMore, setHasMore]       = useState(false)
-  const [page, setPage]             = useState(1)
-  const [search, setSearch]         = useState('')
-  const [filters, setFilters]       = useState({})
-  const [showAdd, setShowAdd]       = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [filters, setFilters] = useState({})
+  const [showAdd, setShowAdd] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
-  const [detail, setDetail]         = useState(null)
-  const [editItem, setEditItem]     = useState(null)
+  const [detail, setDetail] = useState(null)
+  const [editItem, setEditItem] = useState(null)
   const [meetingLoading, setMeetingLoading] = useState(false)
-  const [projects, setProjects]     = useState([])
-  const [users, setUsers]           = useState([])
+  const [projects, setProjects] = useState([])
+  const [users, setUsers] = useState([])
   const scrollRef = useRef(null)
 
   /* load projects & users once */
@@ -1060,23 +1063,23 @@ export default function MeetingsPage() {
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setProjects(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+      }).catch(() => { })
 
     axiosAPI.get('/users/', { params: { page_size: 200 } })
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setUsers(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+      }).catch(() => { })
   }, [])
 
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
-    if (q)           p.search         = q
-    if (f.organizer) p.organizer      = f.organizer
-    if (f.project)   p.project        = f.project
+    if (q) p.search = q
+    if (f.organizer) p.organizer = f.organizer
+    if (f.project) p.project = f.project
     if (f.status !== undefined && f.status !== '') p.is_completed = f.status
-    if (f.dateFrom)  p.start_date_gte = f.dateFrom
-    if (f.dateTo)    p.start_date_lte = f.dateTo
+    if (f.dateFrom) p.start_date_gte = f.dateFrom
+    if (f.dateTo) p.start_date_lte = f.dateTo
     return p
   }, [filters, search])
 
@@ -1087,7 +1090,7 @@ export default function MeetingsPage() {
       const res = await axiosAPI.get('/meetings/', { params: buildParams(f, q, pg) })
       const payload = res.data?.data ?? res.data
       const results = Array.isArray(payload) ? payload : (payload.results ?? [])
-      const next    = Array.isArray(payload) ? null : (payload.next ?? null)
+      const next = Array.isArray(payload) ? null : (payload.next ?? null)
       setData(prev => pg === 1 ? results : [...prev, ...results])
       setHasMore(!!next)
       setPage(pg)
@@ -1213,7 +1216,7 @@ export default function MeetingsPage() {
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" placeholder="Nomi bo'yicha izlash" value={search}
             onChange={e => handleSearch(e.target.value)}
@@ -1249,52 +1252,52 @@ export default function MeetingsPage() {
           <tbody>
             {loading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
-                    {[1,2,3,4,5,6,7,8,9].map(j => (
-                      <td key={j} className="px-4 py-3">
-                        <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(j => (
+                    <td key={j} className="px-4 py-3">
+                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
+                    </td>
+                  ))}
+                </tr>
+              ))
               : data.map((m, idx) => {
-                  const project = projects.find(p => p.id === m.project)
-                  const organizer = m.participants_info?.find(u => u.id === m.organizer) ?? m.participants_info?.[0]
-                  const { val: durVal, unit: durUnit } = minutesToDisplay(m.duration_minutes)
-                  return (
-                    <tr key={m.id}
-                      className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
-                      onClick={() => loadMeetingDetail(m.id, 'edit')}>
-                      <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
-                      <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '�'}</td>
-                      <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{organizer?.username || '�'}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{project?.title || '�'}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{fmtDt(m.start_time)}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">
-                        {durVal ? `${durVal} ${durUnit}` : '�'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${m.is_completed ? 'bg-[#22c55e]' : 'bg-[#EF4444]'}`}>
-                          {m.is_completed
-                            ? <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                            : <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                          }
-                        </span>
-                      </td>
-                      <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                        {!isAuditor && (
-                          <RowMenu
-                            onDetail={() => loadMeetingDetail(m.id, 'edit')}
-                            onEdit={() => loadMeetingDetail(m.id, 'edit')}
-                            onCloseMeeting={() => handleClose(m.id)}
-                            onDelete={() => handleDelete(m.id)}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })
+                const project = projects.find(p => p.id === m.project)
+                const organizer = m.participants_info?.find(u => u.id === m.organizer) ?? m.participants_info?.[0]
+                const { val: durVal, unit: durUnit } = minutesToDisplay(m.duration_minutes)
+                return (
+                  <tr key={m.id}
+                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
+                    onClick={() => loadMeetingDetail(m.id, 'edit')}>
+                    <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0]  font-medium">{idx + 1}</td>
+                    <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0]  font-medium">{m.uid || ''}</td>
+                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{organizer?.username || ''}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{project?.title || ''}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{fmtDt(m.start_time)}</td>
+                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">
+                      {durVal ? `${durVal} ${durUnit}` : ''}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${m.is_completed ? 'bg-[#22c55e]' : 'bg-[#EF4444]'}`}>
+                        {m.is_completed
+                          ? <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                          : <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                        }
+                      </span>
+                    </td>
+                    <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                      {!isAuditor && (
+                        <RowMenu
+                          onDetail={() => loadMeetingDetail(m.id, 'edit')}
+                          onEdit={() => loadMeetingDetail(m.id, 'edit')}
+                          onCloseMeeting={() => handleClose(m.id)}
+                          onDelete={() => handleDelete(m.id)}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                )
+              })
             }
           </tbody>
         </table>
@@ -1309,8 +1312,8 @@ export default function MeetingsPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>
@@ -1335,8 +1338,8 @@ export default function MeetingsPage() {
       {meetingLoading && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
           <svg className="animate-spin w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
         </div>
       )}
