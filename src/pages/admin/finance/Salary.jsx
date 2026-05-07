@@ -6,6 +6,7 @@ import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { DateTimeBox } from '../Components/DateTimeBox'
+import { useAuth } from '../../../context/AuthContext'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
@@ -350,7 +351,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
               <FaXmark size={13} /> {user.is_confirmed ? 'Yopish' : 'Bekor qilish'}
             </button>
-            {!user.is_confirmed && (
+            {!user.is_confirmed && onApprove && (
               <button onClick={() => setShowConfirm(true)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer
                   bg-green-500 text-white hover:bg-green-600">
@@ -375,6 +376,9 @@ function UserDetailModal({ user, onClose, onApprove }) {
 
 // -- Main Page -------------------------------------------------
 export default function SalaryPage() {
+  const { user } = useAuth()
+  const isAccountant = user?.active_role === 'accountant'
+
   const [search, setSearch] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -396,8 +400,8 @@ export default function SalaryPage() {
     else setLoadingMore(true)
     try {
       const params = { page: pg, page_size: 20 }
-      if (q)                     params.search              = q
-      if (f.month)               params.month               = monthToApi(f.month)
+      if (q) params.search = q
+      if (f.month) params.month = monthToApi(f.month)
       if (f.created_at__date__gte) {
         const t = f.created_at__time__gte || '00:00'
         params.created_at__gte = `${f.created_at__date__gte}T${t}:00`
@@ -406,8 +410,8 @@ export default function SalaryPage() {
         const t = f.created_at__time__lte || '00:00'
         params.created_at__lte = `${f.created_at__date__lte}T${t}:59`
       }
-      if (f.total_amount__gte)   params.total_amount__gte   = f.total_amount__gte
-      if (f.total_amount__lte)   params.total_amount__lte   = f.total_amount__lte
+      if (f.total_amount__gte) params.total_amount__gte = f.total_amount__gte
+      if (f.total_amount__lte) params.total_amount__lte = f.total_amount__lte
       if (f.penalty_amount__gte) params.penalty_amount__gte = f.penalty_amount__gte
       if (f.penalty_amount__lte) params.penalty_amount__lte = f.penalty_amount__lte
       const { results, next } = await apiGetPayrolls(params)
@@ -492,7 +496,7 @@ export default function SalaryPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
-          {selecting ? (
+          {isAccountant && (selecting ? (
             <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
               className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
@@ -505,7 +509,7 @@ export default function SalaryPage() {
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
               Tanlash
             </button>
-          )}
+          ))}
         </div>
 
         {/* Filters + Tooltip */}
@@ -576,7 +580,7 @@ export default function SalaryPage() {
                 <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Jami miqdori (UZS)</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Yaratilgan vaqt</th>
                 <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">Tasdiqlanish</th>
-              </tr> 
+              </tr>
             </thead>
             <tbody>
               {data.map((u, idx) => (
@@ -613,8 +617,8 @@ export default function SalaryPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>
@@ -622,7 +626,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Selection bar */}
-      {selecting && selected.size > 0 && (
+      {isAccountant && selecting && selected.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
@@ -637,7 +641,7 @@ export default function SalaryPage() {
       {/* Modals */}
       {showConfirm && <ConfirmModal onCancel={() => setShowConfirm(false)} onConfirm={() => handleApprove(selected)} />}
       {showFilter && <SalaryFilterModal initial={filters} onClose={() => setShowFilter(false)} onApply={handleApplyFilter} />}
-      {detailUser && <UserDetailModal user={detailUser} onClose={() => setDetailUser(null)} onApprove={handleApprove} />}
+      {detailUser && <UserDetailModal user={detailUser} onClose={() => setDetailUser(null)} onApprove={isAccountant ? handleApprove : null} />}
     </div>
   )
 }

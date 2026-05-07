@@ -122,7 +122,7 @@ export default function PaymentsPage() {
   const isEmployee = roles.includes('employee')
   const isManager = roles.includes('manager')
   const isAdmin = roles.includes('admin') || roles.includes('superadmin')
-  const isAccountant = roles.includes('accountant')
+  const isAccountant = activeRole === 'accountant'
   const isAuditor = activeRole === 'auditor' || (roles.includes('auditor') && !activeRole)
 
   // employee → my_requests=true majburiy; qolganlar → false (hammasi ko'rinadi)

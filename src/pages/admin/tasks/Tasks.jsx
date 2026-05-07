@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -65,7 +65,7 @@ const ALLOWED_TRANSITIONS = {
   in_progress: ['todo', 'done', 'checked'],
   done:        ['in_progress', 'production', 'checked'],
   production:  ['rejected', 'checked'],
-  checked:    ['done', 'production'],
+  checked:    ['done', 'production', 'rejected'],
   rejected:    [],
   overdue:     ['in_progress'],
   cancelled:   [],
@@ -124,7 +124,9 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
     ? `${estimatedH ? estimatedH + 'h ' : ''}${estimatedM ? estimatedM + 'min' : ''}`.trim()
     : null
 
-  const showCountdown = deadline && !isOverdue && (deadline - now) < 86400000
+  const showCountdown = deadline && !isOverdue &&
+    (card.status === 'todo' || card.status === 'in_progress') &&
+    (deadline - now) < 86400000
   // drag paytida countdown to'xtatiladi — re-render bo'lmasin
   const countdown = useCountdown(showCountdown ? card.deadline : null, isDraggingGlobal)
 
@@ -242,35 +244,55 @@ function RejectionModal({ task, onClose, onConfirm }) {
   const [reason, setReason] = useState('')
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(false)
+  const [reasonError, setReasonError] = useState(false)
+  const [filesError, setFilesError] = useState(false)
   const fileRef = useRef(null)
 
   const handleSubmit = async () => {
+    // Ikkalasi ham majburiy
+    let hasError = false
+    if (!reason.trim()) { setReasonError(true); hasError = true }
+    if (files.length === 0) { setFilesError(true); hasError = true }
+    if (hasError) return
+
     setLoading(true)
     try {
-      // 1. change-status endpoint orqali rejected + sabab
+      // 1. Avval status o'zgartirish + sabab
       await axiosAPI.patch(`/tasks/${task.id}/change-status/`, {
         status: 'rejected',
-        rejection_reason: reason.trim() || undefined,
+        rejection_reason: reason.trim(),
       })
 
-      // 2. Fayllarni yuklash (task-rejection-files)
-      if (files.length > 0) {
-        await Promise.allSettled(
-          files.map(f => {
-            const fd = new FormData()
-            fd.append('task', task.id)
-            fd.append('file', f.file)
-            return axiosAPI.post('/task-rejection-files/', fd, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-            })
+      // 2. Status rejected bo'lgandan keyin fayllarni ketma-ket yuklash
+      for (let i = 0; i < files.length; i++) {
+        const fd = new FormData()
+        fd.append('task', task.id)
+        fd.append('file', files[i].file)
+        try {
+          await axiosAPI.post('/task-rejection-files/', fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
           })
-        )
+        } catch (fileErr) {
+          const msg = fileErr?.response?.data?.error?.errorMsg
+            || fileErr?.response?.data?.detail
+            || 'Yuklashda xatolik'
+          toast.error(`"${files[i]?.file?.name || 'fayl'}" yuklanmadi`, msg)
+        }
       }
 
       onConfirm()
+      toast.success('Rad etildi', 'Vazifa muvaffaqiyatli rad etildi')
     } catch (err) {
+      const details = err?.response?.data?.error?.details
       const msg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || 'Xatolik yuz berdi'
-      toast.error('Xatolik', msg)
+      if (Array.isArray(details) && details.length > 0) {
+        toast.error('Xatolik', details[0])
+      } else if (details && typeof details === 'object') {
+        const msgs = Object.entries(details).map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`).join('\n')
+        toast.error('Xatolik', msgs || msg)
+      } else {
+        toast.error('Xatolik', msg)
+      }
     } finally {
       setLoading(false)
     }
@@ -291,7 +313,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
 
         {/* Fayllar */}
         <div>
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-1">
             {files.map((f, i) => (
               <div key={i} className="relative w-16 h-16 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
                 {f.preview
@@ -301,14 +323,17 @@ function RejectionModal({ task, onClose, onConfirm }) {
                     <span className="text-[8px] text-[#5B6078] truncate w-full text-center">{f.file.name}</span>
                   </div>
                 }
-                <button type="button" onClick={() => setFiles(p => p.filter((_, j) => j !== i))}
+                <button type="button" onClick={() => { setFiles(p => p.filter((_, j) => j !== i)); setFilesError(false) }}
                   className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
                   <FaXmark size={8} />
                 </button>
               </div>
             ))}
             <button type="button" onClick={() => fileRef.current?.click()}
-              className="w-16 h-16 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-0.5 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors">
+              className={`w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors
+                ${filesError
+                  ? 'border-red-500 text-red-500'
+                  : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3]'}`}>
               <FaPaperclip size={14} />
               <span className="text-[9px]">Rasm</span>
             </button>
@@ -319,21 +344,27 @@ function RejectionModal({ task, onClose, onConfirm }) {
                   preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
                 }))
                 setFiles(p => [...p, ...added])
+                setFilesError(false)
                 e.target.value = ''
               }} />
           </div>
+          {filesError && <p className="text-xs text-red-500 mt-0.5">*Kamida bitta fayl yuklang</p>}
         </div>
 
         {/* Sabab */}
-        <textarea
-          value={reason}
-          onChange={e => setReason(e.target.value)}
-          placeholder="Sababini yozing..."
-          rows={4}
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
-            bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#B6BCCB] dark:placeholder-[#474848]
-            border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]"
-        />
+        <div>
+          <textarea
+            value={reason}
+            onChange={e => { setReason(e.target.value); if (e.target.value.trim()) setReasonError(false) }}
+            placeholder="Sababini yozing..."
+            rows={4}
+            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
+              bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#B6BCCB] dark:placeholder-[#474848]
+              focus:border-[#526ED3] transition-colors
+              ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}
+          />
+          {reasonError && <p className="text-xs text-red-500 mt-0.5">*Sabab kiritish majburiy</p>}
+        </div>
 
         <div className="flex items-center justify-end gap-3">
           <button onClick={onClose}
@@ -622,12 +653,8 @@ export default function TasksPage() {
       return
     }
 
-    // rejected ga tushganda — sabab so'rash (faqat production dan)
+    // rejected ga tushganda — sabab so'rash
     if (newStatus === 'rejected') {
-      if (draggedCard?.status !== 'production' && srcStatus !== 'production') {
-        toast.error("Rad etib bo'lmaydi", "Faqat 'Ishga tushirilgan' holatidagi vazifanigina rad etish mumkin.")
-        return
-      }
       setRejectionPending({ taskId, draggableId, sourceColId: srcStatus })
       return
     }
@@ -762,6 +789,10 @@ export default function TasksPage() {
               await handleEdit(id, body)
               loadKanbanTasks(filters, search)
             }}
+            onDelete={canEdit ? async () => {
+              await handleDelete(editTask.id)
+              setEditTask(null)
+            } : undefined}
           />
         )}
         {rejectionPending && (
@@ -930,6 +961,10 @@ export default function TasksPage() {
             await handleEdit(id, body)
             loadTasks(filters, search, 1)
           }}
+          onDelete={canEdit ? async () => {
+            await handleDelete(editTask.id)
+            setEditTask(null)
+          } : undefined}
         />
       )}
 

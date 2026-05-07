@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from 'react-icons/fa6'
 import { LuFilter, LuLayoutGrid, LuLayoutList } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -21,7 +21,7 @@ const STATUS_LABEL = {
 }
 
 const fmtDt = (iso) => {
-  if (!iso) return '—'
+  if (!iso) return '�'
   try {
     const d = new Date(iso)
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -38,8 +38,8 @@ const EMPLOYEES = [
   { name: 'Olimjon Isayev', role: 'UI/UX dizayner' },
   { name: 'Malika Tashkentova', role: 'Mahsulot menejeri' },
   { name: 'Lazizbek Rahimov', role: 'Mobil dasturchi' },
-  { name: 'Марк Леонидов', role: 'Dizayner' },
-  { name: 'Марина Иванова', role: 'Dasturchi' },
+  { name: '???? ????????', role: 'Dizayner' },
+  { name: '?????? ???????', role: 'Dasturchi' },
   { name: 'Jasur Karimov', role: 'PM' },
   { name: 'Nilufar Yusupova', role: 'Dasturchi' },
 ]
@@ -61,7 +61,7 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-/* ── SimpleSelect (filter uchun) ── */
+/* -- SimpleSelect (filter uchun) -- */
 function SimpleSelect({ value, onChange, options, placeholder }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -93,7 +93,7 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
   )
 }
 
-/* ── FilterModal ── */
+/* -- FilterModal -- */
 function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
@@ -264,7 +264,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   )
 }
 
-/* ── UserPickerModal — figmadagi xodim tanlash modali ── */
+/* -- UserPickerModal � figmadagi xodim tanlash modali -- */
 function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   const [search, setSearch] = useState('')
   const [temp, setTemp] = useState(selected.map(u => u.id))
@@ -357,7 +357,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 {/* Info */}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || '—'}</p>
+                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || '�'}</p>
                 </div>
               </button>
             )
@@ -385,7 +385,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   )
 }
 
-/* ── SelectedUsersField — tanlangan xodimlarni ko'rsatish ── */
+/* -- SelectedUsersField � tanlangan xodimlarni ko'rsatish -- */
 function SelectedUsersField({ label, selected, onOpen, onRemove }) {
   return (
     <div>
@@ -419,7 +419,7 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
   )
 }
 
-/* ── MultiSelect ── */
+/* -- MultiSelect -- */
 function MultiSelect({ placeholder, options, selected, onChange }) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
@@ -488,7 +488,7 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
   )
 }
 
-/* ── AddProjectModal ── */
+/* -- AddProjectModal -- */
 function AddProjectModal({ onClose, onAdd }) {
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
@@ -773,7 +773,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Muddat sanasi</label>
                 <DateTimeBox
                   type="date"
-                  placeholder="KK/OO/YYYY"
+                  placeholder="kk.oo.yyyy"
                   value={form.deadline}
                   onChange={v => set('deadline', v)}
                 />
@@ -840,7 +840,7 @@ function AddProjectModal({ onClose, onAdd }) {
   )
 }
 
-/* ── DeleteConfirmModal ── */
+/* -- DeleteConfirmModal -- */
 function DeleteConfirmModal({ project, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -877,19 +877,19 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
   )
 }
 
-/* ── DetailModal ── */
+/* -- DetailModal -- */
 function DetailModal({ project, onClose }) {
   const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
   const fmtNum = (val) => {
-    if (!val) return '—'
+    if (!val) return '�'
     const n = Math.abs(Number(String(val).replace(/[\s,]/g, '')))
-    if (isNaN(n) || n === 0) return '—'
+    if (isNaN(n) || n === 0) return '�'
     return n.toLocaleString('ru-RU') + ' UZS'
   }
 
   const fmtDtFull = (iso) => {
-    if (!iso) return '—'
+    if (!iso) return '�'
     try {
       const d = new Date(iso)
       return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -908,13 +908,13 @@ function DetailModal({ project, onClose }) {
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || '—'}</p>
+        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || '�'}</p>
       </div>
     )
   }
 
   function UserCard({ label, info }) {
-    if (!info) return <InfoRow label={label} value="—" />
+    if (!info) return <InfoRow label={label} value="�" />
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-1.5">{label}</p>
@@ -989,8 +989,8 @@ function DetailModal({ project, onClose }) {
           <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8F9FC] dark:bg-[#191A1A]">
             <InfoRow label="Loyiha narxi" value={fmtNum(project.project_price)} />
             <InfoRow label="Menejer bonusi" value={fmtNum(project.manager_bonus)} />
-            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : '—'} />
-            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : '—'} />
+            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : '�'} />
+            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : '�'} />
           </div>
 
           {/* Xodimlar */}
@@ -1002,7 +1002,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">—</p>}
+            ) : <p className="text-sm text-[#8F95A8]">�</p>}
           </div>
 
           {/* Sinovchilar */}
@@ -1014,7 +1014,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">—</p>}
+            ) : <p className="text-sm text-[#8F95A8]">�</p>}
           </div>
 
           {/* Vaqtlar */}
@@ -1039,7 +1039,7 @@ function DetailModal({ project, onClose }) {
     </div>
   )
 }
-/* ── EditProjectModal ── */
+/* -- EditProjectModal -- */
 function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
@@ -1251,7 +1251,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
                 <label className={labelCls}>Muddat sanasi</label>
                 <DateTimeBox
                   type="date"
-                  placeholder="KK/OO/YYYY"
+                  placeholder="kk.oo.yyyy"
                   value={form.deadline}
                   onChange={v => set('deadline', v)}
                 />
@@ -1306,7 +1306,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
 }
 
 
-/* ── RowMenu ── */
+/* -- RowMenu -- */
 function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -1355,7 +1355,7 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
   )
 }
 
-/* ── Main Page ── */
+/* -- Main Page -- */
 export default function ProjectsPage() {
   const { registerAction, clearAction } = usePageAction()
   const { user } = useAuth()
@@ -1548,7 +1548,7 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* ── CARD VIEW ── */}
+      {/* -- CARD VIEW -- */}
       {viewMode === 'card' ? (
         <div className="flex-1 overflow-auto">
           {loading ? (
@@ -1611,7 +1611,7 @@ export default function ProjectsPage() {
                           {(p.manager_info?.username || '?').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || '—'}</p>
+                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || '�'}</p>
                           <p className="text-[10px] text-[#8F95A8]">Menejer</p>
                         </div>
                       </div>
@@ -1644,7 +1644,7 @@ export default function ProjectsPage() {
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">?</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Menejer</span>
@@ -1673,10 +1673,10 @@ export default function ProjectsPage() {
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{p.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || '—'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || '�'}</td>
                   <td className="px-4 py-3 text-right">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]`}>
-                      {STATUS_LABEL[p.status] || p.status || '—'}
+                      {STATUS_LABEL[p.status] || p.status || '�'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>

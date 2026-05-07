@@ -340,7 +340,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
     if (!iso) return ''
     const [y, m, d] = iso.split('-')
     if (!y || !m || !d) return iso
-    return `${d}/${m}/${y}`
+    return `${d}.${m}.${y}`
   }
 
   const [dateDisplay, setDateDisplay] = useState(isoToDisplay(value))
@@ -355,8 +355,8 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
   const handleDateInput = (raw) => {
     const digits = raw.replace(/\D/g, '').slice(0, 8)
     let formatted = digits
-    if (digits.length > 2) formatted = digits.slice(0, 2) + '/' + digits.slice(2)
-    if (digits.length > 4) formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4)
+    if (digits.length > 2) formatted = digits.slice(0, 2) + '.' + digits.slice(2)
+    if (digits.length > 4) formatted = digits.slice(0, 2) + '.' + digits.slice(2, 4) + '.' + digits.slice(4)
     setDateDisplay(formatted)
 
     if (digits.length === 8) {
@@ -371,7 +371,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
       const dd = String(d).padStart(2, '0')
       const mm = String(m).padStart(2, '0')
       const yyyy = String(y).padStart(4, '0')
-      setDateDisplay(`${dd}/${mm}/${yyyy}`)
+      setDateDisplay(`${dd}.${mm}.${yyyy}`)
       onChange(`${yyyy}-${mm}-${dd}`)
     } else if (digits.length === 0) {
       onChange('')
@@ -487,7 +487,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
         value={dateDisplay}
         onChange={e => handleDateInput(e.target.value)}
         onBlur={handleDateBlur}
-        placeholder={placeholder || 'KK/OO/YYYY'}
+        placeholder={placeholder || 'kk.oo.yyyy'}
         disabled={disabled}
         maxLength={10}
         className={inputCls}

@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
 import { labelCls } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
@@ -106,7 +106,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
 
 function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const [search, setSearch] = useState("")
-  // Bitta tanlash — selected[0] yoki null
+  // Bitta tanlash � selected[0] yoki null
   const [temp, setTemp] = useState(selected?.length > 0 ? selected[0] : null)
   const filtered = users.filter(u =>
     (u.username ?? "").toLowerCase().includes(search.toLowerCase())
@@ -148,7 +148,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || "—"}</p>
+                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || "�"}</p>
                 </div>
               </button>
             )
@@ -179,7 +179,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // project-shorts — tezroq endpoint (faqat ro'yxat uchun)
+    // project-shorts � tezroq endpoint (faqat ro'yxat uchun)
     axiosAPI.get("/project-shorts/", { params: { page_size: 200 } })
       .then(res => {
         const payload = res.data?.data ?? res.data
@@ -232,7 +232,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   }
 
   // Topshiruvchi uchun foydalanuvchilar ro'yxati
-  // projectEmployees bo'sh bo'lsa — allUsers ni ko'rsatamiz
+  // projectEmployees bo'sh bo'lsa � allUsers ni ko'rsatamiz
 
   // Narxni formatlash: raqam va nuqta, max 12 xona, minglik ajratgich
   const formatPrice = (val) => {
@@ -243,7 +243,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
     return dec !== undefined ? `${formatted}.${dec}` : formatted
   }
 
-  // Foiz: 0–100
+  // Foiz: 0�100
   const handlePenalty = (val) => {
     const digits = val.replace(/\D/g, '')
     if (digits === '') { set('penalty_percentage', ''); return }
@@ -251,7 +251,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
     set('penalty_percentage', String(num))
   }
 
-  // Sprint: 1–10
+  // Sprint: 1�10
   const handleSprint = (val) => {
     const digits = val.replace(/\D/g, '')
     if (digits === '') { set('sprint', ''); return }
@@ -348,7 +348,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
-          {/* ── Header (qotgan) ── */}
+          {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -357,7 +357,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <p className="text-sm text-[#5B6078] ml-8">Yangi vazifa yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
-          {/* ── Scroll qilinadigan content ── */}
+          {/* -- Scroll qilinadigan content -- */}
           <div className="flex-1 overflow-y-auto px-7 py-4 pb-6 flex flex-col gap-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
 
             {/* Loyiha + Nomi */}
@@ -418,7 +418,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <div className="grid grid-cols-2 gap-4">
               <SelectDropdown label="Lavozim" value={form.position} onChange={v => set("position", v)} options={positionOptions} placeholder="Lavozim tanlang" />
               <div>
-                <label className={labelCls}>Sprint raqami <span className="text-[#8F95A8] font-normal">(1–10)</span></label>
+                <label className={labelCls}>Sprint raqami </label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -445,7 +445,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 />
               </div>
               <div>
-                <label className={labelCls}>Jarima foizi (%) <span className="text-[#8F95A8] font-normal">(0–100)</span></label>
+                <label className={labelCls}>Jarima foizi (%) </label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -464,7 +464,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 <div className="grid grid-cols-2 gap-2">
                   <DateTimeBox
                     type="date"
-                    placeholder="KK/OO/YYYY"
+                    placeholder="kk.oo.yyyy"
                     value={form.deadline}
                     onChange={v => set("deadline", v)}
                     dropUp
@@ -544,7 +544,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
           </div>
 
-          {/* ── Footer (qotgan) ── */}
+          {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">

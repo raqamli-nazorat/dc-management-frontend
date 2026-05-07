@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -132,15 +132,15 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-        {/* X tugmasi */}
-        <button onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
+      {/* X tugmasi */}
+      <button onClick={onClose}
+        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
             bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
-          <FaXmark size={14} />
-        </button>
+        <FaXmark size={14} />
+      </button>
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
 
-      
+
 
         <div className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-3 mb-1">
@@ -221,16 +221,16 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-       <button onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
+      <button onClick={onClose}
+        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
             bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
-          <FaXmark size={14} />
-        </button>
+        <FaXmark size={14} />
+      </button>
 
       <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] max-h-[90vh] overflow-y-auto">
 
         {/* X tugmasi */}
-       
+
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center">
           <div className="flex items-center gap-3">
@@ -452,16 +452,16 @@ export default function FinanceHistoryPage() {
             </thead>
             <tbody>
               {data.map((h, idx) => (
-                  <tr key={h.id} onClick={() => handleRowClick(h)}
-                    className="border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{h.user_info?.username ?? ''}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || ''}</td>
-                    <td className="px-4 py-3 text-right font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(h.amount)}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(h.transaction_type)}</td>
-                    <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(h.created_at)}</td>
+                <tr key={h.id} onClick={() => handleRowClick(h)}
+                  className="border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{idx + 1}</td>
+                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-[#FFFFFF]">{h.user_info?.username ?? ''}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{h.description || ''}</td>
+                  <td className="px-4 py-3 text-right font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">{fmt(h.amount)}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-[#FFFFFF]">{typeLabel(h.transaction_type)}</td>
+                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-[#FFFFFF]">{fmtDate(h.created_at)}</td>
 
-                  </tr>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -469,8 +469,8 @@ export default function FinanceHistoryPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>

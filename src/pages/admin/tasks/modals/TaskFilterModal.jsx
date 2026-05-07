@@ -472,19 +472,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           </div>
 
           {/* Footer */}
-          <div className="px-7 py-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Mening vazifalarim</span>
-              <button
-                type="button"
-                onClick={() => set('myTasks', !f.myTasks)}
-                className={`relative w-10 h-5 rounded-full  cursor-pointer
-                  ${f.myTasks ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
-              >
-                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
-                  ${f.myTasks ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
+          <div className="px-7 py-5 flex items-center justify-end">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setF({ ...TASK_EMPTY_FILTER })}
