@@ -352,7 +352,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             title="Analitika"
             className={iconBtn(location.pathname.includes('analytics'))}
           >
-            <img src="/imgs/dashboard-square-03.svg" alt="analytics" className="w-4 h-4" />
+            <img src="/imgs/dashboard-square-03.svg" alt="analytics" className="w-4 h-4 dark:invert dark:brightness-0" />
           </button>
         ) : (
           <NavLink
@@ -364,7 +364,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
             ].join(' ')}
           >
-            <img src="/imgs/dashboard-square-03.svg" alt="" className="w-4 h-4 shrink-0 opacity-70" />
+            <img src="/imgs/dashboard-square-03.svg" alt="" className="w-4 h-4 shrink-0 opacity-70 dark:invert dark:brightness-0 dark:opacity-100" />
             <span>Analitika</span>
           </NavLink>
         )}

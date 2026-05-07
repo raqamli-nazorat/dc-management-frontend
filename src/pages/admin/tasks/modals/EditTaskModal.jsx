@@ -245,6 +245,20 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   // New files to upload after save
   const [newAttachments, setNewAttachments] = useState([])
   const fileInputRef = useRef(null)
+  const normalizePercentInput = (val) => {
+    const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+    if (!cleaned) return ''
+    const firstDot = cleaned.indexOf('.')
+    const normalized = firstDot === -1
+      ? cleaned
+      : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+    const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+    const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+    const num = Number(limited)
+    if (Number.isNaN(num)) return ''
+    return String(Math.min(100, Math.max(0, num)))
+  }
 
   useEffect(() => {
     // project-shorts — tezroq endpoint (faqat ro'yxat uchun)
@@ -377,9 +391,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const handlePenalty = (val) => {
-    const digits = val.replace(/\D/g, '')
-    if (!digits) { set('penalty_percentage', ''); return }
-    set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+    set('penalty_percentage', normalizePercentInput(val))
   }
 
   const handleSprint = (val) => {
@@ -614,7 +626,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%) <span className="text-[#8F95A8] font-normal">(0–100)</span></label>
-                <input type="text" inputMode="numeric" value={form.penalty_percentage}
+                <input type="text" inputMode="decimal" value={form.penalty_percentage}
                   onChange={e => !ro && handlePenalty(e.target.value)}
                   readOnly={ro} placeholder="0" className={inputCls(false, ro)} />
               </div>

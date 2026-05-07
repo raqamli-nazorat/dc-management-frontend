@@ -261,6 +261,20 @@ export default function AddTaskModal({ onClose, onAdd }) {
   const [errors, setErrors] = useState({})
   const [attachments, setAttachments] = useState([]) // { file, preview, id? }
   const fileInputRef = useRef(null)
+  const normalizePercentInput = (val) => {
+    const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+    if (!cleaned) return ''
+    const firstDot = cleaned.indexOf('.')
+    const normalized = firstDot === -1
+      ? cleaned
+      : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+    const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+    const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+    const num = Number(limited)
+    if (Number.isNaN(num)) return ''
+    return String(Math.min(100, Math.max(0, num)))
+  }
   const set = (k, v) => {
     if (k === 'project') {
       setForm(p => ({ ...p, project: v, assignees: [] }))
@@ -296,10 +310,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
   // Foiz: 0�100
   const handlePenalty = (val) => {
-    const digits = val.replace(/\D/g, '')
-    if (digits === '') { set('penalty_percentage', ''); return }
-    const num = Math.min(100, Math.max(0, parseInt(digits, 10)))
-    set('penalty_percentage', String(num))
+    set('penalty_percentage', normalizePercentInput(val))
   }
 
   // Sprint: 1�10
@@ -499,7 +510,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 <label className={labelCls}>Jarima foizi (%) </label>
                 <input
                   type="text"
-                  inputMode="numeric"
+                  inputMode="decimal"
                   value={form.penalty_percentage}
                   onChange={e => handlePenalty(e.target.value)}
                   placeholder="0"

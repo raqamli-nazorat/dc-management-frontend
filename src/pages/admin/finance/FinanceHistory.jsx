@@ -336,6 +336,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
 // ── Main Page ────────────────────────────────────────────────
 export default function FinanceHistoryPage() {
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -380,9 +381,10 @@ export default function FinanceHistoryPage() {
 
   useEffect(() => { loadData() }, [])
 
-  const handleSearch = (val) => {
-    setSearch(val)
-    loadData(filters, val, 1)
+  const runSearch = (val) => {
+    const q = val.trim()
+    setSearch(q)
+    loadData(filters, q, 1)
   }
 
   const handleApplyFilter = (f) => {
@@ -410,8 +412,9 @@ export default function FinanceHistoryPage() {
               width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
-            <input type="text" placeholder="Qidirish" value={search}
-              onChange={e => handleSearch(e.target.value)}
+            <input type="text" placeholder="Qidirish" value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
               className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]" />

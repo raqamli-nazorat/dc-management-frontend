@@ -276,8 +276,10 @@ const ProjectsPage = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => {
-              if (e.key === "Enter" && search.trim()) {
-                loadProjects(filters, search, 1)
+              if (e.key === "Enter") {
+                const q = search.trim()
+                setSearch(q)
+                loadProjects(filters, q, 1)
               }
             }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]

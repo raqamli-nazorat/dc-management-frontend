@@ -579,6 +579,21 @@ const Employee = () => {
     return integerPart === '0' ? '' : integerPart;
   }
 
+  const formatPercent = (val) => {
+    const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+    if (!cleaned) return ''
+    const firstDot = cleaned.indexOf('.')
+    const normalized = firstDot === -1
+      ? cleaned
+      : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+    const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+    const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+    const num = Number(limited)
+    if (Number.isNaN(num)) return ''
+    return String(Math.min(100, Math.max(0, num)))
+  }
+
   const sanitizeParams = (params) => {
     if (!params || typeof params !== 'object') return {}
 
@@ -969,13 +984,13 @@ const Employee = () => {
                   label="dan"
                   className='bg-white'
                   value={filters.penalty_min}
-                  onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
+                  onChange={(e) => handleFilterChange('penalty_min', formatPercent(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
                   className='bg-white'
                   value={filters.penalty_max}
-                  onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
+                  onChange={(e) => handleFilterChange('penalty_max', formatPercent(e.target.value))}
                 />
               </div>
             </div>
