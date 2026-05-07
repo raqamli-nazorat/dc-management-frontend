@@ -18,15 +18,15 @@ import { parseApiError } from '../../../service/parseApiError'
 const TYPE_LABEL = { bug: 'Xato', feature: 'Yangi funksiya', improvement: "Qo'shimcha" }
 const PRIORITY_LABEL = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
 const TASK_STATUS_LABEL = {
-  todo:        'Bajarilishi kerak',
+  todo: 'Bajarilishi kerak',
   in_progress: 'Jarayonda',
-  done:        'Bajarilgan',
-  production:  'Ishga tushirilgan',
-  deployed:    'Ishga tushirilgan',
-  checked:    'Tekshirilgan',
-  rejected:    'Rad etilgan',
-  overdue:     "Muddati o'tgan",
-  cancelled:   'Bekor qilingan',
+  done: 'Bajarilgan',
+  production: 'Ishga tushirilgan',
+  deployed: 'Ishga tushirilgan',
+  checked: 'Tekshirilgan',
+  rejected: 'Rad etilgan',
+  overdue: "Muddati o'tgan",
+  cancelled: 'Bekor qilingan',
 }
 const fmtTaskDt = (iso) => {
   if (!iso) return '—'
@@ -38,38 +38,38 @@ const fmtTaskDt = (iso) => {
 
 // ── Status → Column mapping ──
 const STATUS_TO_COL = {
-  todo:        'todo',
+  todo: 'todo',
   in_progress: 'in_progress',
-  done:        'done',
-  production:  'production',
-  deployed:    'deployed',
-  checked:    'checked',
-  rejected:    'rejected',
-  overdue:     'overdue',
-  cancelled:   'cancelled',
+  done: 'done',
+  production: 'production',
+  deployed: 'deployed',
+  checked: 'checked',
+  rejected: 'rejected',
+  overdue: 'overdue',
+  cancelled: 'cancelled',
 }
 
 /* ── Columns ── */
 const COLUMNS = [
-  { id: 'todo',        label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1', darkBg: '#2A2310' },
-  { id: 'in_progress', label: 'Jarayonda',          color: '#3B82F6', bg: '#E3F2FD', darkBg: '#0F1E2E' },
-  { id: 'done',        label: 'Bajarilgan',         color: '#8B5CF6', bg: '#EDE7F6', darkBg: '#1A1228' },
-  { id: 'production',  label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9', darkBg: '#0D2018' },
-  { id: 'checked',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9', darkBg: '#0A1E22' },
-  { id: 'rejected',    label: 'Rad etilgan',        color: '#EF4444', bg: '#FFEBEE', darkBg: '#2A0F0F' },
-  { id: 'overdue',     label: "Muddati o'tgan",     color: '#9CA3AF', bg: '#F5F5F5', darkBg: '#1A1A1A' },
+  { id: 'todo', label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1', darkBg: '#2A2310' },
+  { id: 'in_progress', label: 'Jarayonda', color: '#3B82F6', bg: '#E3F2FD', darkBg: '#0F1E2E' },
+  { id: 'done', label: 'Bajarilgan', color: '#8B5CF6', bg: '#EDE7F6', darkBg: '#1A1228' },
+  { id: 'production', label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9', darkBg: '#0D2018' },
+  { id: 'checked', label: 'Tekshirilgan', color: '#06B6D4', bg: '#E0FFF9', darkBg: '#0A1E22' },
+  { id: 'rejected', label: 'Rad etilgan', color: '#EF4444', bg: '#FFEBEE', darkBg: '#2A0F0F' },
+  { id: 'overdue', label: "Muddati o'tgan", color: '#9CA3AF', bg: '#F5F5F5', darkBg: '#1A1A1A' },
 ]
 
 // Qaysi ustundan qaysi ustunga o'tish mumkin
 const ALLOWED_TRANSITIONS = {
-  todo:        ['in_progress', 'done'],
+  todo: ['in_progress', 'done'],
   in_progress: ['todo', 'done', 'checked'],
-  done:        ['in_progress', 'production', 'checked'],
-  production:  ['rejected', 'checked'],
-  checked:    ['done', 'production', 'rejected'],
-  rejected:    [],
-  overdue:     ['in_progress'],
-  cancelled:   [],
+  done: ['in_progress', 'production', 'checked'],
+  production: ['rejected', 'checked'],
+  checked: ['done', 'production', 'rejected'],
+  rejected: [],
+  overdue: ['in_progress'],
+  cancelled: [],
 }
 
 /* ── helpers ── */
@@ -155,21 +155,33 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               ? 'border-[#526ED3] dark:border-[#526ED3]'
               : 'border-[#E8EBF4] dark:border-[#333535]'}`}
         >
-          <div className="flex">
-  <div className="flex-1 px-2 py-1.5 flex flex-col gap-1.5">
+          <div className="flex ">
+            <div className="flex-1 px-2 py-1.5 flex  h-35 flex-col gap-1.5">
 
               {/* Title */}
               <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
-                {card.title}
+                {
+                  card.title.length > 27 ? `  ${card.title.slice(0, 27)}...` : `   ${card.title.slice(0, 27)}`
+                }
+
               </p>
 
               {/* UID (flag icon) + reopened_count */}
-              <div className="flex items-center justify-between gap-1">
+              <div className="flex  items-center justify-between gap-1">
                 <div className="flex items-center gap-1">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
                     <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
                   </svg>
-                  <span className="text-[10px] text-[#B6BCCB] font-medium">{card.uid || `T${card.id}`}</span>
+                  <span
+                    className="text-[10px] cursor-pointer text-[#B6BCCB] font-medium hover:text-[#526ED3] transition-colors"
+                    onClick={e => {
+                      e.stopPropagation()
+                      navigator.clipboard.writeText(card.uid || `T${card.id}`).then(() => {
+                        toast.success('Nusxa olindi', card.uid || `T${card.id}`)
+                      }).catch(() => {})
+                    }}
+                    title="Nusxa olish"
+                  >{card.uid || `T${card.id}`}</span>
                 </div>
                 {card.reopened_count > 0 && (
                   <div className="flex items-center gap-0.5 shrink-0">
@@ -213,11 +225,12 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 </div>
               )}
 
-              {/* Divider */}
-              <div className="border-t border-[#F1F3F9] dark:border-[#333535]" />
+           <div className='mt-auto'>
+               {/* Divider */}
+              <div className="border-t  mb-2 border-[#F1F3F9] dark:border-[#333535]" />
 
               {/* Assignee */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex  mt-auto  items-center gap-1.5">
                 {card.assignee_info?.avatar ? (
                   <img src={card.assignee_info.avatar} alt={assignee}
                     className="w-6 h-6 rounded-full object-cover shrink-0" />
@@ -237,6 +250,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                   </p>
                 </div>
               </div>
+           </div>
 
             </div>
 
@@ -258,11 +272,10 @@ function RejectionModal({ task, onClose, onConfirm }) {
   const fileRef = useRef(null)
 
   const handleSubmit = async () => {
-    // Ikkalasi ham majburiy
-    let hasError = false
-    if (!reason.trim()) { setReasonError(true); hasError = true }
-    if (files.length === 0) { setFilesError(true); hasError = true }
-    if (hasError) return
+    if (!reason.trim()) {
+      setReasonError(true)
+      return
+    }
 
     setLoading(true)
     try {
@@ -341,10 +354,8 @@ function RejectionModal({ task, onClose, onConfirm }) {
               </div>
             ))}
             <button type="button" onClick={() => fileRef.current?.click()}
-              className={`w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors
-                ${filesError
-                  ? 'border-red-500 text-red-500'
-                  : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3]'}`}>
+              className="w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors
+                border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3]">
               <FaPaperclip size={14} />
               <span className="text-[9px]">Rasm</span>
             </button>
@@ -359,8 +370,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
                 e.target.value = ''
               }} />
           </div>
-          {filesError && <p className="text-xs text-red-500 mt-0.5">*Kamida bitta fayl yuklang</p>}
-        </div>
+          {filesError && <p className="text-xs text-red-500 mt-0.5">*Kamida bitta fayl yuklang</p>}        </div>
 
         {/* Sabab */}
         <div>
@@ -877,9 +887,9 @@ export default function TasksPage() {
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-auto">
-        <table className="w-full text-sm whitespace-nowrap">
-          <thead>
+      <div ref={scrollRef} className="overflow-auto h-[70vh]">
+        <table className="w-full  text-sm whitespace-nowrap">
+          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#222323]">
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
@@ -898,7 +908,7 @@ export default function TasksPage() {
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
-          <tbody>
+          <tbody className=''>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
