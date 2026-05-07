@@ -1,22 +1,52 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FaArrowLeft, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { DatePicker, TimePicker, ConfigProvider, theme } from "antd"
 import dayjs from "dayjs"
 import { useTheme } from "../../../../../context/ThemeContext"
+import { useAuth } from "../../../../../context/AuthContext"
+import { axiosAPI } from "../../../../../service/axiosAPI"
+import { toast } from "../../../../../Toast/ToastProvider"
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 
 const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filter = {}, useDropdown }) => {
+    const { user } = useAuth()
+
     const [f, setF] = useState({ ...empty_filter, ...initial })
     const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
     const { isDark } = useTheme()
 
+    const [employees, setEmployees] = useState([])
+
+    useEffect(() => {
+        if (user.active_role === "employee") {
+            axiosAPI.get(`project-managers/`)
+                .then(res => {
+                    setEmployees(res.data.data.results)
+                })
+                .catch(err => {
+                    console.error(err)
+                    toast.error(err.response.data.error.errorMsg)
+                })
+        } else if (user.active_role === "manager") {
+            axiosAPI.get(`project-employees/`)
+                .then(res => {
+                    setEmployees(res.data.data.results)
+                })
+                .catch(err => {
+                    console.error(err)
+                    toast.error(err.response.data.error.errorMsg)
+                })
+        }
+    }, [user])
+
+
     const mgrDd = useDropdown()
     const empDd = useDropdown()
     const stsDd = useDropdown()
 
-    const managers = users.filter(u => u.roles?.includes('manager'))
+    const managers = user.active_role === "manager" ? users.filter(u => u.id === user.id) || [] : users.filter(u => u.roles?.includes('manager'))
 
     const STATUS_API = [
         { label: 'Rejalashtirilmoqda', value: 'planning' },
@@ -31,6 +61,17 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
 
     const selectedMgr = users.find(u => u.id === f.manager)
     const selectedEmp = users.find(u => u.id === f.employee)
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
+
 
     return (
         <ConfigProvider theme={{ algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
@@ -71,9 +112,9 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     </button>
                                     {mgrDd.open && (
                                         <div className={ddList}>
-                                            {managers.map((u, i) => (
+                                            {(user.active_role === "manager" ? [user] : user.active_role === "employees" ? employees : managers).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
-                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                                                     <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                                                         {(u.username ?? '?').slice(0, 2).toUpperCase()}
                                                     </div>
@@ -124,9 +165,9 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     </button>
                                     {empDd.open && (
                                         <div className={ddList}>
-                                            {users.map((u, i) => (
+                                            {(user.active_role === "manager" ? employees : users).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
-                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                                                     <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
                                                         {(u.username ?? '?').slice(0, 2).toUpperCase()}
                                                     </div>

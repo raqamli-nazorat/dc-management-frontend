@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaFileLines, FaCamera } from "react-icons/fa6"
-import { MdCheck } from "react-icons/md"
-import { FiGithub } from "react-icons/fi"
-import { CiLinkedin } from "react-icons/ci"
+import { MdCheck, MdOutlineFileUpload } from "react-icons/md"
 import { PiTelegramLogo } from "react-icons/pi"
+import { FiGithub, FiPlus } from "react-icons/fi"
 import { axiosAPI } from "../../../../service/axiosAPI"
 import FilterSelect from "../../Components/FilterSelect"
 import { FaArrowLeft } from "react-icons/fa"
 import { toast } from "../../../../Toast/ToastProvider"
+import { IoIosCamera } from "react-icons/io"
 
 const Dropdown = FilterSelect;
 
@@ -22,9 +22,7 @@ const EMPTY_FORM = {
     district: '',
     passportSeria: '',
     passport_number: '',
-    github: '',
-    linkedin: '',
-    telegram: '',
+    links: [''],
     avatar: null
 }
 
@@ -127,16 +125,14 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     }
                 } else if (key === 'salary') {
                     formData.append('fixed_salary', form.salary.toString().replace(/\s/g, ''))
+                } else if (key === 'links') {
+                    // Skip links here, handled as social_links
                 } else if (form[key] !== null && form[key] !== '') {
                     formData.append(key, form[key])
                 }
             })
 
-            formData.append("social_links", JSON.stringify({
-                "github": form.github,
-                "linkedin": form.linkedin,
-                "telegram": form.telegram,
-            }))
+            formData.append("social_links", JSON.stringify(form.links.filter(l => l?.trim())))
 
             const res = await axiosAPI.post('users/', formData)
 
@@ -221,17 +217,23 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                         <div>
                             <label className={labelCls}>Viloyat</label>
                             <FilterSelect
-                                options={['Viloyatni tanlang', ...regions.map(region => region.name)]}
-                                value={regions.find(r => r.id === form.region)?.name || 'Viloyatni tanlang'}
+                                options={regions.map(region => region.name)}
+                                placeholder="Viloyatni tanlang"
+                                value={regions.find(r => r.id === form.region)?.name || ''}
+                                className="dark:bg-[#191a1a]!"
+                                padding="11px 11px"
                                 onChange={v => set('region', v === 'Viloyatni tanlang' ? '' : regions.find(r => r.name === v)?.id)}
                             />
                         </div>
                         <div>
                             <label className={labelCls}>Tuman</label>
                             <FilterSelect
-                                options={['Tuman tanlang', ...districts.map(district => district.name)]}
-                                value={districts.find(d => d.id === form.district)?.name || 'Tuman tanlang'}
+                                options={districts.map(district => district.name)}
+                                placeholder="Tuman tanlang"
+                                value={districts.find(d => d.id === form.district)?.name || ''}
                                 onChange={v => set('district', v === 'Tuman tanlang' ? '' : districts.find(d => d.name === v)?.id)}
+                                className="dark:bg-[#191a1a]!"
+                                padding="11px 11px"
                                 disabled={!form.region}
                                 title={!form.region && 'Viloyatni tanlang'}
                             />
@@ -265,9 +267,9 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 onClick={() => document.getElementById('pasport').click()}
                                 className={`w-full h-[42px] px-3 rounded-lg border flex items-center justify-center gap-2 cursor-pointer transition-all text-sm border-[#D0D5E2] bg-white text-[#8F95A8] hover:bg-[#F8F9FC] dark:border-[#292A2A] dark:bg-[#191A1A] dark:text-[#8E95B5] dark:hover:bg-[#292A2A] ${form.passport_image ? 'border-solid text-gray-800 dark:text-gray-100 font-medium' : 'border-dashed'}`}
                             >
-                                <FaFileLines size={14} />
-                                <span className="truncate">
-                                    {form.passport_image ? form.passport_image.name : "Fayl yuklash"}
+                                <MdOutlineFileUpload size={18} />
+                                <span className="truncate text-sm">
+                                    {form.passport_image ? form.passport_image.name : "Rasm yuklash"}
                                 </span>
                             </button>
                             <input type="file" id="pasport" className="hidden" onChange={handlePassportUpload} accept="image/*" />
@@ -279,11 +281,11 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             <button
                                 type="button"
                                 onClick={() => fileRef.current?.click()}
-                                className="w-[80px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer  shrink-0 border-[#D0D5E2] bg-[#F8F9FC] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:bg-[#191A1A] dark:hover:bg-[#292A2A]">
+                                className="w-[100px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer  shrink-0 border-[#D0D5E2] bg-[#F8F9FC] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:bg-[#191A1A] dark:hover:bg-[#292A2A]">
                                 {avatarPreview
                                     ? <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover rounded-xl" />
                                     : <>
-                                        <FaCamera size={18} className="text-[#B6BCCB] dark:text-[#8E95B5]" />
+                                        <IoIosCamera size={18} className="text-[#B6BCCB] dark:text-[#8E95B5]" />
                                         <span className="text-[10px] text-[#B6BCCB] dark:text-[#8E95B5] text-center leading-tight">
                                             Rasm yuklash
                                         </span>
@@ -302,15 +304,19 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             value={positions.find(p => p.id === form.position)?.name || ''}
                                             onChange={v => { set('position', positions.find(p => p.name === v)?.id); setErrors(prev => ({ ...prev, position: false })) }}
                                             width={130}
+                                            className="dark:bg-[#191a1a]!"
+                                            placeholder="Tanlash"
                                             error={errors.position}
                                         />
                                     </div>
                                     {errors.position && <p className="text-[13px] text-[#FF5B5B] mt-1.5 pl-4">*Bu maydon majburiy</p>}
                                 </div>
                                 <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                                        <span className="text-sm font-semibold text-[#1A1D2E] dark:text-[#FFFFFF] shrink-0">Roli</span>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                                            <span className="text-sm font-semibold text-[#1A1D2E] dark:text-[#FFFFFF] shrink-0">Roli</span>
+                                        </div>
                                         <Dropdown
                                             label="Tanlash"
                                             multiple={true}
@@ -321,6 +327,8 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                                 set('roles', newRoles);
                                                 setErrors(prev => ({ ...prev, roles: false }));
                                             }}
+                                            className="dark:bg-[#191a1a]!"
+                                            placeholder={form.roles?.length > 0 ? "Tanlangan" : "Tanlash"}
                                             width={130}
                                             error={errors.roles}
                                         />
@@ -332,22 +340,35 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     </div>
 
                     {/* Social links */}
-                    <div className="grid grid-cols-3 gap-3">
-                        {[
-                            { key: 'github', label: 'GitHub', Icon: FiGithub, placeholder: 'Github havola ' },
-                            { key: 'linkedin', label: 'Linkedin', Icon: CiLinkedin, placeholder: 'Linkedin havola ' },
-                            { key: 'telegram', label: 'Telegram', Icon: PiTelegramLogo, placeholder: 'Telegram havola ' },
-                        ].map(({ key, label, Icon, placeholder }) => (
-                            <div key={key}>
-                                <label className={labelCls + ' flex items-center gap-1.5'}>
-                                    {label} <Icon size={14} className="text-[#5B6078] dark:text-[#C2C8E0]" />
-                                </label>
-                                <input
-                                    className={inputCls}
-                                    placeholder={placeholder}
-                                    value={form[key]}
-                                    onChange={e => set(key, e.target.value)}
-                                />
+                    <div className="grid grid-cols-2 gap-3">
+                        {form.links.map((link, index) => (
+                            <div key={index} className="flex items-end gap-3">
+                                <div className="flex-1">
+                                    <label className={labelCls}>{index + 1}.Havola qo'shish</label>
+                                    <input
+                                        className={inputCls}
+                                        placeholder="Havola yuklang"
+                                        value={link}
+                                        onChange={e => {
+                                            const newLinks = [...form.links];
+                                            newLinks[index] = e.target.value;
+                                            set('links', newLinks);
+                                        }}
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (index === form.links.length - 1 && index < 4) {
+                                            set('links', [...form.links, '']);
+                                        } else {
+                                            set('links', form.links.filter((_, i) => i !== index))
+                                        }
+                                    }}
+                                    className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                >
+                                    {index === form.links.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
+                                </button>
                             </div>
                         ))}
                     </div>
