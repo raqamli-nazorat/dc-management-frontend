@@ -279,7 +279,7 @@ export default function UsersPage() {
                     if (selecting) {
                       toggleOne(u.id);
                     } else {
-                      navigate(`/admin/users/detail/${u.id}`)
+                      navigate(`/${user.active_role}/users/detail/${u.id}`)
                     }
                   }}
                   className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
