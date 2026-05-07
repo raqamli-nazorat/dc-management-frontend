@@ -479,6 +479,7 @@ export default function TasksPage() {
 
   const [viewMode, setViewMode] = useState('table')
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
   const [filters, setFilters] = useState(TASK_EMPTY_FILTER)
@@ -546,7 +547,12 @@ export default function TasksPage() {
     return () => el.removeEventListener('scroll', handleScroll)
   }, [hasMore, loadingMore, page, filters, search])
 
-  const handleSearch = (val) => { setSearch(val); loadTasks(filters, val, 1) }
+  const runSearch = (val) => {
+    const q = val.trim()
+    setSearch(q)
+    if (viewMode === 'kanban') loadKanbanTasks(filters, q)
+    else loadTasks(filters, q, 1)
+  }
   const handleApplyFilter = (f) => { setFilters(f); setShowFilter(false); loadTasks(f, search, 1) }
 
   const handleAdd = async (body) => {
@@ -735,7 +741,12 @@ export default function TasksPage() {
               width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
-            <input type="text" placeholder="Izlash" value={search} onChange={e => setSearch(e.target.value)}
+            <input
+              type="text"
+              placeholder="Izlash"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
               className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#8F95A8] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]" />
@@ -864,8 +875,12 @@ export default function TasksPage() {
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Izlash" value={search}
-            onChange={e => handleSearch(e.target.value)}
+          <input
+            type="text"
+            placeholder="Izlash"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[200px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />

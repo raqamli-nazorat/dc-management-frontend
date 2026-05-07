@@ -63,6 +63,21 @@ const minutesToDisplay = (mins) => {
   return { val: String(mins), unit: 'Daqiqa' }
 }
 
+const normalizePercentInput = (val) => {
+  const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+  if (!cleaned) return ''
+  const firstDot = cleaned.indexOf('.')
+  const normalized = firstDot === -1
+    ? cleaned
+    : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+  const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+  const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+  const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+  const num = Number(limited)
+  if (Number.isNaN(num)) return ''
+  return String(Math.min(100, Math.max(0, num)))
+}
+
 /* -- useDropdown -- */
 function useDropdown() {
   const [open, setOpen] = useState(false)
@@ -260,9 +275,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const handleFine = (val) => {
-    const digits = val.replace(/\D/g, '')
-    if (!digits) { set('fine', ''); return }
-    set('fine', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+    set('fine', normalizePercentInput(val))
   }
 
   // Loyha o'zgarganda qatnashchilarni tozalash va xodimlarni yuklash
@@ -315,7 +328,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim()) body.link = form.link.trim()
-      const fineNum = parseInt(form.fine, 10)
+      const fineNum = parseFloat(form.fine)
       if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
@@ -361,7 +374,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input type="text" inputMode="numeric" value={form.fine} onChange={e => handleFine(e.target.value)}
+                <input type="text" inputMode="decimal" value={form.fine} onChange={e => handleFine(e.target.value)}
                   placeholder="Jarima foizini kiriting" className={inputCls(false)} />
               </div>
             </div>
@@ -396,7 +409,10 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                   type="date"
                   placeholder="kk.oo.yyyy"
                   value={form.date}
-                  onChange={v => set('date', v)}
+                  onChange={v => {
+                    set('date', v)
+                    if (v && !form.time) set('time', '23:59')
+                  }}
                   error={errors.date}
                   dropUp
                 />
@@ -517,9 +533,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const handleFine = (val) => {
-    const digits = val.replace(/\D/g, '')
-    if (!digits) { set('fine', ''); return }
-    set('fine', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
+    set('fine', normalizePercentInput(val))
   }
 
   const validate = () => {
@@ -544,7 +558,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
       }
       if (form.description.trim()) body.description = form.description.trim()
       if (form.link.trim()) body.link = form.link.trim()
-      const fineNum = parseInt(form.fine, 10)
+      const fineNum = parseFloat(form.fine)
       if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
@@ -602,7 +616,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input type="text" inputMode="numeric" value={form.fine} onChange={e => handleFine(e.target.value)}
+                <input type="text" inputMode="decimal" value={form.fine} onChange={e => handleFine(e.target.value)}
                   placeholder="Jarima foizini kiriting" className={inputCls(false)} />
               </div>
             </div>
@@ -1047,6 +1061,7 @@ export default function MeetingsPage() {
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState({})
   const [showAdd, setShowAdd] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
@@ -1117,7 +1132,11 @@ export default function MeetingsPage() {
     return () => el.removeEventListener('scroll', handleScroll)
   }, [hasMore, loadingMore, page, filters, search])
 
-  const handleSearch = val => { setSearch(val); loadMeetings(filters, val, 1) }
+  const runSearch = (val) => {
+    const q = val.trim()
+    setSearch(q)
+    loadMeetings(filters, q, 1)
+  }
   const handleApplyFilter = f => { setFilters(f); setShowFilter(false); loadMeetings(f, search, 1) }
 
   const handleAdd = async (body) => {
@@ -1218,8 +1237,9 @@ export default function MeetingsPage() {
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Nomi bo'yicha izlash" value={search}
-            onChange={e => handleSearch(e.target.value)}
+          <input type="text" placeholder="Nomi bo'yicha izlash" value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[220px]
               bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />

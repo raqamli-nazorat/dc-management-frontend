@@ -64,6 +64,21 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         return dec !== undefined ? `${fmtInt}.${dec.slice(0, 2)}` : fmtInt
     }
 
+    const normalizePercentInput = (raw) => {
+        const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+        if (!cleaned) return ''
+        const firstDot = cleaned.indexOf('.')
+        const normalized = firstDot === -1
+            ? cleaned
+            : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+        const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+        const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+        const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+        const num = Number(limited)
+        if (Number.isNaN(num)) return ''
+        return String(Math.min(100, Math.max(0, num)))
+    }
+
     const [form, setForm] = useState({
         title: '',
         prefix: '',
@@ -346,8 +361,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 <div>
                                     <label className={labelCls}>Jarima foizi (%)</label>
                                     <input
+                                        inputMode="decimal"
                                         value={form.penalty_percentage}
-                                        onChange={e => set('penalty_percentage', fmtBonus(e.target.value, "penalty"))}
+                                        onChange={e => set('penalty_percentage', normalizePercentInput(e.target.value))}
                                         placeholder="0,0"
                                         className={inputCls(errors.penalty_percentage)}
                                     />

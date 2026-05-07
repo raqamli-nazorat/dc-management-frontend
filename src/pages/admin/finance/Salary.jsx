@@ -380,6 +380,7 @@ export default function SalaryPage() {
   const isAccountant = user?.active_role === 'accountant'
 
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -476,9 +477,10 @@ export default function SalaryPage() {
     }
   }
 
-  const handleSearch = (val) => {
-    setSearch(val)
-    loadPayrolls(filters, val, 1)
+  const runSearch = (val) => {
+    const q = val.trim()
+    setSearch(q)
+    loadPayrolls(filters, q, 1)
   }
 
   const handleApplyFilter = (f) => {
@@ -520,8 +522,9 @@ export default function SalaryPage() {
                 width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
-              <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={search}
-                onChange={e => handleSearch(e.target.value)}
+              <input type="text" placeholder="Ism Sharifi bo'yicha izlash" value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
                 className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none w-[280px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]"/>

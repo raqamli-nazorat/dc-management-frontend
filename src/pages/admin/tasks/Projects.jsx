@@ -21,7 +21,7 @@ const STATUS_LABEL = {
 }
 
 const fmtDt = (iso) => {
-  if (!iso) return 'ó'
+  if (!iso) return 'ù'
   try {
     const d = new Date(iso)
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -264,7 +264,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   )
 }
 
-/* -- UserPickerModal ó figmadagi xodim tanlash modali -- */
+/* -- UserPickerModal ù figmadagi xodim tanlash modali -- */
 function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   const [search, setSearch] = useState('')
   const [temp, setTemp] = useState(selected.map(u => u.id))
@@ -357,7 +357,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 {/* Info */}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || 'ó'}</p>
+                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || 'ù'}</p>
                 </div>
               </button>
             )
@@ -385,7 +385,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   )
 }
 
-/* -- SelectedUsersField ó tanlangan xodimlarni ko'rsatish -- */
+/* -- SelectedUsersField ù tanlangan xodimlarni ko'rsatish -- */
 function SelectedUsersField({ label, selected, onOpen, onRemove }) {
   return (
     <div>
@@ -518,6 +518,21 @@ function AddProjectModal({ onClose, onAdd }) {
   const fmtBonus = (raw) => {
     const d = raw.replace(/\D/g, '')
     return d.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  }
+
+  const normalizePercentInput = (raw) => {
+    const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+    if (!cleaned) return ''
+    const firstDot = cleaned.indexOf('.')
+    const normalized = firstDot === -1
+      ? cleaned
+      : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+    const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+    const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+    const num = Number(limited)
+    if (Number.isNaN(num)) return ''
+    return String(Math.min(100, Math.max(0, num)))
   }
 
   const validate = () => {
@@ -725,13 +740,9 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Jarima foizi (%)</label>
                 <input
                   type="text"
-                  inputMode="numeric"
+                  inputMode="decimal"
                   value={form.penalty_percentage}
-                  onChange={e => {
-                    const digits = e.target.value.replace(/\D/g, '')
-                    if (!digits) { set('penalty_percentage', ''); return }
-                    set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(digits, 10)))))
-                  }}
+                  onChange={e => set('penalty_percentage', normalizePercentInput(e.target.value))}
                   placeholder="0"
                   className={inputCls(false)}
                 />
@@ -882,14 +893,14 @@ function DetailModal({ project, onClose }) {
   const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
   const fmtNum = (val) => {
-    if (!val) return 'ó'
+    if (!val) return 'ù'
     const n = Math.abs(Number(String(val).replace(/[\s,]/g, '')))
-    if (isNaN(n) || n === 0) return 'ó'
+    if (isNaN(n) || n === 0) return 'ù'
     return n.toLocaleString('ru-RU') + ' UZS'
   }
 
   const fmtDtFull = (iso) => {
-    if (!iso) return 'ó'
+    if (!iso) return 'ù'
     try {
       const d = new Date(iso)
       return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -908,13 +919,13 @@ function DetailModal({ project, onClose }) {
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || 'ó'}</p>
+        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || 'ù'}</p>
       </div>
     )
   }
 
   function UserCard({ label, info }) {
-    if (!info) return <InfoRow label={label} value="ó" />
+    if (!info) return <InfoRow label={label} value="ù" />
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-1.5">{label}</p>
@@ -989,8 +1000,8 @@ function DetailModal({ project, onClose }) {
           <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8F9FC] dark:bg-[#191A1A]">
             <InfoRow label="Loyiha narxi" value={fmtNum(project.project_price)} />
             <InfoRow label="Menejer bonusi" value={fmtNum(project.manager_bonus)} />
-            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : 'ó'} />
-            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : 'ó'} />
+            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : 'ù'} />
+            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : 'ù'} />
           </div>
 
           {/* Xodimlar */}
@@ -1002,7 +1013,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">ó</p>}
+            ) : <p className="text-sm text-[#8F95A8]">ù</p>}
           </div>
 
           {/* Sinovchilar */}
@@ -1014,7 +1025,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">ó</p>}
+            ) : <p className="text-sm text-[#8F95A8]">ù</p>}
           </div>
 
           {/* Vaqtlar */}
@@ -1051,6 +1062,20 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
     return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
   const fmtBonus = (raw) => raw.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  const normalizePercentInput = (raw) => {
+    const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+    if (!cleaned) return ''
+    const firstDot = cleaned.indexOf('.')
+    const normalized = firstDot === -1
+      ? cleaned
+      : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+    const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+    const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
+    const num = Number(limited)
+    if (Number.isNaN(num)) return ''
+    return String(Math.min(100, Math.max(0, num)))
+  }
 
   const initManager   = project.manager_info ? { id: project.manager_info.id, username: project.manager_info.username } : null
   const initEmployees = (project.employees_info || []).map(u => ({ id: u.id, username: u.username }))
@@ -1235,8 +1260,8 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input type="text" inputMode="numeric" value={form.penalty_percentage}
-                  onChange={e => { const d = e.target.value.replace(/\D/g, ''); if (!d) { set('penalty_percentage', ''); return } set('penalty_percentage', String(Math.min(100, Math.max(0, parseInt(d, 10))))) }}
+                <input type="text" inputMode="decimal" value={form.penalty_percentage}
+                  onChange={e => set('penalty_percentage', normalizePercentInput(e.target.value))}
                   placeholder="0" className={inputCls(false)} />
               </div>
             </div>
@@ -1611,7 +1636,7 @@ export default function ProjectsPage() {
                           {(p.manager_info?.username || '?').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || 'ó'}</p>
+                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || 'ù'}</p>
                           <p className="text-[10px] text-[#8F95A8]">Menejer</p>
                         </div>
                       </div>
@@ -1673,10 +1698,10 @@ export default function ProjectsPage() {
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{p.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || 'ó'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || 'ù'}</td>
                   <td className="px-4 py-3 text-right">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]`}>
-                      {STATUS_LABEL[p.status] || p.status || 'ó'}
+                      {STATUS_LABEL[p.status] || p.status || 'ù'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>
