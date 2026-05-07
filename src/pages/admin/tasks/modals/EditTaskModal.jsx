@@ -76,40 +76,91 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
   )
 }
 
+function fmtProjectDate(iso) {
+  if (!iso) return ''
+  try {
+    const d = new Date(iso)
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    return `${dd}.${mm}.${d.getFullYear()}`
+  } catch { return '' }
+}
+
 function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => String(p.id) === String(value))
+
   return (
     <div ref={ref}>
       <label className={labelCls}>Loyiha</label>
       <div className="relative">
-        <button type="button" onClick={() => !disabled && setOpen(o => !o)}
+        {/* Trigger */}
+        <button
+          type="button"
+          onClick={() => !disabled && setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
             ${disabled ? 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A]'}
             ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078]'}`}>
-          <span className="flex-1 text-left truncate">{selected?.title || selected?.name || 'Loyiha tanlang'}</span>
+            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078]'}`}
+        >
+          <span className="flex-1 text-left truncate">
+            {selected ? selected.title : 'Loyiha tanlang'}
+          </span>
           {!disabled && (
-            <div className="flex items-center gap-1.5 shrink-0 ml-1">
-              {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
+            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+              {value && (
+                <span
+                  onMouseDown={e => { e.stopPropagation(); onChange('') }}
+                  className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"
+                >
+                  <FaXmark size={11} />
+                </span>
+              )}
               <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
             </div>
           )}
         </button>
+
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
+
+        {/* Dropdown */}
         {open && !disabled && (
-          <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
+          <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
             bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
-            {projects.map((p, i) => (
-              <button key={p.id} type="button" onClick={() => { onChange(String(p.id)); setOpen(false) }}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer
-                  ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                  ${String(value) === String(p.id) ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                <p className={`text-sm font-medium truncate ${String(value) === String(p.id) ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>
-                  {p.title || p.name}
-                </p>
-              </button>
-            ))}
+            <div className="overflow-y-auto max-h-64">
+              {projects.length === 0 && (
+                <p className="text-sm text-[#8F95A8] text-center py-6">Loyihalar topilmadi</p>
+              )}
+              {projects.map(p => {
+                const isActive = String(value) === String(p.id)
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => { onChange(String(p.id)); setOpen(false) }}
+                    className={`w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer transition-colors
+                      border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0
+                      ${isActive ? 'bg-[#F1F3F9] dark:bg-[#252626]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
+                  >
+                    {/* Left: title + description */}
+                    <div className="flex flex-col min-w-0 flex-1 pr-3">
+                      <span className="text-sm font-semibold truncate leading-snug text-[#1A1D2E] dark:text-white">
+                        {p.title}
+                      </span>
+                      {p.description && (
+                        <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate leading-snug mt-0.5">
+                          {p.description}
+                        </span>
+                      )}
+                    </div>
+                    {/* Right: date */}
+                    <span className="shrink-0 text-sm text-[#8F95A8] dark:text-[#5B6078] font-medium">
+                      {fmtProjectDate(p.created_at)}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
