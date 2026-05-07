@@ -111,7 +111,8 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
   const c = payment.expense_category_info ?? {}
   const isCard = payment.payment_method === 'card'
 
-  const isAccountant = user?.roles?.includes('accountant')
+  const activeRole = user?.active_role
+  const isAccountant = activeRole === 'accountant'
   const isOwner = user?.id === payment.user_info?.id
 
   // To'lov qildim: faqat accountant + pending

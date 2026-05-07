@@ -6,6 +6,7 @@ import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { DateTimeBox } from '../Components/DateTimeBox'
+import { useAuth } from '../../../context/AuthContext'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
@@ -350,7 +351,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
                 text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
               <FaXmark size={13} /> {user.is_confirmed ? 'Yopish' : 'Bekor qilish'}
             </button>
-            {!user.is_confirmed && (
+            {!user.is_confirmed && onApprove && (
               <button onClick={() => setShowConfirm(true)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer
                   bg-green-500 text-white hover:bg-green-600">
@@ -375,6 +376,9 @@ function UserDetailModal({ user, onClose, onApprove }) {
 
 // -- Main Page -------------------------------------------------
 export default function SalaryPage() {
+  const { user } = useAuth()
+  const isAccountant = user?.active_role === 'accountant'
+
   const [search, setSearch] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -492,7 +496,7 @@ export default function SalaryPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Ish haqi</h1>
-          {selecting ? (
+          {isAccountant && (selecting ? (
             <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
               className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold cursor-pointer
               bg-[#DADFF0] text-[#1A1D2E] dark:bg-[#3A3B3B] dark:text-white">
@@ -505,7 +509,7 @@ export default function SalaryPage() {
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:brightness-0 dark:invert" />
               Tanlash
             </button>
-          )}
+          ))}
         </div>
 
         {/* Filters + Tooltip */}
@@ -622,7 +626,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Selection bar */}
-      {selecting && selected.size > 0 && (
+      {isAccountant && selecting && selected.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
           bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
           <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
@@ -637,7 +641,7 @@ export default function SalaryPage() {
       {/* Modals */}
       {showConfirm && <ConfirmModal onCancel={() => setShowConfirm(false)} onConfirm={() => handleApprove(selected)} />}
       {showFilter && <SalaryFilterModal initial={filters} onClose={() => setShowFilter(false)} onApply={handleApplyFilter} />}
-      {detailUser && <UserDetailModal user={detailUser} onClose={() => setDetailUser(null)} onApprove={handleApprove} />}
+      {detailUser && <UserDetailModal user={detailUser} onClose={() => setDetailUser(null)} onApprove={isAccountant ? handleApprove : null} />}
     </div>
   )
 }

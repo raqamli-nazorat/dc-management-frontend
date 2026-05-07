@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -12,9 +12,9 @@ import { DateTimeBox } from '../Components/DateTimeBox'
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const DURATION_UNITS = ['Daqiqa', 'Soat']
 
-/* ── helpers ── */
+/* -- helpers -- */
 const fmtDt = (iso) => {
-  if (!iso) return '—'
+  if (!iso) return '�'
   try {
     const d = new Date(iso)
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -33,7 +33,7 @@ const toIso = (date, time) => {
   return `${date}T${t}:00${sign}${hh}:${mm}`
 }
 
-// Filter uchun sana+vaqt → ISO+timezone
+// Filter uchun sana+vaqt ? ISO+timezone
 const toIsoWithOffset = (date, time) => toIso(date, time)
 
 const fromIso = (iso) => {
@@ -63,7 +63,7 @@ const minutesToDisplay = (mins) => {
   return { val: String(mins), unit: 'Daqiqa' }
 }
 
-/* ── useDropdown ── */
+/* -- useDropdown -- */
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -75,7 +75,7 @@ function useDropdown() {
   return { open, setOpen, ref }
 }
 
-/* ── ProjectDropdown — real API ── */
+/* -- ProjectDropdown � real API -- */
 function ProjectDropdown({ value, onChange, error, projects = [] }) {
   const { open, setOpen, ref } = useDropdown()
   const selected = projects.find(p => p.id === value)
@@ -118,7 +118,7 @@ function ProjectDropdown({ value, onChange, error, projects = [] }) {
   )
 }
 
-/* ── DurationSelect ── */
+/* -- DurationSelect -- */
 function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
   const { open, setOpen, ref } = useDropdown()
   return (
@@ -155,7 +155,7 @@ function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
   )
 }
 
-/* ── ParticipantsModal — real users API ── */
+/* -- ParticipantsModal � real users API -- */
 function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
   const [search, setSearch] = useState('')
   const [sel, setSel] = useState(new Set(selected.map(u => u.id ?? u)))
@@ -219,7 +219,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className={`text-sm font-semibold truncate ${checked ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || '—'}</p>
+                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || '�'}</p>
                 </div>
               </button>
             )
@@ -244,7 +244,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
   )
 }
 
-/* ── AddMeetingModal ── */
+/* -- AddMeetingModal -- */
 function AddMeetingModal({ onClose, onAdd, projects }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -339,7 +339,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
-          {/* ── Header (qotgan) ── */}
+          {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -348,7 +348,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
             <p className="text-sm text-[#8F95A8] ml-8">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
-          {/* ── Scroll qilinadigan content ── */}
+          {/* -- Scroll qilinadigan content -- */}
           <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
             <ProjectDropdown value={form.project} onChange={handleProjectChange} error={errors.project} projects={projects} />
 
@@ -394,7 +394,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                 <label className={labelCls}>Boshlanish sanasi</label>
                 <DateTimeBox
                   type="date"
-                  placeholder="KK/OO/YYYY"
+                  placeholder="kk.oo.yyyy"
                   value={form.date}
                   onChange={v => set('date', v)}
                   error={errors.date}
@@ -453,7 +453,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
             </div>
           </div>
 
-          {/* ── Footer (qotgan) ── */}
+          {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
@@ -488,7 +488,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
   )
 }
 
-/* ── EditMeetingModal ── */
+/* -- EditMeetingModal -- */
 function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -550,7 +550,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
 
       await onSave(meeting.id, body)
 
-      // is_completed true bo'lsa — /close/ endpoint orqali yopamiz
+      // is_completed true bo'lsa � /close/ endpoint orqali yopamiz
       // faqat avval yopilmagan bo'lsa
       if (form.is_completed && !meeting.is_completed) {
         try {
@@ -577,7 +577,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
-          {/* ── Header (qotgan) ── */}
+          {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
@@ -586,7 +586,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <p className="text-sm text-[#8F95A8] ml-8">Yig'ilish ma'lumotlarini yangilang</p>
           </div>
 
-          {/* ── Scroll qilinadigan content ── */}
+          {/* -- Scroll qilinadigan content -- */}
           <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
             <ProjectDropdown value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} />
 
@@ -630,7 +630,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                 <label className={labelCls}>Boshlanish sanasi</label>
                 <DateTimeBox
                   type="date"
-                  placeholder="KK/OO/YYYY"
+                  placeholder="kk.oo.yyyy"
                   value={form.date}
                   onChange={v => set('date', v)}
                   dropUp
@@ -681,7 +681,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             </div>
           </div>
 
-          {/* ── Footer (qotgan) ── */}
+          {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
@@ -716,7 +716,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
   )
 }
 
-/* ── MeetingDetailModal ── */
+/* -- MeetingDetailModal -- */
 function MeetingDetailModal({ meeting, onClose, projects }) {
   const project = projects?.find(p => p.id === meeting.project)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
@@ -743,7 +743,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           <div>
             <label className={labelCls}>Loyiha</label>
             <div className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-              <span className="flex-1 truncate">{project?.title || '—'}</span>
+              <span className="flex-1 truncate">{project?.title || '�'}</span>
               <FaChevronDown size={11} className="text-[#8F95A8] shrink-0 ml-2" />
             </div>
           </div>
@@ -752,7 +752,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Nomi</label>
               <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                {meeting.title || <span className="text-[#8F95A8]">—</span>}
+                {meeting.title || <span className="text-[#8F95A8]">�</span>}
               </div>
             </div>
             <div>
@@ -760,7 +760,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
               <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
                 {meeting.penalty_percentage
                   ? `${Math.abs(parseFloat(meeting.penalty_percentage))} %`
-                  : <span className="text-[#8F95A8]">—</span>}
+                  : <span className="text-[#8F95A8]">�</span>}
               </div>
             </div>
           </div>
@@ -771,14 +771,14 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
               {meeting.link
                 ? <a href={meeting.link} target="_blank" rel="noreferrer"
                     className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline truncate block">{meeting.link}</a>
-                : <span className="text-[#8F95A8]">—</span>}
+                : <span className="text-[#8F95A8]">�</span>}
             </div>
           </div>
 
           <div>
             <label className={labelCls}>Tavsifi</label>
             <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] min-h-[80px] whitespace-pre-wrap text-[#1A1D2E] dark:text-white">
-              {meeting.description || <span className="text-[#8F95A8]">—</span>}
+              {meeting.description || <span className="text-[#8F95A8]">�</span>}
             </div>
           </div>
 
@@ -786,7 +786,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className="col-span-2">
               <label className={labelCls}>Boshlanish sanasi</label>
               <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startDate ? startDate.split('-').reverse().join('.') : '—'}</span>
+                <span>{startDate ? startDate.split('-').reverse().join('.') : '�'}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
                   <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
                 </svg>
@@ -795,7 +795,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Vaqti</label>
               <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startTime || '—'}</span>
+                <span>{startTime || '�'}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
                   <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
                 </svg>
@@ -804,7 +804,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Davomiyligi</label>
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || '—'}</span>
+                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || '�'}</span>
                 {meeting.duration_minutes && (
                   <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
                 )}
@@ -844,7 +844,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
   )
 }
 
-/* ── FilterModal ── */
+/* -- FilterModal -- */
 function FilterModal({ onClose, onApply, initial, users, projects }) {
   const [organizer, setOrganizer] = useState(initial.organizer ?? '')
   const [project,   setProject]   = useState(initial.project   ?? '')
@@ -991,7 +991,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 }
 
 
-/* ── RowMenu ── */
+/* -- RowMenu -- */
 function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -1032,7 +1032,7 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
   )
 }
 
-/* ── Main Page ── */
+/* -- Main Page -- */
 export default function MeetingsPage() {
   const { registerAction, clearAction } = usePageAction()
   const { user } = useAuth()
@@ -1233,7 +1233,7 @@ export default function MeetingsPage() {
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">?</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
@@ -1266,13 +1266,13 @@ export default function MeetingsPage() {
                       className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
                       onClick={() => loadMeetingDetail(m.id, 'edit')}>
                       <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
-                      <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '—'}</td>
+                      <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{m.uid || '�'}</td>
                       <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{organizer?.username || '—'}</td>
-                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{project?.title || '—'}</td>
+                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{organizer?.username || '�'}</td>
+                      <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{project?.title || '�'}</td>
                       <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{fmtDt(m.start_time)}</td>
                       <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">
-                        {durVal ? `${durVal} ${durUnit}` : '—'}
+                        {durVal ? `${durVal} ${durUnit}` : '�'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${m.is_completed ? 'bg-[#22c55e]' : 'bg-[#EF4444]'}`}>

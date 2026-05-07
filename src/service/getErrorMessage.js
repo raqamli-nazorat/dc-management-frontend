@@ -11,8 +11,21 @@ export function getErrorMessage(err, fallback = 'Xatolik yuz berdi.') {
   const data = err?.response?.data
   if (!data) return err?.message || fallback
 
-  // { data: null, error: { errorMsg, ... }, success: false }
+  // { data: null, error: { errorMsg, details, ... }, success: false }
   const inner = data.error ?? data
+
+  // details ob'ekt yoki array bo'lsa — ularni birlashtirib ko'rsatish
+  if (inner.details) {
+    if (Array.isArray(inner.details) && inner.details.length) {
+      return inner.details.join('\n')
+    }
+    if (typeof inner.details === 'object') {
+      const msgs = Object.entries(inner.details)
+        .map(([, v]) => Array.isArray(v) ? v[0] : v)
+        .filter(Boolean)
+      if (msgs.length) return msgs.join('\n')
+    }
+  }
 
   // { errorMsg: "..." } — bu backend'ning asosiy formati
   if (typeof inner.errorMsg === 'string') return inner.errorMsg

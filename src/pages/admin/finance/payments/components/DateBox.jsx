@@ -5,7 +5,7 @@ export function DateBox({ type, value, onChange, placeholder }) {
   return (
     <DateTimeBox
       type={type}
-      placeholder={placeholder || (type === 'time' ? 'SS:DD' : 'KK/OO/YYYY')}
+      placeholder={placeholder || (type === 'time' ? 'SS:DD' : 'kk.oo.yyyy')}
       value={value}
       onChange={onChange}
       dropUp

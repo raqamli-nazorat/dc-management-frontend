@@ -181,7 +181,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   )
 }
 
-export default function EditTaskModal({ task, onClose, onSave, canEdit = true }) {
+export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -576,7 +576,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
                 <div className="grid grid-cols-2 gap-2">
                   <DateTimeBox
                     type="date"
-                    placeholder="KK/OO/YYYY"
+                    placeholder="kk.oo.yyyy"
                     value={form.deadline}
                     onChange={v => !ro && set('deadline', v)}
                     disabled={ro}
@@ -606,8 +606,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
 
             {/* Qo'shimcha fayllar */}
             <div>
-              <label className={labelCls}>Qo'shimcha fayllar</label>
-              <div className="flex flex-wrap gap-2">
+              <label className={labelCls}>Qo'shimcha fayllar</label>              <div className="flex flex-wrap gap-2">
 
                 {/* Existing attachments */}
                 {existingAttachments.map(att => (
@@ -695,24 +694,80 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true })
               </div>
             </div>
 
+            {/* Rad etish sababi */}
+            {task.status === 'rejected' && (task.rejection_reason || (task.rejection_files && task.rejection_files.length > 0)) && (
+              <div>
+                <label className="block text-sm font-extrabold text-[#1A1D2E] dark:text-white mb-2">Rad etilish sababi</label>
+                <div className="rounded-2xl border border-[#FECACA] dark:border-[#7F1D1D] bg-[#FFF5F5] dark:bg-[#1C0A0A] p-4 flex flex-col gap-3">
+                  {/* Rejection files */}
+                  {task.rejection_files && task.rejection_files.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {task.rejection_files.map(rf => (
+                        <a
+                          key={rf.id}
+                          href={rf.file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="relative w-16 h-16 rounded-xl border border-[#FECACA] dark:border-[#7F1D1D] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
+                        >
+                          {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
+                            <img src={rf.file} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="flex flex-col items-center gap-0.5 px-1">
+                              <FaPaperclip size={14} className="text-[#EF4444]" />
+                              <span className="text-[8px] text-[#EF4444] truncate w-full text-center">
+                                {decodeURIComponent(rf.file.split('/').pop() || 'fayl')}
+                              </span>
+                            </div>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {/* Rejection reason text */}
+                  {task.rejection_reason && (
+                    <p className="text-sm text-[#1A1D2E] dark:text-[#FCA5A5] leading-relaxed whitespace-pre-wrap">
+                      {task.rejection_reason}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
-            <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
-              <FaXmark size={13} /> Yopish
-            </button>
-            {canEdit && (
-              <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
-                {loading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                }
-                Saqlash
+          <div className="px-7 py-5 flex items-center justify-between border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
+            {/* O'chirish tugmasi — faqat onDelete prop berilganda */}
+            {onDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-[#EF4444] hover:bg-[#FFF5F5] dark:hover:bg-[#1C0A0A] transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                </svg>
+                O'chirish
               </button>
-            )}
+            ) : <div />}
+
+            <div className="flex items-center gap-3">
+              <button onClick={onClose}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                <FaXmark size={13} /> Yopish
+              </button>
+              {canEdit && (
+                <button onClick={handleSubmit} disabled={loading}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                  {loading
+                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                    : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  }
+                  Saqlash
+                </button>
+              )}
+            </div>
           </div>
 
         </div>
