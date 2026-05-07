@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
 import DropDown from "./Components/DropDown"
 import { FaArrowLeft, FaPause, FaPlay } from 'react-icons/fa'
+import { useAuth } from '../../../context/AuthContext'
 
 const Status = {
   pending: "Kutilmoqda",
@@ -17,6 +18,7 @@ const Status = {
 
 const ApplicationsPage = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
@@ -244,7 +246,7 @@ const ApplicationsPage = () => {
                 {applications?.map((application, idx) => (
                   <tr
                     key={application.id}
-                    onClick={() => navigate(`/admin/applications/detail/${application.id}`)}
+                    onClick={() => navigate(`/${user.active_role}/applications/detail/${application.id}`)}
                     className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
                   >
                     <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{idx + 1}</td>
