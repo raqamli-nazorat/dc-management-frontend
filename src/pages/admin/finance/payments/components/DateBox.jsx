@@ -17,10 +17,10 @@ export function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT
   return (
     <div>
       <label className={labelCls}>{label}</label>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-5">
         {/* Dan */}
-        <div className="flex gap-1.5">
-          <div className="flex-1">
+        <div className="flex justify-between gap-1.5">
+          <div className="  w-[160px]">
             <DateTimeBox type="date" placeholder="dan" value={dateFromD} onChange={onDateFromD} dropUp />
           </div>
           <div className="w-[100px]">
@@ -29,7 +29,7 @@ export function DateTimeRangeRow({ label, dateFromD, dateFromT, dateToD, dateToT
         </div>
         {/* Gacha */}
         <div className="flex gap-1.5">
-          <div className="flex-1">
+          <div className="w-[160px]">
             <DateTimeBox type="date" placeholder="gacha" value={dateToD} onChange={onDateToD} dropUp />
           </div>
           <div className="w-[100px]">

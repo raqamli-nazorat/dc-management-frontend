@@ -4,6 +4,7 @@ import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
+import { useTheme } from '../../../context/ThemeContext'
 import TaskRowMenu from './components/TaskRowMenu'
 import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
 import AddTaskModal from './modals/AddTaskModal'
@@ -50,13 +51,13 @@ const STATUS_TO_COL = {
 
 /* ── Columns ── */
 const COLUMNS = [
-  { id: 'todo',        label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1' },
-  { id: 'in_progress', label: 'Jarayonda',          color: '#3B82F6', bg: '#E3F2FD' },
-  { id: 'done',        label: 'Bajarilgan',         color: '#8B5CF6', bg: '#EDE7F6' },
-  { id: 'production',  label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9' },
-  { id: 'checked',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9' },
-  { id: 'rejected',    label: 'Rad etilgan',        color: '#EF4444', bg: '#FFEBEE' },
-  { id: 'overdue',     label: "Muddati o'tgan",     color: '#9CA3AF', bg: '#F5F5F5' },
+  { id: 'todo',        label: 'Bajarilishi kerak', color: '#F59E0B', bg: '#FFF8E1', darkBg: '#2A2310' },
+  { id: 'in_progress', label: 'Jarayonda',          color: '#3B82F6', bg: '#E3F2FD', darkBg: '#0F1E2E' },
+  { id: 'done',        label: 'Bajarilgan',         color: '#8B5CF6', bg: '#EDE7F6', darkBg: '#1A1228' },
+  { id: 'production',  label: 'Ishga tushirilgan', color: '#10B981', bg: '#E8F5E9', darkBg: '#0D2018' },
+  { id: 'checked',    label: 'Tekshirilgan',       color: '#06B6D4', bg: '#E0FFF9', darkBg: '#0A1E22' },
+  { id: 'rejected',    label: 'Rad etilgan',        color: '#EF4444', bg: '#FFEBEE', darkBg: '#2A0F0F' },
+  { id: 'overdue',     label: "Muddati o'tgan",     color: '#9CA3AF', bg: '#F5F5F5', darkBg: '#1A1A1A' },
 ]
 
 // Qaysi ustundan qaysi ustunga o'tish mumkin
@@ -146,13 +147,13 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               : undefined,
             opacity: snapshot.isDragging ? 0.95 : 1,
             boxShadow: snapshot.isDragging
-              ? '0 8px 20px rgba(0,0,0,0.15)'
-              : '0 1px 3px rgba(0,0,0,0.05)',
+              ? '0 8px 24px rgba(0,0,0,0.35)'
+              : '0 1px 4px rgba(0,0,0,0.12)',
           }}
-          className={`w-full shrink-0 rounded-xl bg-white dark:bg-[#1E1F1F] select-none cursor-grab active:cursor-grabbing overflow-hidden border
+          className={`w-full shrink-0 rounded-xl bg-white dark:bg-[#252626] select-none cursor-grab active:cursor-grabbing overflow-hidden border
             ${snapshot.isDragging
-              ? 'border-[#526ED3]'
-              : 'border-[#E8EBF4] dark:border-[#2A2B2B]'}`}
+              ? 'border-[#526ED3] dark:border-[#526ED3]'
+              : 'border-[#E8EBF4] dark:border-[#333535]'}`}
         >
           <div className="flex">
   <div className="flex-1 px-2 py-1.5 flex flex-col gap-1.5">
@@ -205,7 +206,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               )}
 
               {/* Divider */}
-              <div className="border-t border-[#F1F3F9] dark:border-[#2A2B2B]" />
+              <div className="border-t border-[#F1F3F9] dark:border-[#333535]" />
 
               {/* Assignee */}
               <div className="flex items-center gap-1.5">
@@ -213,7 +214,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                   <img src={card.assignee_info.avatar} alt={assignee}
                     className="w-6 h-6 rounded-full object-cover shrink-0" />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#EEF1FB] dark:bg-[#292A2A] flex items-center justify-center shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-[#EEF1FB] dark:bg-[#333535] flex items-center justify-center shrink-0">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8F95A8" strokeWidth="1.8">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                     </svg>
@@ -387,6 +388,9 @@ function RejectionModal({ task, onClose, onConfirm }) {
 
 /* ── KanbanColumn ── */
 function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget, isDraggingGlobal }) {
+  const { isDark } = useTheme()
+  const colBg = isDark ? col.darkBg : col.bg
+
   return (
     <div
       className="flex flex-col min-w-0"
@@ -418,8 +422,8 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget, isDraggingGl
               flex: '1 1 0',
               minHeight: 80,
               backgroundColor: snapshot.isDraggingOver
-                ? col.color + '22'
-                : col.bg,
+                ? col.color + '33'
+                : colBg,
               outline: isDragTarget ? `2px solid ${col.color}` : 'none',
               outlineOffset: '-2px',
               scrollbarWidth: 'none',
@@ -750,7 +754,7 @@ export default function TasksPage() {
             </div>
           ) : (
             <div
-              className="flex gap-2 px-3 pt-3  bg-white  pb-3 h-full"
+              className="flex gap-2 px-3 pt-3 bg-white dark:bg-[#191A1A] pb-3 h-full"
               style={{ overflow: 'hidden' }}
             >
               {COLUMNS.map(col => (
