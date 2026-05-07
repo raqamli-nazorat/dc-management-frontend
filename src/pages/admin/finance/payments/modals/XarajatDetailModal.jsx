@@ -206,6 +206,17 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
               )}
             </div>
 
+            {/* Rad etish sababi — faqat cancelled statusda */}
+            {payment.status === 'cancelled' && payment.cancel_reason && (
+              <div>
+                <label className={labelCls}>Rad etish sababi</label>
+                <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed
+                   `}>
+                  {payment.cancel_reason}
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Footer */}

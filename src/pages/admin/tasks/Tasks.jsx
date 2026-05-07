@@ -163,12 +163,20 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 {card.title}
               </p>
 
-              {/* UID (flag icon) */}
-              <div className="flex items-center gap-1">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
-                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
-                </svg>
-                <span className="text-[10px] text-[#B6BCCB] font-medium">{card.uid || `T${card.id}`}</span>
+              {/* UID (flag icon) + reopened_count */}
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
+                  </svg>
+                  <span className="text-[10px] text-[#B6BCCB] font-medium">{card.uid || `T${card.id}`}</span>
+                </div>
+                {card.reopened_count > 0 && (
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <img src="/imgs/tuiIconRedo.svg" alt="redo" className="w-3 h-3" style={{ filter: 'invert(65%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)' }} />
+                    <span className="text-[10px] font-bold text-[#5B6078]">{card.reopened_count}</span>
+                  </div>
+                )}
               </div>
 
               {/* Deadline */}
@@ -259,10 +267,12 @@ function RejectionModal({ task, onClose, onConfirm }) {
     setLoading(true)
     try {
       // 1. Avval status o'zgartirish + sabab
-      await axiosAPI.patch(`/tasks/${task.id}/change-status/`, {
+      const res = await axiosAPI.patch(`/tasks/${task.id}/change-status/`, {
         status: 'rejected',
         rejection_reason: reason.trim(),
       })
+      // Backenddan kelgan haqiqiy statusni olish
+      const actualStatus = res.data?.data?.status ?? res.data?.status ?? 'rejected'
 
       // 2. Status rejected bo'lgandan keyin fayllarni ketma-ket yuklash
       for (let i = 0; i < files.length; i++) {
@@ -281,7 +291,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
         }
       }
 
-      onConfirm()
+      onConfirm(actualStatus)
       toast.success('Rad etildi', 'Vazifa muvaffaqiyatli rad etildi')
     } catch (err) {
       const details = err?.response?.data?.error?.details
@@ -669,6 +679,7 @@ export default function TasksPage() {
     try {
       await axiosAPI.patch(`/tasks/${taskId}/change-status/`, { status: newStatus })
       setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
+      loadKanbanTasks(filters, search)
     } catch (err) {
       // Rollback
       setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: srcStatus } : c))
@@ -803,15 +814,19 @@ export default function TasksPage() {
           <RejectionModal
             task={{ id: rejectionPending.taskId }}
             onClose={() => setRejectionPending(null)}
-            onConfirm={() => {
+            onConfirm={(actualStatus) => {
               setCards(prev => prev.map(c =>
-                String(c.id) === rejectionPending.draggableId ? { ...c, status: 'rejected' } : c
+                String(c.id) === String(rejectionPending.draggableId)
+                  ? { ...c, status: actualStatus }
+                  : c
               ))
               setData(prev => prev.map(t =>
-                t.id === rejectionPending.taskId ? { ...t, status: 'rejected' } : t
+                t.id === rejectionPending.taskId
+                  ? { ...t, status: actualStatus }
+                  : t
               ))
               setRejectionPending(null)
-              toast.success('Rad etildi', 'Vazifa rad etildi')
+              loadKanbanTasks(filters, search)
             }}
           />
         )}
