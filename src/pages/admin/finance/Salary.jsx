@@ -152,7 +152,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
             <label className={labelCls}>Yaratilgan vaqti oralig'i</label>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex gap-1.5">
-                <div className="flex-1">
+                <div className="w-[180px]">
                   <DateTimeBox type="date" placeholder="dan" value={f.created_at__date__gte} onChange={v => set('created_at__date__gte', v)} dropUp />
                 </div>
                 <div className="w-[90px]">
@@ -160,7 +160,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
                 </div>
               </div>
               <div className="flex gap-1.5">
-                <div className="flex-1">
+                <div className="w-[180px]">
                   <DateTimeBox type="date" placeholder="gacha" value={f.created_at__date__lte} onChange={v => set('created_at__date__lte', v)} dropUp />
                 </div>
                 <div className="w-[90px]">
