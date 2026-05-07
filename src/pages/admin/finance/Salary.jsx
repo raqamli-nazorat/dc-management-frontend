@@ -396,8 +396,8 @@ export default function SalaryPage() {
     else setLoadingMore(true)
     try {
       const params = { page: pg, page_size: 20 }
-      if (q)                     params.search              = q
-      if (f.month)               params.month               = monthToApi(f.month)
+      if (q) params.search = q
+      if (f.month) params.month = monthToApi(f.month)
       if (f.created_at__date__gte) {
         const t = f.created_at__time__gte || '00:00'
         params.created_at__gte = `${f.created_at__date__gte}T${t}:00`
@@ -406,8 +406,8 @@ export default function SalaryPage() {
         const t = f.created_at__time__lte || '00:00'
         params.created_at__lte = `${f.created_at__date__lte}T${t}:59`
       }
-      if (f.total_amount__gte)   params.total_amount__gte   = f.total_amount__gte
-      if (f.total_amount__lte)   params.total_amount__lte   = f.total_amount__lte
+      if (f.total_amount__gte) params.total_amount__gte = f.total_amount__gte
+      if (f.total_amount__lte) params.total_amount__lte = f.total_amount__lte
       if (f.penalty_amount__gte) params.penalty_amount__gte = f.penalty_amount__gte
       if (f.penalty_amount__lte) params.penalty_amount__lte = f.penalty_amount__lte
       const { results, next } = await apiGetPayrolls(params)
@@ -576,7 +576,7 @@ export default function SalaryPage() {
                 <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Jami miqdori (UZS)</th>
                 <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] bg-[#F8F9FC] dark:bg-[#191A1A]">Yaratilgan vaqt</th>
                 <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] sticky right-0 bg-[#F8F9FC] dark:bg-[#191A1A]">Tasdiqlanish</th>
-              </tr> 
+              </tr>
             </thead>
             <tbody>
               {data.map((u, idx) => (
@@ -613,8 +613,8 @@ export default function SalaryPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>

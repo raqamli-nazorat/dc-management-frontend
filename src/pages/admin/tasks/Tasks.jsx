@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -242,9 +242,14 @@ function RejectionModal({ task, onClose, onConfirm }) {
   const [reason, setReason] = useState('')
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(false)
+  const [reasonError, setReasonError] = useState(false)
   const fileRef = useRef(null)
 
   const handleSubmit = async () => {
+    if (!reason.trim()) {
+      setReasonError(true)
+      return
+    }
     setLoading(true)
     try {
       // 1. change-status endpoint orqali rejected + sabab
@@ -327,12 +332,13 @@ function RejectionModal({ task, onClose, onConfirm }) {
         {/* Sabab */}
         <textarea
           value={reason}
-          onChange={e => setReason(e.target.value)}
+          onChange={e => { setReason(e.target.value); if (e.target.value.trim()) setReasonError(false) }}
           placeholder="Sababini yozing..."
           rows={4}
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
+          className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
             bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#B6BCCB] dark:placeholder-[#474848]
-            border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]"
+            focus:border-[#526ED3] transition-colors
+            ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}
         />
 
         <div className="flex items-center justify-end gap-3">
