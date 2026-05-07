@@ -90,6 +90,8 @@ const menuByRole = {
       children: [
         { label: "Xodim bo'yicha", path: '/manager/reports/employee' },
         { label: "Loyihalar bo'yicha", path: '/manager/reports/project' },
+        { label: "Xarajat so'rovlari bo'yicha", path: '/manager/reports/cost_inquiries' },
+        { label: "Ish haqi bo'yicha", path: '/manager/reports/salary' },
         { label: "Vazifalar bo'yicha", path: '/manager/reports/by_tasks' },
       ],
     },
@@ -184,6 +186,9 @@ const menuByRole = {
       children: [
         { label: "Xarajat so'rovlari bo'yicha", path: '/accountant/reports/cost_inquiries' },
         { label: "Ish haqi bo'yicha", path: '/accountant/reports/salary' },
+        { label: "Xodim bo'yicha", path: '/accountant/reports/employee' },
+        { label: "Loyihalar bo'yicha", path: '/accountant/reports/project' },
+        { label: "Vazifalar bo'yicha", path: '/accountant/reports/by_tasks' },
       ],
     },
   ],

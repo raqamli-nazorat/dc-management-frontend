@@ -642,7 +642,7 @@ const Employee = () => {
 
   const handleSelectAccountantConfirm = (selected) => {
     setFilters(prev => ({ ...prev, created_by: selected.join(',') }))
-    setSelectSubmitter(false)
+    setSelectAuthor(false)
   }
 
   const handleSelectProjectConfirm = (selected) => {
@@ -709,7 +709,7 @@ const Employee = () => {
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
-          Shakillantirish
+          Shakllantirish
         </button>
       </div>
       {/* Filter Panel */}
@@ -1130,7 +1130,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.assignee ? filters.assignee.split(',') : []}
           title="Topshiruvchi tanlang"
-          type='employee'
+          employee_role='employee'
           onConfirm={handleSelectEmployeeConfirm}
           onClose={() => setSelectSubmitter(false)}
         />
@@ -1141,7 +1141,7 @@ const Employee = () => {
           selectedList={filters.created_by ? filters.created_by.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
           title="Muallif tanlang"
-          type='creator'
+          param={{ roles: 'admin' }}
           onClose={() => setSelectAuthor(false)}
         />
       )}

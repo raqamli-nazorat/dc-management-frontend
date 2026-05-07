@@ -188,7 +188,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     <div className={`${inputBox} flex-1 min-w-0`}>
                                         <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
                                         <DatePicker
-                                            format="YYYY-MM-DD"
+                                            format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.startFromD ? dayjs(f.startFromD) : null}
                                             onChange={(v) => set('startFromD', v ? v.format('YYYY-MM-DD') : '')}
@@ -214,7 +214,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     <div className={`${inputBox} flex-1 min-w-0`}>
                                         <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
                                         <DatePicker
-                                            format="YYYY-MM-DD"
+                                            format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.startToD ? dayjs(f.startToD) : null}
                                             onChange={(v) => set('startToD', v ? v.format('YYYY-MM-DD') : '')}
@@ -247,7 +247,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     <div className={`${inputBox} flex-1 min-w-0`}>
                                         <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
                                         <DatePicker
-                                            format="YYYY-MM-DD"
+                                            format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.deadFromD ? dayjs(f.deadFromD) : null}
                                             onChange={(v) => set('deadFromD', v ? v.format('YYYY-MM-DD') : '')}
@@ -273,7 +273,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                     <div className={`${inputBox} flex-1 min-w-0`}>
                                         <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
                                         <DatePicker
-                                            format="YYYY-MM-DD"
+                                            format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.deadToD ? dayjs(f.deadToD) : null}
                                             onChange={(v) => set('deadToD', v ? v.format('YYYY-MM-DD') : '')}
