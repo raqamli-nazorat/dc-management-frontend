@@ -195,24 +195,24 @@ const Employee = () => {
     UserReports.forEach((item, index) => {
       const rowData = {
         id: index + 1,
-        prefix: item?.prefix || '-',
-        title: item?.title || '-',
-        description: item?.description || '-',
-        deadline: item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : '-',
-        status: tableStatuses[item?.status] || item?.status || '-',
+        prefix: item?.prefix || '',
+        title: item?.title || '',
+        description: item?.description || '',
+        deadline: item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : '',
+        status: tableStatuses[item?.status] || item?.status || '',
         project_price: item?.project_price || 0,
-        created_by_name: item?.created_by_name || '-',
-        manager_name: item?.manager_name || '-',
-        employees_names: item?.employees_names || '-',
-        testers_names: item?.testers_names || '-',
-        total: item?.task_stats?.total || 0,
-        todo: item?.task_stats?.todo || 0,
-        in_progress: item?.task_stats?.in_progress || 0,
-        overdue: item?.task_stats?.overdue || 0,
-        done: item?.task_stats?.done || 0,
-        production: item?.task_stats?.production || 0,
-        checked: item?.task_stats?.checked || 0,
-        rejected: item?.task_stats?.rejected || 0,
+        created_by_name: item?.created_by_name || '',
+        manager_name: item?.manager_name || '',
+        employees_names: item?.employees_names || '',
+        testers_names: item?.testers_names || '',
+        total: item?.task_stats?.total || '',
+        todo: item?.task_stats?.todo || '',
+        in_progress: item?.task_stats?.in_progress || '',
+        overdue: item?.task_stats?.overdue || '',
+        done: item?.task_stats?.done || '',
+        production: item?.task_stats?.production || '',
+        checked: item?.task_stats?.checked || '',
+        rejected: item?.task_stats?.rejected || '',
       };
       const row = worksheet.addRow(rowData);
 
@@ -388,50 +388,61 @@ const Employee = () => {
           <style>
             @page { 
               size: landscape; 
-              margin: 0; 
+              margin: 5mm; 
             }
             body { 
               font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
               font-size: 8px; 
-              color: #333;
+              color: #1a1d2e;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
-              zoom: 50%;
             }
             h2 { 
               text-align: center; 
               margin-bottom: 15px; 
-              font-size: 14px;
+              font-size: 16px;
+              color: #1e293b;
             }
             table { 
               width: 100%; 
               border-collapse: collapse; 
               margin-bottom: 20px;
+              table-layout: auto;
             }
             th, td { 
               border: 1px solid #e2e8f0; 
-              padding: 3px 4px; 
+              padding: 4px 6px; 
               text-align: left;
-              white-space: nowrap;
             }
             th { 
-              background-color: #f8fafc; 
+              background-color: #7186ED; 
               font-weight: bold; 
-              color: #475569;
+              color: white;
               text-align: center;
+              text-transform: uppercase;
+              font-size: 7px;
+            }
+            td {
+              color: #334155;
             }
             td.number { 
               text-align: right; 
-              font-weight: bold;
+              font-weight: 600;
             }
             td.center { 
               text-align: center; 
             }
+            td.bold {
+              font-weight: 600;
+              color: #1e293b;
+            }
             .status-badge {
               padding: 2px 6px;
               border-radius: 4px;
-              font-size: 9px;
-              font-weight: bold;
+              font-size: 8px;
+              font-weight: 700;
+              display: inline-block;
+              white-space: nowrap;
             }
             .status-planning { background-color: #e0f2fe; color: #0284c7; }
             .status-active { background-color: #dbeafe; color: #1e3a8a; }
@@ -473,28 +484,26 @@ const Employee = () => {
               ${UserReports.map((item, index) => `
                 <tr>
                   <td class="center">${index + 1}</td>
-                  <td>${item?.prefix || '-'}</td>
-                  <td>${item?.title || '-'}</td>
+                  <td class="center">${item?.prefix || '-'}</td>
+                  <td class="bold">${item?.title || '-'}</td>
                   <td>${item?.description || '-'}</td>
                   <td class="center">${item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : '-'}</td>
                   <td class="center">
-                    <span class="status-badge status-${item?.status || 'default'}">
                       ${tableStatuses[item?.status] || item?.status || '-'}
-                    </span>
                   </td>
-                  <td class="number">${formatNum(item?.project_price || 0)}</td>
+                  <td class="number">${item?.project_price ? formatNum(item.project_price) : '0'}</td>
                   <td>${item?.created_by_name || '-'}</td>
                   <td>${item?.manager_name || '-'}</td>
                   <td>${item?.employees_names || '-'}</td>
                   <td>${item?.testers_names || '-'}</td>
-                  <td class="center">${item?.task_stats?.total || 0}</td>
-                  <td class="center">${item?.task_stats?.todo || 0}</td>
-                  <td class="center">${item?.task_stats?.in_progress || 0}</td>
-                  <td class="center">${item?.task_stats?.overdue || 0}</td>
-                  <td class="center">${item?.task_stats?.done || 0}</td>
-                  <td class="center">${item?.task_stats?.production || 0}</td>
-                  <td class="center">${item?.task_stats?.checked || 0}</td>
-                  <td class="center">${item?.task_stats?.rejected || 0}</td>
+                  <td class="center bold">${item?.task_stats?.total || '0'}</td>
+                  <td class="center">${item?.task_stats?.todo || '0'}</td>
+                  <td class="center">${item?.task_stats?.in_progress || '0'}</td>
+                  <td class="center">${item?.task_stats?.overdue || '0'}</td>
+                  <td class="center">${item?.task_stats?.done || '0'}</td>
+                  <td class="center">${item?.task_stats?.production || '0'}</td>
+                  <td class="center">${item?.task_stats?.checked || '0'}</td>
+                  <td class="center">${item?.task_stats?.rejected || '0'}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -592,11 +601,7 @@ const Employee = () => {
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'deadline_min' || key === 'deadline_max') {
-      if (!value) return false;
-      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
-        return false;
-      }
-      return true;
+      return !!value;
     }
     if (value === undefined || value === null || value === '') return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -611,7 +616,11 @@ const Employee = () => {
   }
 
   const handleClear = () => {
-    setFilters(initialFilters)
+    setFilters({
+      ...initialFilters,
+      deadline_min: null,
+      deadline_max: null
+    })
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
@@ -692,7 +701,6 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
@@ -902,12 +910,12 @@ const Employee = () => {
             className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
             onScroll={handleMoreReportsScroll}
           >
-            <table className="text-left border-collapse w-full min-w-[2500px]">
+            <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-center">№</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[100px] sticky left-[40px] z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-start">Titul</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[200px] sticky left-[115px] z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1e2021]! font-bold border-r border-[#e2e6f2] text-end">Nomi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[100px] sticky left-[42px] z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Titul</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[200px] sticky left-[129px] z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-end" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Nomi</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[250px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Ta'rifi</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[180px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muddati</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[120px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
@@ -915,11 +923,11 @@ const Employee = () => {
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Xodimlar</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Sinovchilar</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">Sinovchilar</th>
                   <th colSpan={8} className="py-2 px-3 text-xs font-bold border-b border-[#e2e6f2] dark:border-[#292A2A] text-center">Vazifalar</th>
                 </tr>
                 <tr>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#292A2A] min-w-[140px] max-w-[200px]">Jami</th>
+                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1e2021] min-w-[140px] max-w-[200px]">Jami</th>
                   <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Qilish kerak</th>
                   <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Jarayonda</th>
                   <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Muddati o'tgan</th>
@@ -932,62 +940,65 @@ const Employee = () => {
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors" key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#1E2021]">
+                    <td className="p-3 text-xs text-slate-500 border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[40px] z-10! bg-slate-50 dark:bg-[#1E2021]">
-                      {item?.prefix || '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[42px] z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item?.prefix}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[115px] z-10! bg-slate-50 dark:bg-[#1E2021]">
-                      {item?.title || '-'}
+                    <td className="p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] sticky left-[129px] z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item?.title}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {item?.description || '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item?.description}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : '-'}
+                      {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {tableStatuses[item?.status] || '-'}
+                      {tableStatuses[item?.status]}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.project_price || 0)}
+                      {item?.project_price ? formatNum(item.project_price) : ''}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.created_by_name || '-'}
+                      {item?.created_by_name}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.manager_name || '-'}
+                      {item?.manager_name}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.employees_names || '-'}
+                      {item?.employees_names}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.testers_names || '-'}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 dark:bg-[#292A2A] border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.total || 0}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item?.testers_names}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.todo || 0}
+                      {item?.task_stats?.total || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.in_progress || 0}
+                      {item?.task_stats?.todo || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.overdue || 0}
+                      {item?.task_stats?.in_progress || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.done || 0}
+                      {item?.task_stats?.overdue || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.production || 0}
+                      {item?.task_stats?.done || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.checked || 0}
+                      {item?.task_stats?.production || ''}
+                    </td>
+                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item?.task_stats?.checked || ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 text-center">
-                      {item?.task_stats?.rejected || 0}
+                      {item?.task_stats?.rejected || ''}
                     </td>
                   </tr>
                 ))}

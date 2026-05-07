@@ -202,16 +202,16 @@ const Employee = () => {
     UserReports.forEach((item, index) => {
       const rowData = {
         id: index + 1,
-        name: item?.user?.first_name ? `${item.user.first_name} ${item.user.last_name || ''}` : item?.user?.username || item?.user?.name || 'Noma\'lum',
-        month: months.find(m => m.value === item?.month)?.label || item?.month || '-',
-        salary: item?.salary || 0,
-        kpi: item?.kpi || 0,
-        penalty: item?.penalty || 0,
+        name: item?.user || "-",
+        month: item?.month ? dayjs(item.month).format('DD.MM.YYYY') : "-",
+        salary: item?.fixed_salary || 0,
+        kpi: item?.kpi_bonus || 0,
+        penalty: item?.penalty_amount || 0,
         total: item?.total_amount || 0,
-        status: item?.is_confirmed ? 'Tasdiqlangan' : 'Hisoblangan',
+        status: item?.status || "-",
         created_at: item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
         confirmed_at: item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-        accountant: item?.accountant?.first_name ? `${item.accountant.first_name} ${item.accountant.last_name || ''}` : item?.accountant?.username || item?.accountant?.name || '-'
+        accountant: item?.accountant || "-"
       };
       const row = worksheet.addRow(rowData);
 
@@ -282,16 +282,16 @@ const Employee = () => {
       head: [['№', 'Ism Sharifi', 'Oy', 'Oylik maosh', 'KPI bonus', 'Jarima miqdori', 'Jami miqdori', 'Holati', 'Hisoblangan vaqti', 'Tasdiqlangan vaqti', 'Hisobchi']],
       body: UserReports.map((item, index) => [
         index + 1,
-        item?.user?.first_name ? `${item.user.first_name} ${item.user.last_name || ''}` : item?.user?.username || item?.user?.name || 'Noma\'lum',
-        months.find(m => m.value === item?.month)?.label || item?.month || '-',
-        formatNum(item?.salary || 0),
-        formatNum(item?.kpi || 0),
-        formatNum(item?.penalty || 0),
+        item?.user || '-',
+        item?.month ? dayjs(item.month).format('DD.MM.YYYY') : '-',
+        formatNum(item?.fixed_salary || 0),
+        formatNum(item?.kpi_bonus || 0),
+        formatNum(item?.penalty_amount || 0),
         formatNum(item?.total_amount || 0),
-        item?.is_confirmed ? 'Tasdiqlangan' : 'Hisoblangan',
+        item?.status || '-',
         item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
         item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-        item?.accountant?.first_name ? `${item.accountant.first_name} ${item.accountant.last_name || ''}` : item?.accountant?.username || item?.accountant?.name || '-'
+        item?.accountant || '-'
       ]),
       headStyles: {
         fillColor: [113, 134, 237],
@@ -337,16 +337,16 @@ const Employee = () => {
 
     const csvData = UserReports.map((item, index) => ({
       '№': index + 1,
-      'Ism Sharifi': item?.user?.first_name ? `${item.user.first_name} ${item.user.last_name || ''}` : item?.user?.username || item?.user?.name || 'Noma\'lum',
-      'Oy': months.find(m => m.value === item?.month)?.label || item?.month || '-',
-      'Oylik maosh': item?.salary || 0,
-      'KPI bonus': item?.kpi || 0,
-      'Jarima miqdori': item?.penalty || 0,
+      'Ism Sharifi': item?.user || '-',
+      'Oy': item?.month ? dayjs(item.month).format('DD.MM.YYYY') : '-',
+      'Oylik maosh': item?.fixed_salary || 0,
+      'KPI bonus': item?.kpi_bonus || 0,
+      'Jarima miqdori': item?.penalty_amount || 0,
       'Jami miqdori': item?.total_amount || 0,
-      'Holati': item?.is_confirmed ? 'Tasdiqlangan' : 'Hisoblangan',
+      'Holati': item?.status || '-',
       'Hisoblangan vaqti': item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
       'Tasdiqlangan vaqti': item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-      'Hisobchi': item?.accountant?.first_name ? `${item.accountant.first_name} ${item.accountant.last_name || ''}` : item?.accountant?.username || item?.accountant?.name || '-'
+      'Hisobchi': item?.accountant || '-'
     }));
 
     const csvContent = "\uFEFF" + Papa.unparse(csvData);
@@ -356,7 +356,7 @@ const Employee = () => {
 
   const handlePrint = () => {
     if (!UserReports || UserReports.length === 0) {
-      toast.info('Chop etish uchun ma\'lumot yo\'q');
+      toast.info("Chop etish uchun ma'lumot yo'q");
       return;
     }
 
@@ -368,50 +368,61 @@ const Employee = () => {
           <style>
             @page { 
               size: landscape; 
-              margin: 0; 
+              margin: 5mm; 
             }
             body { 
               font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-              font-size: 8px; 
-              color: #333;
+              font-size: 9px; 
+              color: #1a1d2e;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
-              zoom: 50%;
             }
             h2 { 
               text-align: center; 
-              margin-bottom: 15px; 
-              font-size: 14px;
+              margin-bottom: 20px; 
+              font-size: 18px;
+              color: #1e293b;
             }
             table { 
               width: 100%; 
               border-collapse: collapse; 
               margin-bottom: 20px;
+              table-layout: auto;
             }
             th, td { 
               border: 1px solid #e2e8f0; 
-              padding: 3px 4px; 
+              padding: 6px 8px; 
               text-align: left;
-              white-space: nowrap;
             }
             th { 
-              background-color: #f8fafc; 
+              background-color: #7186ED; 
               font-weight: bold; 
-              color: #475569;
+              color: white;
               text-align: center;
+              text-transform: uppercase;
+              font-size: 8px;
+            }
+            td {
+              color: #334155;
             }
             td.number { 
               text-align: right; 
-              font-weight: bold;
+              font-weight: 600;
             }
             td.center { 
               text-align: center; 
             }
+            td.bold {
+              font-weight: 600;
+              color: #1e293b;
+            }
             .status-badge {
               padding: 2px 6px;
               border-radius: 4px;
-              font-size: 9px;
-              font-weight: bold;
+              font-size: 8px;
+              font-weight: 700;
+              display: inline-block;
+              white-space: nowrap;
             }
             .status-tasdiqlangan {
               background-color: #dcfce7;
@@ -445,20 +456,18 @@ const Employee = () => {
               ${UserReports.map((item, index) => `
                 <tr>
                   <td class="center">${index + 1}</td>
-                  <td>${item?.user?.first_name ? `${item.user.first_name} ${item.user.last_name || ''}` : item?.user?.username || item?.user?.name || 'Noma\'lum'}</td>
-                  <td>${months.find(m => m.value === item?.month)?.label || item?.month || '-'}</td>
-                  <td class="number">${formatNum(item?.salary || 0)}</td>
-                  <td class="number">${formatNum(item?.kpi || 0)}</td>
-                  <td class="number" style="color: #ef4444;">${formatNum(item?.penalty || 0)}</td>
-                  <td class="number">${formatNum(item?.total_amount || 0)}</td>
-                  <td class="center">
-                    <span class="status-badge ${item?.is_confirmed ? 'status-tasdiqlangan' : 'status-hisoblangan'}">
-                      ${item?.is_confirmed ? 'Tasdiqlangan' : 'Hisoblangan'}
-                    </span>
+                  <td class="bold">${item?.user || '-'}</td>
+                  <td class="center">${item?.month ? dayjs(item.month).format('MM.YYYY') : '-'}</td>
+                  <td class="number">${item?.fixed_salary ? formatNum(item.fixed_salary) : '0'}</td>
+                  <td class="number">${item?.kpi_bonus ? formatNum(item.kpi_bonus) : '0'}</td>
+                  <td class="number" style="color: #ef4444;">${item?.penalty_amount ? formatNum(item.penalty_amount) : '0'}</td>
+                  <td class="number">${item?.total_amount ? formatNum(item.total_amount) : '0'}</td>
+                  <td class="center">                    
+                      ${item?.status || '-'}
                   </td>
                   <td class="center">${item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
                   <td class="center">${item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
-                  <td class="center">${item?.accountant?.first_name ? `${item.accountant.first_name} ${item.accountant.last_name || ''}` : item?.accountant?.username || item?.accountant?.name || '-'}</td>
+                  <td>${item?.accountant || '-'}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -556,11 +565,7 @@ const Employee = () => {
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'created_at_min' || key === 'created_at_max') {
-      if (!value) return false;
-      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
-        return false;
-      }
-      return true;
+      return !!value;
     }
     if (value === undefined || value === null || value === '') return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -575,7 +580,11 @@ const Employee = () => {
   }
 
   const handleClear = () => {
-    setFilters(initialFilters)
+    setFilters({
+      ...initialFilters,
+      created_at_min: null,
+      created_at_max: null
+    })
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
@@ -646,7 +655,6 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
@@ -921,8 +929,8 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2000px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED]  dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2] text-center">№</th>
-                  <th className="p-3 text-xs w-[150px] sticky left-[60px] z-20! bg-[#7186ED]  dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2] text-start">Ism Sharifi</th>
+                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
+                  <th className="p-3 text-xs w-[150px] sticky left-[64px] z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Ism Sharifi</th>
                   <th className="p-3 text-xs font-bold border-r w-[100px] border-[#e2e6f2] dark:border-[#292A2A] text-start">Oy</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Oylik maosh</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">KPI bonus</th>
@@ -930,45 +938,48 @@ const Employee = () => {
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Jami miqdori</th>
                   <th className="p-3 text-xs font-bold border-r w-[120px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Holati</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisoblangan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Tasdiqlangan vaqti</th>
-                  <th className="p-3 text-xs font-bold sticky right-0 bg-[#7186ED] dark:bg-[#1E2021] z-10! border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisobchi</th>
+                  <th className="p-3 text-xs font-bold w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Tasdiqlangan vaqti</th>
+                  <th className="p-3 text-xs font-bold sticky right-0 bg-[#7186ED] dark:bg-[#1E2021] z-20! w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Hisobchi</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] " key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#292A2A]">
+                    <td className="p-3 text-xs text-slate-500 dark:text-white border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[60px] z-10! bg-slate-50 dark:bg-[#292A2A]">
-                      {item?.user || "-"}
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-white border-[#e2e6f2] dark:border-[#292A2A] sticky left-[64px] z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item?.user}
                     </td>
                     <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {dayjs(item?.month).format("DD.MM.YYYY") || '-'}
+                      {item?.month ? dayjs(item.month).format('DD.MM.YYYY') : ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.fixed_salary) || "-"}
+                      {item?.fixed_salary ? formatNum(item.fixed_salary) : ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.kpi_bonus) || "-"}
+                      {item?.kpi_bonus ? formatNum(item.kpi_bonus) : ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.penalty_amount) || "-"}
+                      {item?.penalty_amount ? formatNum(item.penalty_amount) : ''}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {formatNum(item?.total_amount || 0)}
+                      {item?.total_amount ? formatNum(item.total_amount) : ''}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.status || "-"}
+                      {item?.status}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') || '-'}
+                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className="p-3 text-xs sticky right-0 bg-slate-50 dark:bg-[#1E2021] text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.accountant || "-"}
+                    <td className="p-3 text-xs sticky right-0 bg-white dark:bg-[#1E2021] text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-center"
+                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
+                      {item?.accountant}
                     </td>
                   </tr>
                 ))}

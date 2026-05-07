@@ -237,39 +237,39 @@ const Employee = () => {
     UserReports.forEach((item, index) => {
       const row = worksheet.addRow([
         index + 1,
-        item?.username || '-',
-        item?.position || '-',
-        item?.region || '-',
-        item?.district || '-',
-        item?.phone_number || '-',
-        item?.fixed_salary || 0,
-        item?.balance || 0,
-        item?.report?.projects?.total || 0,
-        item?.report?.projects?.completed || 0,
-        item?.report?.projects?.in_progress || 0,
-        item?.report?.projects?.cancelled || 0,
-        item?.report?.projects?.overdue || 0,
-        item?.report?.projects?.planning || 0,
-        item?.report?.tasks?.total || 0,
-        item?.report?.tasks?.todo || 0,
-        item?.report?.tasks?.in_progress || 0,
-        item?.report?.tasks?.overdue || 0,
-        item?.report?.tasks?.done || 0,
-        item?.report?.tasks?.production || 0,
-        item?.report?.tasks?.checked || 0,
-        item?.report?.tasks?.rejected || 0,
-        item?.report?.meetings?.total || 0,
-        item?.report?.meetings?.attended || 0,
-        item?.report?.meetings?.missed_excused || 0,
-        item?.report?.meetings?.missed_unexcused || 0,
-        item?.report?.expense_requests_amount?.total || 0,
-        item?.report?.expense_requests_amount?.pending || 0,
-        item?.report?.expense_requests_amount?.pain || 0,
-        item?.report?.expense_requests_amount?.confirmed || 0,
-        item?.report?.payroll_amount?.total || 0,
-        item?.report?.payroll_amount?.kpi_bonuses || 0,
-        item?.report?.payroll_amount?.penalty_amount || 0,
-        item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY') : '-'
+        item?.username || '',
+        item?.position || '',
+        item?.region || '',
+        item?.district || '',
+        item?.phone_number || '',
+        item?.fixed_salary || '',
+        item?.balance || '',
+        item?.report?.projects?.total || '',
+        item?.report?.projects?.completed || '',
+        item?.report?.projects?.in_progress || '',
+        item?.report?.projects?.cancelled || '',
+        item?.report?.projects?.overdue || '',
+        item?.report?.projects?.planning || '',
+        item?.report?.tasks?.total || '',
+        item?.report?.tasks?.todo || '',
+        item?.report?.tasks?.in_progress || '',
+        item?.report?.tasks?.overdue || '',
+        item?.report?.tasks?.done || '',
+        item?.report?.tasks?.production || '',
+        item?.report?.tasks?.checked || '',
+        item?.report?.tasks?.rejected || '',
+        item?.report?.meetings?.total || '',
+        item?.report?.meetings?.attended || '',
+        item?.report?.meetings?.missed_excused || '',
+        item?.report?.meetings?.missed_unexcused || '',
+        item?.report?.expense_requests_amount?.total || '',
+        item?.report?.expense_requests_amount?.pending || '',
+        item?.report?.expense_requests_amount?.pain || '',
+        item?.report?.expense_requests_amount?.confirmed || '',
+        item?.report?.payroll_amount?.total || '',
+        item?.report?.payroll_amount?.kpi_bonuses || '',
+        item?.report?.payroll_amount?.penalty_amount || '',
+        item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ''
       ]);
 
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
@@ -343,39 +343,39 @@ const Employee = () => {
       ],
       body: UserReports.map((item, index) => [
         index + 1,
-        item?.username || '-',
-        item?.position || '-',
-        item?.region || '-',
-        item?.district || '-',
-        item?.phone_number || '-',
-        Number(item?.fixed_salary || 0).toLocaleString("uz-UZ"),
-        Number(item?.balance || 0).toLocaleString("uz-UZ"),
-        item?.report?.projects?.total || 0,
-        item?.report?.projects?.completed || 0,
-        item?.report?.projects?.in_progress || 0,
-        item?.report?.projects?.cancelled || 0,
-        item?.report?.projects?.overdue || 0,
-        item?.report?.projects?.planning || 0,
-        item?.report?.tasks?.total || 0,
-        item?.report?.tasks?.todo || 0,
-        item?.report?.tasks?.in_progress || 0,
-        item?.report?.tasks?.overdue || 0,
-        item?.report?.tasks?.done || 0,
-        item?.report?.tasks?.production || 0,
-        item?.report?.tasks?.checked || 0,
-        item?.report?.tasks?.rejected || 0,
-        item?.report?.meetings?.total || 0,
-        item?.report?.meetings?.attended || 0,
-        item?.report?.meetings?.missed_excused || 0,
-        item?.report?.meetings?.missed_unexcused || 0,
-        Number(item?.report?.expense_requests_amount?.total || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.expense_requests_amount?.pending || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.expense_requests_amount?.pain || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.expense_requests_amount?.confirmed || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.payroll_amount?.total || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.payroll_amount?.kpi_bonuses || 0).toLocaleString("uz-UZ"),
-        Number(item?.report?.payroll_amount?.penalty_amount || 0).toLocaleString("uz-UZ"),
-        item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY') : '-'
+        item?.username || '',
+        item?.position || '',
+        item?.region || '',
+        item?.district || '',
+        item?.phone_number || '',
+        Number(item?.fixed_salary || '').toLocaleString("uz-UZ"),
+        Number(item?.balance || '').toLocaleString("uz-UZ"),
+        item?.report?.projects?.total || '',
+        item?.report?.projects?.completed || '',
+        item?.report?.projects?.in_progress || '',
+        item?.report?.projects?.cancelled || '',
+        item?.report?.projects?.overdue || '',
+        item?.report?.projects?.planning || '',
+        item?.report?.tasks?.total || '',
+        item?.report?.tasks?.todo || '',
+        item?.report?.tasks?.in_progress || '',
+        item?.report?.tasks?.overdue || '',
+        item?.report?.tasks?.done || '',
+        item?.report?.tasks?.production || '',
+        item?.report?.tasks?.checked || '',
+        item?.report?.tasks?.rejected || '',
+        item?.report?.meetings?.total || '',
+        item?.report?.meetings?.attended || '',
+        item?.report?.meetings?.missed_excused || '',
+        item?.report?.meetings?.missed_unexcused || '',
+        Number(item?.report?.expense_requests_amount?.total || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.expense_requests_amount?.pending || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.expense_requests_amount?.pain || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.expense_requests_amount?.confirmed || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.payroll_amount?.total || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.payroll_amount?.kpi_bonuses || '').toLocaleString("uz-UZ"),
+        Number(item?.report?.payroll_amount?.penalty_amount || '').toLocaleString("uz-UZ"),
+        item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ''
       ]),
       headStyles: {
         fillColor: [113, 134, 237],
@@ -409,39 +409,39 @@ const Employee = () => {
 
     const csvData = UserReports.map((item, index) => ({
       '№': index + 1,
-      'Ism Sharifi': item?.username || '-',
-      'Lavozim': item?.position || '-',
-      'Viloyati': item?.region || '-',
-      'Tumani': item?.district || '-',
-      'Telefon raqami': item?.phone_number || '-',
-      'Oylik maosh (UZS)': item?.fixed_salary || 0,
-      'Balans (UZS)': item?.balance || 0,
-      'Loyihalar - Jami': item?.report?.projects?.total || 0,
-      'Loyihalar - Tugatilgan': item?.report?.projects?.completed || 0,
-      'Loyihalar - Jarayonda': item?.report?.projects?.in_progress || 0,
-      'Loyihalar - Bekor qilingan': item?.report?.projects?.cancelled || 0,
-      "Loyihalar - Muddati o'tgan": item?.report?.projects?.overdue || 0,
-      'Loyihalar - Rejalashtirilayotgan': item?.report?.projects?.planning || 0,
-      'Vazifalar - Jami': item?.report?.tasks?.total || 0,
-      'Vazifalar - Qilish kerak': item?.report?.tasks?.todo || 0,
-      'Vazifalar - Jarayonda': item?.report?.tasks?.in_progress || 0,
-      "Vazifalar - Muddati o'tgan": item?.report?.tasks?.overdue || 0,
-      'Vazifalar - Bajarilgan': item?.report?.tasks?.done || 0,
-      'Vazifalar - Ishga tushurilgan': item?.report?.tasks?.production || 0,
-      'Vazifalar - Tekshirilgan': item?.report?.tasks?.checked || 0,
-      'Vazifalar - Rad etilgan': item?.report?.tasks?.rejected || 0,
-      "Yig'ilishlar - Jami": item?.report?.meetings?.total || 0,
-      "Yig'ilishlar - Qatnashgan": item?.report?.meetings?.attended || 0,
-      "Yig'ilishlar - Sababli qatnashmagan": item?.report?.meetings?.missed_excused || 0,
-      "Yig'ilishlar - Sababsiz qatnashmagan": item?.report?.meetings?.missed_unexcused || 0,
-      "Xarajat so'rovlari (UZS) - Jami": item?.report?.expense_requests_amount?.total || 0,
-      "Xarajat so'rovlari (UZS) - Kutilmoqda": item?.report?.expense_requests_amount?.pending || 0,
-      "Xarajat so'rovlari (UZS) - To'landi": item?.report?.expense_requests_amount?.pain || 0,
-      "Xarajat so'rovlari (UZS) - Tasdiqlangan": item?.report?.expense_requests_amount?.confirmed || 0,
-      'Ish haqi (UZS) - Jami': item?.report?.payroll_amount?.total || 0,
-      'Ish haqi (UZS) - KPI bonusi': item?.report?.payroll_amount?.kpi_bonuses || 0,
-      'Ish haqi - Jarima miqdori': item?.report?.payroll_amount?.penalty_amount || 0,
-      'Ishga kirgan vaqti': item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY') : '-'
+      'Ism Sharifi': item?.username || '',
+      'Lavozim': item?.position || '',
+      'Viloyati': item?.region || '',
+      'Tumani': item?.district || '',
+      'Telefon raqami': item?.phone_number || '',
+      'Oylik maosh (UZS)': item?.fixed_salary || '',
+      'Balans (UZS)': item?.balance || '',
+      'Loyihalar - Jami': item?.report?.projects?.total || '',
+      'Loyihalar - Tugatilgan': item?.report?.projects?.completed || '',
+      'Loyihalar - Jarayonda': item?.report?.projects?.in_progress || '',
+      'Loyihalar - Bekor qilingan': item?.report?.projects?.cancelled || '',
+      "Loyihalar - Muddati o'tgan": item?.report?.projects?.overdue || '',
+      'Loyihalar - Rejalashtirilayotgan': item?.report?.projects?.planning || '',
+      'Vazifalar - Jami': item?.report?.tasks?.total || '',
+      'Vazifalar - Qilish kerak': item?.report?.tasks?.todo || '',
+      'Vazifalar - Jarayonda': item?.report?.tasks?.in_progress || '',
+      "Vazifalar - Muddati o'tgan": item?.report?.tasks?.overdue || '',
+      'Vazifalar - Bajarilgan': item?.report?.tasks?.done || '',
+      'Vazifalar - Ishga tushurilgan': item?.report?.tasks?.production || '',
+      'Vazifalar - Tekshirilgan': item?.report?.tasks?.checked || '',
+      'Vazifalar - Rad etilgan': item?.report?.tasks?.rejected || '',
+      "Yig'ilishlar - Jami": item?.report?.meetings?.total || '',
+      "Yig'ilishlar - Qatnashgan": item?.report?.meetings?.attended || '',
+      "Yig'ilishlar - Sababli qatnashmagan": item?.report?.meetings?.missed_excused || '',
+      "Yig'ilishlar - Sababsiz qatnashmagan": item?.report?.meetings?.missed_unexcused || '',
+      "Xarajat so'rovlari (UZS) - Jami": item?.report?.expense_requests_amount?.total || '',
+      "Xarajat so'rovlari (UZS) - Kutilmoqda": item?.report?.expense_requests_amount?.pending || '',
+      "Xarajat so'rovlari (UZS) - To'landi": item?.report?.expense_requests_amount?.pain || '',
+      "Xarajat so'rovlari (UZS) - Tasdiqlangan": item?.report?.expense_requests_amount?.confirmed || '',
+      'Ish haqi (UZS) - Jami': item?.report?.payroll_amount?.total || '',
+      'Ish haqi (UZS) - KPI bonusi': item?.report?.payroll_amount?.kpi_bonuses || '',
+      'Ish haqi - Jarima miqdori': item?.report?.payroll_amount?.penalty_amount || '',
+      'Ishga kirgan vaqti': item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ''
     }));
 
     const csvContent = "\\uFEFF" + Papa.unparse(csvData);
@@ -461,17 +461,68 @@ const Employee = () => {
           <head>
             <title>Xodimlar hisoboti</title>
             <style>
-              @page { size: landscape; margin: 0; }
-              body { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; font-size: 7px; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; zoom: 50%; }
-              h2 { text-align: center; margin-bottom: 15px; font-size: 12px; }
-              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-              th, td { border: 1px solid #e2e8f0; padding: 2px 3px; text-align: left; white-space: nowrap; }
-              th { background-color: #f8fafc; font-weight: bold; color: #475569; text-align: center; }
-              th.main-group { background-color: #7186ED; color: white; }
-              th.sub-group { background-color: #8999EF; color: white; font-size: 7px; }
-              td.number { text-align: right; font-weight: bold; }
-              td.center { text-align: center; }
-              td.bg-slate { background-color: #f8fafc; }
+              @page { 
+                size: landscape; 
+                margin: 5mm; 
+              }
+              body { 
+                font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; 
+                font-size: 8px; 
+                color: #1a1d2e; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+              }
+              h2 { 
+                text-align: center; 
+                margin-bottom: 10px; 
+                font-size: 14px; 
+                color: #1e293b;
+              }
+              table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-bottom: 15px; 
+              }
+              th, td { 
+                border: 1px solid #e2e8f0; 
+                padding: 3px 4px; 
+                text-align: left; 
+                white-space: nowrap; 
+              }
+              th { 
+                background-color: #7186ED; 
+                font-weight: bold; 
+                color: white; 
+                text-align: center; 
+                font-size: 7px;
+              }
+              th.main-group { 
+                background-color: #7186ED; 
+                color: white; 
+                border-color: #5a6ed1;
+              }
+              th.sub-group { 
+                background-color: #7186ED ; 
+                color: #475569; 
+                font-size: 6px; 
+              }
+              td {
+                color: #334155;
+              }
+              td.number { 
+                text-align: right; 
+                font-weight: 600; 
+              }
+              td.center { 
+                text-align: center; 
+              }
+              td.bg-slate { 
+                background-color: #f8fafc; 
+              }
+              td.bold {
+                font-weight: 600;
+                color: #1e293b;
+              }
             </style>
           </head>
           <body>
@@ -503,44 +554,44 @@ const Employee = () => {
                 </tr>
               </thead>
               <tbody>
-                \${UserReports.map((item, index) => \`
+                ${UserReports.map((item, index) => `
                   <tr>
-                    <td class="center">\${index + 1}</td>
-                    <td><b>\${item?.username || '-'}</b></td>
-                    <td class="center">\${item?.position || '-'}</td>
-                    <td class="center">\${item?.region || '-'}</td>
-                    <td class="center">\${item?.district || '-'}</td>
-                    <td class="center">\${item?.phone_number || '-'}</td>
-                    <td class="number">\${Number(item?.fixed_salary || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.balance || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="center bg-slate">\${item?.report?.projects?.total || 0}</td>
-                    <td class="center">\${item?.report?.projects?.completed || 0}</td>
-                    <td class="center">\${item?.report?.projects?.in_progress || 0}</td>
-                    <td class="center">\${item?.report?.projects?.cancelled || 0}</td>
-                    <td class="center">\${item?.report?.projects?.overdue || 0}</td>
-                    <td class="center">\${item?.report?.projects?.planning || 0}</td>
-                    <td class="center bg-slate">\${item?.report?.tasks?.total || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.todo || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.in_progress || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.overdue || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.done || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.production || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.checked || 0}</td>
-                    <td class="center">\${item?.report?.tasks?.rejected || 0}</td>
-                    <td class="center bg-slate">\${item?.report?.meetings?.total || 0}</td>
-                    <td class="center">\${item?.report?.meetings?.attended || 0}</td>
-                    <td class="center">\${item?.report?.meetings?.missed_excused || 0}</td>
-                    <td class="center">\${item?.report?.meetings?.missed_unexcused || 0}</td>
-                    <td class="number bg-slate">\${Number(item?.report?.expense_requests_amount?.total || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.report?.expense_requests_amount?.pending || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.report?.expense_requests_amount?.pain || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.report?.expense_requests_amount?.confirmed || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number bg-slate">\${Number(item?.report?.payroll_amount?.total || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.report?.payroll_amount?.kpi_bonuses || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="number">\${Number(item?.report?.payroll_amount?.penalty_amount || 0).toLocaleString("uz-UZ")}</td>
-                    <td class="center">\${item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY') : '-'}</td>
+                    <td class="center">${index + 1}</td>
+                    <td class="bold">${item?.username || ''}</td>
+                    <td>${item?.position || ''}</td>
+                    <td>${item?.region || ''}</td>
+                    <td>${item?.district || ''}</td>
+                    <td class="center">${item?.phone_number || ''}</td>
+                    <td class="number">${item?.fixed_salary ? Number(item.fixed_salary).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.balance ? Number(item.balance).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="center bg-slate">${item?.report?.projects?.total || ''}</td>
+                    <td class="center">${item?.report?.projects?.completed || ''}</td>
+                    <td class="center">${item?.report?.projects?.in_progress || ''}</td>
+                    <td class="center">${item?.report?.projects?.cancelled || ''}</td>
+                    <td class="center">${item?.report?.projects?.overdue || ''}</td>
+                    <td class="center">${item?.report?.projects?.planning || ''}</td>
+                    <td class="center bg-slate">${item?.report?.tasks?.total || ''}</td>
+                    <td class="center">${item?.report?.tasks?.todo || ''}</td>
+                    <td class="center">${item?.report?.tasks?.in_progress || ''}</td>
+                    <td class="center">${item?.report?.tasks?.overdue || ''}</td>
+                    <td class="center">${item?.report?.tasks?.done || ''}</td>
+                    <td class="center">${item?.report?.tasks?.production || ''}</td>
+                    <td class="center">${item?.report?.tasks?.checked || ''}</td>
+                    <td class="center">${item?.report?.tasks?.rejected || ''}</td>
+                    <td class="center bg-slate">${item?.report?.meetings?.total || ''}</td>
+                    <td class="center">${item?.report?.meetings?.attended || ''}</td>
+                    <td class="center">${item?.report?.meetings?.missed_excused || ''}</td>
+                    <td class="center">${item?.report?.meetings?.missed_unexcused || ''}</td>
+                    <td class="number bg-slate">${item?.report?.expense_requests_amount?.total ? Number(item.report.expense_requests_amount.total).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.report?.expense_requests_amount?.pending ? Number(item.report.expense_requests_amount.pending).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.report?.expense_requests_amount?.pain ? Number(item.report.expense_requests_amount.pain).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.report?.expense_requests_amount?.confirmed ? Number(item.report.expense_requests_amount.confirmed).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number bg-slate">${item?.report?.payroll_amount?.total ? Number(item.report.payroll_amount.total).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.report?.payroll_amount?.kpi_bonuses ? Number(item.report.payroll_amount.kpi_bonuses).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="number">${item?.report?.payroll_amount?.penalty_amount ? Number(item.report.payroll_amount.penalty_amount).toLocaleString("uz-UZ") : ""}</td>
+                    <td class="center">${item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ''}</td>
                   </tr>
-                \`).join('')}
+                `).join('')}
               </tbody>
             </table>
           </body>
@@ -631,20 +682,10 @@ const Employee = () => {
     }, {})
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => {
-    if (value === undefined || value === null || value === '') return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
-
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'joined_min' || key === 'joined_max') {
-      if (!value) return false;
-      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
-        return false;
-      }
-      return true;
+      return !!value;
     }
     if (value === undefined || value === null || value === '') return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -659,7 +700,11 @@ const Employee = () => {
   }
 
   const handleClear = () => {
-    setFilters(initialFilters)
+    setFilters({
+      ...initialFilters,
+      joined_min: null,
+      joined_max: null
+    })
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
@@ -726,7 +771,6 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
@@ -1116,22 +1160,22 @@ const Employee = () => {
           <table className="text-left border-collapse w-[4500px]">
             <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
               <tr>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r-1! border-[#e2e6f2] dark:border-[#292A2A]">№</th>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[200px] left-[45px] z-10! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r-1! border-[#e2e6f2] dark:border-[#292A2A]">Ism Sharifi</th>
-                <th rowSpan={2} className="p-3 text-xs sticky w-[180px] left-[240px] z-10! bg-[#7186ED] font-bold border-r-1! border-[#e2e6f2] text-center dark:bg-[#1e2021] dark:border-[#292A2A]">Lavozim</th>
-                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Viloyati</th>
-                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Tumani</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Telefon raqami</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Oylik maosh (UZS)</th>
-                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-center dark:border-[#292A2A]">Balans (UZS)</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[#e2e6f2] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>№</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[200px] left-[45px] z-20! bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>Ism Sharifi</th>
+                <th rowSpan={2} className="p-3 text-xs sticky w-[180px] left-[245px] z-20! bg-[#7186ED] font-bold border-[#e2e6f2] text-start dark:bg-[#1e2021] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>Lavozim</th>
+                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-end dark:border-[#292A2A]">Viloyati</th>
+                <th rowSpan={2} className="p-3 text-xs w-[160px] font-bold border-r-1! border-[#e2e6f2] text-end dark:border-[#292A2A]">Tumani</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-end dark:border-[#292A2A]">Telefon raqami</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-end dark:border-[#292A2A]">Oylik maosh (UZS)</th>
+                <th rowSpan={2} className="p-3 text-xs w-[180px] font-bold border-r-1! border-[#e2e6f2] text-end dark:border-[#292A2A]">Balans (UZS)</th>
                 <th colSpan={6} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Loyihalar</th>
                 <th colSpan={8} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Vazifalar</th>
                 <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Yig'ilishlar</th>
                 <th colSpan={4} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Xarajat so'rovlari (UZS)</th>
                 <th colSpan={3} className="p-2 text-xs font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:border-[#292A2A]">Ish haqi (UZS)</th>
-                <th rowSpan={2} className="p-2 text-xs sticky right-0 z-10! bg-[#7186ED] font-bold border-r-1! text-center border-b border-[#e2e6f2] dark:bg-[#1e2021]! dark:border-[#292A2A]">Ishga kirgan vaqti</th>
+                <th rowSpan={2} className="p-2 text-xs sticky right-0 z-20! bg-[#7186ED] font-bold border-[#e2e6f2] text-center dark:bg-[#1e2021]! dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2' }}>Ishga kirgan vaqti</th>
               </tr>
-              <tr className="bg-[#8999EF] dark:bg-[#1E2021] text-[10px] text-center">
+              <tr className="bg-[#7186ED] dark:bg-[#1E2021] text-[10px] text-center">
                 <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jami</th>
                 <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Tugatilgan</th>
                 <th className="p-2 border-r border-[#e2e6f2] dark:border-[#292A2A]">Jarayonda</th>
@@ -1163,69 +1207,69 @@ const Employee = () => {
               {UserReports.map((item, index) => (
                 <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
                   <td
-                    className="p-3 text-xs text-slate-500 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#292A2A]">
+                    className="p-3 text-xs text-slate-500 border-t border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
+                    style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>
                     {index + 1}
                   </td>
-                  <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] sticky left-[44px] z-10! bg-slate-50 dark:bg-[#292A2A]">
+                  <td className="p-3 text-xs text-start font-semibold text-slate-700 dark:text-slate-200 border-t border-[#e2e6f2] dark:border-[#292A2A] sticky left-[45px] z-10! bg-white dark:bg-[#1E2021]"
+                    style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>
                     {item.username}
                   </td>
-                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r! border-t! border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[243px] z-10! bg-slate-50 dark:bg-[#292A2A]!">
-                    {item.position || "-"}
+                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[245px] z-10! bg-white dark:bg-[#1E2021]"
+                    style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>
+                    {item.position}
                   </td>
-                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">{item.region || "-"}</td>
-                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">{item.district || "-"}</td>
-                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">{item.phone_number || "-"}</td>
-                  <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                    {Number(item.fixed_salary || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end">{item.region}</td>
+                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end">{item.district}</td>
+                  <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">{item.phone_number}</td>
+                  <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    {item.fixed_salary && Number(item.fixed_salary) > 0 ? Number(item.fixed_salary).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                    {Number(item.balance || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    {item.balance && Number(item.balance) > 0 ? Number(item.balance).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-slate-50/50 dark:bg-white/5">{item?.report?.projects?.total || 0}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects.completed}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects.in_progress}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects.cancelled}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects.overdue}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects.planning}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-slate-50/50 dark:bg-white/5">
-                    {item?.report?.tasks.total}
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.total || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.completed || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.in_progress || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.cancelled || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.overdue || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.projects?.planning || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.total || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.todo || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.in_progress || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.overdue || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.done || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.production || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.checked || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks?.rejected || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.total || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.attended || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.missed_excused || ""}</td>
+                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.missed_unexcused || ""}</td>
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.expense_requests_amount?.total ? Number(item.report.expense_requests_amount.total).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.todo}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.in_progress}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.overdue}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.done}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.production}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.checked}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.tasks.rejected}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-slate-50/50 dark:bg-white/5">
-                    {item?.report?.meetings?.total}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.expense_requests_amount?.pending ? Number(item.report.expense_requests_amount.pending).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.attended}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.missed_excused}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">{item?.report?.meetings?.missed_unexcused}</td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-slate-50/50 dark:bg-white/5">
-                    {Number(item?.report?.expense_requests_amount?.total || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.expense_requests_amount?.pain ? Number(item.report.expense_requests_amount.pain).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.expense_requests_amount?.pending || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.expense_requests_amount?.confirmed ? Number(item.report.expense_requests_amount.confirmed).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.expense_requests_amount?.pain || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.payroll_amount?.total ? Number(item.report.payroll_amount.total).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.expense_requests_amount?.confirmed || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.payroll_amount?.kpi_bonuses ? Number(item.report.payroll_amount.kpi_bonuses).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.payroll_amount?.total || 0).toLocaleString("uz-UZ")}
+                  <td className="p-3 text-xs text-end border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
+                    {item?.report?.payroll_amount?.penalty_amount ? Number(item.report.payroll_amount.penalty_amount).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.payroll_amount?.kpi_bonuses || 0).toLocaleString("uz-UZ")}
-                  </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A]">
-                    {Number(item?.report?.payroll_amount?.penalty_amount || 0).toLocaleString("uz-UZ")}
-                  </td>
-                  <td className="p-3 text-xs text-center border-r border-t border-[#e2e6f2] dark:border-[#292A2A] dark:bg-[#292A2A]! sticky right-0 z-10! bg-slate-50!">
-                    {dayjs(item?.created_at || "2026-04-30T03:23:39+05:00").format('DD.MM.YYYY')}
+                  <td className="p-3 text-xs text-end border-t border-[#e2e6f2] dark:border-[#292A2A] sticky right-0 z-10! bg-white dark:bg-[#1E2021]"
+                    style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2' }}>
+                    {item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ""}
                   </td>
                 </tr>
               ))}

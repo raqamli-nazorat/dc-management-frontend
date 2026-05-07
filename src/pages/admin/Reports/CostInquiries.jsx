@@ -81,6 +81,7 @@ const Employee = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
 
@@ -144,7 +145,8 @@ const Employee = () => {
 
 
   const loadMoreReports = async () => {
-    if (!ReportsNextURL) return
+    if (!ReportsNextURL || isFetchingNextPage) return
+    setIsFetchingNextPage(true)
     try {
       const { data } = await axiosAPI.get(ReportsNextURL)
       setUserReports(prev => [...prev, ...data.data.results])
@@ -152,12 +154,14 @@ const Employee = () => {
     } catch (error) {
       console.error(error)
       toast.error('Keyingi sahifani yuklashda xatolik yuz berdi.', error?.response?.data?.error?.errMsg || 'Iltimos, qayta urinib ko\'ring.')
+    } finally {
+      setIsFetchingNextPage(false)
     }
   }
 
   const handleMoreReportsScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target
-    if (scrollHeight - scrollTop <= clientHeight + 50 && ReportsNextURL) {
+    if (scrollHeight - scrollTop <= clientHeight + 100 && ReportsNextURL && !isFetchingNextPage) {
       loadMoreReports()
     }
   }
@@ -215,21 +219,21 @@ const Employee = () => {
     UserReports.forEach((item, index) => {
       const rowData = {
         id: index + 1,
-        name: item.user || '-',
-        project: item.project || '-',
-        expense_category: item.expense_category || '-',
-        type: cost_type.find((t) => t.value === item.type)?.label || '-',
+        name: item.user || '',
+        project: item.project || '',
+        expense_category: item.expense_category || '',
+        type: cost_type.find((t) => t.value === item.type)?.label || '',
         amount: item.amount || 0,
-        payment_method: item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+        payment_method: item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '',
         status: item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
-        reason: item.reason || '-',
-        created_at: item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
-        paid_at: item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
-        confirmed_at: item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-        accountant: item.accountant || '-',
-        cancelled_at: item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
-        cancel_reason: item.cancel_reason || '-',
-        card_number: item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+        reason: item.reason || '',
+        created_at: item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '',
+        paid_at: item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '',
+        confirmed_at: item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '',
+        accountant: item.accountant || '',
+        cancelled_at: item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '',
+        cancel_reason: item.cancel_reason || '',
+        card_number: item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''
       };
       const row = worksheet.addRow(rowData);
 
@@ -295,21 +299,21 @@ const Employee = () => {
       head: [['№', 'Ism Sharifi', 'Loyiha nomi', 'Xarajat turi', 'Toifa', 'Miqdori (UZS)', "To'lov turi", 'Holati', "So'rov sababi", "So'ralgan vaqti", "To'langan vaqti", 'Tasdiqlangan vaqti', 'Hisobchi', 'Bekor qilingan vaqti', 'Bekor sababi', 'Karta raqami']],
       body: UserReports.map((item, index) => [
         index + 1,
-        item.user || '-',
-        item.project || '-',
-        item.expense_category || '-',
-        cost_type.find((t) => t.value === item.type)?.label || '-',
+        item.user || '',
+        item.project || '',
+        item.expense_category || '',
+        cost_type.find((t) => t.value === item.type)?.label || '',
         formatNum(item.amount || 0),
-        item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+        item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '',
         item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
-        item.reason || '-',
-        item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
-        item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
-        item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-        item.accountant || '-',
-        item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
-        item.cancel_reason || '-',
-        item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+        item.reason || '',
+        item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '',
+        item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '',
+        item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '',
+        item.accountant || '',
+        item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '',
+        item.cancel_reason || '',
+        item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''
       ]),
       headStyles: {
         fillColor: [113, 134, 237],
@@ -347,21 +351,21 @@ const Employee = () => {
 
     const csvData = UserReports.map((item, index) => ({
       '№': index + 1,
-      'Ism Sharifi': item.user || '-',
-      'Loyiha nomi': item.project || '-',
-      'Xarajat turi': item.expense_category || '-',
-      'Toifa': cost_type.find((t) => t.value === item.type)?.label || '-',
+      'Ism Sharifi': item.user || '',
+      'Loyiha nomi': item.project || '',
+      'Xarajat turi': item.expense_category || '',
+      'Toifa': cost_type.find((t) => t.value === item.type)?.label || '',
       'Miqdori (UZS)': item.amount || 0,
-      "To'lov turi": item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-',
+      "To'lov turi": item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '',
       'Holati': item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status,
-      "So'rov sababi": item.reason || '-',
-      "So'ralgan vaqti": item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-',
-      "To'langan vaqti": item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-',
-      'Tasdiqlangan vaqti': item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-',
-      'Hisobchi': item.accountant || '-',
-      'Bekor qilingan vaqti': item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-',
-      'Bekor sababi': item.cancel_reason || '-',
-      'Karta raqami': item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'
+      "So'rov sababi": item.reason || '',
+      "So'ralgan vaqti": item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '',
+      "To'langan vaqti": item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '',
+      'Tasdiqlangan vaqti': item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '',
+      'Hisobchi': item.accountant || '',
+      'Bekor qilingan vaqti': item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '',
+      'Bekor sababi': item.cancel_reason || '',
+      'Karta raqami': item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''
     }));
 
     const csvContent = "\uFEFF" + Papa.unparse(csvData);
@@ -383,50 +387,61 @@ const Employee = () => {
             <style>
               @page { 
                 size: landscape; 
-                margin: 0; 
+                margin: 10mm; 
               }
               body { 
                 font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-                font-size: 8px; 
-                color: #333;
+                font-size: 9px; 
+                color: #1a1d2e;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                zoom: 50%;
               }
               h2 { 
                 text-align: center; 
-                margin-bottom: 15px; 
-                font-size: 14px;
+                margin-bottom: 20px; 
+                font-size: 18px;
+                color: #1e293b;
               }
               table { 
                 width: 100%; 
                 border-collapse: collapse; 
                 margin-bottom: 20px;
+                table-layout: auto;
               }
               th, td { 
                 border: 1px solid #e2e8f0; 
-                padding: 3px 4px; 
-                text-align: left; 
-                white-space: nowrap;
+                padding: 6px 8px; 
+                text-align: left;
               }
               th { 
-                background-color: #f8fafc; 
+                background-color: #7186ED; 
                 font-weight: bold; 
-                color: #475569;
+                color: white;
                 text-align: center;
+                text-transform: uppercase;
+                font-size: 8px;
+              }
+              td {
+                color: #334155;
               }
               td.number { 
                 text-align: right; 
-                font-weight: bold;
+                font-weight: 600;
               }
               td.center { 
                 text-align: center; 
               }
+              td.bold {
+                font-weight: 600;
+                color: #1e293b;
+              }
               .status-badge {
-                padding: 2px 4px;
+                padding: 2px 6px;
                 border-radius: 4px;
                 font-size: 8px;
-                font-weight: bold;
+                font-weight: 700;
+                display: inline-block;
+                white-space: nowrap;
               }
               .status-tasdiqlangan {
                 background-color: #dcfce7;
@@ -472,40 +487,38 @@ const Employee = () => {
               <tbody>
                 ${UserReports.map((item, index) => {
       let statusClass = 'status-boshqa';
-      let statusText = item.status;
+      let statusText = item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? "To'langan" : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status;
+
       if (item.status === 'confirmed') {
         statusClass = 'status-tasdiqlangan';
-        statusText = 'Tasdiqlangan';
       } else if (item.status === 'paid') {
         statusClass = 'status-tolangan';
-        statusText = "To'langan";
       } else if (item.status === 'cancelled') {
         statusClass = 'status-bekor';
-        statusText = 'Bekor qilingan';
       }
 
       return `
                   <tr>
                     <td class="center">${index + 1}</td>
-                    <td><b>${item.user || '-'}</b></td>
-                    <td class="center">${item.project || '-'}</td>
-                    <td class="center">${item.expense_category || '-'}</td>
-                    <td class="center">${cost_type.find((t) => t.value === item.type)?.label || '-'}</td>
-                    <td class="number">${formatNum(item.amount || 0)}</td>
-                    <td class="center">${item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-'}</td>
-                    <td class="center">
-                      <span class="status-badge ${statusClass}">
-                        ${statusText}
-                      </span>
+                    <td class="bold">${item.user || ''}</td>
+                    <td>${item.project || ''}</td>
+                    <td class="center">${item.expense_category || ''}</td>
+                    <td class="center">${cost_type.find((t) => t.value === item.type)?.label || ''}</td>
+                    <td class="number">
+                      ${item.amount ? Number(item.amount).toLocaleString('uz-UZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
                     </td>
-                    <td class="center">${item.reason || '-'}</td>
-                    <td class="center">${item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
-                    <td class="center">${item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
-                    <td class="center">${item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
-                    <td class="center">${item.accountant || '-'}</td>
-                    <td class="center">${item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-'}</td>
-                    <td class="center">${item.cancel_reason || '-'}</td>
-                    <td class="center">${item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'}</td>
+                    <td class="center">${item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || ''}</td>
+                    <td class="center">
+                        ${statusText}
+                    </td>
+                    <td>${item.reason || ''}</td>
+                    <td class="center">${item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}</td>
+                    <td class="center">${item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : ''}</td>
+                    <td class="center">${item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''}</td>
+                    <td>${item.accountant || ''}</td>
+                    <td class="center">${item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : ''}</td>
+                    <td class="number">${item.cancel_reason || ''}</td>
+                    <td class="center">${item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''}</td>
                   </tr>
                 `}).join('')}
               </tbody>
@@ -592,20 +605,10 @@ const Employee = () => {
     }, {})
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => {
-    if (value === undefined || value === null || value === '') return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
-
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'created_at_start' || key === 'created_at_end') {
-      if (!value) return false;
-      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
-        return false;
-      }
-      return true;
+      return !!value;
     }
     if (value === undefined || value === null || value === '') return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -620,7 +623,11 @@ const Employee = () => {
   }
 
   const handleClear = () => {
-    setFilters(initialFilters)
+    setFilters({
+      ...initialFilters,
+      created_at_start: null,
+      created_at_end: null
+    })
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
@@ -697,7 +704,6 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
@@ -1025,9 +1031,9 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2]">№</th>
-                  <th className="p-3 text-xs w-[180px] sticky left-[40px] z-10! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r border-[#e2e6f2]">Ism Sharifi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] sticky left-[215px] z-10! bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] border-[#e2e6f2] text-center">Loyiha nomi</th>
+                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
+                  <th className="p-3 text-xs w-[180px] text-start sticky left-[45px] z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Ism Sharifi</th>
+                  <th className="p-3 text-xs font-bold w-[200px] sticky left-[225px] z-20! bg-[#7186ED] dark:bg-[#1E2021] border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Loyiha nomi</th>
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Xarajat turi</th>
                   <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Toifa</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Miqdori (UZS)</th>
@@ -1036,65 +1042,67 @@ const Employee = () => {
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'rov sababi</th>
                   <th className="p-3 text-xs font-bold border-r w-[190px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'ralgan vaqti</th>
                   <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] dark:border-[#292A2A] text-end">To'langan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Tasdiqlangan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Hisobchi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilingan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor sababi</th>
-                  <th className="p-3 text-xs w-[180px] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-l border-[#e2e6f2] text-end">Kart raqami</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Tasdiqlangan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Hisobchi</th>
+                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] dark:border-[#292A2A] text-start">Bekor qilingan vaqti</th>
+                  <th className="p-3 text-xs font-bold w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilish sababi</th>
+                  <th className="p-3 text-xs w-[180px] bg-[#7186ED] dark:bg-[#1E2021] z-20! sticky right-0 dark:border-[#292A2A] font-bold border-[#e2e6f2] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Kart raqami</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
-                    <td className="p-3 text-xs text-slate-500 border-r border-[#e2e6f2] dark:bg-[#252626] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-slate-50">
+                    <td className="p-3 text-xs text-slate-500 border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#252626] dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] sticky left-[40px] z-10! bg-slate-50">{
-                      item.user}
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] sticky left-[45px] z-10! bg-white dark:bg-[#1E2021] text-start"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item.user}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#252626] dark:text-slate-200 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky left-[215px] z-10! bg-slate-50">{
-                      item.project || "-"}
+                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#1E2021] dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[225px] z-10! bg-white"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item.project}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.expense_category || '-'}
+                      {item.expense_category}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {cost_type.find((t) => t.value === item.type)?.label || '-'}
+                      {cost_type.find((t) => t.value === item.type)?.label}
                     </td>
                     <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {Number(item.amount || 0).toLocaleString('uz-UZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {item.amount ? Number(item.amount).toLocaleString('uz-UZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method || '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
                       {item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? 'To\'langan' : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.reason || '-'}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : '-'}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
+                      {item.reason}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : '-'}
-                    </td>
-
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.accountant ? item.accountant : '-'}
-                    </td>
-
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : '-'}
+                      {item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
                     <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.cancel_reason || '-'}
+                      {item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-l border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.card_number ? String(item.card_number).replace(/\\s/g, '').match(/.{1,4}/g)?.join(' ') : '-'}
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
+                      {item.accountant}
+                    </td>
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item.cancel_reason}
+                    </td>
+                    <td className="p-3 text-xs sticky right-0 z-10! bg-white dark:bg-[#1E2021] text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-center"
+                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
+                      {item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''}
                     </td>
                   </tr>
                 ))}

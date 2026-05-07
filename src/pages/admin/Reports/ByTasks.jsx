@@ -92,6 +92,7 @@ const Employee = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
 
@@ -154,7 +155,8 @@ const Employee = () => {
   }
 
   const loadMoreReports = async () => {
-    if (!ReportsNextURL) return
+    if (!ReportsNextURL || isFetchingNextPage) return
+    setIsFetchingNextPage(true)
     try {
       const { data } = await axiosAPI.get(ReportsNextURL)
       setUserReports(prev => [...prev, ...data.data.results])
@@ -162,12 +164,14 @@ const Employee = () => {
     } catch (error) {
       console.error(error)
       toast.error('Keyingi sahifani yuklashda xatolik yuz berdi.', error?.response?.data?.error?.errMsg || 'Iltimos, qayta urinib ko\'ring.')
+    } finally {
+      setIsFetchingNextPage(false)
     }
   }
 
   const handleMoreReportsScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target
-    if (scrollHeight - scrollTop <= clientHeight + 50 && ReportsNextURL) {
+    if (scrollHeight - scrollTop <= clientHeight + 100 && ReportsNextURL && !isFetchingNextPage) {
       loadMoreReports()
     }
   }
@@ -414,40 +418,50 @@ const Employee = () => {
             }
             body { 
               font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-              font-size: 7px; 
-              color: #333;
+              font-size: 8px; 
+              color: #1a1d2e;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
             h2 { 
               text-align: center; 
-              margin-bottom: 10px; 
-              font-size: 14px;
+              margin-bottom: 15px; 
+              font-size: 16px;
+              color: #1e293b;
             }
             table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin-bottom: 10px;
+              margin-bottom: 20px;
+              table-layout: auto;
             }
             th, td { 
               border: 1px solid #e2e8f0; 
-              padding: 2px 3px; 
+              padding: 4px 6px; 
               text-align: left;
               word-wrap: break-word;
             }
             th { 
-              background-color: #f8fafc; 
+              background-color: #7186ED; 
               font-weight: bold; 
-              color: #475569;
+              color: white;
               text-align: center;
-              font-size: 8px;
+              text-transform: uppercase;
+              font-size: 7px;
+            }
+            td {
+              color: #334155;
             }
             td.number { 
               text-align: right; 
-              font-weight: bold;
+              font-weight: 600;
             }
             td.center { 
               text-align: center; 
+            }
+            td.bold {
+              font-weight: 600;
+              color: #1e293b;
             }
           </style>
         </head>
@@ -458,20 +472,20 @@ const Employee = () => {
               <tr>
                 <th>№</th>
                 <th>Titul</th>
-                <th>Loyiha</th>
-                <th>Vazifa</th>
+                <th>Loyiha nomi</th>
+                <th>Vazifa nomi</th>
                 <th>Topshiruvchi</th>
                 <th>Muallif</th>
                 <th>Darajasi</th>
                 <th>Holati</th>
                 <th>Turi</th>
-                <th>Narxi</th>
-                <th>Jarima %</th>
+                <th>Vazifa narxi (UZS)</th>
+                <th>Jarima foizi (%)</th>
                 <th>Muddati</th>
-                <th>Yaratilgan</th>
-                <th>Sprint</th>
-                <th>Kimga</th>
-                <th>Qaytish</th>
+                <th>Yaratilgan vaqti</th>
+                <th>Sprint raqami</th>
+                <th>Kim uchun</th>
+                <th>Qaytishlar soni</th>
                 <th>Bekor qilish sababi</th>
               </tr>
             </thead>
@@ -480,14 +494,16 @@ const Employee = () => {
                 <tr>
                   <td class="center">${index + 1}</td>
                   <td class="center">${item?.prefix || "-"}</td>
-                  <td>${item?.project || "-"}</td>
-                  <td>${item?.title || "-"}</td>
+                  <td class="bold">${item?.project || "-"}</td>
+                  <td class="bold">${item?.title || "-"}</td>
                   <td>${item?.assignee || "-"}</td>
                   <td>${item?.created_by || "-"}</td>
                   <td class="center">${priority_type.find((s) => s?.value === item?.priority)?.label || "-"}</td>
                   <td class="center">${status[item?.status] || "-"}</td>
                   <td class="center">${type.find((s) => s?.value === item?.type)?.label || "-"}</td>
-                  <td class="number">${formatNum(item?.task_price || 0)}</td>
+                  <td class="number">
+                    ${item?.task_price ? item.task_price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ') : '0'}
+                  </td>
                   <td class="center">${item?.penalty_percentage || 0}</td>
                   <td class="center">${item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : "-"}</td>
                   <td class="center">${item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : "-"}</td>
@@ -592,11 +608,7 @@ const Employee = () => {
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'created_at_min' || key === 'created_at_max') {
-      if (!value) return false;
-      if (initialFilters[key] && value.isSame && value.isSame(initialFilters[key])) {
-        return false;
-      }
-      return true;
+      return !!value;
     }
     if (value === undefined || value === null || value === '') return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -611,7 +623,11 @@ const Employee = () => {
   }
 
   const handleClear = () => {
-    setFilters(initialFilters)
+    setFilters({
+      ...initialFilters,
+      created_at_min: null,
+      created_at_max: null
+    })
     setSearch('')
     setFilterModal(false)
     getEmployeeReports({ params: {} })
@@ -690,7 +706,6 @@ const Employee = () => {
         </div>
         <button
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
-          disabled={!hasActiveFilters}
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
@@ -1012,9 +1027,9 @@ const Employee = () => {
             <table className="text-left border-collapse min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1E2021] font-bold border-r border-[#e2e6f2] text-center">№</th>
+                  <th className="p-2 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold text-center" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
                   <th className="p-3 text-xs w-[100px] z-20! font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">Titul</th>
-                  <th className="p-3 text-xs font-bold sticky left-[43px] z-20! bg-[#7186ED] dark:border-[#292A2A] dark:bg-[#1E2021] border-r w-[180px] border-[#e2e6f2] text-start">Loyiha nomi</th>
+                  <th className="p-3 text-xs font-bold sticky left-[48px] z-20! bg-[#7186ED] dark:bg-[#1E2021] w-[180px] text-end" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Loyiha nomi</th>
                   <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Vazifa nomi</th>
                   <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Topshiruvchi</th>
                   <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
@@ -1022,68 +1037,72 @@ const Employee = () => {
                   <th className="p-3 text-xs font-bold border-r w-[120px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Holati</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Turi</th>
                   <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Vazifa narxi (UZS)</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Jarima foizi (%)</th>
-                  <th className="p-3 text-xs sticky right-[155px] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-r w-[150px] border-[#e2e6f2] text-center">Muddati</th>
-                  <th className="p-3 text-xs  sticky right-0 bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] font-bold border-y! w-[150px] border-[#e2e6f2] text-center">Yaratilgan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Sprint raqami</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Kim uchun</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Qaytishlar soni</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Bekor qilish sababi</th>
+                  <th className="p-3 text-xs font-bold w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Jarima foizi (%)</th>
+                  <th className="p-3 text-xs sticky right-[155px] z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold w-[150px] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Muddati</th>
+                  <th className="p-3 text-xs sticky right-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold w-[150px] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Yaratilgan vaqti</th>
+                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Sprint raqami</th>
+                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Kim uchun</th>
+                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Qaytishlar soni</th>
+                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilish sababi</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] " key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#292A2A]">
+                    <td className="p-3 text-xs text-slate-500 dark:text-white text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#1E2021]"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-medium text-slate-500 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A]">
-                      {item?.prefix || "-"}
+                    <td className="p-3 text-xs font-medium text-slate-500 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
+                      {item?.prefix}
                     </td>
-                    <td className="p-3 text-xs font-medium text-slate-700 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] dark:bg-[#292A2A] text-start sticky left-[40px] z-10! bg-slate-50">
-                      {item?.project || "-"}
-                    </td>
-                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.title || '-'}
+                    <td className="p-3 text-xs font-medium text-slate-700 dark:text-white dark:bg-[#1E2021] text-end sticky left-[48px] z-10! bg-slate-50"
+                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                      {item?.project}
                     </td>
                     <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.assignee || "-"}
+                      {item?.title}
+                    </td>
+                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item?.assignee}
                     </td>
                     <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.created_by || "-"}
+                      {item?.created_by}
                     </td>
-                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {priority_type.find((s) => s?.value === item?.priority)?.label || '-'}
-                    </td>
-                    <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {status[item?.status] || '-'}
+                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {priority_type.find((s) => s?.value === item?.priority)?.label}
                     </td>
                     <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {type.find((s) => s?.value === item?.type)?.label || '-'}
+                      {status[item?.status]}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_price?.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ') || "-"}
+                    <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                      {type.find((s) => s?.value === item?.type)?.label}
+                    </td>
+                    <td className="p-3 text-xs font-bold text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item?.task_price ? item.task_price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ') : ''}
+                    </td>
+                    <td className="p-3 text-xs text-end">
+                      {item?.penalty_percentage ? Number(item.penalty_percentage) : ''}
+                    </td>
+                    <td className="p-3 text-xs sticky right-[155px] z-10! bg-white dark:bg-[#1E2021] text-start dark:text-white"
+                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
+                      {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className="p-3 text-xs sticky right-0 z-10! bg-white dark:bg-[#1E2021] text-start dark:text-white"
+                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
+                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
+                      {item?.sprint}
+                    </td>
+                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : ''}
                     </td>
                     <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.penalty_percentage || item?.penalty_percentage === 0 ? Number(item.penalty_percentage) : "-"}
+                      {item?.reopened_count || ''}
                     </td>
-                    <td className="p-3 text-xs sticky right-[160px] bg-white dark:bg-[#292A2A] border-r border-[#e2e6f2] dark:border-[#292A2A] text-center dark:text-white">
-                      {dayjs(item?.deadline).format("DD.MM.YYYY HH:mm") || "-"}
-                    </td>
-                    <td className="p-3 text-xs sticky right-0 bg-white dark:bg-[#292A2A] border-r border-[#e2e6f2] dark:border-[#292A2A] text-center dark:text-white">
-                      {dayjs(item?.created_at).format("DD.MM.YYYY HH:mm") || "-"}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.sprint || "-"}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : "-"}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.reopened_count || "-"}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.rejection_reason || "-"}
+                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                      {item?.rejection_reason}
                     </td>
                   </tr>
                 ))}
