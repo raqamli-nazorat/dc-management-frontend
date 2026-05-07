@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { usePageAction } from '../context/PageActionContext'
@@ -7,6 +7,7 @@ import { FaAngleDown, FaXmark } from 'react-icons/fa6'
 import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
+import { axiosAPI } from '../service/axiosAPI'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -30,6 +31,32 @@ const NOTIFS_DATA = [
   { id: 5, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: false, urgent: false },
 ]
 
+function formatNotifDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('en-GB').replace(/\//g, '.')
+}
+
+function formatNotifTime(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+function mapApiNotification(item) {
+  return {
+    id: item.id,
+    date: formatNotifDate(item.created_at),
+    title: item.title || 'Bildirishnoma',
+    sub: item.message || '',
+    time: formatNotifTime(item.created_at),
+    read: !!item.is_read,
+    urgent: item.type === 'alert',
+  }
+}
+
 function groupByDate(notifs) {
   const map = {}
   notifs.forEach(n => {
@@ -42,7 +69,24 @@ function groupByDate(notifs) {
 function NotificationPanel({ notifs, setNotifs, onClose }) {
   const grouped = groupByDate(notifs)
 
-  const markRead = (id) => setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  const markRead = async (id) => {
+    setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+    try {
+      await axiosAPI.patch(`/notifications/${id}/read/`)
+    } catch {
+      setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: false } : n))
+    }
+  }
+
+  const markAllRead = async () => {
+    const previous = [...notifs]
+    setNotifs(prev => prev.map(n => ({ ...n, read: true })))
+    try {
+      await axiosAPI.post('/notifications/read-all/')
+    } catch {
+      setNotifs(previous)
+    }
+  }
 
   return (
     <div
@@ -56,6 +100,13 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
           <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={markAllRead}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
+              text-[#526ED3] hover:bg-[#F1F3F9] dark:text-[#8EA1E8] dark:hover:bg-[#292A2A]"
+          >
+            Barchasi o'qildi
+          </button>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
@@ -171,6 +222,70 @@ export default function Layout() {
   const [notifs, setNotifs] = useState(NOTIFS_DATA)
   const [downloadOpen, setDownloadOpen] = useState(false)
   const downloadRef = useRef(null)
+  const wsRef = useRef(null)
+  const reconnectTimerRef = useRef(null)
+  const unreadCount = notifs.filter(n => !n.read).length
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const { data } = await axiosAPI.get('/notifications/')
+      const list = Array.isArray(data?.results)
+        ? data.results
+        : Array.isArray(data?.data?.results)
+          ? data.data.results
+          : []
+      setNotifs(list.map(mapApiNotification))
+    } catch {
+      // static fallback saqlanadi
+    }
+  }, [])
+
+  const connectNotificationsWs = useCallback(async () => {
+    try {
+      const { data } = await axiosAPI.post('/notifications/tickets/')
+      const ticket = data?.data?.ticket
+      if (!ticket) return
+
+      const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin
+      const baseUrl = new URL(apiBase, window.location.origin)
+      const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
+
+      const ws = new WebSocket(wsUrl)
+      wsRef.current = ws
+
+      ws.onmessage = (event) => {
+        try {
+          const raw = JSON.parse(event.data)
+          const payload =
+            typeof raw?.data?.payload === 'string'
+              ? JSON.parse(raw.data.payload)
+              : raw?.data?.payload || raw
+          const mapped = mapApiNotification(payload)
+          if (!mapped.id) return
+
+          setNotifs(prev => {
+            if (prev.some(n => n.id === mapped.id)) {
+              return prev.map(n => (n.id === mapped.id ? mapped : n))
+            }
+            return [mapped, ...prev]
+          })
+        } catch {
+          // noto'g'ri payloadlarni e'tiborsiz qoldiramiz
+        }
+      }
+
+      ws.onclose = () => {
+        reconnectTimerRef.current = setTimeout(() => {
+          connectNotificationsWs()
+        }, 4000)
+      }
+    } catch {
+      reconnectTimerRef.current = setTimeout(() => {
+        connectNotificationsWs()
+      }, 6000)
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -181,6 +296,16 @@ export default function Layout() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    fetchNotifications()
+    connectNotificationsWs()
+
+    return () => {
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
+      if (wsRef.current) wsRef.current.close()
+    }
+  }, [fetchNotifications, connectNotificationsWs])
 
   // navbarExtra mavjud bo'lsa sidebar collapsed holda ko'rsatiladi (kanban mode)
   const isKanban = !!navbarExtra
@@ -299,8 +424,10 @@ export default function Layout() {
                   className="w-[18px] h-[18px] brightness-0 [filter:brightness(0)_saturate(100%)_invert(10%)_sepia(10%)_saturate(1000%)_hue-rotate(190deg)_brightness(90%)] dark:brightness-0 dark:invert"
                 />
               </button>
-              {notifs.some(n => !n.read) && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#3F57B3] border-2 border-white dark:border-[#191A1A]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#E02D2D] border-2 border-white dark:border-[#191A1A] text-[10px] leading-none font-bold text-white flex items-center justify-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
               )}
             </div>
           </div>
