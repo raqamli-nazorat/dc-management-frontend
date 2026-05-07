@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MdExpandMore, MdExpandLess } from 'react-icons/md'
 import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
@@ -345,6 +345,29 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           isCollapsed ? 'px-[10px]' : 'px-3 py-3',
         ].join(' ')}
       >
+           {/* Analitika */}
+        {isCollapsed ? (
+          <button
+            onClick={() => navigate(`/${urlPrefix}/analytics`)}
+            title="Analitika"
+            className={iconBtn(location.pathname.includes('analytics'))}
+          >
+            <img src="/imgs/dashboard-square-03.svg" alt="analytics" className="w-4 h-4" />
+          </button>
+        ) : (
+          <NavLink
+            to={`/${urlPrefix}/analytics`}
+            className={({ isActive }) => [
+              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
+              isActive
+                ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
+                : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
+            ].join(' ')}
+          >
+            <img src="/imgs/dashboard-square-03.svg" alt="" className="w-4 h-4 shrink-0 opacity-70" />
+            <span>Analitika</span>
+          </NavLink>
+        )}
         {menu.map((group, i) => {
           const active = isGroupActive(group)
           const open = openGroups[i]
@@ -352,6 +375,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
 
           return (
             <div key={i} className="flex flex-col gap-1.5">
+              
               {/* Group header */}
               {isCollapsed ? (
                 /* Yopilgan: faqat ikonka, kvadrat */
@@ -381,6 +405,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   }
                 </button>
               )}
+              
 
               {/* Children — smooth accordion */}
               {!isCollapsed && (
@@ -422,6 +447,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           isCollapsed ? 'px-[10px] py-3 items-center' : 'px-3 py-3',
         ].join(' ')}
       >
+     
+
         {/* Mening vazifalarim */}
         {isCollapsed ? (
           <button
