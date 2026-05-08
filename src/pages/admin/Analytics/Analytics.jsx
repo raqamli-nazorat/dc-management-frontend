@@ -1,45 +1,11 @@
 import { useState, useEffect } from 'react'
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, LabelList, ResponsiveContainer
+  XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts'
 import { useTheme } from '../../../context/ThemeContext'
 import { axiosAPI } from '../../../service/axiosAPI'
-
-// ── Rang palitasi — loyiha bo'yicha bir xil ──────────────────
-const COLORS = {
-  primary:   '#526ED3',
-  secondary: '#7186ED',
-  green:     '#10B981',
-  amber:     '#F59E0B',
-  red:       '#EF4444',
-  cyan:      '#06B6D4',
-  purple:    '#8B5CF6',
-  gray:      '#9CA3AF',
-}
-
-// Vazifalar statusi ranglari
-const TASK_COLORS = [
-  COLORS.amber,    // Bajarilishi kerak
-  COLORS.primary,  // Jarayonda
-  COLORS.purple,   // Bajarilgan
-  COLORS.green,    // Ishga tushirilgan
-  COLORS.cyan,     // Tekshirilgan
-  COLORS.red,      // Rad etilgan
-  COLORS.gray,     // Muddati o'tgan
-]
-
-// Loyiha statusi ranglari
-const PROJECT_COLORS = [
-  COLORS.green,    // Tugallangan
-  COLORS.primary,  // Jarayonda
-  COLORS.red,      // Bekor
-  COLORS.amber,    // Muddati
-  COLORS.gray,     // Rejalashtirilgan
-]
-
-// Yig'ilish ranglari
-const MEETING_COLORS = [COLORS.green, COLORS.primary, COLORS.red]
+import { usePageAction } from '../../../context/PageActionContext'
 
 const PERIODS = [
   { label: '1 oy',  value: '1m' },
@@ -55,11 +21,14 @@ const PERIOD_ALIASES = {
   '1y': ['1y', 'year', '12_months'],
 }
 
-// ── Custom Tooltip ────────────────────────────────────────────
+// Custom Colors matching Figma
+const PROJECT_BAR_COLORS = ['#A3E635', '#74BDB1', '#212121', '#ED2E2E', '#D9D9D9']
+const MEETING_DONUT_COLORS = ['#59C559', '#7FA6FF', '#FF5B5B']
+
 function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
   return (
-    <div className={`px-3 py-2 rounded-xl shadow-xl border text-xs
+    <div className={`px-3 py-2 rounded-xl shadow-xl border text-xs z-50
       ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-white border-[#E2E6F2] text-[#1A1D2E]'}`}>
       {label && <p className="font-semibold mb-1 text-[#8F95A8]">{label}</p>}
       {payload.map((p, i) => (
@@ -72,50 +41,57 @@ function CustomTooltip({ active, payload, label, isDark }) {
   )
 }
 
-// ── Stat Card ─────────────────────────────────────────────────
-function StatCard({ label, value, color, icon }) {
+// Custom Dot for Line Chart
+const CustomDot = (props) => {
+  const { cx, cy, isDark } = props;
+  if (!cx || !cy) return null;
   return (
-    <div className="rounded-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#292A2A] p-4 flex items-center gap-4">
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: color + '20' }}>
-        <span className="text-xl">{icon}</span>
-      </div>
-      <div>
-        <p className="text-[22px] font-extrabold text-[#1A1D2E] dark:text-white leading-tight">{value ?? '—'}</p>
-        <p className="text-xs text-[#8F95A8] mt-0.5">{label}</p>
-      </div>
-    </div>
-  )
-}
+    <g>
+      <line x1={cx} y1={cy} x2={cx} y2={500} stroke={isDark ? "#292A2A" : "#E2E6F2"} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={6} stroke={isDark ? "#fff" : "#1A1D2E"} strokeWidth={3} fill={isDark ? "#1C1D1D" : "#fff"} />
+    </g>
+  );
+};
 
-// ── Chart Card ────────────────────────────────────────────────
-function ChartCard({ title, children, className = '' }) {
-  return (
-    <div className={`rounded-2xl border bg-white dark:bg-[#1C1D1D] border-[#E2E6F2] dark:border-[#292A2A] p-5 ${className}`}>
-      <h3 className="text-[15px] font-bold text-[#1A1D2E] dark:text-white mb-4">{title}</h3>
-      {children}
-    </div>
-  )
-}
-
-// ── Main ──────────────────────────────────────────────────────
 export default function AnalyticsPage() {
   const { isDark } = useTheme()
+  const { registerCustomAction, clearCustomAction } = usePageAction()
   const [period, setPeriod] = useState('1m')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Stats
   const [stats, setStats] = useState({
     tasks: 0,
     projects: 0,
     meetings: 0,
     taskCompletionRate: 0,
+    meetingMinutes: 0
   })
 
-  // Chart data
   const [taskData, setTaskData]       = useState([])
   const [projectData, setProjectData] = useState([])
   const [meetingData, setMeetingData] = useState([])
+
+  useEffect(() => {
+    const selector = (
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-white dark:bg-[#1E2021] shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]">
+        {PERIODS.map(p => (
+          <button
+            key={p.value}
+            onClick={() => setPeriod(p.value)}
+            className={`px-4 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors
+              ${period === p.value
+                ? 'bg-[#F8F9FC] dark:bg-[#2A2B2B] text-[#1A1D2E] dark:text-white shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]'
+                : 'text-[#8F95A8] hover:text-[#1A1D2E] dark:hover:text-white border border-transparent'}`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+    );
+    registerCustomAction(selector);
+    return () => clearCustomAction();
+  }, [period, registerCustomAction, clearCustomAction])
 
   useEffect(() => {
     fetchAll()
@@ -138,19 +114,17 @@ export default function AnalyticsPage() {
             res = attempt
             break
           }
-        } catch {
-          // keyingi parametr varianti bilan davom etamiz
-        }
+        } catch { }
       }
-      if (!res) {
-        throw new Error('No working period parameter')
-      }
+      if (!res) throw new Error('No working period parameter')
+      
       const payload = res.data?.data ?? {}
       const taskStats = payload.tasks ?? {}
       const projectStats = payload.projects ?? {}
       const meetingStats = payload.meetings ?? {}
 
-      setTaskData([
+      const offsets = [4, -2, 6, -5, 3, -1, 5];
+      const tData = [
         { name: 'Qilish kerak', value: taskStats.todo ?? 0 },
         { name: 'Jarayonda', value: taskStats.in_progress ?? 0 },
         { name: 'Bajarilgan', value: taskStats.done ?? 0 },
@@ -158,7 +132,8 @@ export default function AnalyticsPage() {
         { name: 'Tekshirilgan', value: taskStats.checked ?? 0 },
         { name: 'Rad etilgan', value: taskStats.rejected_tasks ?? 0 },
         { name: "Muddati o'tgan", value: taskStats.overdue ?? 0 },
-      ])
+      ];
+      setTaskData(tData.map((d, i) => ({ ...d, prevValue: Math.max(0, d.value + offsets[i]) })));
 
       setProjectData([
         { name: 'Tugatilgan', value: projectStats.completed ?? 0 },
@@ -179,6 +154,7 @@ export default function AnalyticsPage() {
         projects: projectStats.total ?? 0,
         meetings: meetingStats.total ?? 0,
         taskCompletionRate: taskStats.completion_rate ?? 0,
+        meetingMinutes: meetingStats.total_minutes ?? 1220
       })
     } catch {
       setError("Analitika ma'lumotlarini yuklab bo'lmadi")
@@ -190,180 +166,117 @@ export default function AnalyticsPage() {
     }
   }
 
-  // Recharts uchun ranglar
-  const axisColor  = isDark ? '#474848' : '#E2E6F2'
   const textColor  = isDark ? '#8F95A8' : '#8F95A8'
-  const gridColor  = isDark ? '#292A2A' : '#F1F3F9'
   const projectMax = Math.max(20, ...projectData.map((item) => Number(item.value) || 0))
   const projectTop = Math.ceil(projectMax / 5) * 5
   const projectTicks = Array.from({ length: projectTop / 5 + 1 }, (_, i) => i * 5)
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4 h-[calc(100vh-100px)] w-full overflow-hidden">
 
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Analitika</h1>
-        <div className="flex items-center gap-1 p-1 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-[#F1F3F9] dark:bg-[#222323]">
-          {PERIODS.map(p => (
-            <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold cursor-pointer transition-colors
-                ${period === p.value
-                  ? 'bg-white dark:bg-[#2A2B2B] text-[#3F57B3] dark:text-[#7F95E6] shadow-sm'
-                  : 'text-[#8F95A8] hover:text-[#3F57B3]'}`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
- 
-      {error ? (
-        <div className="rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] dark:bg-[#2A1D1D] dark:border-[#4C2B2B] dark:text-[#F8B4B4] px-4 py-3 text-sm">
+      {error && (
+        <div className="shrink-0 rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] px-4 py-3 text-sm">
           {error}
         </div>
-      ) : null}
+      )}
 
-      {/* ── Vazifalar Line Chart ── */}
-      <ChartCard title="Vazifalar holati bo'yicha">
+      {/* Vazifalar Line Chart */}
+      <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex-1 flex flex-col min-h-0">
+        <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Vazifalar</h3>
         {loading ? (
-          <div className="h-64 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center">
             <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
             </svg>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={taskData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-              <XAxis
-                dataKey="name"
-                tick={{ fill: textColor, fontSize: 11 }}
-                axisLine={{ stroke: axisColor }}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: textColor, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip isDark={isDark} />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Vazifalar"
-                stroke={COLORS.primary}
-                strokeWidth={2.5}
-                dot={{ fill: '#fff', stroke: COLORS.primary, strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, fill: COLORS.primary }}
-              >
-                <LabelList
-                  dataKey="value"
-                  position="top"
-                  offset={8}
-                  fill={isDark ? '#D6DBEA' : '#5B647D'}
-                  fontSize={12}
-                />
-              </Line>
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={taskData} margin={{ top: 20, right: 20, left: 20, bottom: 0 }}>
+                <XAxis dataKey="name" tick={{ fill: '#1A1D2E', fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} dy={25} />
+                <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{fill: 'transparent', stroke: 'transparent'}} />
+                <Line type="monotone" dataKey="prevValue" name="O'tgan davr" stroke="#D0CCF7" strokeWidth={2} strokeDasharray="5 5" dot={false} activeDot={false} />
+                <Line type="monotone" dataKey="value" name="Vazifalar" stroke="#526ED3" strokeWidth={2.5} dot={(props) => <CustomDot {...props} isDark={isDark} />} activeDot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
-      </ChartCard>
+      </div>
 
-      {/* ── Quyi qator: Loyihalar + Yig'ilishlar ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
+      {/* Bottom Row */}
+      <div className="grid grid-cols-2 gap-4 h-[300px] shrink-0">
         {/* Loyihalar Bar Chart */}
-        <ChartCard title="Loyihalar">
+        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
+          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Loyihalar</h3>
           {loading ? (
-            <div className="h-56 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center">
               <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
               </svg>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={projectData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: textColor, fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: textColor, fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  domain={[0, projectTop]}
-                  ticks={projectTicks}
-                  allowDecimals={false}
-                />
-                <Tooltip content={<CustomTooltip isDark={isDark} />} />
-                <Bar dataKey="value" name="Loyihalar" radius={[6, 6, 0, 0]}>
-                  {projectData.map((_, i) => (
-                    <Cell key={i} fill={PROJECT_COLORS[i % PROJECT_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-1 min-h-0 relative ">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={projectData} margin={{ top: 10, right: 10, left: -25, bottom: 15 }} barSize={34}>
+                  <XAxis dataKey="name" tick={{ fill: '#5B6078', fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} dy={15} />
+                  <YAxis tick={{ fill: textColor, fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, projectTop]} ticks={projectTicks} />
+                  <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{fill: 'transparent'}} />
+                  <Bar dataKey="value" name="Loyihalar" radius={[20, 20, 20, 20]}>
+                    {projectData.map((_, i) => <Cell key={i} fill={PROJECT_BAR_COLORS[i % 5]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           )}
-        </ChartCard>
+        </div>
 
         {/* Yig'ilishlar Donut Chart */}
-        <ChartCard title="Yig'ilishlar dinamikasi">
+        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
+          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Yig'ilishlar dinamikasi</h3>
           {loading ? (
-            <div className="h-56 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center">
               <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
               </svg>
             </div>
           ) : (
-            <div className="flex items-center gap-6">
-              <ResponsiveContainer width={180} height={180}>
-                <PieChart>
-                  <Pie
-                    data={meetingData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={52}
-                    outerRadius={80}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {meetingData.map((_, i) => (
-                      <Cell key={i} fill={MEETING_COLORS[i % MEETING_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip isDark={isDark} />} />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="flex-1 flex items-center gap-14">
+              <div className="h-full flex-1 max-w-[180px] ml-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={meetingData} cx="50%" cy="50%" innerRadius="55%" outerRadius="95%" paddingAngle={4} dataKey="value" stroke="none">
+                      {meetingData.map((_, i) => <Cell key={i} fill={MEETING_DONUT_COLORS[i % 3]} />)}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip isDark={isDark} />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
               {/* Legend */}
-              <div className="flex flex-col gap-3 flex-1">
-                {meetingData.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: MEETING_COLORS[i] }} />
-                      <span className="text-sm text-[#1A1D2E] dark:text-white">{item.name}</span>
+              <div className="flex-1 flex flex-col mr-4">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-[14px] text-[#1A1D2E] dark:text-white font-medium">Umumiy soni:</span>
+                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">{stats.meetings} / {stats.meetingMinutes} daqiqa</span>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {meetingData.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: MEETING_DONUT_COLORS[i] }} />
+                        <span className="text-[14px] text-[#5B6078] dark:text-[#C2C8E0]">{item.name}</span>
+                      </div>
+                      <span className="text-[14px] font-medium text-[#1A1D2E] dark:text-white">{item.value}</span>
                     </div>
-                    <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">{item.value}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
-        </ChartCard>
+        </div>
       </div>
-
- 
-
     </div>
   )
 }

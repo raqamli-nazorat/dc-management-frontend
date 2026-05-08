@@ -217,7 +217,7 @@ function Breadcrumb() {
 }
 
 export default function Layout() {
-  const { action, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
+  const { action, customAction, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifs, setNotifs] = useState(NOTIFS_DATA)
   const [downloadOpen, setDownloadOpen] = useState(false)
@@ -341,6 +341,8 @@ export default function Layout() {
 
           {/* Actions */}
           <div className={`flex items-center gap-2 shrink-0 ${isKanban ? 'ml-3' : ''}`}>
+            {customAction && customAction}
+
             {action && (
               <button
                 onClick={action.onClick}
