@@ -94,15 +94,6 @@ export default function AnalyticsPage() {
   }, [period, registerCustomAction, clearCustomAction])
 
   useEffect(() => {
-    registerNavbarExtra(
-      <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer">
-        Analitika
-      </span>
-    )
-    return () => clearNavbarExtra()
-  }, [registerNavbarExtra, clearNavbarExtra])
-
-  useEffect(() => {
     fetchAll()
   }, [period])
 
@@ -182,7 +173,7 @@ export default function AnalyticsPage() {
 
 
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-80px)] w-full overflow-hidden px-5 py-5 mb-0 pb-0">
+    <div className="flex flex-col gap-4 h-[calc(100vh-120px)] w-full overflow-hidden">
 
       {error && (
         <div className="shrink-0 rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] px-4 py-3 text-sm">
@@ -204,11 +195,11 @@ export default function AnalyticsPage() {
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={taskData} margin={{ top: 20, right: 40, left: 40, bottom: 30 }}>
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fill: '#8F95A8', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }} 
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: '#8F95A8', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }}
                   axisLine={false}
-                  tickLine={false} 
+                  tickLine={false}
                   dy={15}
                   interval={0}
                   padding={{ left: 30, right: 30 }}
