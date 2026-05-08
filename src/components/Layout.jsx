@@ -103,7 +103,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
       style={{ width: 480 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-[#EEF1F7] dark:border-[#292A2A] shrink-0">
+      <div className="flex items-center justify-between px-6 py-5  shrink-0">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2>
         </div>

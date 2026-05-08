@@ -300,7 +300,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                     </div>
 
                     {/* Footer */}
-                    <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+                    <div className="px-7 py-5 flex items-center justify-end gap-3 ">
                         <button onClick={() => setF(empty_filter)}
                             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                             <FaXmark size={13} /> Tozalash
