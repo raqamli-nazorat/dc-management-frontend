@@ -734,8 +734,14 @@ export default function TasksPage() {
       loadKanbanTasks(filters, search)
       registerNavbarExtra(
         <div className="flex items-center gap-3 flex-1">
+          <span
+            className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer"
+            onClick={() => setViewMode('table')}
+          >
+            Vazifa boshqaruvi
+          </span>
           <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0]">
-            Vazifa boshqaruvi › Vazifalar
+            › Vazifalar
           </span>
           <div className="flex-1" />
           {/* Search */}

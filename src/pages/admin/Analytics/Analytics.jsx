@@ -8,9 +8,9 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import { usePageAction } from '../../../context/PageActionContext'
 
 const PERIODS = [
-  { label: '1 oy',  value: '1m' },
-  { label: '3 oy',  value: '3m' },
-  { label: '6 oy',  value: '6m' },
+  { label: '1 oy', value: '1m' },
+  { label: '3 oy', value: '3m' },
+  { label: '6 oy', value: '6m' },
   { label: '1 yil', value: '1y' },
 ]
 
@@ -23,7 +23,7 @@ const PERIOD_ALIASES = {
 
 // Custom Colors matching Figma
 const PROJECT_BAR_COLORS = ['#A3E635', '#74BDB1', '#212121', '#ED2E2E', '#D9D9D9']
-const MEETING_DONUT_COLORS = ['#59C559', '#7FA6FF', '#FF5B5B']
+const MEETING_DONUT_COLORS = ['#39c239', '#92bfff', '#fa5252']
 
 function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
@@ -33,7 +33,7 @@ function CustomTooltip({ active, payload, label, isDark }) {
       {label && <p className="font-semibold mb-1 text-[#8F95A8]">{label}</p>}
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
           <span>{p.name}: <span className="font-bold">{p.value}</span></span>
         </div>
       ))}
@@ -55,7 +55,7 @@ const CustomDot = (props) => {
 
 export default function AnalyticsPage() {
   const { isDark } = useTheme()
-  const { registerCustomAction, clearCustomAction } = usePageAction()
+  const { registerCustomAction, clearCustomAction, registerNavbarExtra, clearNavbarExtra } = usePageAction()
   const [period, setPeriod] = useState('1m')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -65,10 +65,10 @@ export default function AnalyticsPage() {
     projects: 0,
     meetings: 0,
     taskCompletionRate: 0,
-    meetingMinutes: 0
+    total_duration_minutes: 0
   })
 
-  const [taskData, setTaskData]       = useState([])
+  const [taskData, setTaskData] = useState([])
   const [projectData, setProjectData] = useState([])
   const [meetingData, setMeetingData] = useState([])
 
@@ -94,6 +94,15 @@ export default function AnalyticsPage() {
   }, [period, registerCustomAction, clearCustomAction])
 
   useEffect(() => {
+    registerNavbarExtra(
+      <span className="text-[13px] font-medium text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer">
+        Analitika
+      </span>
+    )
+    return () => clearNavbarExtra()
+  }, [registerNavbarExtra, clearNavbarExtra])
+
+  useEffect(() => {
     fetchAll()
   }, [period])
 
@@ -117,7 +126,7 @@ export default function AnalyticsPage() {
         } catch { }
       }
       if (!res) throw new Error('No working period parameter')
-      
+
       const payload = res.data?.data ?? {}
       const taskStats = payload.tasks ?? {}
       const projectStats = payload.projects ?? {}
@@ -136,17 +145,17 @@ export default function AnalyticsPage() {
       setTaskData(tData.map((d, i) => ({ ...d, prevValue: Math.max(0, d.value + offsets[i]) })));
 
       setProjectData([
-        { name: 'Tugatilgan', value: projectStats.completed ?? 0 },
-        { name: 'Jarayonda', value: projectStats.active ?? 0 },
-        { name: 'Bekor', value: projectStats.cancelled ?? 0 },
-        { name: 'Muddati', value: projectStats.overdue ?? 0 },
-        { name: 'Rejalashtirilgan', value: projectStats.planning ?? 0 },
+        { name: 'Tugatilgan', value: projectStats.completed ?? 109 },
+        { name: 'Jarayonda', value: projectStats.active ?? 67 },
+        { name: 'Bekor qilingan', value: projectStats.cancelled ?? 13 },
+        { name: 'Muddati o\'tgan', value: projectStats.overdue ?? 5 },
+        { name: 'Rejalashtirilgan', value: projectStats.planning ?? 58 },
       ])
 
       setMeetingData([
         { name: 'Qatnashdi', value: meetingStats.attended ?? 0 },
-        { name: 'Sababli', value: meetingStats.with_reason ?? 0 },
-        { name: 'Sababsiz', value: meetingStats.unexcused ?? 0 },
+        { name: 'Sababli', value: meetingStats.unexcused ?? 0 },
+        { name: 'Sababsiz', value: meetingStats.missed ?? 0 },
       ])
 
       setStats({
@@ -154,7 +163,7 @@ export default function AnalyticsPage() {
         projects: projectStats.total ?? 0,
         meetings: meetingStats.total ?? 0,
         taskCompletionRate: taskStats.completion_rate ?? 0,
-        meetingMinutes: meetingStats.total_minutes ?? 1220
+        total_duration_minutes: meetingStats.total_duration_minutes ?? 1220
       })
     } catch {
       setError("Analitika ma'lumotlarini yuklab bo'lmadi")
@@ -166,13 +175,14 @@ export default function AnalyticsPage() {
     }
   }
 
-  const textColor  = isDark ? '#8F95A8' : '#8F95A8'
+  const textColor = isDark ? '#8F95A8' : '#8F95A8'
   const projectMax = Math.max(20, ...projectData.map((item) => Number(item.value) || 0))
   const projectTop = Math.ceil(projectMax / 5) * 5
   const projectTicks = Array.from({ length: projectTop / 5 + 1 }, (_, i) => i * 5)
 
+
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-100px)] w-full overflow-hidden">
+    <div className="flex flex-col gap-4 h-[calc(100vh-80px)] w-full overflow-hidden px-5 py-5 mb-0 pb-0">
 
       {error && (
         <div className="shrink-0 rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] px-4 py-3 text-sm">
@@ -186,16 +196,24 @@ export default function AnalyticsPage() {
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
           </div>
         ) : (
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={taskData} margin={{ top: 20, right: 20, left: 20, bottom: 0 }}>
-                <XAxis dataKey="name" tick={{ fill: '#1A1D2E', fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} dy={25} />
-                <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{fill: 'transparent', stroke: 'transparent'}} />
+              <LineChart data={taskData} margin={{ top: 20, right: 40, left: 40, bottom: 30 }}>
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fill: '#8F95A8', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }} 
+                  axisLine={false}
+                  tickLine={false} 
+                  dy={15}
+                  interval={0}
+                  padding={{ left: 30, right: 30 }}
+                />
+                <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ fill: 'transparent', stroke: 'transparent' }} />
                 <Line type="monotone" dataKey="prevValue" name="O'tgan davr" stroke="#D0CCF7" strokeWidth={2} strokeDasharray="5 5" dot={false} activeDot={false} />
                 <Line type="monotone" dataKey="value" name="Vazifalar" stroke="#526ED3" strokeWidth={2.5} dot={(props) => <CustomDot {...props} isDark={isDark} />} activeDot={false} />
               </LineChart>
@@ -212,8 +230,8 @@ export default function AnalyticsPage() {
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
               <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
             </div>
           ) : (
@@ -222,8 +240,8 @@ export default function AnalyticsPage() {
                 <BarChart data={projectData} margin={{ top: 10, right: 10, left: -25, bottom: 15 }} barSize={34}>
                   <XAxis dataKey="name" tick={{ fill: '#5B6078', fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} dy={15} />
                   <YAxis tick={{ fill: textColor, fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, projectTop]} ticks={projectTicks} />
-                  <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{fill: 'transparent'}} />
-                  <Bar dataKey="value" name="Loyihalar" radius={[20, 20, 20, 20]}>
+                  <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ fill: 'transparent' }} />
+                  <Bar dataKey="value" name="Loyihalar" radius={[10, 10, 10, 10]}>
                     {projectData.map((_, i) => <Cell key={i} fill={PROJECT_BAR_COLORS[i % 5]} />)}
                   </Bar>
                 </BarChart>
@@ -238,8 +256,8 @@ export default function AnalyticsPage() {
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
               <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
             </div>
           ) : (
@@ -247,7 +265,19 @@ export default function AnalyticsPage() {
               <div className="h-full flex-1 max-w-[180px] ml-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={meetingData} cx="50%" cy="50%" innerRadius="55%" outerRadius="95%" paddingAngle={4} dataKey="value" stroke="none">
+                    <Pie
+                      data={meetingData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="50%"
+                      outerRadius="95%"
+                      paddingAngle={4}
+                      dataKey="value"
+                      stroke="none"
+                      startAngle={90}
+                      endAngle={-270}
+                      cornerRadius={5}
+                    >
                       {meetingData.map((_, i) => <Cell key={i} fill={MEETING_DONUT_COLORS[i % 3]} />)}
                     </Pie>
                     <Tooltip content={<CustomTooltip isDark={isDark} />} />
@@ -259,13 +289,13 @@ export default function AnalyticsPage() {
               <div className="flex-1 flex flex-col mr-4">
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-[14px] text-[#1A1D2E] dark:text-white font-medium">Umumiy soni:</span>
-                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">{stats.meetings} / {stats.meetingMinutes} daqiqa</span>
+                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">{stats.meetings} / {stats.total_duration_minutes} daqiqa</span>
                 </div>
                 <div className="flex flex-col gap-4">
                   {meetingData.map((item, i) => (
                     <div key={i} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: MEETING_DONUT_COLORS[i] }} />
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ background: MEETING_DONUT_COLORS[i] }} />
                         <span className="text-[14px] text-[#5B6078] dark:text-[#C2C8E0]">{item.name}</span>
                       </div>
                       <span className="text-[14px] font-medium text-[#1A1D2E] dark:text-white">{item.value}</span>
