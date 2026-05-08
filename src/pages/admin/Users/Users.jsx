@@ -113,7 +113,6 @@ export default function UsersPage() {
     try {
       selected.forEach(async (id) => {
         const user = users.find(user => user.id === id)
-        console.log(user.roles.includes('superadmin'));
         if (user.roles.includes('superadmin')) {
           toast.error("Foydalanuvchilarni o'chirish", "Superadmin o'chirib bo'lmaydi")
           setConfirmDelete(false)
@@ -122,6 +121,7 @@ export default function UsersPage() {
           await axiosAPI.delete(`users/${id}/`)
           toast.success("Foydalanuvchilarni o'chirish", "Tanlangan foydalanuvchi tizimdan muvaffaqiyatli o'chirildi")
           setUsers(prev => prev.filter(u => !selected.has(u.id)))
+          setConfirmDelete(false)
         }
       })
       cancelSelecting()

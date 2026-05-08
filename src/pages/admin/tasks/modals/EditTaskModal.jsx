@@ -703,8 +703,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
             {/* Qo'shimcha fayllar */}
             <div>
-              <label className={labelCls}>Qo'shimcha fayllar</label>              <div className="flex flex-wrap gap-2">
-
+              <label className={labelCls}>Qo'shimcha fayllar</label>
+              <div className="flex flex-wrap gap-2">
                 {/* Existing attachments */}
                 {existingAttachments.map(att => (
                   <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">

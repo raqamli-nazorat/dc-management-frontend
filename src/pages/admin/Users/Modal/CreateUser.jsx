@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
-import { FaXmark, FaFileLines, FaCamera } from "react-icons/fa6"
-import { MdCheck, MdOutlineFileUpload } from "react-icons/md"
+import { FaXmark, FaFileLines, FaCamera, FaEye, FaRegEyeSlash, FaRegEye } from "react-icons/fa6"
+import { MdCheck, MdOutlineFileUpload, MdOutlineRemoveRedEye } from "react-icons/md"
 import { PiTelegramLogo } from "react-icons/pi"
 import { FiGithub, FiPlus } from "react-icons/fi"
 import { axiosAPI } from "../../../../service/axiosAPI"
@@ -22,14 +22,37 @@ const EMPTY_FORM = {
     district: '',
     passportSeria: '',
     passport_number: '',
+    phone_number: '',
+    card_number: '',
     links: [''],
     avatar: null
+}
+
+const formatPhone = (val) => {
+    let digits = val.replace(/\D/g, '');
+    if (digits.length < 3) return '+998';
+    if (!digits.startsWith('998')) digits = '998' + digits;
+
+    digits = digits.slice(0, 12);
+    let res = '+' + digits.slice(0, 3);
+    if (digits.length > 3) res += ' ' + digits.slice(3, 5);
+    if (digits.length > 5) res += ' ' + digits.slice(5, 8);
+    if (digits.length > 8) res += ' ' + digits.slice(8, 10);
+    if (digits.length > 10) res += ' ' + digits.slice(10, 12);
+    return res;
+}
+
+const formatCard = (val) => {
+    if (!val) return '';
+    let digits = val.replace(/\D/g, '').slice(0, 16);
+    return digits.match(/.{1,4}/g)?.join(' ') || digits;
 }
 
 const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     const [form, setForm] = useState(EMPTY_FORM)
     const [errors, setErrors] = useState({})
     const [avatarPreview, setAvatarPreview] = useState(null)
+    const [showPassword, setShowPassword] = useState(false);
 
     const [regions, setRegions] = useState([])
     const [districts, setDistricts] = useState([])
@@ -98,12 +121,17 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     const handleSubmit = async () => {
         try {
             const newErrs = {}
-            if (!form.username?.trim()) newErrs.username = true
-            if (!form.password?.trim()) newErrs.password = true
+            if (!form.username?.trim()) newErrs.username = "*Bu maydon majburiy"
+            if (!form.password?.trim()) newErrs.password = "*Bu maydon majburiy"
             const cleanSalary = form.salary.toString().replace(/\s/g, '')
-            if (!cleanSalary || parseFloat(cleanSalary) <= 0) newErrs.salary = true
-            if (!form.position) newErrs.position = true
-            if (!form.roles || form.roles.length === 0) newErrs.roles = true
+            if (!cleanSalary || parseFloat(cleanSalary) <= 0) newErrs.salary = "*Maosh noto'g'ri kiritildi"
+            if (!form.position) newErrs.position = "*Bu maydon majburiy"
+            if (!form.roles || form.roles.length === 0) newErrs.roles = "*Bu maydon majburiy"
+            if (!form.phone_number) newErrs.phone_number = "*Bu maydon majburiy"
+            if (!form.card_number) newErrs.card_number = "*Bu maydon majburiy"
+            if (form.card_number && form.card_number.replace(/\s/g, '').length !== 16) newErrs.card_number = "*Karta raqami 16 ta raqamdan iborat bo'lishi shart!"
+            if (form.passportSeria && !form.passport_number) newErrs.passport_number = "*Passport raqami majburiy"
+            if (!form.passportSeria && form.passport_number) newErrs.passportSeria = "*Passport seriyasi majburiy"
 
             if (Object.keys(newErrs).length > 0) {
                 setErrors(newErrs)
@@ -127,10 +155,19 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     formData.append('fixed_salary', form.salary.toString().replace(/\s/g, ''))
                 } else if (key === 'links') {
                     // Skip links here, handled as social_links
+                } else if (key === "phone_number") {
+                    const clean = form.phone_number.replace(/\s/g, '');
+                    formData.append(key, clean)
+                } else if (key === "card_number") {
+                    const clean = form.card_number.replace(/\s/g, '');
+                    formData.append(key, clean)
                 } else if (form[key] !== null && form[key] !== '') {
                     formData.append(key, form[key])
                 }
             })
+
+
+            formData.append('passport_series', (form.passportSeria || '') + (form.passport_number || ''))
 
             formData.append("social_links", JSON.stringify(form.links.filter(l => l?.trim())))
 
@@ -148,6 +185,15 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
 
             if (errData?.details && typeof errData.details === 'object') {
+                const serverErrors = {};
+                Object.entries(errData.details).forEach(([key, messages]) => {
+                    let field = key;
+                    if (key === 'fixed_salary') field = 'salary';
+                    if (key === 'passport_series') field = 'passportSeria';
+                    serverErrors[field] = Array.isArray(messages) ? messages[0] : messages;
+                });
+                setErrors(serverErrors);
+
                 const detailMsgs = Object.values(errData.details).flat().join(' ');
                 if (detailMsgs) errMsg = detailMsgs;
             } else if (errData?.errorMsg) {
@@ -159,6 +205,16 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             toast.error(errMsg)
         }
     }
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
 
     const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[#E2E6F2] focus:border-[#526ED3] dark:border-[#292A2A]'}`
     const inputCls = getInputCls(false)
@@ -192,7 +248,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                         </p>
                     </div>
                 </div>
-                <div className="px-7 pb-2 flex flex-col gap-4">
+                <div className="px-7 pb-2 flex flex-col gap-4 max-h-[480px] overflow-y-auto">
                     <div>
                         <label className={labelCls}>Ism Sharifi</label>
                         <input
@@ -202,19 +258,27 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             onChange={e => set('username', e.target.value)}
                             maxLength={150}
                         />
-                        {errors.username && <p className="text-[13px] text-[#FF5B5B] mt-1.5">*Bu maydon majburiy</p>}
+                        {errors.username && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.username}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className={labelCls}>Parol</label>
-                            <input
-                                className={getInputCls(errors.password)}
-                                type="password"
-                                placeholder="Parol"
-                                value={form.password}
-                                onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }}
-                            />
-                            {errors.password && <p className="text-[13px] text-[#FF5B5B] mt-1.5">*Bu maydon majburiy</p>}
+                            <div className="relative">
+                                <input
+                                    className={getInputCls(errors.password)}
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Parol"
+                                    value={form.password}
+                                    onChange={e => { set('password', e.target.value); set('confirm_password', e.target.value) }}
+                                />
+                                <span
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-[#8F95A8] dark:text-[#]"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                                </span>
+                            </div>
+                            {errors.password && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.password}</p>}
                         </div>
                         <div>
                             <label className={labelCls}>Oylik maosh (UZS)</label>
@@ -224,7 +288,30 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={form.salary}
                                 onChange={e => set('salary', formatNum(e.target.value))}
                             />
-                            {errors.salary && <p className="text-[13px] text-[#FF5B5B] mt-1.5">*Bu maydon majburiy</p>}
+                            {errors.salary && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.salary}</p>}
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className={labelCls}>Telifon raqami</label>
+                            <input
+                                className={getInputCls(errors.phone_number)}
+                                type="text"
+                                placeholder="+998 90 123 45 67"
+                                value={form.phone_number}
+                                onChange={e => set('phone_number', formatPhone(e.target.value))}
+                            />
+                            {errors.phone_number && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.phone_number}</p>}
+                        </div>
+                        <div>
+                            <label className={labelCls}>Karta raqami</label>
+                            <input
+                                className={getInputCls(errors.card_number)}
+                                placeholder="0000 0000 0000 0000"
+                                value={form.card_number}
+                                onChange={e => set('card_number', formatCard(e.target.value))}
+                            />
+                            {errors.card_number && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.card_number}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -236,6 +323,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={regions.find(r => r.id === form.region)?.name || ''}
                                 className="dark:bg-[#191a1a]!"
                                 padding="11px 11px"
+                                error={errors.region}
                                 onChange={v => {
                                     set('region', regions.find(r => r.name === v)?.id);
                                     if (districts.length === 1) {
@@ -245,6 +333,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                     }
                                 }}
                             />
+                            {errors.region && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.region}</p>}
                         </div>
                         <div>
                             <label className={labelCls}>Tuman</label>
@@ -256,29 +345,37 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 className="dark:bg-[#191a1a]!"
                                 padding="11px 11px"
                                 disabled={!form.region}
+                                error={errors.district}
                                 title={!form.region && 'Viloyatni tanlang'}
                             />
+                            {errors.district && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.district}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className={labelCls}>Passport ma'lumotlari</label>
                             <div className="flex gap-2">
-                                <input
-                                    className={inputCls}
-                                    placeholder="AA"
-                                    maxLength={2}
-                                    value={form.passportSeria}
-                                    onChange={e => set('passportSeria', e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2))}
-                                    style={{ width: 64 }}
-                                />
-                                <input
-                                    className={inputCls}
-                                    placeholder="1234567"
-                                    maxLength={7}
-                                    value={form.passport_number}
-                                    onChange={e => set('passport_number', e.target.value.replace(/\D/g, '').slice(0, 7))}
-                                />
+                                <div className="flex flex-col items-start relative gap-3" style={errors.passportSeria ? { paddingBottom: 10 } : {}}>
+                                    <input
+                                        className={getInputCls(errors.passportSeria)}
+                                        placeholder="AA"
+                                        maxLength={2}
+                                        value={form.passportSeria}
+                                        onChange={e => set('passportSeria', e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2))}
+                                        style={{ width: 64 }}
+                                    />
+                                    {errors.passportSeria && <p className="text-[13px] absolute bottom-[-10px] left-0 text-[#FF5B5B] w-[180px]">{errors.passportSeria}</p>}
+                                </div>
+                                <div className="flex flex-col items-end!">
+                                    <input
+                                        className={getInputCls(errors.passport_number)}
+                                        placeholder="1234567"
+                                        maxLength={7}
+                                        value={form.passport_number}
+                                        onChange={e => set('passport_number', e.target.value.replace(/\D/g, '').slice(0, 7))}
+                                    />
+                                    {errors.passport_number && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.passport_number}</p>}
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -294,6 +391,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 </span>
                             </button>
                             <input type="file" id="pasport" className="hidden" onChange={handlePassportUpload} accept="image/*" />
+                            {errors.passport_image && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.passport_image}</p>}
                         </div>
                     </div>
                     <div>
@@ -330,7 +428,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             error={errors.position}
                                         />
                                     </div>
-                                    {errors.position && <p className="text-[13px] text-[#FF5B5B] mt-1.5 pl-4">*Bu maydon majburiy</p>}
+                                    {errors.position && <p className="text-[13px] text-[#FF5B5B] mt-1.5 pl-4">{errors.position}</p>}
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between gap-2">
@@ -354,7 +452,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             error={errors.roles}
                                         />
                                     </div>
-                                    {errors.roles && <p className="text-[13px] text-[#FF5B5B] mt-1.5 pl-4">*Bu maydon majburiy</p>}
+                                    {errors.roles && <p className="text-[13px] text-[#FF5B5B] mt-1.5 pl-4">{errors.roles}</p>}
                                 </div>
                             </div>
                         </div>

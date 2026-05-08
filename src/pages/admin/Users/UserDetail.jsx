@@ -439,7 +439,7 @@ const UserDetail = () => {
                                 className={inputCls}
                                 type="text"
                                 inputMode="numeric"
-                                placeholder="+998 99 999 99 99"
+                                placeholder="+998 90 123 45 67"
                                 value={form.phone_number}
                                 onChange={e => set('phone_number', formatPhone(e.target.value))}
                             />
