@@ -174,7 +174,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                   </svg>
 
                   <span
-                    className="text-[11px] cursor-pointer text-[#1A1D2E] font-medium hover:text-[#526ED3] transition-colors"
+                    className="text-[11px] cursor-pointer text-[#1A1D2E] dark:text-[#8B949E] font-medium hover:text-[#526ED3] transition-colors"
                     onClick={e => {
                       e.stopPropagation()
                       navigator.clipboard.writeText(card.uid || `T${card.id}`).then(() => {
@@ -187,7 +187,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 {card.reopened_count > 0 && (
                   <div className="flex items-center top-0 right-3 absolute gap-0.5 shrink-0">
                     <img src="/imgs/tuiIconRedo.svg" alt="redo" className="w-3 h-3" style={{ filter: 'invert(65%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)' }} />
-                    <span className="text-[11px] font-bold text-[#5B6078]">{card.reopened_count}</span>
+                    <span className="text-[11px]  dark:text-[#8B949E]  font-bold text-[#5B6078]">{card.reopened_count}</span>
                   </div>
                 )}
               </div>
@@ -199,7 +199,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M4.375 0C4.85825 0 5.25 0.391751 5.25 0.875V1.75L8.75 1.75V0.875C8.75 0.391751 9.14175 0 9.625 0C10.1082 0 10.5 0.391751 10.5 0.875V1.75H11.0836C12.2109 1.75 13.125 2.66413 13.125 3.79138L13.125 11.9586C13.125 13.0859 12.2109 14 11.0836 14L2.91637 14C1.78913 14 0.875 13.0859 0.875 11.9586L0.875 3.79138C0.875 2.66413 1.78913 1.75 2.91637 1.75L3.5 1.75L3.5 0.875C3.5 0.391751 3.89175 0 4.375 0ZM3.54969 3.5H2.91637C2.75562 3.5 2.625 3.63062 2.625 3.79138L2.625 5.25L11.375 5.25V3.79138C11.375 3.63062 11.2444 3.5 11.0836 3.5L10.4503 3.5C10.3303 3.84 10.0061 4.08362 9.625 4.08362C9.24391 4.08362 8.91972 3.84 8.79969 3.5L5.20031 3.5C5.08028 3.84 4.75609 4.08362 4.375 4.08362C3.99391 4.08362 3.66972 3.84 3.54969 3.5ZM11.375 7L2.625 7L2.625 11.9586C2.625 12.1194 2.75562 12.25 2.91637 12.25L11.0836 12.25C11.2444 12.25 11.375 12.1194 11.375 11.9586L11.375 7Z" fill="#9AA1B5" />
                   </svg>
 
-                  <span className={`text-[11px] font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[#1A1D2E]'}`}>
+                  <span className={`text-[11px] dark:text-[#8B949E]  font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[#1A1D2E]'}`}>
                     {fmtDate(card.deadline)}
                   </span>
                 </div>
@@ -221,7 +221,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                         </defs>
                       </svg>
 
-                      <span className="text-[11px] text-[#1A1D2E] font-medium">{durationStr}</span>
+                      <span className="text-[11px] dark:text-[#8B949E]  text-[#1A1D2E] font-medium">{durationStr}</span>
                     </div>
                   )}
                   {countdown && (
@@ -239,7 +239,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
 
               <div className='mt-auto'>
                 {/* Divider */}
-                <div className="  mb-2 dark:border-[#333535]" />
+                <div className="  mb-2 " />
 
                 {/* Assignee */}
                 <div className="flex  mt-auto  items-center gap-1.5">
@@ -257,7 +257,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                     <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white truncate leading-tight">
                       {assignee}
                     </p>
-                    <p className="text-[11px] text-[#1A1D2E] truncate leading-tight">
+                    <p className="text-[11px] dark:text-[#E6EDF3]  text-[#1A1D2E] truncate leading-tight">
                       {position || 'Dasturchi'}
                     </p>
                   </div>

@@ -64,7 +64,12 @@ function groupByDate(notifs) {
     if (!map[n.date]) map[n.date] = []
     map[n.date].push(n)
   })
-  return Object.entries(map)
+  // Sanalarni teskari tartibda (yangilari tepada) qaytarish
+  return Object.entries(map).sort((a, b) => {
+    // "DD.MM.YYYY" formatini taqqoslash uchun "YYYY-MM-DD" ga o'tkazamiz
+    const toSortable = (d) => d.split('.').reverse().join('-')
+    return toSortable(b[0]).localeCompare(toSortable(a[0]))
+  })
 }
 
 function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
@@ -128,7 +133,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <div key={date}>
             <p className="text-xs font-semibold text-[#8F95A8] dark:text-[#8E95B5] mb-3 px-2">{date}</p>
             <div className="flex flex-col gap-1">
-              {items.map(n => (
+              {[...items].sort((a, b) => b.time.localeCompare(a.time)).map(n => (
                 <button
                   key={n.id}
                   onClick={() => {
@@ -232,7 +237,12 @@ function Breadcrumb() {
 export default function Layout() {
   const { action, customAction, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
   const [notifOpen, setNotifOpen] = useState(false)
-  const [notifs, setNotifs] = useState(NOTIFS_DATA)
+  const [notifs, setNotifs] = useState([...NOTIFS_DATA].sort((a, b) => {
+    const toSortable = (d) => d.split('.').reverse().join('-')
+    const dateCmp = toSortable(b.date).localeCompare(toSortable(a.date))
+    if (dateCmp !== 0) return dateCmp
+    return b.time.localeCompare(a.time)
+  }))
   const [downloadOpen, setDownloadOpen] = useState(false)
   const downloadRef = useRef(null)
   const wsRef = useRef(null)
@@ -332,7 +342,9 @@ export default function Layout() {
         : Array.isArray(data?.data?.results)
           ? data.data.results
           : []
-      setNotifs(list.map(mapApiNotification))
+      // Yangilari tepada turishi uchun created_at bo'yicha teskari tartibda saralash
+      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      setNotifs(sorted.map(mapApiNotification))
     } catch {
       // static fallback saqlanadi
     }
