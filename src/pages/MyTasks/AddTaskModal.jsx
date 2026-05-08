@@ -1,22 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaArrowLeft, FaRegStar, FaStar, FaXmark, FaRegBookmark } from 'react-icons/fa6'
 
 const COLORS = [
-  { id: 'red',    hex: '#FF2E2E' },
+  { id: 'red', hex: '#FF2E2E' },
   { id: 'yellow', hex: '#FFD200' },
-  { id: 'green',  hex: '#15B036' },
-  { id: 'blue',   hex: '#005FF9' },
+  { id: 'green', hex: '#15B036' },
+  { id: 'blue', hex: '#005FF9' },
 ]
 
 /* task prop berilsa — tahrirlash rejimi, aks holda — yaratish */
 export default function AddTaskModal({ onClose, onSave, task = null }) {
   const isEdit = !!task
 
-  const [title, setTitle]               = useState(task?.title || '')
+  const [title, setTitle] = useState(task?.title || '')
   const [deadline] = useState(task?.deadline || null)
   const [selectedColor, setSelectedColor] = useState(task?.color || 'blue')
-  const [isStarred, setIsStarred]       = useState(false)
-  const [loading, setLoading]           = useState(false)
+  const [isStarred, setIsStarred] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   /* Subtasklar: tahrirlashda mavjud items, yaratishda 5 ta bo'sh qator */
   const [subtasks, setSubtasks] = useState(
@@ -62,27 +62,37 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
     }
   }
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     /* Overlay */
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="relative w-full max-w-[640px] bg-white dark:bg-[#1C1D1D] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
-
-        {/* X tugmasi */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full
+      {/* X tugmasi */}
+      <button
+        onClick={onClose}
+        className="absolute top-8 right-6 w-8 h-8 flex items-center justify-center rounded-full
             bg-[#F1F3F9] dark:bg-[#292A2A] text-[#5B6078] dark:text-[#C2C8E0]
             hover:bg-[#E2E6F2] dark:hover:bg-[#333435] transition-colors cursor-pointer"
-        >
-          <FaXmark size={13} />
-        </button>
+      >
+        <FaXmark size={13} />
+      </button>
+
+      {/* Modal */}
+      <div className="relative w-full max-w-[640px] h-[80vh]! bg-white dark:bg-[#1C1D1D] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
 
         {/* ── Header ── */}
         <div className="flex items-start justify-between mb-6">
@@ -116,9 +126,9 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         </div>
 
         {/* ── Form tanasi ── */}
-        <div className="flex gap-5 mb-8">
+        <div className="flex relative gap-5 mb-8">
           {/* Vazifa nomi + subtasklar */}
-          <div className="flex-1 bg-[#F8F9FC] dark:bg-[#222323] rounded-[24px] p-6 flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
+          <div className="w-full bg-[#F8F9FC] dark:bg-[#222323] rounded-[24px] p-6 pr-20! flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
             {/* Vazifa nomi */}
             <input
               type="text"
@@ -176,7 +186,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           </div>
 
           {/* Rang tanlash */}
-          <div className="flex flex-col gap-4 items-center pt-1 shrink-0">
+          <div className="absolute -top-8 right-0 px-3 py-4 rounded-full dark:bg-[#222323] shadow-2xl border border-[#F1F3F9] dark:border-[#2A2B2B] flex flex-col gap-4 items-center justify-center shrink-0">
             {COLORS.map(c => (
               <button
                 key={c.id}
@@ -195,7 +205,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-6 mt-auto ml-auto">
           <button
             onClick={onClose}
             className="flex items-center gap-2 px-6 py-3.5 rounded-[16px] font-bold cursor-pointer
