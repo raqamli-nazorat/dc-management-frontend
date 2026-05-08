@@ -704,7 +704,7 @@ const Employee = () => {
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
-          Shakillantirish
+          Shakllantirish
         </button>
       </div>
 
@@ -919,7 +919,7 @@ const Employee = () => {
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[250px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Ta'rifi</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[180px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muddati</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[120px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi bonusi</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi bonusi (UZS)</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi</th>
                   <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Xodimlar</th>
@@ -1027,7 +1027,7 @@ const Employee = () => {
           selectedList={filters.employees ? filters.employees.split(',') : []}
           onConfirm={handleSelectUserConfirm}
           title="Xodimlar tanlang"
-          type="employee"
+          employee_role="employee"
           onClose={() => setSelectUser(false)}
         />
       )}
@@ -1037,8 +1037,7 @@ const Employee = () => {
           selectedList={filters.manager ? filters.manager.split(',') : []}
           onConfirm={handleSelectManagerConfirm}
           title="Boshqaruvchi tanlang"
-          employee_role='accountant'
-          type="creator"
+          param={{roles: "accountant"}}
           onClose={() => setSelectManager(false)}
         />
       )}
@@ -1048,7 +1047,7 @@ const Employee = () => {
           selectedList={filters.created_by ? filters.created_by.split(',') : []}
           onConfirm={handleSelectAuthorConfirm}
           title="Muallif tanlang"
-          type='creator'
+          param={{roles: "admin"}}
           onClose={() => setSelectAuthor(false)}
         />
       )}

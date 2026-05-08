@@ -707,7 +707,7 @@ const Employee = () => {
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
-          Shakillantirish
+          Shakllantirish
         </button>
       </div>
 
@@ -1131,8 +1131,7 @@ const Employee = () => {
           selectedList={filters.user ? filters.user.split(',') : []}
           onConfirm={handleSelectEmployeeConfirm}
           title="Xodimlar tanlang"
-          param={{ roles: "employee" }}
-          type='employee'
+          employee_role='employee'
           onClose={() => setSelectEmployee(false)}
         />
       )}
@@ -1141,8 +1140,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.accountants ? filters.accountants.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
-          employee_role='accountant'
-          type='creator'
+          param={{ roles: "manager" }}
           title="Hisobchilar tanlang"
           onClose={() => setSelectAccountant(false)}
         />

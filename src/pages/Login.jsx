@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getRouteRole } from '../components/ProtectedRoute'
 import { LuEye, LuEyeClosed } from 'react-icons/lu'
+import { axiosAPI } from '../service/axiosAPI'
+import { toast } from '../Toast/ToastProvider'
 
 const THROTTLE_KEY = 'login_throttle_until'
 
@@ -60,9 +62,23 @@ export default function Login() {
     setLoading(true)
     setTimeout(async () => {
       const result = await login(loginVal, parolVal)
+
       setLoading(false)
+
       if (result.success) {
-        navigate(`/${getRouteRole({ roles: result.roles })}/dashboard`)
+        if (result.roles.length === 1) {
+          const role = await axiosAPI.put("users/me/change-role/", result.roles[0])
+            .then(() => {
+              navigate(`/${getRouteRole({ roles: result.roles })}/dashboard`);
+              
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error(err?.response?.data?.error?.errorMsg || "Role almashtirishda xatolik yuz berdi!")
+            })
+        } else {
+          navigate('/role', { state: { roles: result.roles } });
+        }
       } else {
         // 429 throttle xatosini tekshirish
         const raw = result.error
@@ -226,7 +242,7 @@ export default function Login() {
               ) : isThrottled ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                   </svg>
                   {formatTime(throttleSecs)}
                 </span>

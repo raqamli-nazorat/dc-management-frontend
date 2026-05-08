@@ -658,7 +658,7 @@ const Employee = () => {
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
-          Shakillantirish
+          Shakllantirish
         </button>
       </div>
       {/* Filter Panel */}
@@ -683,223 +683,223 @@ const Employee = () => {
             }
           }}
         >
-        {/* Row 1 */}
-        <div className="grid grid-cols-4 gap-4 mb-3">
-          <div className="col-span-4 lg:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">So'ralgan vaqt</label>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  format="DD.MM.YYYY HH:mm"
-                  value={filters.created_at_min}
-                  onChange={(value) => handleFilterChange('created_at_min', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                  placeholder='Boshlanish sanasi'
-                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+          {/* Row 1 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div className="col-span-4 lg:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">So'ralgan vaqt</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    format="DD.MM.YYYY HH:mm"
+                    value={filters.created_at_min}
+                    onChange={(value) => handleFilterChange('created_at_min', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Boshlanish sanasi'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <DatePicker
+                    inputReadOnly
+                    value={filters.created_at_max}
+                    format="DD.MM.YYYY HH:mm"
+                    onChange={(value) => handleFilterChange('created_at_max', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Tugash sana'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-4 lg:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Tasdiqlangan vaqt</label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <DatePicker
+                    inputReadOnly
+                    value={filters.confirmed_at_min}
+                    format="DD.MM.YYYY HH:mm"
+                    onChange={(value) => handleFilterChange('confirmed_at_min', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Boshlanish sanasi'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+
+                <div className="relative">
+                  <DatePicker
+                    inputReadOnly
+                    value={filters.confirmed_at_max}
+                    format="DD.MM.YYYY HH:mm"
+                    onChange={(value) => handleFilterChange('confirmed_at_max', value)}
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    placeholder='Tugash sanasi'
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div className="col-span-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
+                  <button
+                    type="button"
+                    onClick={() => setSelectEmployee(true)}
+                    className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
+                  >
+                    <span className="truncate text-sm font-medium">
+                      {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <PiUsersThreeBold size={18} />
+
+                      {filters.user && (
+                        <FaXmark
+                          size={18}
+                          className="text-red-500"
+                          onClick={(e) => { e.stopPropagation(); handleFilterChange('user', '') }}
+                        />
+                      )}
+                    </div>
+                  </button>
+                </div>
+                <div>
+                  <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Hisobchi</label>
+                  <button
+                    type="button"
+                    onClick={() => setSelectAccountant(true)}
+                    className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.accountant?.length > 0 ? 'filter-notif' : ''}`}
+                  >
+                    <span className="truncate text-sm font-medium">
+                      {filters.accountant ? `${filters.accountant.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <PiUsersThreeBold size={18} />
+
+                      {filters.accountant && (
+                        <FaXmark
+                          size={18}
+                          className="text-red-500"
+                          onClick={(e) => { e.stopPropagation(); handleFilterChange('accountant', '') }}
+                        />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-1">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Oy uchun</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Oy tanlang"
+                options={months}
+                value={filters.month}
+                onChange={(value) => handleFilterChange('month', value)}
+              />
+            </div>
+
+            <div className="col-span-1">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
+              <FilterSelect
+                padding='13.5px 12px'
+                placeholder="Holatini tanlang"
+                options={status_type}
+                value={filters.is_confirmed}
+                onChange={(value) => handleFilterChange('is_confirmed', value)}
+              />
+            </div>
+          </div>
+
+          {/* Row 3*/}
+          <div className="grid grid-cols-8 gap-4">
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jami miqdori (UZS)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.total_amount_min}
+                  onChange={(e) => handleFilterChange('total_amount_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.total_amount_max}
+                  onChange={(e) => handleFilterChange('total_amount_max', formatNum(e.target.value))}
                 />
               </div>
-              <div className="relative flex-1">
-                <DatePicker
-                  inputReadOnly
-                  value={filters.created_at_max}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('created_at_max', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                  placeholder='Tugash sana'
-                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+            </div>
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Oylik maoshi (UZS)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.salary_min}
+                  onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.salary_max}
+                  onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
                 />
               </div>
             </div>
-          </div>
-
-          <div className="col-span-4 lg:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Tasdiqlangan vaqt</label>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative">
-                <DatePicker
-                  inputReadOnly
-                  value={filters.confirmed_at_min}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('confirmed_at_min', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                  placeholder='Boshlanish sanasi'
-                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">KPI bonus (UZS)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.kpi_min}
+                  onChange={(e) => handleFilterChange('kpi_min', formatNum(e.target.value))}
                 />
-              </div>
-
-              <div className="relative">
-                <DatePicker
-                  inputReadOnly
-                  value={filters.confirmed_at_max}
-                  format="DD.MM.YYYY HH:mm"
-                  onChange={(value) => handleFilterChange('confirmed_at_max', value)}
-                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                  className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                  placeholder='Tugash sanasi'
-                  suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                  allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.kpi_max}
+                  onChange={(e) => handleFilterChange('kpi_max', formatNum(e.target.value))}
                 />
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="grid grid-cols-4 gap-4 mb-3">
-          <div className="col-span-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Xodimlar</label>
-                <button
-                  type="button"
-                  onClick={() => setSelectEmployee(true)}
-                  className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
-                >
-                  <span className="truncate text-sm font-medium">
-                    {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <PiUsersThreeBold size={18} />
-
-                    {filters.user && (
-                      <FaXmark
-                        size={18}
-                        className="text-red-500"
-                        onClick={(e) => { e.stopPropagation(); handleFilterChange('user', '') }}
-                      />
-                    )}
-                  </div>
-                </button>
-              </div>
-              <div>
-                <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Hisobchi</label>
-                <button
-                  type="button"
-                  onClick={() => setSelectAccountant(true)}
-                  className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.accountant?.length > 0 ? 'filter-notif' : ''}`}
-                >
-                  <span className="truncate text-sm font-medium">
-                    {filters.accountant ? `${filters.accountant.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <PiUsersThreeBold size={18} />
-
-                    {filters.accountant && (
-                      <FaXmark
-                        size={18}
-                        className="text-red-500"
-                        onClick={(e) => { e.stopPropagation(); handleFilterChange('accountant', '') }}
-                      />
-                    )}
-                  </div>
-                </button>
+            <div className="col-span-2 md:col-span-2">
+              <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jarima miqdori (UZS)</label>
+              <div className='grid grid-cols-2 gap-3'>
+                <FilterInput
+                  label="dan"
+                  className='bg-white'
+                  value={filters.penalty_min}
+                  onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
+                />
+                <FilterInput
+                  label="gacha"
+                  className='bg-white'
+                  value={filters.penalty_max}
+                  onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
+                />
               </div>
             </div>
-          </div>
 
-          <div className="col-span-1">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Oy uchun</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Oy tanlang"
-              options={months}
-              value={filters.month}
-              onChange={(value) => handleFilterChange('month', value)}
-            />
           </div>
-
-          <div className="col-span-1">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
-            <FilterSelect
-              padding='13.5px 12px'
-              placeholder="Holatini tanlang"
-              options={status_type}
-              value={filters.is_confirmed}
-              onChange={(value) => handleFilterChange('is_confirmed', value)}
-            />
-          </div>
-        </div>
-
-        {/* Row 3*/}
-        <div className="grid grid-cols-8 gap-4">
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jami miqdori (UZS)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.total_amount_min}
-                onChange={(e) => handleFilterChange('total_amount_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.total_amount_max}
-                onChange={(e) => handleFilterChange('total_amount_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Oylik maoshi (UZS)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.salary_min}
-                onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.salary_max}
-                onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">KPI bonus (UZS)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.kpi_min}
-                onChange={(e) => handleFilterChange('kpi_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.kpi_max}
-                onChange={(e) => handleFilterChange('kpi_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
-            <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Jarima miqdori (UZS)</label>
-            <div className='grid grid-cols-2 gap-3'>
-              <FilterInput
-                label="dan"
-                className='bg-white'
-                value={filters.penalty_min}
-                onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
-              />
-              <FilterInput
-                label="gacha"
-                className='bg-white'
-                value={filters.penalty_max}
-                onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
-              />
-            </div>
-          </div>
-
-        </div>
         </ConfigProvider>
       </div>
 
@@ -1003,17 +1003,15 @@ const Employee = () => {
         }
       `}</style>
 
-      {
-        selectEmployee && (
-          <EmployeeStep
-            selectedList={filters.user ? filters.user.split(',') : []}
-            title="Xodimlar tanlang"
-            type='employee'
-            onConfirm={handleSelectEmployeeConfirm}
-            onClose={() => setSelectEmployee(false)}
-          />
-        )
-      }
+      {selectEmployee && (
+        <EmployeeStep
+          selectedList={filters.user ? filters.user.split(',') : []}
+          title="Xodimlar tanlang"
+          employee_role='employee'
+          onConfirm={handleSelectEmployeeConfirm}
+          onClose={() => setSelectEmployee(false)}
+        />
+      )}
 
       {selectAccountant && (
         <EmployeeStep
@@ -1021,7 +1019,6 @@ const Employee = () => {
           onConfirm={handleSelectAccountantConfirm}
           title="Hisobchilar tanlang"
           employee_role='accountant'
-          type='creator'
           onClose={() => setSelectAccountant(false)}
         />
       )}
