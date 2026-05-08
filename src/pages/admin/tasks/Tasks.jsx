@@ -15,7 +15,7 @@ import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
 
 // ── Label maps ──
-const TYPE_LABEL = { bug: 'Xato', feature: 'Yangi funksiya', improvement: "Qo'shimcha" }
+const TYPE_LABEL = { bug: 'Xatolik (Bug)', feature: 'Yangi funksiya', extra: "Qo'shimcha", improvement: "Qo'shimcha", research: "Tadqiqot/O'rganish" }
 const PRIORITY_LABEL = { low: 'Past', medium: "O'rta", high: 'Yuqori', critical: 'Kritik' }
 const TASK_STATUS_LABEL = {
   todo: 'Bajarilishi kerak',

@@ -451,9 +451,10 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
                 value={f.turi}
                 onChange={v => set('turi', v)}
                 options={[
-                  { label: 'Xato',           value: 'bug' },
-                  { label: 'Yangi funksiya',  value: 'feature' },
-                  { label: "Qo'shimcha",      value: 'improvement' },
+                  { label: 'Xatolik (Bug)',       value: 'bug' },
+                  { label: 'Yangi funksiya',       value: 'feature' },
+                  { label: "Qo'shimcha",           value: 'extra' },
+                  { label: "Tadqiqot/O'rganish",   value: 'research' },
                 ]}
                 placeholder="Turi tanlang"
               />
