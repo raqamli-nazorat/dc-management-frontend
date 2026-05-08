@@ -143,7 +143,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
                     </div>
                     {/* Right: date */}
                     <span className="shrink-0 text-sm text-[#8F95A8] dark:text-[#5B6078] font-medium">
-                      {fmtProjectDate(p.created_at)}
+                      {fmtProjectDate(p.deadline)}
                     </span>
                   </button>
                 )
@@ -420,13 +420,16 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !pickerOpen) {
         onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, pickerOpen]);
+
+  console.log(form.assignees);
+  console.log(form.position);
 
 
   return (
@@ -489,13 +492,18 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 onClick={() => form.project ? setPickerOpen(true) : null}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
                   ${form.project ? 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]' : 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]'}
-                  border-[#E2E6F2] dark:border-[#292A2A]`}>
-                <span className={assigneeLabel ? "text-[#1A1D2E] dark:text-white flex-1 text-left truncate" : "text-[#5B6078] flex-1 text-left"}>
+                  border-[#E2E6F2] dark:border-[#292A2A]`}
+              >
+                <span
+                  className={assigneeLabel ? "text-[#1A1D2E] dark:text-white flex-1 text-left truncate" : "text-[#5B6078] flex-1 text-left"}
+                >
                   {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || "Topshiruvchi tanlang")}
                 </span>
                 <div className="flex items-center gap-1.5 shrink-0 ml-1">
                   {form.assignees.length > 0 && (
-                    <span onMouseDown={e => { e.stopPropagation(); set("assignees", []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                    <span
+                      onMouseDown={e => { e.stopPropagation(); set("assignees", []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"
+                    >
                       <FaXmark size={11} />
                     </span>
                   )}
@@ -506,7 +514,13 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
             {/* Lavozim + Sprint */}
             <div className="grid grid-cols-2 gap-4">
-              <SelectDropdown label="Lavozim" value={form.position} onChange={v => set("position", v)} options={positionOptions} placeholder="Lavozim tanlang" />
+              <SelectDropdown
+                label="Lavozim"
+                value={form.position}
+                onChange={v => set("position", v)}
+                options={positionOptions}
+                placeholder="Lavozim tanlang"
+              />
               <div>
                 <label className={labelCls}>Sprint raqami </label>
                 <input
@@ -557,8 +571,10 @@ export default function AddTaskModal({ onClose, onAdd }) {
                     placeholder="Sana tanlash"
                     value={form.deadline}
                     onChange={v => {
-                      set("deadline", v)
-                      set("deadline_time", "23:59")
+                      set("deadline", v);
+                      if (v && (!form.deadline_time || form.deadline_time === "00:00")) {
+                        set("deadline_time", "23:59");
+                      }
                     }}
                     dropUp
                   />
@@ -662,7 +678,19 @@ export default function AddTaskModal({ onClose, onAdd }) {
           selected={form.assignees}
           users={projectEmployees}
           onClose={() => setPickerOpen(false)}
-          onConfirm={list => { set("assignees", list); setPickerOpen(false) }}
+          onConfirm={list => {
+            set("assignees", list)
+            if (list.length > 0) {
+              const user = list[0]
+              if (user.position) {
+                const foundPos = positions.find(p => p.name === user.position)
+                if (foundPos) {
+                  set("position", String(foundPos.id))
+                }
+              }
+            }
+            setPickerOpen(false)
+          }}
         />
       )}
     </>

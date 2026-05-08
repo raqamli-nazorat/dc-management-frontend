@@ -456,11 +456,11 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
       >
 
 
-        {/* Mening vazifalarim */}
+        {/* Kundalik reja */}
         {isCollapsed ? (
           <button
             onClick={() => navigate(`/${urlPrefix}/my_tasks`)}
-            title="Mening vazifalarim"
+            title="Kundalik reja"
             className={iconBtn(location.pathname.includes('my_tasks'))}
           >
             <FaRegCalendarCheck size={16} />
@@ -476,7 +476,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             ].join(' ')}
           >
             <FaRegCalendarCheck size={16} className="shrink-0" />
-            <span>Mening vazifalarim</span>
+            <span>Kundalik reja</span>
           </NavLink>
         )}
 

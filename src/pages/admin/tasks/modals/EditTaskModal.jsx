@@ -529,13 +529,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !pickerOpen) {
         onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, pickerOpen]);
 
 
   return (
@@ -593,7 +593,9 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             {/* Holati + Darajasi + Turi */}
             <div className="grid grid-cols-3 gap-4">
               <SelectDropdown label="Holati" value={form.status} onChange={v => set('status', v)} options={STATUS_OPTIONS} placeholder="Holati" disabled={ro} />
+
               <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder="Daraja" disabled={ro} error={errors.priority} />
+
               <SelectDropdown label="Turi" value={form.type} onChange={v => set('type', v)} options={TYPE_OPTIONS} placeholder="Turi" disabled={ro} error={errors.type} />
             </div>
 
@@ -875,7 +877,19 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           selected={form.assignees}
           users={projectEmployees}
           onClose={() => setPickerOpen(false)}
-          onConfirm={list => { set('assignees', list); setPickerOpen(false) }}
+          onConfirm={list => {
+            set('assignees', list)
+            if (list.length > 0) {
+              const user = list[0]
+              if (user.position) {
+                const foundPos = positions.find(p => p.name === user.position)
+                if (foundPos) {
+                  set('position', String(foundPos.id))
+                }
+              }
+            }
+            setPickerOpen(false)
+          }}
         />
       )}
     </>

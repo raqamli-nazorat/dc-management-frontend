@@ -382,7 +382,7 @@ export default function MyTasks() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-[28px] font-bold text-[#1A1D2E] dark:text-white">
-        Mening vazifalarim
+        Kundalik rejalar
       </h1>
 
       {loading ? (

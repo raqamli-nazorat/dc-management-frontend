@@ -9,25 +9,25 @@ const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] m
 
 const HOLAT_LIST = [
   { label: 'Bajarilishi kerak', value: 'todo' },
-  { label: 'Jarayonda',         value: 'in_progress' },
-  { label: "Muddati o'tgan",    value: 'overdue' },
-  { label: 'Bajarilgan',        value: 'done' },
+  { label: 'Jarayonda', value: 'in_progress' },
+  { label: "Muddati o'tgan", value: 'overdue' },
+  { label: 'Bajarilgan', value: 'done' },
   { label: 'Ishga tushirilgan', value: 'production' },
-  { label: 'Tekshirilgan',      value: 'checked' },
-  { label: 'Rad etilgan',       value: 'rejected' },
-  { label: 'Bekor qilingan',    value: 'cancelled' },
+  { label: 'Tekshirilgan', value: 'checked' },
+  { label: 'Rad etilgan', value: 'rejected' },
+  { label: 'Bekor qilingan', value: 'cancelled' },
 ]
 
 export const TASK_EMPTY_FILTER = {
-  projects:  [],
-  holat:     '',
-  daraja:    '',
-  turi:      '',
+  projects: [],
+  holat: '',
+  daraja: '',
+  turi: '',
   deadFromD: '',
   deadFromT: '',
-  deadToD:   '',
-  deadToT:   '',
-  myTasks:   false,
+  deadToD: '',
+  deadToT: '',
+  myTasks: false,
 }
 
 /* ─── SimpleDropdown — { label, value } yoki string options ─── */
@@ -385,9 +385,23 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
             const payload = res.data?.data ?? res.data
             const list = Array.isArray(payload) ? payload : (payload.results ?? [])
             setProjectsList(list)
-          }).catch(() => {})
+          }).catch(() => { })
       })
   }, [])
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKey)
+    return () => {
+      window.removeEventListener("keydown", handleKey)
+    }
+  }, [onClose])
+
 
   return (
     <>
@@ -439,10 +453,10 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
                 value={f.daraja}
                 onChange={v => set('daraja', v)}
                 options={[
-                  { label: 'Past',    value: 'low' },
-                  { label: "O'rta",   value: 'medium' },
-                  { label: 'Yuqori',  value: 'high' },
-                  { label: 'Kritik',  value: 'critical' },
+                  { label: 'Past', value: 'low' },
+                  { label: "O'rta", value: 'medium' },
+                  { label: 'Yuqori', value: 'high' },
+                  { label: 'Kritik', value: 'critical' },
                 ]}
                 placeholder="Daraja tanlang"
               />
@@ -451,10 +465,10 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
                 value={f.turi}
                 onChange={v => set('turi', v)}
                 options={[
-                  { label: 'Xatolik (Bug)',       value: 'bug' },
-                  { label: 'Yangi funksiya',       value: 'feature' },
-                  { label: "Qo'shimcha",           value: 'extra' },
-                  { label: "Tadqiqot/O'rganish",   value: 'research' },
+                  { label: 'Xatolik (Bug)', value: 'bug' },
+                  { label: 'Yangi funksiya', value: 'feature' },
+                  { label: "Qo'shimcha", value: 'extra' },
+                  { label: "Tadqiqot/O'rganish", value: 'research' },
                 ]}
                 placeholder="Turi tanlang"
               />
@@ -464,10 +478,10 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
             <div>
               <label className={labelCls}>Muddat oralig'i</label>
               <div className="grid grid-cols-4 gap-2">
-                <DateTimeBox type="date" placeholder="dan"   value={f.deadFromD} onChange={v => set('deadFromD', v)} />
-                <DateTimeBox type="time"                     value={f.deadFromT} onChange={v => set('deadFromT', v)} />
-                <DateTimeBox type="date" placeholder="gacha" value={f.deadToD}   onChange={v => set('deadToD', v)} />
-                <DateTimeBox type="time"                     value={f.deadToT}   onChange={v => set('deadToT', v)} />
+                <DateTimeBox type="date" placeholder="dan" value={f.deadFromD} onChange={v => set('deadFromD', v)} />
+                <DateTimeBox type="time" value={f.deadFromT} onChange={v => set('deadFromT', v)} />
+                <DateTimeBox type="date" placeholder="gacha" value={f.deadToD} onChange={v => set('deadToD', v)} />
+                <DateTimeBox type="time" value={f.deadToT} onChange={v => set('deadToT', v)} />
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -72,7 +72,7 @@ const normalizePercentInput = (val) => {
     : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
   const [intPartRaw = '', decRaw = ''] = normalized.split('.')
   const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-  
+
   if (firstDot === -1) {
     return Number(intPart) > 100 ? '100' : intPart
   } else {
@@ -191,6 +191,16 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
     else setSel(prev => { const s = new Set(prev); filtered.forEach(u => s.add(u.id)); return s })
   }
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
@@ -281,6 +291,16 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
   const handleFine = (val) => {
     set('fine', normalizePercentInput(val))
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && !showParticipants) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, showParticipants]);
 
   // Loyha o'zgarganda qatnashchilarni tozalash va xodimlarni yuklash
   const handleProjectChange = (v) => {
@@ -415,7 +435,9 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                   value={form.date}
                   onChange={v => {
                     set('date', v)
-                    if (v && !form.time) set('time', '23:59')
+                    if (v && (!form.time || form.time === '00:00')) {
+                      set('time', '23:59')
+                    }
                   }}
                   error={errors.date}
                   dropUp
@@ -447,37 +469,55 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
             </div>
 
             <div>
-              <label className={labelCls}>Yig’ilish qatnashchilarini qo’shish</label>
-              <div className=' border border-[#E2E6F2] dark:border-[#292A2A] rounded-xl '>
-                {form.participants.length > 0 && (
-                  <div className="px-3 py-2.5  bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 mb-2">
+              <label className={labelCls}>Yig'ilish qatnashchilari</label>
+              <div
+                onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
+                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#111111] p-3 flex flex-col transition-all
+                  ${!form.project || membersLoading ? 'cursor-default' : 'cursor-pointer hover:border-[#526ED3]'}
+                  ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
+              >
+                {form.participants.length === 0 ? (
+                  <>
+                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">
+                      {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : 'Quyidagi tugma orqali qidiring va tanlang'}
+                    </p>
+                    <div className={`inline-flex items-center gap-1 p-2 rounded-xl text-sm font-medium
+                      ${!form.project || membersLoading
+                        ? 'bg-[#F1F3F9] text-[#C2C8E0] dark:bg-[#1C1D1D] dark:text-[#474848]'
+                        : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] cursor-pointer'}`}>
+                      {membersLoading ? (
+                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                      ) : (
+                        <FaPlus size={15} />
+                      )}
+                      {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Loyiha tanlanmagan' : "Qatnashchilarni qo'shing"}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
                     {form.participants.map(u => (
-                      <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
-                        {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
-                        <button type="button" onMouseDown={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
-                          className="hover:opacity-70 cursor-pointer ml-0.5"><FaXmark size={9} /></button>
-                      </span>
+                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[#1A1D2E] dark:text-white text-xs border border-[#E2E6F2] dark:border-[#292A2A]">
+                        <span className="font-medium text-[13px]">
+                          {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
+                          className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
+                        >
+                          <FaXmark size={12} className="text-[#8F95A8]" />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
-                <button type="button" onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed text-sm transition-colors
-                  ${!form.project || membersLoading
-                      ? 'border-[#E2E6F2] dark:border-[#292A2A] text-[#C2C8E0] dark:text-[#474848] cursor-default'
-                      : 'border-[#C2C8E0] dark:border-[#474848] text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer'}`}>
-                  {membersLoading
-                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
-                  }
-                  {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Qatnashchilarni qo'shish"}
-                </button>
               </div>
             </div>
           </div>
 
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-end gap-3 shrink-0 bg-white dark:bg-[#111111]">
-            
+
             {/* <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
@@ -589,6 +629,16 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
     }
   }
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && !showParticipants) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, showParticipants]);
+
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -653,7 +703,12 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                   type="date"
                   placeholder="kk.oo.yyyy"
                   value={form.date}
-                  onChange={v => set('date', v)}
+                  onChange={v => {
+                    set('date', v)
+                    if (v && (!form.time || form.time === '00:00')) {
+                      set('time', '23:59')
+                    }
+                  }}
                   dropUp
                 />
               </div>
@@ -681,24 +736,39 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             </div>
 
             <div>
-              <label className={labelCls}>Qatnashchilar</label>
-              {form.participants.length > 0 && (
-                <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 mb-2">
-                  {form.participants.map(u => (
-                    <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
-                      {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
-                      <button type="button" onMouseDown={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
-                        className="hover:opacity-70 cursor-pointer ml-0.5"><FaXmark size={9} /></button>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <button type="button" onClick={() => setShowParticipants(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#C2C8E0] dark:border-[#474848]
-                  text-sm text-[#8F95A8] dark:text-[#C2C8E0] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer ">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
-                Qatnashchilarni qo'shish
-              </button>
+              <label className={labelCls}>Yig'ilish qatnashchilari</label>
+              <div
+                onClick={() => setShowParticipants(true)}
+                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#111111] p-3 flex flex-col cursor-pointer transition-all hover:border-[#526ED3]
+                  ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
+              >
+                {form.participants.length === 0 ? (
+                  <>
+                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">Quyidagi tugma orqali qidiring va tanlang</p>
+                    <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] text-sm">
+                      <FaPlus size={15} />
+                      Qatnashchilarni qo'shing
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {form.participants.map(u => (
+                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[#1A1D2E] dark:text-white text-xs border border-[#E2E6F2] dark:border-[#292A2A]">
+                        <span className="font-medium text-[13px]">
+                          {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
+                          className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
+                        >
+                          <FaXmark size={12} className="text-[#8F95A8]" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -742,6 +812,16 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
   const project = projects?.find(p => p.id === meeting.project)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -886,6 +966,19 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
     { label: 'Tugallangan', value: 'true' },
     { label: 'Tugallanmagan', value: 'false' },
   ]
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKey)
+    return () => {
+      window.removeEventListener("keydown", handleKey)
+    }
+  }, [onClose])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
