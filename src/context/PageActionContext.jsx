@@ -4,6 +4,7 @@ const PageActionContext = createContext(null)
 
 export function PageActionProvider({ children }) {
   const [action, setAction] = useState(null)
+  const [customAction, setCustomAction] = useState(null)
   const [download, setDownload] = useState(null)
   const [print, setPrint] = useState(null)
   const [breadcrumbExtra, setBreadcrumbExtra] = useState(null)
@@ -12,6 +13,8 @@ export function PageActionProvider({ children }) {
 
   const registerAction = useCallback((a) => setAction(a), [])
   const clearAction = useCallback(() => setAction(null), [])
+  const registerCustomAction = useCallback((a) => setCustomAction(a), [])
+  const clearCustomAction = useCallback(() => setCustomAction(null), [])
   const clearDownload = useCallback(() => setDownload(null), [])
   const clearPrint = useCallback(() => setPrint(null), [])
   const registerBreadcrumb = useCallback((label) => setBreadcrumbExtra(label), [])
@@ -23,7 +26,8 @@ export function PageActionProvider({ children }) {
 
   return (
     <PageActionContext.Provider value={{
-      action, registerAction, clearAction,      
+      action, registerAction, clearAction,
+      customAction, registerCustomAction, clearCustomAction,
       download, setDownload, clearDownload,
       print, setPrint, clearPrint,
       breadcrumbExtra, registerBreadcrumb, clearBreadcrumb,
