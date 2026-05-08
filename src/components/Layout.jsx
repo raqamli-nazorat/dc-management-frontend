@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { usePageAction } from '../context/PageActionContext'
-import { useTheme } from '../context/ThemeContext'
 import { FaAngleDown, FaXmark } from 'react-icons/fa6'
 import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
@@ -20,7 +19,7 @@ const labelMap = {
   calendar: 'Kalendar',
   salary: 'Ish haqi bo\'yicha', employee: 'Xodimlar bo\'yicha', archive: 'Arxiv', staff: 'Xodimlar', done: 'Bajarilgan',
   applications: 'Arizalar', positions: 'Lavozimlar', regions: 'Viloyatlar',
-  trash: 'Chiqindi qutisi', profile: 'Shaxsiy kabinet',
+  trash: 'Chiqindi qutisi', profile: 'Shaxsiy kabinet', analytics: "Analitika", meetings: "Yig'ilishlar", my_tasks: "Mening vazifalarim",
 }
 
 const NOTIFS_DATA = [
@@ -177,6 +176,7 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
 }
 
 function Breadcrumb() {
+  const navigate = useNavigate()
   const location = useLocation()
 
   const isId = (part) => {
@@ -185,7 +185,7 @@ function Breadcrumb() {
     return false
   }
 
-  const hiddenParts = ['detail', 'edit', 'add', 'new', 'create', 'admin', 'manager']
+  const hiddenParts = ['edit', 'add', 'new', 'create', 'admin', 'manager']
 
   const parts = location.pathname.split('/').filter(part => {
     if (!part) return false
@@ -199,13 +199,17 @@ function Breadcrumb() {
       {parts.map((part, i) => {
         const isLast = i === parts.length - 1
         const label = labelMap[part] || part
+        const isReport = ['reports', 'by_tasks', 'project', 'cost_inquiries', 'salary', 'employee'].includes(part)
+        const canClick = !isLast && !isReport
+
         return (
           <span key={i} className="flex items-center gap-1">
-            {i > 0 && (
+            {i > 0 && part !== "detail" && (
               <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
             )}
             <span
-              className={`text-[13px] font-medium ${isLast ? 'text-[#5B6078] dark:text-white' : 'text-[#c2c8e0]'}`}
+              className={`text-[13px] font-medium ${part === "detail" ? "hidden" : ""} ${isLast ? 'text-[#5B6078] dark:text-white' : 'text-[#c2c8e0]'} ${canClick ? 'cursor-pointer' : ''}`}
+              onClick={() => canClick && navigate(part)}
             >
               {label}
             </span>

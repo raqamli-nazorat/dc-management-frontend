@@ -721,7 +721,7 @@ export default function TasksPage() {
     if (!isAuditor && !isEmployee) {
       registerAction({
         label: "Vazifa qo'shish",
-        icon: <img src="/imgs/addProjectIcon.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
+        icon: <img src="/imgs/tasks.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
         onClick: () => setShowAdd(true),
       })
     }
@@ -754,7 +754,7 @@ export default function TasksPage() {
           <button onClick={() => setShowFilter(true)}
             className="relative flex items-center gap-1.5 px-3 py-[5px] rounded-xl text-[13px] font-semibold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-            <LuFilter size={13} /> Filtrlash
+            <LuFilter size={13} />
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
           </button>
         </div>
