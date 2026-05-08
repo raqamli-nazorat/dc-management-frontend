@@ -350,7 +350,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           isCollapsed ? 'px-[10px]' : 'px-3 py-3',
         ].join(' ')}
       >
-           {/* Analitika */}
+        {/* Analitika */}
         {isCollapsed ? (
           <button
             onClick={() => navigate(`/${urlPrefix}/analytics`)}
@@ -380,7 +380,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
 
           return (
             <div key={i} className="flex flex-col gap-1.5">
-              
+
               {/* Group header */}
               {isCollapsed ? (
                 /* Yopilgan: faqat ikonka, kvadrat */
@@ -410,7 +410,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   }
                 </button>
               )}
-              
+
 
               {/* Children — smooth accordion */}
               {!isCollapsed && (
@@ -452,20 +452,20 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           isCollapsed ? 'px-[10px] py-3 items-center' : 'px-3 py-3',
         ].join(' ')}
       >
-     
+
 
         {/* Mening vazifalarim */}
         {isCollapsed ? (
           <button
-            onClick={() => navigate(`/${urlPrefix}/my-tasks`)}
+            onClick={() => navigate(`/${urlPrefix}/my_tasks`)}
             title="Mening vazifalarim"
-            className={iconBtn(location.pathname.includes('my-tasks'))}
+            className={iconBtn(location.pathname.includes('my_tasks'))}
           >
             <FaRegCalendarCheck size={16} />
           </button>
         ) : (
           <NavLink
-            to={`/${urlPrefix}/my-tasks`}
+            to={`/${urlPrefix}/my_tasks`}
             className={({ isActive }) => [
               'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
               isActive
