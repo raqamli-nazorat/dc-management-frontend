@@ -442,12 +442,12 @@ export default function AddTaskModal({ onClose, onAdd }) {
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* -- Header (qotgan) -- */}
-          <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
+          <div className="px-7 pt-7 pb-4 shrink-0  rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Vazifa qo'shish</h2>
             </div>
-            <p className="text-sm text-[#5B6078] ml-8">Yangi vazifa yaratish uchun ma'lumotlarni kiriting</p>
+            <p className="text-sm text-[#5B6078] ">Yangi vazifa yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
           {/* -- Scroll qilinadigan content -- */}
@@ -654,7 +654,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
           </div>
 
           {/* -- Footer (qotgan) -- */}
-          <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
+          <div className="px-7 py-5 flex items-center justify-end gap-3  shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
