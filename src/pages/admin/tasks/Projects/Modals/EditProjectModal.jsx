@@ -65,18 +65,22 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     }
 
     const normalizePercentInput = (raw) => {
-        const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
-        if (!cleaned) return ''
-        const firstDot = cleaned.indexOf('.')
-        const normalized = firstDot === -1
-            ? cleaned
-            : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
-        const [intPartRaw = '', decRaw = ''] = normalized.split('.')
-        const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-        const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
-        const num = Number(limited)
-        if (Number.isNaN(num)) return ''
-        return String(Math.min(100, Math.max(0, num)))
+      const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+      if (!cleaned) return ''
+      const firstDot = cleaned.indexOf('.')
+      const normalized = firstDot === -1
+        ? cleaned
+        : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+      const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+      const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+      
+      if (firstDot === -1) {
+        return Number(intPart) > 100 ? '100' : intPart
+      } else {
+        const limitedDec = decRaw.slice(0, 2)
+        const resultStr = `${intPart}.${limitedDec}`
+        return Number(resultStr) > 100 ? '100' : resultStr
+      }
     }
 
     const [form, setForm] = useState({
