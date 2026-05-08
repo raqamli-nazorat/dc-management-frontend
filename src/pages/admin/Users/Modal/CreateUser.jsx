@@ -140,9 +140,23 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             toast.success("Ma'lumotlar muvaffaqiyatli qo'shildi")
             onClose()
         } catch (error) {
-            console.error('Error adding user:', error)
-            const msg = error.response?.data?.message || 'Xatolik yuz berdi'
-            toast.error(msg)
+            console.error(error);
+
+            const errData = error?.response?.data?.error;
+
+            // Field-level detail xatolarini chiqarish (masalan: password, name ...)
+            let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+
+            if (errData?.details && typeof errData.details === 'object') {
+                const detailMsgs = Object.values(errData.details).flat().join(' ');
+                if (detailMsgs) errMsg = detailMsgs;
+            } else if (errData?.errorMsg) {
+                errMsg = errData.errorMsg;
+            } else if (typeof error?.response?.data === 'string') {
+                errMsg = error.response.data;
+            }
+
+            toast.error(errMsg)
         }
     }
 
@@ -222,7 +236,14 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={regions.find(r => r.id === form.region)?.name || ''}
                                 className="dark:bg-[#191a1a]!"
                                 padding="11px 11px"
-                                onChange={v => set('region', v === 'Viloyatni tanlang' ? '' : regions.find(r => r.name === v)?.id)}
+                                onChange={v => {
+                                    set('region', regions.find(r => r.name === v)?.id);
+                                    if (districts.length === 1) {
+                                        set('district', districts[0].id)
+                                    } else {
+                                        set('district', '')
+                                    }
+                                }}
                             />
                         </div>
                         <div>
@@ -231,7 +252,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 options={districts.map(district => district.name)}
                                 placeholder="Tuman tanlang"
                                 value={districts.find(d => d.id === form.district)?.name || ''}
-                                onChange={v => set('district', v === 'Tuman tanlang' ? '' : districts.find(d => d.name === v)?.id)}
+                                onChange={v => set('district', districts.find(d => d.name === v)?.id)}
                                 className="dark:bg-[#191a1a]!"
                                 padding="11px 11px"
                                 disabled={!form.region}

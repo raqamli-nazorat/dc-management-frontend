@@ -279,9 +279,9 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 {errors.manager && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>
               <div>
-                <label className={labelCls}>Loyiha narxi (UZS)</label>
+                <label className={labelCls}>Boshqaruvchi bonusi (UZS)</label>
                 <input value={form.project_price} onChange={e => set('project_price', fmtBonus(e.target.value))}
-                  placeholder="Loyiha uchun: 0,0"
+                  placeholder="Boshqaruvchi bonusi 0,0"
                   className={inputCls(errors.project_price) + "font-bold"} />
                 {errors.project_price && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>

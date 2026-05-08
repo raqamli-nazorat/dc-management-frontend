@@ -774,7 +774,7 @@ const Employee = () => {
           onClick={handleFetchReports}
         >
           <FaRegFile size={15} />
-          Shakillantirish
+          Shakllantirish
         </button>
       </div>
 
@@ -1296,6 +1296,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.users}
           title="Xodim tanlang"
+          employee_role='employee'
           onConfirm={handleSelectEmployeeConfirm}
           onClose={() => setSelectEmployee(false)}
         />

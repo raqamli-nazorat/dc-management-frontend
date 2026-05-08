@@ -11,7 +11,7 @@ import { FaXmark } from "react-icons/fa6";
 import { LuCheckCheck } from "react-icons/lu";
 import { useAuth } from "../../../../context/AuthContext";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", type = "", title = "Boshqaruvchi tanlang", param = {} }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang", param = {} }) => {
     const { user } = useAuth();
 
     const [employees, setEmployees] = useState([]);
@@ -34,20 +34,18 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
         const params = { ...param, search };
 
-        if (employee_role !== "all" && employee_role !== "tester") {
+        if (employee_role !== "all" && employee_role !== "tester" && user.active_role !== "employee") {
             params.roles = employee_role;
         }
 
         setLoading(true);
         try {
-            if (user.active_role === "employee" && type === "employee") {
+            if (user.active_role === "employee" && employee_role === "employee") {
                 setEmployees([user]);
                 return;
             }
 
-            const end_point = employee_role === "tester" ? "reports/projects/all-testers/" : type === "creator" && user.active_role === "employee" ? "project-managers/" : "users/"
-
-            const { data } = await axiosAPI.get(end_point, { params });
+            const { data } = await axiosAPI.get(employee_role === "tester" ? "reports/projects/all-testers/" : "users/all/", { params });
 
             const response = employee_role === "tester" ? data.data : data?.data?.results || [];
 
@@ -61,10 +59,6 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     };
 
     useEffect(() => {
-        // if (user.active_role === "employee") {
-        //     setEmployees([user]);
-        //     return;
-        // }
         const timer = setTimeout(() => {
             getEmployee({ search: searchTerm });
         }, 300);
