@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -62,9 +62,9 @@ const COLUMNS = [
 
 // Qaysi ustundan qaysi ustunga o'tish mumkin
 const ALLOWED_TRANSITIONS = {
-  todo: ['in_progress', 'done'],
-  in_progress: ['todo', 'done', 'checked'],
-  done: ['in_progress', 'production', 'checked'],
+  todo: ['in_progress'],
+  in_progress: ['done'],
+  done: ['production'],
   production: ['rejected', 'checked'],
   checked: ['done', 'production', 'rejected'],
   rejected: [],
@@ -407,16 +407,15 @@ function RejectionModal({ task, onClose, onConfirm }) {
 }
 
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget, isDraggingGlobal }) {
+function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarget, isDraggingGlobal }) {
   const { isDark } = useTheme()
   const colBg = isDark ? col.darkBg : col.bg
 
   return (
     <div
-      className="flex flex-col min-w-0"
+      className={`flex flex-col min-w-0 transition-opacity duration-300 ${isDimmed ? 'opacity-40 grayscale-[30%]' : 'opacity-100'}`}
       style={{
         flex: '1 1 0',
-        opacity: isDimmed ? 0.35 : 1,
         willChange: isDraggingGlobal ? 'opacity' : 'auto',
       }}
     >
@@ -432,7 +431,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDragTarget, isDraggingGl
       </div>
 
       {/* Cards area */}
-      <Droppable droppableId={col.id}>
+      <Droppable droppableId={col.id} isDropDisabled={isDropDisabled}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
@@ -493,7 +492,7 @@ export default function TasksPage() {
   const [cards, setCards] = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
   const [draggingOver, setDraggingOver] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
+  const [dragSourceCol, setDragSourceCol] = useState(null)
   const [rejectionPending, setRejectionPending] = useState(null) // { taskId, draggableId, sourceColId }
   const scrollRef = useRef(null)
 
@@ -664,7 +663,7 @@ export default function TasksPage() {
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
     setDraggingOver(null)
-    setIsDragging(false)
+    setDragSourceCol(null)
     if (!destination) return
     if (destination.droppableId === source.droppableId && destination.index === source.index) return
 
@@ -714,8 +713,8 @@ export default function TasksPage() {
     setDraggingOver(destination?.droppableId || null)
   }
 
-  const onDragStart = () => {
-    setIsDragging(true)
+  const onDragStart = (start) => {
+    setDragSourceCol(start.source.droppableId)
   }
 
   useEffect(() => {
@@ -789,17 +788,23 @@ export default function TasksPage() {
               className="flex gap-2 px-3 pt-3 bg-white dark:bg-[#191A1A] pb-3 h-full"
               style={{ overflow: 'hidden' }}
             >
-              {COLUMNS.map(col => (
-                <KanbanColumn
-                  key={col.id}
-                  col={col}
-                  cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
-                  onOpen={loadTaskDetail}
-                  isDimmed={isDragging && draggingOver !== null && draggingOver !== col.id}
-                  isDragTarget={draggingOver === col.id}
-                  isDraggingGlobal={isDragging}
-                />
-              ))}
+              {COLUMNS.map(col => {
+                const allowedCols = dragSourceCol ? (ALLOWED_TRANSITIONS[dragSourceCol] || []) : [];
+                const isDropDisabled = !!(dragSourceCol && dragSourceCol !== col.id && !allowedCols.includes(col.id));
+
+                return (
+                  <KanbanColumn
+                    key={col.id}
+                    col={col}
+                    cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
+                    onOpen={loadTaskDetail}
+                    isDimmed={isDropDisabled}
+                    isDropDisabled={isDropDisabled}
+                    isDragTarget={draggingOver === col.id}
+                    isDraggingGlobal={!!dragSourceCol}
+                  />
+                )
+              })}
             </div>
           )}
         </div>
