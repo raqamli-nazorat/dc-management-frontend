@@ -254,6 +254,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   const [existingAttachments, setExistingAttachments] = useState(
     Array.isArray(task.attachments) ? task.attachments : []
   )
+
   // New files to upload after save
   const [newAttachments, setNewAttachments] = useState([])
   const fileInputRef = useRef(null)
@@ -362,6 +363,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     deadline_time: initDeadlineTime,
     estimated_hours: initHours,
     estimated_minutes: initMins,
+    task_attachments: task.task_attachments || [],
   })
   const [errors, setErrors] = useState({})
 
@@ -472,15 +474,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
       // 1. Asosiy ma'lumotlarni saqlash
       await onSave(task.id, body)
 
-      // 2. Agar status o'zgargan bo'lsa — change-status endpoint
-      if (form.status && form.status !== task.status) {
-        try {
-          await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: form.status })
-        } catch (statusErr) {
-          toast.error('Holat xatoligi', parseApiError(statusErr, "Holat yangilashda xatolik"))
-        }
-      }
-
       // 3. Yangi fayllarni yuklash
       if (newAttachments.length > 0) {
         const uploadResults = await Promise.allSettled(
@@ -500,6 +493,15 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             toast.error(`"${fname}" yuklanmadi`, parseApiError(result.reason, "Fayl yuklashda xatolik"))
           }
         })
+      }
+
+      // 2. Agar status o'zgargan bo'lsa — change-status endpoint
+      if (form.status && form.status !== task.status) {
+        try {
+          await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: form.status })
+        } catch (statusErr) {
+          toast.error('Holat xatoligi', parseApiError(statusErr, "Holat yangilashda xatolik"))
+        }
       }
 
       onClose()
@@ -702,94 +704,96 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             </div>
 
             {/* Qo'shimcha fayllar */}
-            <div>
-              <label className={labelCls}>Qo'shimcha fayllar</label>
-              <div className="flex flex-wrap gap-2">
-                {/* Existing attachments */}
-                {existingAttachments.map(att => (
-                  <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
-                    {isImage(att.file) ? (
-                      <img src={att.file} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 px-1">
-                        <FaPaperclip size={16} className="text-[#526ED3]" />
-                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{getFilename(att.file)}</span>
-                      </div>
-                    )}
-                    {/* View link */}
-                    <a
-                      href={att.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute inset-0 z-10"
-                      onClick={e => e.stopPropagation()}
-                    />
-                    {/* Delete button (edit mode only) */}
-                    {!ro && (
+            {(!ro || existingAttachments.length > 0) && (
+              <div>
+                <label className={labelCls}>Qo'shimcha fayllar</label>
+                <div className="flex flex-wrap gap-2">
+                  {/* Existing attachments */}
+                  {existingAttachments.map(att => (
+                    <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                      {isImage(att.file) ? (
+                        <img src={att.file} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 px-1">
+                          <FaPaperclip size={16} className="text-[#526ED3]" />
+                          <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center whitespace-normal break-words w-[75%] px-1">{getFilename(att.file.split('/').pop().split('?')[0])}</span>
+                        </div>
+                      )}
+                      {/* View link */}
+                      <a
+                        href={att.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 z-10"
+                        onClick={e => e.stopPropagation()}
+                      />
+                      {/* Delete button (edit mode only) */}
+                      {!ro && (
+                        <button
+                          type="button"
+                          onClick={e => { e.preventDefault(); handleDeleteAttachment(att.id) }}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-20"
+                        >
+                          <FaXmark size={9} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* New (pending) attachments */}
+                  {newAttachments.map((att, i) => (
+                    <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl border border-[#526ED3]/40 dark:border-[#526ED3]/40 overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                      {att.preview ? (
+                        <img src={att.preview} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 px-1">
+                          <FaPaperclip size={16} className="text-[#526ED3]" />
+                          <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center whitespace-normal break-words w-full px-1">{att.file.name}</span>
+                        </div>
+                      )}
                       <button
                         type="button"
-                        onClick={e => { e.preventDefault(); handleDeleteAttachment(att.id) }}
-                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-20"
+                        onClick={() => setNewAttachments(prev => prev.filter((_, j) => j !== i))}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       >
                         <FaXmark size={9} />
                       </button>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  ))}
 
-                {/* New (pending) attachments */}
-                {newAttachments.map((att, i) => (
-                  <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl border border-[#526ED3]/40 dark:border-[#526ED3]/40 overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
-                    {att.preview ? (
-                      <img src={att.preview} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 px-1">
-                        <FaPaperclip size={16} className="text-[#526ED3]" />
-                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setNewAttachments(prev => prev.filter((_, j) => j !== i))}
-                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    >
-                      <FaXmark size={9} />
-                    </button>
-                  </div>
-                ))}
+                  {/* Add file button (edit mode only) */}
+                  {!ro && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
+                      >
+                        <FaPaperclip size={16} />
+                        <span className="text-[10px] font-medium">Fayl</span>
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
+                        className="hidden"
+                        onChange={e => {
+                          const files = Array.from(e.target.files || [])
+                          const added = files.map(f => ({
+                            file: f,
+                            preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                          }))
+                          setNewAttachments(prev => [...prev, ...added])
+                          e.target.value = ''
+                        }}
+                      />
+                    </>
+                  )}
 
-                {/* Add file button (edit mode only) */}
-                {!ro && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
-                    >
-                      <FaPaperclip size={16} />
-                      <span className="text-[10px] font-medium">Fayl</span>
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
-                      className="hidden"
-                      onChange={e => {
-                        const files = Array.from(e.target.files || [])
-                        const added = files.map(f => ({
-                          file: f,
-                          preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
-                        }))
-                        setNewAttachments(prev => [...prev, ...added])
-                        e.target.value = ''
-                      }}
-                    />
-                  </>
-                )}
-
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Rad etish sababi */}
             {task.status === 'rejected' && (task.rejection_reason || (task.rejection_files && task.rejection_files.length > 0)) && (

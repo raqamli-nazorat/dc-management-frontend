@@ -498,7 +498,7 @@ export default function TasksPage() {
 
   const hasFilter = filters.projects?.length > 0 ||
     !!filters.holat || !!filters.daraja || !!filters.turi ||
-    !!filters.deadFromD || !!filters.deadToD || filters.myTasks
+    !!filters.deadFromD || !!filters.deadToD || !!filters.created_by?.length > 0 || !!filters.assignee?.length > 0
 
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
@@ -506,10 +506,11 @@ export default function TasksPage() {
     if (f.holat) p.status = f.holat
     if (f.daraja) p.priority = f.daraja
     if (f.turi) p.type = f.turi
-    if (f.myTasks) p.my_tasks = true
     if (f.projects?.length) p.project = f.projects.map(pr => pr.id || pr).join(',')
     if (f.deadFromD) p.deadline_from = f.deadFromD
     if (f.deadToD) p.deadline_to = f.deadToD
+    if (f.created_by?.length) p.created_by = f.created_by.map(pr => pr.id || pr).join(',')
+    if (f.assignee?.length) p.assignee = f.assignee.map(pr => pr.id || pr).join(',')
     return p
   }, [filters, search])
 
@@ -618,7 +619,10 @@ export default function TasksPage() {
           task.project = task.project_info.id
         }
       }
-      setEditTask(task)
+
+      const { data } = await axiosAPI.get(`task-attachments/?task=${id}`)
+
+      setEditTask({ ...task, attachments: data?.data?.results })
     } catch (err) {
       const status = err?.response?.status
       if (status === 404) {
