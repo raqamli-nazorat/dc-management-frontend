@@ -16,8 +16,15 @@ export function AuthProvider({ children }) {
         .then(res => {
           const fetchedUser = res.data?.data ?? res.data
           if (fetchedUser) {
-            setUser(fetchedUser)
-            localStorage.setItem('user', JSON.stringify(fetchedUser))
+            // localStorage dagi active_role ni saqlab qolish
+            // (backend /users/me/ active_role ni qaytarmasligi mumkin)
+            const savedUser = JSON.parse(localStorage.getItem('user') || '{}')
+            const mergedUser = {
+              ...fetchedUser,
+              active_role: fetchedUser.active_role || savedUser.active_role || fetchedUser.roles?.[0],
+            }
+            setUser(mergedUser)
+            localStorage.setItem('user', JSON.stringify(mergedUser))
           }
         })
         .catch(err => {

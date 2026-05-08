@@ -55,7 +55,7 @@ const commonRoutes = (prefix) => [
   <Route key="users" path="users" element={<AdminUsers />} />,
   <Route key="user-detail" path="users/detail/:id" element={<AdminUserDetail />} />,
   <Route key="my_tasks" path="my_tasks" element={<MyTasks />} />,
-  ...(['employee', 'manager'].includes(prefix) ? [<Route key="analytics" path="analytics" element={<AnalyticsPage />} />] : []),
+  <Route key="analytics" path="analytics" element={<AnalyticsPage />} />,
 ]
 
 function App() {
@@ -77,13 +77,13 @@ function App() {
 
               {/* ── MANAGER ── */}
               <Route path="/manager" element={<ProtectedRoute allowedRole="manager"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AnalyticsPage />} />
                 {commonRoutes('manager')}
               </Route>
 
               {/* ── EMPLOYEE ── */}
               <Route path="/employee" element={<ProtectedRoute allowedRole="employee"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AnalyticsPage />} />
                 {commonRoutes('employee')}
               </Route>
 
