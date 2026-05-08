@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -72,10 +72,14 @@ const normalizePercentInput = (val) => {
     : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
   const [intPartRaw = '', decRaw = ''] = normalized.split('.')
   const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-  const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
-  const num = Number(limited)
-  if (Number.isNaN(num)) return ''
-  return String(Math.min(100, Math.max(0, num)))
+  
+  if (firstDot === -1) {
+    return Number(intPart) > 100 ? '100' : intPart
+  } else {
+    const limitedDec = decRaw.slice(0, 2)
+    const resultStr = `${intPart}.${limitedDec}`
+    return Number(resultStr) > 100 ? '100' : resultStr
+  }
 }
 
 /* -- useDropdown -- */

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+Ôªøimport { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaEllipsisVertical, FaCheck } from 'react-icons/fa6'
 import { LuFilter, LuLayoutGrid, LuLayoutList } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -21,7 +21,7 @@ const STATUS_LABEL = {
 }
 
 const fmtDt = (iso) => {
-  if (!iso) return 'ù'
+  if (!iso) return 'ÔøΩ'
   try {
     const d = new Date(iso)
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -264,7 +264,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
   )
 }
 
-/* -- UserPickerModal ù figmadagi xodim tanlash modali -- */
+/* -- UserPickerModal ÔøΩ figmadagi xodim tanlash modali -- */
 function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   const [search, setSearch] = useState('')
   const [temp, setTemp] = useState(selected.map(u => u.id))
@@ -357,7 +357,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 {/* Info */}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || 'ù'}</p>
+                  <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate">{u.position || u.roles?.[0] || 'ÔøΩ'}</p>
                 </div>
               </button>
             )
@@ -385,7 +385,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   )
 }
 
-/* -- SelectedUsersField ù tanlangan xodimlarni ko'rsatish -- */
+/* -- SelectedUsersField ÔøΩ tanlangan xodimlarni ko'rsatish -- */
 function SelectedUsersField({ label, selected, onOpen, onRemove }) {
   return (
     <div>
@@ -529,10 +529,13 @@ function AddProjectModal({ onClose, onAdd }) {
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
-    const num = Number(limited)
-    if (Number.isNaN(num)) return ''
-    return String(Math.min(100, Math.max(0, num)))
+    if (firstDot === -1) {
+      return Number(intPart) > 100 ? '100' : intPart
+    } else {
+      const limitedDec = decRaw.slice(0, 2)
+      const resultStr = `${intPart}.${limitedDec}`
+      return Number(resultStr) > 100 ? '100' : resultStr
+    }
   }
 
   const validate = () => {
@@ -893,14 +896,14 @@ function DetailModal({ project, onClose }) {
   const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]'
 
   const fmtNum = (val) => {
-    if (!val) return 'ù'
+    if (!val) return 'ÔøΩ'
     const n = Math.abs(Number(String(val).replace(/[\s,]/g, '')))
-    if (isNaN(n) || n === 0) return 'ù'
+    if (isNaN(n) || n === 0) return 'ÔøΩ'
     return n.toLocaleString('ru-RU') + ' UZS'
   }
 
   const fmtDtFull = (iso) => {
-    if (!iso) return 'ù'
+    if (!iso) return 'ÔøΩ'
     try {
       const d = new Date(iso)
       return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
@@ -919,13 +922,13 @@ function DetailModal({ project, onClose }) {
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || 'ù'}</p>
+        <p className="text-sm font-medium text-[#1A1D2E] dark:text-white">{value || 'ÔøΩ'}</p>
       </div>
     )
   }
 
   function UserCard({ label, info }) {
-    if (!info) return <InfoRow label={label} value="ù" />
+    if (!info) return <InfoRow label={label} value="ÔøΩ" />
     return (
       <div>
         <p className="text-xs text-[#8F95A8] dark:text-[#5B6078] mb-1.5">{label}</p>
@@ -1000,8 +1003,8 @@ function DetailModal({ project, onClose }) {
           <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F8F9FC] dark:bg-[#191A1A]">
             <InfoRow label="Loyiha narxi" value={fmtNum(project.project_price)} />
             <InfoRow label="Menejer bonusi" value={fmtNum(project.manager_bonus)} />
-            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : 'ù'} />
-            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : 'ù'} />
+            <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : 'ÔøΩ'} />
+            <InfoRow label="Bajarilish" value={project.completion_percentage ? `${project.completion_percentage} %` : 'ÔøΩ'} />
           </div>
 
           {/* Xodimlar */}
@@ -1013,7 +1016,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">ù</p>}
+            ) : <p className="text-sm text-[#8F95A8]">ÔøΩ</p>}
           </div>
 
           {/* Sinovchilar */}
@@ -1025,7 +1028,7 @@ function DetailModal({ project, onClose }) {
                   <span key={e.id} className={tagCls}>{e.username}</span>
                 ))}
               </div>
-            ) : <p className="text-sm text-[#8F95A8]">ù</p>}
+            ) : <p className="text-sm text-[#8F95A8]">ÔøΩ</p>}
           </div>
 
           {/* Vaqtlar */}
@@ -1071,10 +1074,13 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    const limited = decRaw ? `${intPart}.${decRaw.slice(0, 2)}` : intPart
-    const num = Number(limited)
-    if (Number.isNaN(num)) return ''
-    return String(Math.min(100, Math.max(0, num)))
+    if (firstDot === -1) {
+      return Number(intPart) > 100 ? '100' : intPart
+    } else {
+      const limitedDec = decRaw.slice(0, 2)
+      const resultStr = `${intPart}.${limitedDec}`
+      return Number(resultStr) > 100 ? '100' : resultStr
+    }
   }
 
   const initManager   = project.manager_info ? { id: project.manager_info.id, username: project.manager_info.username } : null
@@ -1636,7 +1642,7 @@ export default function ProjectsPage() {
                           {(p.manager_info?.username || '?').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || 'ù'}</p>
+                          <p className="text-xs font-semibold text-[#1A1D2E] dark:text-white truncate">{p.manager_info?.username || 'ÔøΩ'}</p>
                           <p className="text-[10px] text-[#8F95A8]">Menejer</p>
                         </div>
                       </div>
@@ -1698,10 +1704,10 @@ export default function ProjectsPage() {
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{p.uid || idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title || p.name}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || 'ù'}</td>
+                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || 'ÔøΩ'}</td>
                   <td className="px-4 py-3 text-right">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]`}>
-                      {STATUS_LABEL[p.status] || p.status || 'ù'}
+                      {STATUS_LABEL[p.status] || p.status || 'ÔøΩ'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDt(p.created_at)}</td>

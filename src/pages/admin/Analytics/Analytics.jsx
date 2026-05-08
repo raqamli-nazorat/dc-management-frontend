@@ -220,13 +220,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard label="Vazifalar jami" value={stats.tasks} color={COLORS.primary} icon="📝" />
-        <StatCard label="Loyihalar jami" value={stats.projects} color={COLORS.amber} icon="📁" />
-        <StatCard label="Yig'ilishlar jami" value={stats.meetings} color={COLORS.green} icon="📅" />
-        <StatCard label="Vazifa bajarilish foizi" value={`${stats.taskCompletionRate}%`} color={COLORS.purple} icon="📈" />
-      </div>
-
+ 
       {error ? (
         <div className="rounded-xl border border-[#F3C7C7] bg-[#FFF2F2] text-[#A02323] dark:bg-[#2A1D1D] dark:border-[#4C2B2B] dark:text-[#F8B4B4] px-4 py-3 text-sm">
           {error}
