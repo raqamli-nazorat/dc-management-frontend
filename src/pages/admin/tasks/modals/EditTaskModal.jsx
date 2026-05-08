@@ -244,12 +244,30 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   )
 }
 
+// rejection_reason ni parse qilish: "[08.05.2026 11:26] matn\n\n[08.05.2026 18:51] matn2"
+function parseRejectionReason(reason) {
+  if (!reason) return []
+  // Har bir [sana vaqt] blokini ajratib olish
+  const parts = reason.split(/\n\n+/)
+  return parts.map(part => part.trim()).filter(Boolean).map(part => {
+    const match = part.match(/^\[([^\]]+)\]\s*(.*)$/s)
+    if (match) {
+      return { date: match[1].trim(), text: match[2].trim() }
+    }
+    return { date: null, text: part }
+  })
+}
+
 export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  // Rejection files from separate endpoint
+  const [rejectionFiles, setRejectionFiles] = useState(
+    Array.isArray(task.rejection_files) ? task.rejection_files : []
+  )
   // Existing attachments from the task
   const [existingAttachments, setExistingAttachments] = useState(
     Array.isArray(task.attachments) ? task.attachments : []
@@ -298,6 +316,19 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
       }).catch(() => { })
+
+    // Rad etilgan yoki qayta ochilgan bo'lsa — rejection fayllarni alohida endpoint dan yuklash
+    if ((task.status === 'rejected' || task.reopened_count > 0) && task.id) {
+      axiosAPI.get('/task-rejection-files/', { params: { task: task.id } })
+        .then(res => {
+          const payload = res.data?.data ?? res.data
+          const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+          if (Array.isArray(list) && list.length > 0) {
+            setRejectionFiles(list)
+          }
+        })
+        .catch(() => { /* task.rejection_files fallback ishlatiladi */ })
+    }
   }, [])
 
   // Mavjud task ning loyihasidan xodimlarni yuklash
@@ -796,42 +827,61 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             )}
 
             {/* Rad etish sababi */}
-            {task.status === 'rejected' && (task.rejection_reason || (task.rejection_files && task.rejection_files.length > 0)) && (
+            {(task.status === 'rejected' || task.reopened_count > 0) && (task.rejection_reason || rejectionFiles.length > 0) && (
               <div>
-                <label className="block text-sm font-extrabold text-[#1A1D2E] dark:text-white mb-2">Rad etilish sababi</label>
-                <div className="rounded-2xl border border-[#E2E6F2] dark:border-[#292A2A] bg-[#FFFFFF] dark:bg-[#1C0A0A] p-4 flex flex-col gap-3">
-                  {/* Rejection files */}
-                  {task.rejection_files && task.rejection_files.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {task.rejection_files.map(rf => (
-                        <a
-                          key={rf.id}
-                          href={rf.file}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="relative w-16 h-16 rounded-xl border 
-                          border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
-                        >
-                          {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
-                            <img src={rf.file} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="flex flex-col items-center gap-0.5 px-1">
-                              <FaPaperclip size={14} className="text-[#EF4444]" />
-                              <span className="text-[8px] text-[#EF4444] truncate w-full text-center">
-                                {decodeURIComponent(rf.file.split('/').pop() || 'fayl')}
-                              </span>
-                            </div>
+                <label className="text-[11px]  text-[#5B6078] dark:text-[#8B949E] mb-2 flex items-center gap-1.5">
+                  
+                  Rad etish sabablari
+                </label>
+                <div className="rounded-2xl border border-[#E2E6F2] dark:border-[#262C36] p-4 flex flex-col gap-3">
+
+                  
+                  {rejectionFiles.length > 0 && (
+                    <div>
+                     
+                      <div className="flex flex-wrap gap-2">
+                        {rejectionFiles.map(rf => (
+                          <a
+                            key={rf.id}
+                            href={rf.file}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative w-16 h-16 rounded-xl border border-[#E2E6F2] dark:border-[#262C36] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
+                          >
+                            {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
+                              <img src={rf.file} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="flex flex-col items-center gap-0.5 px-1">
+                                <FaPaperclip size={14} className="text-[#5B6078]" />
+                                <span className="text-[8px] text-[#5B6078] truncate w-full text-center">
+                                  {decodeURIComponent((rf.file.split('/').pop() || 'fayl').split('?')[0])}
+                                </span>
+                              </div>
+                            )}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rejection reason — har bir yozuv alohida blok */}
+                  {task.rejection_reason && (
+                    <div className="flex flex-col gap-1">
+                      {parseRejectionReason(task.rejection_reason).map((entry, idx) => (
+                        <div key={idx} className="rounded-xl bg-white dark:bg-[#1A0808] px-3 py-2.5">
+                          {entry.date && (
+                            <p className="text-[11px] font-semibold text-[#5B6078]/70 dark:text-[#E6EDF3] mb-1">
+                              {entry.date}
+                            </p>
                           )}
-                        </a>
+                          <p className="text-sm text-[#1A1D2E] dark:text-[#E6EDF3] leading-relaxed whitespace-pre-wrap">
+                            {entry.text}
+                          </p>
+                        </div>
                       ))}
                     </div>
                   )}
-                  {/* Rejection reason text */}
-                  {task.rejection_reason && (
-                    <p className="text-sm text-[#1A1D2E] dark:text-[#FCA5A5] leading-relaxed whitespace-pre-wrap">
-                      {task.rejection_reason}
-                    </p>
-                  )}
+
                 </div>
               </div>
             )}
@@ -839,13 +889,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-7 py-5 flex items-center justify-between border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
+          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             {/* O'chirish tugmasi — faqat onDelete prop berilganda */}
             {onDelete ? (
               <button
                 type="button"
                 onClick={onDelete}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-[#EF4444] hover:bg-[#FFF5F5] dark:hover:bg-[#1C0A0A] transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-[#FA5252] hover:bg-[#FFF5F5] dark:hover:bg-[#1C0A0A] transition-colors"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />

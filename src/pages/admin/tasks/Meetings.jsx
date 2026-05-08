@@ -552,7 +552,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 }
 
 /* -- EditMeetingModal -- */
-function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
+function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit = true }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -588,10 +588,11 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
     return Object.keys(e).length === 0
   }
 
-  const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+  const inputCls = (err, ro = !canEdit) =>
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${ro ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B] cursor-default' : 'bg-white dark:bg-[#191A1A]'} ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${!ro ? 'focus:border-[#526ED3]' : ''}`
 
   const handleSubmit = async () => {
+    if (!canEdit) return
     if (!validate()) return
     setLoading(true)
     try {
@@ -652,42 +653,56 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
           <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilishni tahrirlash</h2>
+              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">
+                {canEdit ? "Yig'ilishni tahrirlash" : "Yig'ilish ma'lumotlari"}
+              </h2>
             </div>
-            <p className="text-sm text-[#8F95A8] ml-8">Yig'ilish ma'lumotlarini yangilang</p>
+            <p className="text-sm text-[#8F95A8] ml-8">
+              {canEdit ? "Yig'ilish ma'lumotlarini yangilang" : "Yig'ilish haqida to'liq ma'lumot"}
+            </p>
           </div>
 
           {/* -- Scroll qilinadigan content -- */}
           <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
-            <ProjectDropdown value={form.project} onChange={v => set('project', v)} error={errors.project} projects={projects} />
+            <ProjectDropdown value={form.project} onChange={v => canEdit && set('project', v)} error={errors.project} projects={projects} disabled={!canEdit} />
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelCls}>Nomi</label>
-                <input value={form.title} onChange={e => set('title', e.target.value)}
-                  placeholder="Nomi yozing" className={inputCls(errors.title)} />
+                <input value={form.title} onChange={e => canEdit && set('title', e.target.value)}
+                  readOnly={!canEdit} placeholder="Nomi yozing" className={inputCls(errors.title)} />
                 {errors.title && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%)</label>
-                <input type="text" inputMode="decimal" value={form.fine} onChange={e => handleFine(e.target.value)}
-                  placeholder="Jarima foizini kiriting" className={inputCls(false)} />
+                <input type="text" inputMode="decimal" value={form.fine}
+                  onChange={e => canEdit && handleFine(e.target.value)}
+                  readOnly={!canEdit} placeholder="Jarima foizini kiriting" className={inputCls(false)} />
               </div>
             </div>
 
             <div>
               <label className={labelCls}>Havolasi</label>
-              <input value={form.link} onChange={e => set('link', e.target.value)}
-                placeholder="URL manzil kiriting" className={inputCls(false)} />
+              {canEdit ? (
+                <input value={form.link} onChange={e => set('link', e.target.value)}
+                  placeholder="URL manzil kiriting" className={inputCls(false)} />
+              ) : (
+                <div className={inputCls(false)}>
+                  {form.link
+                    ? <a href={form.link} target="_blank" rel="noreferrer"
+                        className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline break-all">{form.link}</a>
+                    : <span className="text-[#8F95A8]">—</span>}
+                </div>
+              )}
             </div>
 
             <div>
               <label className={labelCls}>Tavsifi</label>
               <div className="relative">
-                <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder="Tavsifni yozing" rows={3}
-                  className={inputCls(false) + ' resize-none pr-8'} />
-                {form.description && (
+                <textarea value={form.description} onChange={e => canEdit && set('description', e.target.value)}
+                  readOnly={!canEdit} placeholder="Tavsifni yozing" rows={3}
+                  className={inputCls(false) + ' resize-none' + (canEdit ? ' pr-8' : '')} />
+                {form.description && canEdit && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
                     <FaXmark size={12} />
@@ -704,11 +719,11 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                   placeholder="kk.oo.yyyy"
                   value={form.date}
                   onChange={v => {
+                    if (!canEdit) return
                     set('date', v)
-                    if (v && (!form.time || form.time === '00:00')) {
-                      set('time', '23:59')
-                    }
+                    if (v && (!form.time || form.time === '00:00')) set('time', '23:59')
                   }}
+                  disabled={!canEdit}
                   dropUp
                 />
               </div>
@@ -718,18 +733,20 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                   type="time"
                   placeholder="SS:DD"
                   value={form.time}
-                  onChange={v => set('time', v)}
+                  onChange={v => canEdit && set('time', v)}
+                  disabled={!canEdit}
                   dropUp
                 />
               </div>
               <div>
                 <label className={labelCls}>Davomiyligi</label>
-                <div className="flex rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] overflow-hidden focus-within:border-[#526ED3]">
-                  <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
-                    placeholder="40"
+                <div className={`flex rounded-xl border overflow-hidden ${!canEdit ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B] border-[#E2E6F2] dark:border-[#292A2A]' : 'bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] focus-within:border-[#526ED3]'}`}>
+                  <input type="number" min="1" value={form.durationVal}
+                    onChange={e => canEdit && set('durationVal', e.target.value)}
+                    readOnly={!canEdit} placeholder="40"
                     className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
                   <span className="flex items-center px-2 text-xs text-[#5B6078] dark:text-[#C2C8E0] border-l border-[#E2E6F2] dark:border-[#292A2A] whitespace-nowrap">
-                    {form.durationUnit === 'soat' ? 'soat' : 'saqiqa'}
+                    {form.durationUnit === 'soat' ? 'soat' : 'daqiqa'}
                   </span>
                 </div>
               </div>
@@ -738,17 +755,22 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
             <div>
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
-                onClick={() => setShowParticipants(true)}
-                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#111111] p-3 flex flex-col cursor-pointer transition-all hover:border-[#526ED3]
+                onClick={() => canEdit && setShowParticipants(true)}
+                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] p-3 flex flex-col transition-all
+                  ${canEdit ? 'bg-white dark:bg-[#111111] cursor-pointer hover:border-[#526ED3]' : 'bg-[#F8F9FC] dark:bg-[#1A1B1B] cursor-default'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
-                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">Quyidagi tugma orqali qidiring va tanlang</p>
-                    <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] text-sm">
-                      <FaPlus size={15} />
-                      Qatnashchilarni qo'shing
-                    </div>
+                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">
+                      {canEdit ? "Quyidagi tugma orqali qidiring va tanlang" : "Qatnashchilar yo'q"}
+                    </p>
+                    {canEdit && (
+                      <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] text-sm">
+                        <FaPlus size={15} />
+                        Qatnashchilarni qo'shing
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="flex flex-wrap gap-2">
@@ -757,13 +779,15 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                         <span className="font-medium text-[13px]">
                           {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
                         </span>
-                        <button
-                          type="button"
-                          onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
-                          className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
-                        >
-                          <FaXmark size={12} className="text-[#8F95A8]" />
-                        </button>
+                        {canEdit && (
+                          <button
+                            type="button"
+                            onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
+                            className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
+                          >
+                            <FaXmark size={12} className="text-[#8F95A8]" />
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -776,8 +800,9 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
           <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
-              <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              <button type="button"
+                onClick={() => canEdit && set('is_completed', !form.is_completed)}
+                className={`relative w-10 h-5 rounded-full ${canEdit ? 'cursor-pointer' : 'cursor-default'} ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
@@ -786,19 +811,21 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users }) {
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
-              <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
-                {loading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                  : <FaCheck size={13} />
-                }
-                Saqlash
-              </button>
+              {canEdit && (
+                <button onClick={handleSubmit} disabled={loading}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                  {loading
+                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                    : <FaCheck size={13} />
+                  }
+                  Saqlash
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
-      {showParticipants && (
+      {showParticipants && canEdit && (
         <ParticipantsModal selected={form.participants} users={users}
           onClose={() => setShowParticipants(false)}
           onApply={vals => { set('participants', vals); setShowParticipants(false) }} />
@@ -823,14 +850,18 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  const fieldCls = "px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-[#F8F9FC] dark:bg-[#1A1B1B] text-[#1A1D2E] dark:text-white"
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
-        <div className="px-7 pt-7 pb-3">
+
+        {/* Header */}
+        <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
@@ -840,54 +871,56 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           <p className="text-sm text-[#8F95A8] ml-8">Yig'ilish haqida to'liq ma'lumot</p>
         </div>
 
-        <div className="px-7 pb-2 flex flex-col gap-3">
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
+
+          {/* Loyiha */}
           <div>
             <label className={labelCls}>Loyiha</label>
-            <div className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-              <span className="flex-1 truncate">{project?.title || ''}</span>
-              <FaChevronDown size={11} className="text-[#8F95A8] shrink-0 ml-2" />
-            </div>
+            <div className={fieldCls}>{project?.title || <span className="text-[#8F95A8]">—</span>}</div>
           </div>
 
+          {/* Nomi + Jarima */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Nomi</label>
-              <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                {meeting.title || <span className="text-[#8F95A8]"></span>}
-              </div>
+              <div className={fieldCls}>{meeting.title || <span className="text-[#8F95A8]">—</span>}</div>
             </div>
             <div>
               <label className={labelCls}>Jarima foizi (%)</label>
-              <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
+              <div className={fieldCls}>
                 {meeting.penalty_percentage
                   ? `${Math.abs(parseFloat(meeting.penalty_percentage))} %`
-                  : <span className="text-[#8F95A8]"></span>}
+                  : <span className="text-[#8F95A8]">—</span>}
               </div>
             </div>
           </div>
 
+          {/* Havola */}
           <div>
             <label className={labelCls}>Havolasi</label>
-            <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+            <div className={fieldCls}>
               {meeting.link
                 ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                  className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline truncate block">{meeting.link}</a>
-                : <span className="text-[#8F95A8]"></span>}
+                    className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline break-all">{meeting.link}</a>
+                : <span className="text-[#8F95A8]">—</span>}
             </div>
           </div>
 
+          {/* Tavsif */}
           <div>
             <label className={labelCls}>Tavsifi</label>
-            <div className="px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] min-h-[80px] whitespace-pre-wrap text-[#1A1D2E] dark:text-white">
-              {meeting.description || <span className="text-[#8F95A8]"></span>}
+            <div className={fieldCls + " min-h-[80px] whitespace-pre-wrap"}>
+              {meeting.description || <span className="text-[#8F95A8]">—</span>}
             </div>
           </div>
 
+          {/* Sana + Vaqt + Davomiylik */}
           <div className="grid grid-cols-4 gap-3">
             <div className="col-span-2">
               <label className={labelCls}>Boshlanish sanasi</label>
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startDate ? startDate.split('-').reverse().join('.') : ''}</span>
+              <div className={`${fieldCls} flex items-center justify-between`}>
+                <span>{startDate ? startDate.split('-').reverse().join('.') : <span className="text-[#8F95A8]">—</span>}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
                   <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
@@ -895,8 +928,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
             <div>
               <label className={labelCls}>Vaqti</label>
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white">
-                <span>{startTime || ''}</span>
+              <div className={`${fieldCls} flex items-center justify-between`}>
+                <span>{startTime || <span className="text-[#8F95A8]">—</span>}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
                   <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                 </svg>
@@ -904,18 +937,28 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
             <div>
               <label className={labelCls}>Davomiyligi</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                <span className="text-[#1A1D2E] dark:text-white">{meeting.duration_minutes || ''}</span>
-                {meeting.duration_minutes && (
-                  <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
-                )}
+              <div className={`${fieldCls} flex items-center gap-1.5`}>
+                <span>{durVal || <span className="text-[#8F95A8]">—</span>}</span>
+                {durVal && <span className="text-xs text-[#8F95A8]">{durUnit}</span>}
               </div>
             </div>
           </div>
 
-          <div className="pb-2">
+          {/* Tugatildimi */}
+          <div className="flex items-center gap-3">
+            <label className={labelCls + " mb-0"}>Tugatildimi?</label>
+            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
+            </div>
+            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">
+              {meeting.is_completed ? 'Ha' : "Yo'q"}
+            </span>
+          </div>
+
+          {/* Qatnashchilar */}
+          <div>
             <label className={labelCls}>Qatnashchilar</label>
-            <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] flex flex-wrap gap-1.5 min-h-[44px] items-start">
+            <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-[#F8F9FC] dark:bg-[#1A1B1B] flex flex-wrap gap-1.5 min-h-[44px] items-start">
               {meeting.participants_info?.length > 0
                 ? meeting.participants_info.map(u => (
                   <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
@@ -926,20 +969,17 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
               }
             </div>
           </div>
+
         </div>
 
-        <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
-          <div className="flex items-center gap-2.5">
-            <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
-            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
-            </div>
-          </div>
+        {/* Footer — faqat Yopish */}
+        <div className="px-7 py-4 flex items-center justify-end border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
         </div>
+
       </div>
     </div>
   )
@@ -1450,7 +1490,12 @@ export default function MeetingsPage() {
       )}
       {editItem && (
         <EditMeetingModal meeting={editItem} onClose={() => setEditItem(null)}
-          onSave={handleEdit} projects={projects} users={users} />
+          onSave={handleEdit} projects={projects} users={users}
+          canEdit={(() => {
+            const isAdminOrManager = user?.active_role === 'admin' || user?.active_role === 'manager'
+            const isOwner = editItem.organizer === user?.id || editItem.created_by === user?.id
+            return isAdminOrManager || isOwner
+          })()} />
       )}
       {meetingLoading && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
