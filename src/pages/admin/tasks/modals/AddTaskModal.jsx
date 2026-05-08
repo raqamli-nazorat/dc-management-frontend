@@ -7,16 +7,16 @@ import { parseApiError } from "../../../../service/parseApiError"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 
 const PRIORITY_OPTIONS = [
-  { label: 'Past',    value: 'low' },
-  { label: "O'rta",  value: 'medium' },
+  { label: 'Past', value: 'low' },
+  { label: "O'rta", value: 'medium' },
   { label: 'Yuqori', value: 'high' },
   { label: 'Kritik', value: 'critical' },
 ]
 const TYPE_OPTIONS = [
-  { label: 'Xatolik (Bug)',        value: 'bug' },
-  { label: 'Yangi funksiya',       value: 'feature' },
-  { label: "Qo'shimcha",           value: 'extra' },
-  { label: "Tadqiqot/O'rganish",   value: 'research' },
+  { label: 'Xatolik (Bug)', value: 'bug' },
+  { label: 'Yangi funksiya', value: 'feature' },
+  { label: "Qo'shimcha", value: 'extra' },
+  { label: "Tadqiqot/O'rganish", value: 'research' },
 ]
 function useDropdown() {
   const [open, setOpen] = useState(false)
@@ -163,6 +163,18 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const filtered = users.filter(u =>
     (u.username ?? "").toLowerCase().includes(search.toLowerCase())
   )
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/70" onClick={onClose} />
@@ -175,7 +187,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
           </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
@@ -200,7 +212,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || "�"}</p>
+                  <p className="text-xs text-[#8F95A8] truncate">{u.position || "Ko'rsatilmagan"}</p>
                 </div>
               </button>
             )
@@ -251,7 +263,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
         const payload = res.data?.data ?? res.data
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+      }).catch(() => { })
   }, [])
 
   const [form, setForm] = useState({
@@ -271,7 +283,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    
+
     if (firstDot === -1) {
       return Number(intPart) > 100 ? '100' : intPart
     } else {
@@ -328,10 +340,10 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
   const validate = () => {
     const e = {}
-    if (!form.project)      e.project  = true
-    if (!form.title.trim()) e.title    = true
-    if (!form.priority)     e.priority = true
-    if (!form.type)         e.type     = true
+    if (!form.project) e.project = true
+    if (!form.title.trim()) e.title = true
+    if (!form.priority) e.priority = true
+    if (!form.type) e.type = true
     if (form.sprint && (isNaN(Number(form.sprint)) || Number(form.sprint) > 10 || Number(form.sprint) < 1)) {
       e.sprint = "Sprint 1 dan 10 gacha bo'lishi kerak"
     }
@@ -348,26 +360,26 @@ export default function AddTaskModal({ onClose, onAdd }) {
     try {
       // API sxemasiga mos body
       const body = {
-        project:  Number(form.project),
-        title:    form.title.trim(),
+        project: Number(form.project),
+        title: form.title.trim(),
         priority: form.priority,
-        type:     form.type,
-        status:   'todo',
+        type: form.type,
+        status: 'todo',
       }
       if (form.description.trim()) body.description = form.description.trim()
-      if (form.assignees.length)   body.assignee    = form.assignees[0].id
-      if (form.position)           body.position    = Number(form.position)
-      if (form.sprint)             body.sprint      = Number(form.sprint)
-      if (form.task_price)         body.task_price  = form.task_price.replace(/\s/g, '')
+      if (form.assignees.length) body.assignee = form.assignees[0].id
+      if (form.position) body.position = Number(form.position)
+      if (form.sprint) body.sprint = Number(form.sprint)
+      if (form.task_price) body.task_price = form.task_price.replace(/\s/g, '')
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
         const t = form.deadline_time || '00:00'
         body.deadline = `${form.deadline}T${t}:00`
       }
-      const hrs  = parseInt(form.estimated_hours, 10) || 0
+      const hrs = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
       if (hrs || mins) {
-        body.estimated_input_hours   = hrs
+        body.estimated_input_hours = hrs
         body.estimated_input_minutes = mins
       }
 
@@ -405,6 +417,17 @@ export default function AddTaskModal({ onClose, onAdd }) {
 
   const positionOptions = positions.map(p => ({ label: p.name, value: String(p.id) }))
   const assigneeLabel = form.assignees.map(u => u.username).join(", ")
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
 
   return (
     <>
@@ -456,7 +479,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
             {/* Darajasi + Turi */}
             <div className="grid grid-cols-2 gap-4">
               <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set("priority", v)} options={PRIORITY_OPTIONS} placeholder="Daraja" error={errors.priority} />
-              <SelectDropdown label="Turi"     value={form.type}     onChange={v => set("type", v)}     options={TYPE_OPTIONS}     placeholder="Turi"   error={errors.type} />
+              <SelectDropdown label="Turi" value={form.type} onChange={v => set("type", v)} options={TYPE_OPTIONS} placeholder="Turi" error={errors.type} />
             </div>
 
             {/* Topshiruvchi */}
@@ -531,9 +554,12 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 <div className="grid grid-cols-2 gap-2">
                   <DateTimeBox
                     type="date"
-                    placeholder="kk.oo.yyyy"
+                    placeholder="Sana tanlash"
                     value={form.deadline}
-                    onChange={v => set("deadline", v)}
+                    onChange={v => {
+                      set("deadline", v)
+                      set("deadline_time", "23:59")
+                    }}
                     dropUp
                   />
                   <DateTimeBox
@@ -620,8 +646,8 @@ export default function AddTaskModal({ onClose, onAdd }) {
             <button onClick={handleSubmit} disabled={loading}
               className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
               {loading
-                ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
               }
               Qo'shish
             </button>

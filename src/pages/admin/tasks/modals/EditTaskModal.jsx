@@ -7,24 +7,24 @@ import { parseApiError } from '../../../../service/parseApiError'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 
 const PRIORITY_OPTIONS = [
-  { label: 'Past',    value: 'low' },
-  { label: "O'rta",  value: 'medium' },
+  { label: 'Past', value: 'low' },
+  { label: "O'rta", value: 'medium' },
   { label: 'Yuqori', value: 'high' },
   { label: 'Kritik', value: 'critical' },
 ]
 const TYPE_OPTIONS = [
-  { label: 'Xatolik (Bug)',        value: 'bug' },
-  { label: 'Yangi funksiya',       value: 'feature' },
-  { label: "Qo'shimcha",           value: 'extra' },
-  { label: "Tadqiqot/O'rganish",   value: 'research' },
+  { label: 'Xatolik (Bug)', value: 'bug' },
+  { label: 'Yangi funksiya', value: 'feature' },
+  { label: "Qo'shimcha", value: 'extra' },
+  { label: "Tadqiqot/O'rganish", value: 'research' },
 ]
 const STATUS_OPTIONS = [
   { label: 'Bajarilishi kerak', value: 'todo' },
-  { label: 'Jarayonda',         value: 'in_progress' },
-  { label: 'Bajarilgan',        value: 'done' },
+  { label: 'Jarayonda', value: 'in_progress' },
+  { label: 'Bajarilgan', value: 'done' },
   { label: 'Ishga tushirilgan', value: 'production' },
-  { label: 'Tekshirilgan',      value: 'checked' },
-  { label: 'Rad etilgan',       value: 'rejected' },
+  { label: 'Tekshirilgan', value: 'checked' },
+  { label: 'Rad etilgan', value: 'rejected' },
 ]
 
 function useDropdown() {
@@ -176,6 +176,17 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   const [temp, setTemp] = useState(selected?.length > 0 ? selected[0] : null)
   const filtered = users.filter(u => (u.username ?? '').toLowerCase().includes(search.toLowerCase()))
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
@@ -187,7 +198,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
           </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
@@ -211,7 +222,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.roles?.[0] || '—'}</p>
+                  <p className="text-xs text-[#8F95A8] truncate">{u.position || '—'}</p>
                 </div>
               </button>
             )
@@ -255,7 +266,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    
+
     if (firstDot === -1) {
       return Number(intPart) > 100 ? '100' : intPart
     } else {
@@ -285,7 +296,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         const payload = res.data?.data ?? res.data
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
-      }).catch(() => {})
+      }).catch(() => { })
   }, [])
 
   // Mavjud task ning loyihasidan xodimlarni yuklash
@@ -298,7 +309,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           const emps = proj?.employees_info ?? []
           setProjectEmployees(Array.isArray(emps) ? emps : [])
         })
-        .catch(() => {})
+        .catch(() => { })
     }
   }, [])
 
@@ -313,17 +324,17 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     return `${hh}:${mm}`
   })()
 
-  const initHours     = task.estimated_minutes ? String(Math.floor(task.estimated_minutes / 60)) : ''
-  const initMins      = task.estimated_minutes ? String(task.estimated_minutes % 60) : ''
+  const initHours = task.estimated_minutes ? String(Math.floor(task.estimated_minutes / 60)) : ''
+  const initMins = task.estimated_minutes ? String(task.estimated_minutes % 60) : ''
   const initAssignees = task.assignee_info ? [task.assignee_info] : []
-  const initProject   = task.project
+  const initProject = task.project
     ? String(task.project)
     : (task.project_info && typeof task.project_info === 'object'
-        ? String(task.project_info.id)
-        : (task.project_info && typeof task.project_info === 'string' && task.project_info
-            ? '' // string bo'lsa ID yo'q
-            : '')
-      )
+      ? String(task.project_info.id)
+      : (task.project_info && typeof task.project_info === 'string' && task.project_info
+        ? '' // string bo'lsa ID yo'q
+        : '')
+    )
 
   const fmtPrice = (val) => {
     if (!val) return ''
@@ -336,21 +347,21 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const [form, setForm] = useState({
-    project:            initProject,
-    title:              task.title              || '',
-    description:        task.description        || '',
-    priority:           task.priority           || 'low',
-    type:               task.type               || 'bug',
-    status:             task.status             || 'todo',
-    assignees:          initAssignees,
-    position:           task.position_info      ? String(task.position_info.id) : '',
-    sprint:             task.sprint             ? String(task.sprint) : '',
-    task_price:         fmtPrice(task.task_price),
+    project: initProject,
+    title: task.title || '',
+    description: task.description || '',
+    priority: task.priority || 'low',
+    type: task.type || 'bug',
+    status: task.status || 'todo',
+    assignees: initAssignees,
+    position: task.position_info ? String(task.position_info.id) : '',
+    sprint: task.sprint ? String(task.sprint) : '',
+    task_price: fmtPrice(task.task_price),
     penalty_percentage: task.penalty_percentage ? String(Math.abs(parseFloat(task.penalty_percentage))) : '',
-    deadline:           initDeadlineDate,
-    deadline_time:      initDeadlineTime,
-    estimated_hours:    initHours,
-    estimated_minutes:  initMins,
+    deadline: initDeadlineDate,
+    deadline_time: initDeadlineTime,
+    estimated_hours: initHours,
+    estimated_minutes: initMins,
   })
   const [errors, setErrors] = useState({})
 
@@ -366,15 +377,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             const emps = proj?.employees_info ?? []
             setProjectEmployees(Array.isArray(emps) ? emps : [])
           })
-          .catch(() => {})
+          .catch(() => { })
       }
       return
     }
     setForm(p => ({ ...p, [k]: v }))
     setErrors(p => ({ ...p, [k]: false }))
   }
-
-  const selectedProject = projects.find(p => String(p.id) === String(form.project))
 
   // projects yuklanganidan keyin project_info string bo'lsa, title bo'yicha moslashtirish
   useEffect(() => {
@@ -407,10 +416,10 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   const validate = () => {
     const e = {}
-    if (!form.project)      e.project  = true
-    if (!form.title.trim()) e.title    = true
-    if (!form.priority)     e.priority = true
-    if (!form.type)         e.type     = true
+    if (!form.project) e.project = true
+    if (!form.title.trim()) e.title = true
+    if (!form.priority) e.priority = true
+    if (!form.type) e.type = true
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -438,25 +447,25 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     try {
       // API sxemasiga mos body: status ALOHIDA change-status orqali yuboriladi
       const body = {
-        project:  Number(form.project),
-        title:    form.title.trim(),
+        project: Number(form.project),
+        title: form.title.trim(),
         priority: form.priority,
-        type:     form.type,
+        type: form.type,
       }
       if (form.description.trim()) body.description = form.description.trim()
-      if (form.assignees.length)   body.assignee    = form.assignees[0].id
-      if (form.position)           body.position    = Number(form.position)
-      if (form.sprint)             body.sprint      = Number(form.sprint)
-      if (form.task_price)         body.task_price  = form.task_price.replace(/\s/g, '')
+      if (form.assignees.length) body.assignee = form.assignees[0].id
+      if (form.position) body.position = Number(form.position)
+      if (form.sprint) body.sprint = Number(form.sprint)
+      if (form.task_price) body.task_price = form.task_price.replace(/\s/g, '')
       if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
       if (form.deadline) {
         const t = form.deadline_time || '00:00'
         body.deadline = `${form.deadline}T${t}:00`
       }
-      const hrs  = parseInt(form.estimated_hours, 10) || 0
+      const hrs = parseInt(form.estimated_hours, 10) || 0
       const mins = parseInt(form.estimated_minutes, 10) || 0
       if (hrs || mins) {
-        body.estimated_input_hours   = hrs
+        body.estimated_input_hours = hrs
         body.estimated_input_minutes = mins
       }
 
@@ -502,7 +511,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const positionOptions = positions.map(p => ({ label: p.name, value: String(p.id) }))
-  const assigneeLabel   = form.assignees.map(u => u.username).join(', ')
+  const assigneeLabel = form.assignees.map(u => u.username).join(', ')
   const ro = !canEdit
 
   // Helper: extract filename from URL
@@ -517,6 +526,17 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     if (!url) return false
     return /\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(url)
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
 
   return (
     <>
@@ -572,9 +592,9 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
             {/* Holati + Darajasi + Turi */}
             <div className="grid grid-cols-3 gap-4">
-              <SelectDropdown label="Holati"   value={form.status}   onChange={v => set('status', v)}   options={STATUS_OPTIONS}   placeholder="Holati"  disabled={ro} />
-              <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder="Daraja"  disabled={ro} error={errors.priority} />
-              <SelectDropdown label="Turi"     value={form.type}     onChange={v => set('type', v)}     options={TYPE_OPTIONS}     placeholder="Turi"    disabled={ro} error={errors.type} />
+              <SelectDropdown label="Holati" value={form.status} onChange={v => set('status', v)} options={STATUS_OPTIONS} placeholder="Holati" disabled={ro} />
+              <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder="Daraja" disabled={ro} error={errors.priority} />
+              <SelectDropdown label="Turi" value={form.type} onChange={v => set('type', v)} options={TYPE_OPTIONS} placeholder="Turi" disabled={ro} error={errors.type} />
             </div>
 
             {/* Topshiruvchi */}
@@ -646,7 +666,14 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                     type="date"
                     placeholder="kk.oo.yyyy"
                     value={form.deadline}
-                    onChange={v => !ro && set('deadline', v)}
+                    onChange={v => {
+                      if (!ro) {
+                        set('deadline', v);
+                        if (v && (!form.deadline_time || form.deadline_time === "00:00")) {
+                          set('deadline_time', "23:59");
+                        }
+                      }
+                    }}
                     disabled={ro}
                     dropUp
                   />
@@ -815,7 +842,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer text-[#EF4444] hover:bg-[#FFF5F5] dark:hover:bg-[#1C0A0A] transition-colors"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                  <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
                 </svg>
                 O'chirish
               </button>
@@ -830,8 +857,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                 <button onClick={handleSubmit} disabled={loading}
                   className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
                   {loading
-                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                    : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                    : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   }
                   Saqlash
                 </button>
