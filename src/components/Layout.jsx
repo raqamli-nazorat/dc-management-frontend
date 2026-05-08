@@ -7,6 +7,7 @@ import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
+import { MeetingAttendanceModal, MeetingAbsenceModal } from './MeetingModals'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -23,11 +24,11 @@ const labelMap = {
 }
 
 const NOTIFS_DATA = [
-  { id: 1, date: '17.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: true, urgent: false },
-  { id: 2, date: '17.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '10:00', read: false, urgent: true },
-  { id: 3, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: false, urgent: false },
-  { id: 4, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: true, urgent: false },
-  { id: 5, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: false, urgent: false },
+  { id: 1, date: '17.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: true, urgent: false, raw: { meeting_id: 1 } },
+  { id: 2, date: '17.01.2026', title: "Yig'ilishga qatnashmadingiz", sub: "Sababni yozishingiz so'raladi", time: '10:00', read: false, urgent: true, raw: { attendance_id: 1, meeting_title: "Marketing meet" } },
+  { id: 3, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: false, urgent: false, raw: { meeting_id: 1 } },
+  { id: 4, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: true, urgent: false, raw: { meeting_id: 1 } },
+  { id: 5, date: '16.01.2026', title: "Yig'ilish yakunlandi", sub: "Yig'ilishda kimlar qatnashdi", time: '11:00', read: false, urgent: false, raw: { meeting_id: 1 } },
 ]
 
 function formatNotifDate(dateStr) {
@@ -53,6 +54,7 @@ function mapApiNotification(item) {
     time: formatNotifTime(item.created_at),
     read: !!item.is_read,
     urgent: item.type === 'alert',
+    raw: item,
   }
 }
 
@@ -65,7 +67,7 @@ function groupByDate(notifs) {
   return Object.entries(map)
 }
 
-function NotificationPanel({ notifs, setNotifs, onClose }) {
+function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   const grouped = groupByDate(notifs)
 
   const markRead = async (id) => {
@@ -125,7 +127,10 @@ function NotificationPanel({ notifs, setNotifs, onClose }) {
               {items.map(n => (
                 <button
                   key={n.id}
-                  onClick={() => markRead(n.id)}
+                  onClick={() => {
+                    markRead(n.id)
+                    if (onItemClick) onItemClick(n)
+                  }}
                   className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
                     ${!n.read
                       ? 'bg-[#F4F6FD] dark:bg-[#222323]'
@@ -229,6 +234,30 @@ export default function Layout() {
   const wsRef = useRef(null)
   const reconnectTimerRef = useRef(null)
   const unreadCount = notifs.filter(n => !n.read).length
+  const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
+  const [activeAbsence, setActiveAbsence] = useState(null)
+
+  const handleNotifClick = (n) => {
+    const title = n.title?.toLowerCase() || ''
+    if (title.includes("yig'ilish yakunlandi")) {
+      const meetingId = n.raw?.meeting_id || n.raw?.data?.meeting_id || n.raw?.meeting
+      if (meetingId || n.raw?.id) {
+        setActiveAttendanceMeetingId(meetingId || n.raw?.id)
+        setNotifOpen(false)
+      }
+    } else if (title.includes("qatnashmadingiz")) {
+      const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
+      const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
+      if (attendanceId || n.raw?.id) {
+        setActiveAbsence({ 
+          attendanceId: attendanceId || n.raw?.id, 
+          meetingTitle, 
+          meetingDate: n.date + " " + n.time 
+        })
+        setNotifOpen(false)
+      }
+    }
+  }
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -448,7 +477,29 @@ export default function Layout() {
       {notifOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setNotifOpen(false)} />
-          <NotificationPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} />
+          <NotificationPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} onItemClick={handleNotifClick} />
+        </>
+      )}
+
+      {activeAttendanceMeetingId && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAttendanceMeetingId(null)} />
+          <MeetingAttendanceModal 
+            meetingId={activeAttendanceMeetingId} 
+            onClose={() => setActiveAttendanceMeetingId(null)} 
+          />
+        </>
+      )}
+
+      {activeAbsence && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAbsence(null)} />
+          <MeetingAbsenceModal 
+            attendanceId={activeAbsence.attendanceId}
+            meetingTitle={activeAbsence.meetingTitle}
+            meetingDate={activeAbsence.meetingDate}
+            onClose={() => setActiveAbsence(null)} 
+          />
         </>
       )}
     </div>
