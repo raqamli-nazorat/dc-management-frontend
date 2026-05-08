@@ -55,7 +55,7 @@ const commonRoutes = (prefix) => [
   <Route key="users" path="users" element={<AdminUsers />} />,
   <Route key="user-detail" path="users/detail/:id" element={<AdminUserDetail />} />,
   <Route key="my_tasks" path="my_tasks" element={<MyTasks />} />,
-  <Route key="analytics" path="analytics" element={<AnalyticsPage />} />,
+  ...(['employee', 'manager'].includes(prefix) ? [<Route key="analytics" path="analytics" element={<AnalyticsPage />} />] : []),
 ]
 
 function App() {
