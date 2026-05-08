@@ -128,7 +128,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         {/* ── Form tanasi ── */}
         <div className="flex relative gap-5 mb-8">
           {/* Vazifa nomi + subtasklar */}
-          <div className="w-full bg-[#F8F9FC] dark:bg-[#222323] rounded-[24px] p-6 pr-20! flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
+          <div className="w-full max-h-[350px] overflow-y-auto bg-[#F8F9FC] dark:bg-[#222323] rounded-[24px] p-6 pr-20! flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
             {/* Vazifa nomi */}
             <input
               type="text"

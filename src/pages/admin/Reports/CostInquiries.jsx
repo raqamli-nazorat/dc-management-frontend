@@ -1140,7 +1140,7 @@ const Employee = () => {
         <EmployeeStep
           selectedList={filters.accountants ? filters.accountants.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
-          param={{ roles: "manager" }}
+          param={{ roles: "accountant" }}
           title="Hisobchilar tanlang"
           onClose={() => setSelectAccountant(false)}
         />

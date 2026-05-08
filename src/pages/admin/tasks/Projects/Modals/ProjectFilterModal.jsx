@@ -21,7 +21,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
 
     useEffect(() => {
         if (user.active_role === "employee") {
-            axiosAPI.get(`project-managers/`)
+            axiosAPI.get(`users/all/?roles=manager`)
                 .then(res => {
                     setEmployees(res.data.data.results)
                 })
@@ -30,7 +30,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                     toast.error(err.response.data.error.errorMsg)
                 })
         } else if (user.active_role === "manager") {
-            axiosAPI.get(`project-employees/`)
+            axiosAPI.get(`users/all/?roles=employee`)
                 .then(res => {
                     setEmployees(res.data.data.results)
                 })

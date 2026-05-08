@@ -1037,7 +1037,7 @@ const Employee = () => {
           selectedList={filters.manager ? filters.manager.split(',') : []}
           onConfirm={handleSelectManagerConfirm}
           title="Boshqaruvchi tanlang"
-          param={{roles: "accountant"}}
+          param={{roles: "manager"}}
           onClose={() => setSelectManager(false)}
         />
       )}

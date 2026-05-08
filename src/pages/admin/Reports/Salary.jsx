@@ -1018,7 +1018,7 @@ const Employee = () => {
           selectedList={filters.accountant ? filters.accountant.split(',') : []}
           onConfirm={handleSelectAccountantConfirm}
           title="Hisobchilar tanlang"
-          employee_role='accountant'
+          param={{ roles: "accountant" }}
           onClose={() => setSelectAccountant(false)}
         />
       )}
