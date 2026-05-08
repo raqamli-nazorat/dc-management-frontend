@@ -13,9 +13,10 @@ const PRIORITY_OPTIONS = [
   { label: 'Kritik', value: 'critical' },
 ]
 const TYPE_OPTIONS = [
-  { label: 'Xato',           value: 'bug' },
-  { label: 'Yangi funksiya', value: 'feature' },
-  { label: "Qo'shimcha",    value: 'improvement' },
+  { label: 'Xatolik (Bug)',        value: 'bug' },
+  { label: 'Yangi funksiya',       value: 'feature' },
+  { label: "Qo'shimcha",           value: 'extra' },
+  { label: "Tadqiqot/O'rganish",   value: 'research' },
 ]
 function useDropdown() {
   const [open, setOpen] = useState(false)

@@ -71,6 +71,8 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   const grouped = groupByDate(notifs)
 
   const markRead = async (id) => {
+    const notif = notifs.find(n => n.id === id)
+    if (notif?.read) return  // allaqachon o'qilgan — backend ga so'rov yuborma
     setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     try {
       await axiosAPI.patch(`/notifications/${id}/read/`)
@@ -101,6 +103,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <h2 className="text-xl font-bold text-[#1A1D2E] dark:text-white">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
+         {/* 
           <button
             onClick={markAllRead}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
@@ -108,6 +111,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           >
             Barchasi o'qildi
           </button>
+          */}
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
@@ -237,23 +241,84 @@ export default function Layout() {
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
 
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const handleNotifClick = (n) => {
+    const type = n.raw?.type || ''
     const title = n.title?.toLowerCase() || ''
-    if (title.includes("yig'ilish yakunlandi")) {
-      const meetingId = n.raw?.meeting_id || n.raw?.data?.meeting_id || n.raw?.meeting
-      if (meetingId || n.raw?.id) {
-        setActiveAttendanceMeetingId(meetingId || n.raw?.id)
+
+    // Allaqachon o'qilgan bo'lsa backend ga so'rov yuborilmaydi (markRead ichida tekshiriladi)
+
+    // type ga qarab yo'naltirish
+    if (type === 'task') {
+      // Vazifa notification — tasks sahifasiga
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      navigate(`/${prefix}/tasks`)
+      setNotifOpen(false)
+    } else if (type === 'finance') {
+      // Moliya notification — payments sahifasiga
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      navigate(`/${prefix}/payments`)
+      setNotifOpen(false)
+    } else if (type === 'meeting') {
+      // Yig'ilish notification
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      if (title.includes("yakunlandi")) {
+        const meetingId = n.raw?.meeting_id || n.raw?.data?.meeting_id || n.raw?.meeting
+        if (meetingId || n.raw?.id) {
+          setActiveAttendanceMeetingId(meetingId || n.raw?.id)
+          setNotifOpen(false)
+        } else {
+          navigate(`/${prefix}/meetings`)
+          setNotifOpen(false)
+        }
+      } else if (title.includes("qatnashmadingiz")) {
+        const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
+        const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
+        if (attendanceId || n.raw?.id) {
+          setActiveAbsence({
+            attendanceId: attendanceId || n.raw?.id,
+            meetingTitle,
+            meetingDate: n.date + ' ' + n.time,
+          })
+          setNotifOpen(false)
+        } else {
+          navigate(`/${prefix}/meetings`)
+          setNotifOpen(false)
+        }
+      } else {
+        navigate(`/${prefix}/meetings`)
         setNotifOpen(false)
       }
-    } else if (title.includes("qatnashmadingiz")) {
-      const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
-      const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
-      if (attendanceId || n.raw?.id) {
-        setActiveAbsence({ 
-          attendanceId: attendanceId || n.raw?.id, 
-          meetingTitle, 
-          meetingDate: n.date + " " + n.time 
-        })
+    } else if (type === 'system' || type === 'alert') {
+      // Tizim xabari yoki ogohlantirish — loyihalar sahifasiga
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      navigate(`/${prefix}/projects`)
+      setNotifOpen(false)
+    } else {
+      // type yo'q yoki noma'lum — title ga qarab eski logika
+      if (title.includes("yig'ilish yakunlandi")) {
+        const meetingId = n.raw?.meeting_id || n.raw?.data?.meeting_id || n.raw?.meeting
+        if (meetingId || n.raw?.id) {
+          setActiveAttendanceMeetingId(meetingId || n.raw?.id)
+          setNotifOpen(false)
+        }
+      } else if (title.includes("qatnashmadingiz")) {
+        const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
+        const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
+        if (attendanceId || n.raw?.id) {
+          setActiveAbsence({
+            attendanceId: attendanceId || n.raw?.id,
+            meetingTitle,
+            meetingDate: n.date + ' ' + n.time,
+          })
+          setNotifOpen(false)
+        }
+      } else {
+        // default — loyihalar
+        const prefix = location.pathname.split('/')[1] || 'admin'
+        navigate(`/${prefix}/projects`)
         setNotifOpen(false)
       }
     }
