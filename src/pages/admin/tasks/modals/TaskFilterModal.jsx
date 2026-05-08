@@ -3,6 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 import { axiosAPI } from '../../../../service/axiosAPI'
+import EmployeeStep from '../../Reports/Modals/EmployeeStep'
 
 /* ─── constants ─── */
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
@@ -20,6 +21,8 @@ const HOLAT_LIST = [
 
 export const TASK_EMPTY_FILTER = {
   projects: [],
+  created_by: [],
+  assignee: [],
   holat: '',
   daraja: '',
   turi: '',
@@ -27,7 +30,6 @@ export const TASK_EMPTY_FILTER = {
   deadFromT: '',
   deadToD: '',
   deadToT: '',
-  myTasks: false,
 }
 
 /* ─── SimpleDropdown — { label, value } yoki string options ─── */
@@ -109,18 +111,18 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
         className="w-full min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border  cursor-pointer text-left
           bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]"
       >
-        {selected.length === 0 ? (
+        {selected?.length === 0 ? (
           <span className="flex-1 text-sm text-[#8F95A8] dark:text-[#5B6078]">{placeholder}</span>
         ) : (
           <span className="flex flex-wrap gap-1.5 flex-1">
-            {selected.map(item => (
+            {selected?.map(item => (
               <span
-                key={item.id ?? item.name}
+                key={item.id || item}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
                   bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]"
               >
                 <span className="truncate max-w-[130px]">
-                  {renderChip ? renderChip(item) : item.name}
+                  {renderChip ? renderChip(item) : (item.username || item.name || item)}
                 </span>
                 <span
                   onMouseDown={e => { e.stopPropagation(); onRemove(item) }}
@@ -194,8 +196,8 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 
         {/* List */}
         <div className="flex-1 overflow-y-auto px-7 pb-2 flex flex-col gap-2">
-          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Loyiha topilmadi</p>}
-          {filtered.map(p => {
+          {filtered?.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Loyiha topilmadi</p>}
+          {filtered?.map(p => {
             const checked = !!local.find(x => x.id === p.id)
             return (
               <button
@@ -248,123 +250,6 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
   )
 }
 
-/* ─── AuthorSelectModal ─── */
-function AuthorSelectModal({ title, selected, onClose, onApply, usersList = [] }) {
-  const [query, setQuery] = useState('')
-  const [local, setLocal] = useState(selected)
-
-  const filtered = usersList.filter(u =>
-    (u.username ?? '').toLowerCase().includes(query.toLowerCase()) ||
-    (u.position_info?.name ?? '').toLowerCase().includes(query.toLowerCase())
-  )
-
-  const toggle = u => setLocal(prev =>
-    prev.find(x => x.id === u.id)
-      ? prev.filter(x => x.id !== u.id)
-      : [...prev, { id: u.id, name: u.username, role: u.position_info?.name || u.roles?.[0] || '' }]
-  )
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[90vh]">
-
-        {/* Header */}
-        <div className="px-7 pt-7 pb-4 shrink-0">
-          <div className="flex items-center gap-3 mb-4">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
-              <FaArrowLeft size={17} />
-            </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">{title}</h2>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                local.length === usersList.length
-                  ? setLocal([])
-                  : setLocal(usersList.map(u => ({ id: u.id, name: u.username, role: u.position_info?.name || u.roles?.[0] || '' })))
-              }
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0"
-            >
-              <LuSlidersHorizontal size={12} /> Barchasi tanlash
-            </button>
-            <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-              <LuSearch size={13} className="text-[#8F95A8] shrink-0" />
-              <input
-                autoFocus
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Ism bo'yicha izlash"
-                className="flex-1 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* List */}
-        <div className="flex-1 overflow-y-auto px-7 pb-2 flex flex-col gap-2">
-          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
-          {filtered.map(u => {
-            const checked = !!local.find(x => x.id === u.id)
-            return (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => toggle(u)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
-                  ${checked
-                    ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[#526ED3]'
-                    : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
-              >
-                <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center 
-                  ${checked ? 'border-[#526ED3] bg-[#526ED3]' : 'border-[#C2C8E0] dark:border-[#474848]'}`}>
-                  {checked && (
-                    <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
-                  {(u.username ?? '?').slice(0, 2).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8]">{u.position_info?.name || u.roles?.[0] || '—'}</p>
-                </div>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-between shrink-0 border-t border-[#F1F3F9] dark:border-[#292A2A]">
-          <span className="text-sm text-[#8F95A8]">{local.length} ta tanlangan</span>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLocal([])}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
-            >
-              <FaXmark size={13} /> Tozalash
-            </button>
-            <button
-              onClick={() => onApply(local)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
-            >
-              <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Qo'shish
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 /* ─── Main TaskFilterModal ─── */
 export default function TaskFilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...TASK_EMPTY_FILTER, ...initial })
@@ -372,6 +257,26 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
   const [subModal, setSubModal] = useState(null) // 'project' | 'author'
 
   const [projectsList, setProjectsList] = useState([])
+  const [authorsList, setAuthorsList] = useState([])
+
+  const handleSelectEmployees = (selectedIds) => {
+    // Map IDs to full objects using authorsList
+    const selectedObjects = selectedIds.map(id => {
+      return authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
+    })
+    setF(prev => ({ ...prev, created_by: selectedObjects }))
+    setSubModal(null)
+  }
+
+  const handleSelectAssignee = (selectedIds) => {
+    // Map IDs to full objects using authorsList
+    const selectedObjects = selectedIds.map(id => {
+      return authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
+    })
+    setF(prev => ({ ...prev, assignee: selectedObjects }))
+    setSubModal(null)
+  }
+
 
   useEffect(() => {
     axiosAPI.get('/project-shorts/', { params: { page_size: 200 } })
@@ -387,6 +292,11 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
             setProjectsList(list)
           }).catch(() => { })
       })
+
+    axiosAPI.get('/users/all/', { params: { roles: 'admin' } })
+      .then(res => {
+        setAuthorsList(res.data?.data?.results || [])
+      }).catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -438,6 +348,26 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
               onClick={() => setSubModal('project')}
               placeholder="Loyiha tanlang"
             />
+
+            <div className='grid grid-cols-2 gap-2'>
+              {/* Muallif */}
+              <MultiChipField
+                label="Muallif"
+                selected={f.created_by}
+                onRemove={item => set('created_by', f.created_by.filter(x => (x.id ?? x) !== (item.id ?? item)))}
+                onClick={() => setSubModal('created_by')}
+                placeholder="Muallif tanlang"
+              />
+
+              <MultiChipField
+                label="Xodim"
+                selected={f.assignee}
+                onRemove={item => set('assignee', f.assignee.filter(x => (x.id ?? x) !== (item.id ?? item)))}
+                onClick={() => setSubModal('assignee')}
+                placeholder="Xodim tanlang"
+              />
+            </div>
+
 
             {/* Holati + Darajasi + Turi */}
             <div className="grid grid-cols-3 gap-3">
@@ -517,6 +447,26 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           onClose={() => setSubModal(null)}
           onApply={items => { set('projects', items); setSubModal(null) }}
           projectsList={projectsList}
+        />
+      )}
+
+      {subModal === 'created_by' && (
+        <EmployeeStep
+          onClose={() => setSubModal(null)}
+          param={{ roles: "admin" }}
+          title='Muallif tanlash'
+          selectedList={f.created_by ? f.created_by.map(u => u.id || u) : []}
+          onConfirm={handleSelectEmployees}
+        />
+      )}
+
+      {subModal === 'assignee' && (
+        <EmployeeStep
+          onClose={() => setSubModal(null)}
+          employee_role='all'
+          title='Xodim tanlash'
+          selectedList={f.assignee ? f.assignee.map(u => u.id || u) : []}
+          onConfirm={handleSelectAssignee}
         />
       )}
     </>
