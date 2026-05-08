@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MdExpandMore, MdExpandLess } from 'react-icons/md'
 import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
@@ -354,18 +354,18 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         {['employee', 'xodim', 'manager', 'menager'].includes(routeRole) && (
           isCollapsed ? (
             <button
-              onClick={() => navigate(`/${urlPrefix}/analytics`)}
+              onClick={() => navigate(`/${urlPrefix}/dashboard`)}
               title="Analitika"
-              className={iconBtn(location.pathname.includes('analytics'))}
+              className={iconBtn(location.pathname.includes('dashboard') || location.pathname.includes('analytics'))}
             >
               <img src="/imgs/dashboard-square-03.svg" alt="analytics" className="w-4 h-4 dark:invert dark:brightness-0" />
             </button>
           ) : (
             <NavLink
-              to={`/${urlPrefix}/analytics`}
+              to={`/${urlPrefix}/dashboard`}
               className={({ isActive }) => [
                 'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
-                isActive
+                isActive || location.pathname.includes('analytics')
                   ? 'bg-[#E2E6F2] text-[#1A1D2E] border-[#EEF1F7] dark:bg-[#303131] dark:text-white dark:border-[#474848]'
                   : 'text-[#5B6078] border-transparent hover:bg-[#E2E6F2] hover:border-[#EEF1F7] dark:text-[#C2C8E0] dark:hover:bg-[#303131] dark:border-transparent',
               ].join(' ')}
