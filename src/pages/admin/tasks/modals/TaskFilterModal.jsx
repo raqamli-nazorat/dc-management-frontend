@@ -4,6 +4,7 @@ import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import EmployeeStep from '../../Reports/Modals/EmployeeStep'
+import { useAuth } from '../../../../context/AuthContext'
 
 /* ─── constants ─── */
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
@@ -252,6 +253,8 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 
 /* ─── Main TaskFilterModal ─── */
 export default function TaskFilterModal({ onClose, onApply, initial }) {
+  const { user } = useAuth()
+
   const [f, setF] = useState({ ...TASK_EMPTY_FILTER, ...initial })
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
   const [subModal, setSubModal] = useState(null) // 'project' | 'author'
@@ -463,7 +466,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
       {subModal === 'assignee' && (
         <EmployeeStep
           onClose={() => setSubModal(null)}
-          employee_role='all'
+          employee_role={user.active_role !== "admin" ? "employee" : "all"}
           title='Xodim tanlash'
           selectedList={f.assignee ? f.assignee.map(u => u.id || u) : []}
           onConfirm={handleSelectAssignee}
