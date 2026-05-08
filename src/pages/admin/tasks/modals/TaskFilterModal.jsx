@@ -456,7 +456,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
       {subModal === 'created_by' && (
         <EmployeeStep
           onClose={() => setSubModal(null)}
-          param={{ roles: "admin" }}
+          param={{ roles: "admin,manager" }}
           title='Muallif tanlash'
           selectedList={f.created_by ? f.created_by.map(u => u.id || u) : []}
           onConfirm={handleSelectEmployees}
