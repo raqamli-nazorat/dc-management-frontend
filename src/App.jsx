@@ -28,6 +28,7 @@ import Salary from './pages/admin/Reports/Salary'
 import TrashPage from './pages/admin/Trash/Trash'
 import ProfilePage from './pages/admin/Profile/Profile'
 import MyTasks from './pages/MyTasks/MyTasks'
+import SelectRore from './pages/SelectRore'
 
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -63,6 +64,7 @@ function App() {
           <PageActionProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/role" element={<ProtectedRoute><SelectRore /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
               {/* ── ADMIN ── */}
