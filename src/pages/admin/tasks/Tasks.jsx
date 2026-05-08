@@ -156,24 +156,25 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               : 'border-[#E8EBF4] dark:border-[#333535]'}`}
         >
           <div className="flex ">
-            <div className="flex-1 px-2 py-1.5 flex  h-35 flex-col gap-1.5">
+            <div className="flex-1 px-2 py-1.5 flex    h-35 flex-col gap-1.5">
 
               {/* Title */}
-              <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
+              <p className=" w-full text-[13px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
                 {
-                  card.title.length > 27 ? `  ${card.title.slice(0, 27)}...` : `   ${card.title.slice(0, 27)}`
+                  card.title
                 }
 
               </p>
 
               {/* UID (flag icon) + reopened_count */}
-              <div className="flex  items-center justify-between gap-1">
+              <div className="flex  items-center relative justify-between gap-1">
                 <div className="flex items-center gap-1">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1.94048 0.379342C2.4338 0.174378 3.151 0 4.15625 0C5.23407 0 6.12464 0.370484 6.85083 0.67258C6.86665 0.679161 6.88239 0.685709 6.89805 0.692221C7.66714 1.01194 8.26531 1.25037 8.96875 1.25037C9.76797 1.25037 10.2538 1.11224 10.5124 1.00466C10.6427 0.950482 10.72 0.902155 10.7543 0.878337C10.7632 0.872212 10.7693 0.867595 10.773 0.864778C11.0204 0.630029 11.3834 0.559762 11.7021 0.688171C12.0332 0.821599 12.25 1.14278 12.25 1.49975L12.25 9.00025C12.25 9.22648 12.1624 9.44391 12.0055 9.60693L11.375 9.00025C12.0055 9.60693 12.0051 9.6074 12.0046 9.60786L12.0037 9.60881L12.0018 9.61074L11.9979 9.61477L11.9892 9.62346C11.9831 9.62954 11.9763 9.63617 11.9687 9.64331C11.9536 9.65759 11.9356 9.6739 11.9146 9.6919C11.8725 9.72792 11.8184 9.77057 11.7511 9.81717C11.6162 9.9106 11.4302 10.0186 11.1845 10.1207C10.6912 10.3256 9.974 10.5 8.96875 10.5C7.89093 10.5 7.00036 10.1295 6.27418 9.82742C6.25836 9.82084 6.24261 9.81429 6.22695 9.80778C5.45786 9.48806 4.85969 9.24963 4.15625 9.24963C3.35982 9.24963 2.87459 9.3868 2.61529 9.49421C2.62168 9.53688 2.625 9.58055 2.625 9.625L2.625 13.125C2.625 13.6082 2.23325 14 1.75 14C1.26675 14 0.875 13.6082 0.875 13.125L0.875 9.625C0.875 9.51484 0.895357 9.40943 0.932515 9.31234C0.895138 9.2145 0.875 9.10904 0.875 9.00025L0.875 1.49975C0.875 1.27352 0.96262 1.05609 1.11947 0.893068L1.75 1.49975C1.11947 0.893068 1.11992 0.892604 1.12037 0.892137L1.12128 0.891192L1.12316 0.889261L1.1271 0.885235L1.13577 0.876539C1.14191 0.870461 1.14874 0.86383 1.1563 0.85669C1.17142 0.842407 1.18941 0.826097 1.21045 0.808098C1.25254 0.772077 1.30663 0.729427 1.37391 0.682828C1.5088 0.589399 1.69475 0.481437 1.94048 0.379342ZM2.625 1.99003L2.625 7.66161C3.0382 7.56449 3.5438 7.49963 4.15625 7.49963C5.2347 7.49963 6.12559 7.87023 6.85198 8.17241C6.86763 8.17892 6.88321 8.1854 6.89871 8.19185C7.66792 8.51161 8.2658 8.75 8.96875 8.75C9.75533 8.75 10.2383 8.61655 10.5 8.50997L10.5 2.83839C10.0868 2.93551 9.5812 3.00037 8.96875 3.00037C7.8903 3.00037 6.99941 2.62977 6.27302 2.32759C6.25737 2.32108 6.24179 2.3146 6.22629 2.30815C5.45708 1.98839 4.8592 1.75 4.15625 1.75C3.36967 1.75 2.88668 1.88345 2.625 1.99003Z" fill="#9AA1B5" />
                   </svg>
+
                   <span
-                    className="text-[10px] cursor-pointer text-[#B6BCCB] font-medium hover:text-[#526ED3] transition-colors"
+                    className="text-[11px] cursor-pointer text-[#1A1D2E] font-medium hover:text-[#526ED3] transition-colors"
                     onClick={e => {
                       e.stopPropagation()
                       navigator.clipboard.writeText(card.uid || `T${card.id}`).then(() => {
@@ -184,9 +185,9 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                   >{card.uid || `T${card.id}`}</span>
                 </div>
                 {card.reopened_count > 0 && (
-                  <div className="flex items-center gap-0.5 shrink-0">
+                  <div className="flex items-center top-0 right-3 absolute gap-0.5 shrink-0">
                     <img src="/imgs/tuiIconRedo.svg" alt="redo" className="w-3 h-3" style={{ filter: 'invert(65%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)' }} />
-                    <span className="text-[10px] font-bold text-[#5B6078]">{card.reopened_count}</span>
+                    <span className="text-[11px] font-bold text-[#5B6078]">{card.reopened_count}</span>
                   </div>
                 )}
               </div>
@@ -194,10 +195,11 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               {/* Deadline */}
               {deadline && (
                 <div className="flex items-center gap-1">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
-                    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.375 0C4.85825 0 5.25 0.391751 5.25 0.875V1.75L8.75 1.75V0.875C8.75 0.391751 9.14175 0 9.625 0C10.1082 0 10.5 0.391751 10.5 0.875V1.75H11.0836C12.2109 1.75 13.125 2.66413 13.125 3.79138L13.125 11.9586C13.125 13.0859 12.2109 14 11.0836 14L2.91637 14C1.78913 14 0.875 13.0859 0.875 11.9586L0.875 3.79138C0.875 2.66413 1.78913 1.75 2.91637 1.75L3.5 1.75L3.5 0.875C3.5 0.391751 3.89175 0 4.375 0ZM3.54969 3.5H2.91637C2.75562 3.5 2.625 3.63062 2.625 3.79138L2.625 5.25L11.375 5.25V3.79138C11.375 3.63062 11.2444 3.5 11.0836 3.5L10.4503 3.5C10.3303 3.84 10.0061 4.08362 9.625 4.08362C9.24391 4.08362 8.91972 3.84 8.79969 3.5L5.20031 3.5C5.08028 3.84 4.75609 4.08362 4.375 4.08362C3.99391 4.08362 3.66972 3.84 3.54969 3.5ZM11.375 7L2.625 7L2.625 11.9586C2.625 12.1194 2.75562 12.25 2.91637 12.25L11.0836 12.25C11.2444 12.25 11.375 12.1194 11.375 11.9586L11.375 7Z" fill="#9AA1B5" />
                   </svg>
-                  <span className={`text-[10px] font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[#8F95A8]'}`}>
+
+                  <span className={`text-[11px] font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[#1A1D2E]'}`}>
                     {fmtDate(card.deadline)}
                   </span>
                 </div>
@@ -208,18 +210,28 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 <div className="flex items-center gap-2">
                   {durationStr && (
                     <div className="flex items-center gap-1">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B6BCCB" strokeWidth="2" className="shrink-0">
-                        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_928_475044)">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M6.98926 0.292006C7.87708 0.281132 8.75864 0.447081 9.58203 0.77931C10.4053 1.11149 11.1545 1.60371 11.7861 2.22755C12.4177 2.85147 12.9194 3.5949 13.2617 4.41408C13.604 5.23335 13.7803 6.11309 13.7803 7.00099C13.7802 7.88874 13.604 8.7678 13.2617 9.58693C12.9194 10.4061 12.4178 11.1495 11.7861 11.7735C11.1545 12.3973 10.4053 12.8895 9.58203 13.2217C8.75863 13.5539 7.87709 13.7199 6.98926 13.709C5.22454 13.6873 3.53911 12.9704 2.29883 11.7149C1.05874 10.4593 0.363401 8.76569 0.363281 7.00099C0.363281 5.23611 1.05861 3.54179 2.29883 2.28615C3.53911 1.03058 5.22454 0.313731 6.98926 0.292006ZM7.01074 2.04201C5.70639 2.05808 4.46068 2.58761 3.54395 3.51564C2.62715 4.44375 2.11328 5.69641 2.11328 7.00099C2.1134 8.30539 2.62727 9.55736 3.54395 10.4854C4.46068 11.4134 5.70638 11.9429 7.01074 11.959C7.66698 11.967 8.31912 11.8442 8.92773 11.5986C9.53613 11.3531 10.0899 10.9894 10.5566 10.5283C11.0235 10.0671 11.3945 9.51768 11.6475 8.91212C11.9004 8.30674 12.0302 7.65708 12.0303 7.00099C12.0303 6.34472 11.9005 5.69442 11.6475 5.08888C11.3945 4.48332 11.0235 3.93388 10.5566 3.47267C10.0899 3.01161 9.53613 2.64791 8.92773 2.40236C8.31912 2.15679 7.66698 2.03397 7.01074 2.04201ZM7 2.62501C7.48322 2.62501 7.87495 3.0168 7.875 3.50001L7.875 6.459L9.72559 7.3838C10.1576 7.59989 10.3331 8.12548 10.1172 8.55763C9.9012 8.98977 9.37555 9.16499 8.94336 8.94923L6.60937 7.78322C6.31287 7.63502 6.12598 7.33149 6.12598 7.00001L6.12598 3.50001C6.12602 3.01697 6.517 2.62528 7 2.62501Z" fill="#9AA1B5" />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_928_475044">
+                            <rect width="14" height="14" fill="white" />
+                          </clipPath>
+                        </defs>
                       </svg>
-                      <span className="text-[10px] text-[#8F95A8] font-medium">{durationStr}</span>
+
+                      <span className="text-[11px] text-[#1A1D2E] font-medium">{durationStr}</span>
                     </div>
                   )}
                   {countdown && (
                     <div className="flex items-center gap-1">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" className="shrink-0">
-                        <path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.0837 1.16675V2.91675C11.0837 5.17191 9.25549 7.00008 7.00033 7.00008M2.91699 1.16675L2.91699 2.91675C2.91699 5.17191 4.74516 7.00008 7.00033 7.00008M7.00033 7.00008C9.25549 7.00008 11.0837 8.82825 11.0837 11.0834L11.0837 12.8334M7.00033 7.00008C4.74516 7.00008 2.91699 8.82825 2.91699 11.0834L2.91699 12.8334" stroke="#9AA1B5" stroke-width="1.5" />
+                        <path d="M2.33398 1.16675L11.6673 1.16675M11.6673 12.8334L2.33398 12.8334" stroke="#9AA1B5" stroke-width="1.5" stroke-linecap="round" />
                       </svg>
-                      <span className="text-[10px] font-bold text-[#EF4444]">{countdown}</span>
+
+                      <span className="text-[11px] font-bold text-[#EF4444]">{countdown}</span>
                     </div>
                   )}
                 </div>
@@ -227,7 +239,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
 
               <div className='mt-auto'>
                 {/* Divider */}
-                <div className="border-t  mb-2 border-[#F1F3F9] dark:border-[#333535]" />
+                <div className="  mb-2 dark:border-[#333535]" />
 
                 {/* Assignee */}
                 <div className="flex  mt-auto  items-center gap-1.5">
@@ -245,7 +257,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                     <p className="text-[11px] font-bold text-[#1A1D2E] dark:text-white truncate leading-tight">
                       {assignee}
                     </p>
-                    <p className="text-[10px] text-[#8F95A8] truncate leading-tight">
+                    <p className="text-[11px] text-[#1A1D2E] truncate leading-tight">
                       {position || 'Dasturchi'}
                     </p>
                   </div>
