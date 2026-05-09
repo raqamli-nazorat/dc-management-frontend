@@ -7,7 +7,8 @@ import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
-import { MeetingAttendanceModal, MeetingAbsenceModal } from './MeetingModals'
+import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal } from './MeetingModals'
+import { useAuth } from '../context/AuthContext'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -236,6 +237,7 @@ function Breadcrumb() {
 
 export default function Layout() {
   const { action, customAction, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
+  const { user } = useAuth()
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifs, setNotifs] = useState([...NOTIFS_DATA].sort((a, b) => {
     const toSortable = (d) => d.split('.').reverse().join('-')
@@ -250,6 +252,7 @@ export default function Layout() {
   const unreadCount = notifs.filter(n => !n.read).length
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
+  const [activeOpenMeeting, setActiveOpenMeeting] = useState(null) // { meetingId, projectId }
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -257,6 +260,28 @@ export default function Layout() {
   const handleNotifClick = (n) => {
     const type = n.raw?.type || ''
     const title = n.title?.toLowerCase() || ''
+    const extraData = n.raw?.extra_data || n.raw?.data?.extra_data || {}
+
+    // extra_data.action === 'close_meeting' bo'lsa — davomat modalini ochish
+    if (extraData?.action === 'close_meeting') {
+      const meetingId = extraData.meeting_id
+      if (meetingId) {
+        setActiveAttendanceMeetingId(meetingId)
+        setNotifOpen(false)
+        return
+      }
+    }
+
+    // extra_data.action === 'open_meeting' bo'lsa — sabab yozish modalini ochish
+    if (extraData?.action === 'open_meeting') {
+      const meetingId = extraData.meeting_id
+      const projectId = extraData.project_id
+      if (meetingId) {
+        setActiveOpenMeeting({ meetingId, projectId })
+        setNotifOpen(false)
+        return
+      }
+    }
 
     // Allaqachon o'qilgan bo'lsa backend ga so'rov yuborilmaydi (markRead ichida tekshiriladi)
 
@@ -576,6 +601,17 @@ export default function Layout() {
             meetingTitle={activeAbsence.meetingTitle}
             meetingDate={activeAbsence.meetingDate}
             onClose={() => setActiveAbsence(null)} 
+          />
+        </>
+      )}
+
+      {activeOpenMeeting && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveOpenMeeting(null)} />
+          <MeetingOpenModal
+            meetingId={activeOpenMeeting.meetingId}
+            userId={user?.id}
+            onClose={() => setActiveOpenMeeting(null)}
           />
         </>
       )}
