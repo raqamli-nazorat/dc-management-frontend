@@ -12,7 +12,7 @@ import { useAuth } from '../context/AuthContext'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
-  dashboard: 'Dashboard', users: 'Foydalanuvchilar', roles: 'Rollar',
+  dashboard: 'Analitika', users: 'Foydalanuvchilar', roles: 'Rollar',
   projects: 'Loyihalar', payments: "Xarajat so'rovlari", finance: 'Ish haqi',
   history: 'Tarix',
   reports: 'Hisobotlar', messages: 'Xabarlar', settings: 'Sozlamalar',

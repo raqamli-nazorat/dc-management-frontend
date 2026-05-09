@@ -60,7 +60,7 @@ const DetailModal = ({ id, onClose }) => {
             <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer z-10">
                 <FaXmark size={14} />
             </button>
-            <div className="relative w-full max-w-[600px] h-[90vh] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+            <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
 
 
                 {/* Header */}
@@ -197,7 +197,7 @@ const DetailModal = ({ id, onClose }) => {
 
 
                 {/* Footer */}
-                <div className="px-7 py-5 flex items-center rounded-b-2xl border-t border-[#F1F3F9] dark:border-[#292A2A] sticky bottom-0 z-10 bg-white dark:bg-[#111111]">
+                <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-white dark:bg-[#111111]">
                     {!loading &&
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Faolmi?</span>
