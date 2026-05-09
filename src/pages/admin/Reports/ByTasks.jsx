@@ -3,8 +3,27 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, Select, ConfigProvider, theme } from 'antd'
+import { DatePicker, Select, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
+
+const MAIN_COLUMNS = [
+  { key: 'prefix', label: 'Titul', width: 100 },
+  { key: 'project', label: 'Loyiha nomi', width: 180 },
+  { key: 'title', label: 'Vazifa nomi', width: 180 },
+  { key: 'assignee', label: 'Topshiruvchi', width: 250 },
+  { key: 'created_by', label: 'Muallif', width: 250 },
+  { key: 'priority', label: 'Darajasi', width: 140 },
+  { key: 'status', label: 'Holati', width: 120 },
+  { key: 'type', label: 'Turi', width: 140 },
+  { key: 'task_price', label: 'Vazifa narxi (UZS)', width: 150 },
+  { key: 'penalty_percentage', label: 'Jarima foizi (%)', width: 150 },
+  { key: 'deadline', label: 'Muddati', width: 150 },
+  { key: 'created_at', label: 'Yaratilgan vaqti', width: 150 },
+  { key: 'sprint', label: 'Sprint raqami', width: 150 },
+  { key: 'position', label: 'Kim uchun', width: 150 },
+  { key: 'reopened_count', label: 'Qaytishlar soni', width: 150 },
+  { key: 'rejection_reason', label: 'Bekor qilish sababi', width: 150 },
+]
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -95,6 +114,36 @@ const Employee = () => {
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
+  const RIGHT_PINNED_KEYS = ['deadline', 'created_at', 'sprint', 'position', 'reopened_count', 'rejection_reason'];
+  const [tablePin, setTablePin] = useState({
+    number: false,
+    project: false,
+  })
+
+  const handlePin = (key, value) => {
+    setTablePin(prev => ({ ...prev, [key]: value }))
+  }
+
+  const getPinnedLeft = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+    for (const col of MAIN_COLUMNS) {
+      if (col.key === key) return offset
+      if (tablePin[col.key]) offset += col.width
+    }
+    return undefined
+  }
+
+  const getPinnedRight = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+    for (let i = MAIN_COLUMNS.length - 1; i >= 0; i--) {
+      const col = MAIN_COLUMNS[i]
+      if (col.key === key) return offset
+      if (tablePin[col.key]) offset += col.width
+    }
+    return undefined
+  }
 
   useEffect(() => {
     if (!filterModal) return
@@ -588,7 +637,7 @@ const Employee = () => {
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    
+
     if (firstDot === -1) {
       return Number(intPart) > 100 ? '100' : intPart
     } else {
@@ -617,12 +666,6 @@ const Employee = () => {
       return cleaned
     }, {})
   }
-
-  const hasActiveFilters = Object.values(filters).some((value) => {
-    if (value === undefined || value === null || value === '') return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
 
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
@@ -716,7 +759,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-[#222323] text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[#222323] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -1046,83 +1089,87 @@ const Employee = () => {
             <table className="text-left border-collapse min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-2 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold text-center" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
-                  <th className="p-3 text-xs w-[100px] z-20! font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">Titul</th>
-                  <th className="p-3 text-xs font-bold sticky left-[48px] z-20! bg-[#7186ED] dark:bg-[#1E2021] w-[180px] text-end" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Loyiha nomi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Vazifa nomi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Topshiruvchi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Darajasi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[120px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Holati</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-center">Vazifa narxi (UZS)</th>
-                  <th className="p-3 text-xs font-bold w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Jarima foizi (%)</th>
-                  <th className="p-3 text-xs sticky right-[155px] z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold w-[150px] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Muddati</th>
-                  <th className="p-3 text-xs sticky right-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold w-[150px] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Yaratilgan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Sprint raqami</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Kim uchun</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Qaytishlar soni</th>
-                  <th className="p-3 text-xs font-bold border-r w-[150px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilish sababi</th>
+                  <th className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] w-[40px] dark:border-[#292A2A] text-center" >№</th>
+                  {MAIN_COLUMNS.map((col) => {
+                    const isRight = RIGHT_PINNED_KEYS.includes(col.key);
+                    return (
+                      <th
+                        key={col.key}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        style={{
+                          width: col.width,
+                          minWidth: col.width,
+                          maxWidth: col.width,
+                          left: isRight ? undefined : getPinnedLeft(col.key),
+                          right: isRight ? getPinnedRight(col.key) : undefined,
+                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2'))) : 'none',
+                          textAlign: (col.key === 'number' || col.key === 'status' || col.key === 'type' || col.key === 'sprint' || col.key === 'reopened_count') ? 'center' : (col.key === 'prefix' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by' || col.key === 'rejection_reason') ? 'start' : 'end'
+                        }}
+                      >
+                        <div className={`flex items-center gap-2 ${(col.key === 'number' || col.key === 'status' || col.key === 'type' || col.key === 'sprint' || col.key === 'reopened_count') ? 'justify-center' : (col.key === 'prefix' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by' || col.key === 'rejection_reason') ? 'justify-start' : 'justify-end'}`}>
+                          <Checkbox
+                            checked={tablePin[col.key]}
+                            onChange={(e) => handlePin(col.key, e.target.checked)}
+                            className="custom-header-checkbox"
+                          />
+                          {col.label}
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] " key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 dark:text-white text-center sticky w-[45px] left-0 z-10! bg-slate-50 dark:bg-[#1E2021]"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                  <tr className="border-b border-slate-100 dark:border-[#292A2A]" key={item.id || index}>
+
+                    <td className={`p-3 text-xs text-slate-500 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 border-r`}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs font-medium text-slate-500 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {item?.prefix}
-                    </td>
-                    <td className="p-3 text-xs font-medium text-slate-700 dark:text-white dark:bg-[#1E2021] text-end sticky left-[48px] z-10! bg-slate-50"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
-                      {item?.project}
-                    </td>
-                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.title}
-                    </td>
-                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.assignee}
-                    </td>
-                    <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.created_by}
-                    </td>
-                    <td className="p-3 text-xs font-medium text-slate-900 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {priority_type.find((s) => s?.value === item?.priority)?.label}
-                    </td>
-                    <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {status[item?.status]}
-                    </td>
-                    <td className="p-3 text-xs font-medium border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {type.find((s) => s?.value === item?.type)?.label}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.task_price ? item.task_price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ') : ''}
-                    </td>
-                    <td className="p-3 text-xs text-end">
-                      {item?.penalty_percentage ? Number(item.penalty_percentage) : ''}
-                    </td>
-                    <td className="p-3 text-xs sticky right-[155px] z-10! bg-white dark:bg-[#1E2021] text-start dark:text-white"
-                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
-                      {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs sticky right-0 z-10! bg-white dark:bg-[#1E2021] text-start dark:text-white"
-                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
-                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
-                      {item?.sprint}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : ''}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.reopened_count || ''}
-                    </td>
-                    <td className="p-3 text-xs border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item?.rejection_reason}
-                    </td>
+
+                    {MAIN_COLUMNS.map((col) => {
+                      const isPinned = !!tablePin[col.key];
+                      const isRight = RIGHT_PINNED_KEYS.includes(col.key);
+
+                      let content = null;
+                      switch (col.key) {
+                        case 'number': content = index + 1; break;
+                        case 'prefix': content = item?.prefix; break;
+                        case 'project': content = item?.project; break;
+                        case 'title': content = item?.title; break;
+                        case 'assignee': content = item?.assignee; break;
+                        case 'created_by': content = item?.created_by; break;
+                        case 'priority': content = priority_type.find((s) => s?.value === item?.priority)?.label; break;
+                        case 'status': content = status[item?.status]; break;
+                        case 'type': content = type.find((s) => s?.value === item?.type)?.label; break;
+                        case 'task_price': content = item?.task_price ? formatNum(item.task_price) : ''; break;
+                        case 'penalty_percentage': content = item?.penalty_percentage ? Number(item.penalty_percentage) : ''; break;
+                        case 'deadline': content = item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'created_at': content = item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'sprint': content = item?.sprint; break;
+                        case 'position': content = item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : ''; break;
+                        case 'reopened_count': content = item?.reopened_count || ''; break;
+                        case 'rejection_reason': content = item?.rejection_reason; break;
+                        default: content = '';
+                      }
+
+                      return (
+                        <td
+                          key={col.key}
+                          className={`p-3 text-xs border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-white dark:bg-[#1E2021] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'project' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'task_price' ? 'font-bold text-slate-900 dark:text-white text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'type' || col.key === 'deadline' || col.key === 'created_at' || col.key === 'sprint' || col.key === 'reopened_count') ? 'text-center' : ''}`}
+                          style={{
+                            width: col.width,
+                            minWidth: col.width,
+                            maxWidth: col.width,
+                            left: isRight ? undefined : getPinnedLeft(col.key),
+                            right: isRight ? getPinnedRight(col.key) : undefined,
+                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2'))) : 'none'
+                          }}
+                        >
+                          {content}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
@@ -1142,6 +1189,33 @@ const Employee = () => {
           top: 4px;
           right: 4px;
           z-index: 10;
+        }
+
+        .custom-header-checkbox .ant-checkbox-inner {
+          background-color: white !important;
+          border-color: white !important;
+          border-radius: 6px !important;
+          width: 18px !important;
+          height: 18px !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #3f57b3 !important;
+          border-color: #3f57b3 !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-inner::after {
+          border-color: white !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-inner {
+          background-color: #292A2A !important;
+          border-color: #404040 !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #7186ED !important;
+          border-color: #7186ED !important;
         }
       `}</style>
 

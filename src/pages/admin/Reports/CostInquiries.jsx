@@ -3,8 +3,27 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, ConfigProvider, theme } from 'antd'
+import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
+
+const MAIN_COLUMNS = [
+  { key: 'number', label: '№', width: 45 },
+  { key: 'user', label: 'Ism Sharifi', width: 180 },
+  { key: 'project', label: 'Loyiha nomi', width: 200 },
+  { key: 'expense_category', label: 'Xarajat turi', width: 180 },
+  { key: 'type', label: 'Toifa', width: 250 },
+  { key: 'amount', label: 'Miqdori (UZS)', width: 140 },
+  { key: 'payment_method', label: 'To\'lov turi', width: 160 },
+  { key: 'status', label: 'Holati', width: 140 },
+  { key: 'reason', label: 'So\'rov sababi', width: 180 },
+  { key: 'created_at', label: 'So\'ralgan vaqti', width: 190 },
+  { key: 'paid_at', label: 'To\'langan vaqti', width: 160 },
+  { key: 'confirmed_at', label: 'Tasdiqlangan vaqti', width: 200 },
+  { key: 'accountant', label: 'Hisobchi', width: 200 },
+  { key: 'cancelled_at', label: 'Bekor qilingan vaqti', width: 220 },
+  { key: 'cancel_reason', label: 'Bekor qilish sababi', width: 180 },
+  { key: 'card_number', label: 'Kart raqami', width: 180 },
+]
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -84,6 +103,37 @@ const Employee = () => {
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
+  const RIGHT_PINNED_KEYS = ['created_at', 'paid_at', 'confirmed_at', 'accountant', 'cancelled_at', 'cancel_reason', 'card_number'];
+  const [tablePin, setTablePin] = useState({
+    number: false,
+    user: false,
+    project: false,
+  })
+
+  const handlePin = (key, value) => {
+    setTablePin(prev => ({ ...prev, [key]: value }))
+  }
+
+  const getPinnedLeft = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+    for (const col of MAIN_COLUMNS) {
+      if (col.key === key) return offset
+      if (tablePin[col.key]) offset += col.width
+    }
+    return undefined
+  }
+
+  const getPinnedRight = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+    for (let i = MAIN_COLUMNS.length - 1; i >= 0; i--) {
+      const col = MAIN_COLUMNS[i]
+      if (col.key === key) return offset
+      if (tablePin[col.key]) offset += col.width
+    }
+    return undefined
+  }
 
   useEffect(() => {
     if (!filterModal) return
@@ -695,7 +745,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 text-sm font-semibold cursor-pointer dark:bg-[#222323]`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 text-sm font-semibold cursor-pointer dark:bg-[#222323]`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -1031,79 +1081,81 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th className="p-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
-                  <th className="p-3 text-xs w-[180px] text-start sticky left-[45px] z-20! bg-[#7186ED] dark:bg-[#1E2021] font-bold border-[#e2e6f2] dark:border-[#292A2A]" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Ism Sharifi</th>
-                  <th className="p-3 text-xs font-bold w-[200px] sticky left-[225px] z-20! bg-[#7186ED] dark:bg-[#1E2021] border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Loyiha nomi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Xarajat turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[250px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Toifa</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Miqdori (UZS)</th>
-                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] dark:border-[#292A2A] text-end">To'lov turi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[140px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
-                  <th className="p-3 text-xs font-bold border-r w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'rov sababi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[190px] border-[#e2e6f2] dark:border-[#292A2A] text-end">So'ralgan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[160px] border-[#e2e6f2] dark:border-[#292A2A] text-end">To'langan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Tasdiqlangan vaqti</th>
-                  <th className="p-3 text-xs font-bold border-r w-[200px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Hisobchi</th>
-                  <th className="p-3 text-xs font-bold border-r w-[220px] border-[#e2e6f2] dark:border-[#292A2A] text-start">Bekor qilingan vaqti</th>
-                  <th className="p-3 text-xs font-bold w-[180px] border-[#e2e6f2] dark:border-[#292A2A] text-end">Bekor qilish sababi</th>
-                  <th className="p-3 text-xs w-[180px] bg-[#7186ED] dark:bg-[#1E2021] z-20! sticky right-0 dark:border-[#292A2A] font-bold border-[#e2e6f2] text-end" style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>Kart raqami</th>
+                  {MAIN_COLUMNS.map((col) => {
+                    const isRight = RIGHT_PINNED_KEYS.includes(col.key);
+                    return (
+                      <th
+                        key={col.key}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        style={{
+                          width: col.width,
+                          minWidth: col.width,
+                          maxWidth: col.width,
+                          left: isRight ? undefined : getPinnedLeft(col.key),
+                          right: isRight ? getPinnedRight(col.key) : undefined,
+                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2')) : 'none',
+                          textAlign: col.key === 'number' ? 'center' : (col.key === 'user' || col.key === 'project' || col.key === 'accountant' || col.key === 'reason') ? 'start' : 'end'
+                        }}
+                      >
+                        <div className={`flex items-center gap-2 ${col.key === 'number' ? 'justify-center' : (col.key === 'user' || col.key === 'project' || col.key === 'accountant' || col.key === 'reason') ? 'justify-start' : 'justify-end'}`}>
+                          <Checkbox
+                            checked={tablePin[col.key]}
+                            onChange={(e) => handlePin(col.key, e.target.checked)}
+                            className="custom-header-checkbox"
+                          />
+                          {col.label}
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
+
                 {UserReports.map((item, index) => (
-                  <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] ">
-                    <td className="p-3 text-xs text-slate-500 border-[#e2e6f2] dark:border-[#292A2A] sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
-                      {index + 1}
-                    </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] sticky left-[45px] z-10! bg-white dark:bg-[#1E2021] text-start"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
-                      {item.user}
-                    </td>
-                    <td className="p-3 text-xs font-semibold text-slate-700 dark:bg-[#1E2021] dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[225px] z-10! bg-white"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
-                      {item.project}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.expense_category}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {cost_type.find((t) => t.value === item.type)?.label}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.amount ? Number(item.amount).toLocaleString('uz-UZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? 'To\'langan' : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {item.reason}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-start">
-                      {item.accountant}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : ''}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-end">
-                      {item.cancel_reason}
-                    </td>
-                    <td className="p-3 text-xs sticky right-0 z-10! bg-white dark:bg-[#1E2021] text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-center"
-                      style={{ boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #CBD5E1' }}>
-                      {item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''}
-                    </td>
+                  <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors">
+                    {MAIN_COLUMNS.map((col) => {
+                      const isPinned = !!tablePin[col.key];
+                      const isRight = RIGHT_PINNED_KEYS.includes(col.key);
+
+                      let content = null;
+                      switch (col.key) {
+                        case 'number': content = index + 1; break;
+                        case 'user': content = item.user; break;
+                        case 'project': content = item.project; break;
+                        case 'expense_category': content = item.expense_category; break;
+                        case 'type': content = cost_type.find((t) => t.value === item.type)?.label; break;
+                        case 'amount': content = item.amount ? formatNum(item.amount) : ''; break;
+                        case 'payment_method': content = item.payment_method === 'card' ? 'Karta orqali' : item.payment_method === 'cash' ? 'Naqd pul' : item.payment_method; break;
+                        case 'status': content = item.status === 'cancelled' ? 'Bekor qilingan' : item.status === 'paid' ? 'To\'langan' : item.status === 'confirmed' ? 'Tasdiqlangan' : item.status; break;
+                        case 'reason': content = item.reason; break;
+                        case 'created_at': content = item.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'paid_at': content = item.paid_at ? dayjs(item.paid_at).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'confirmed_at': content = item.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'accountant': content = item.accountant; break;
+                        case 'cancelled_at': content = item.cancelled_at ? dayjs(item.cancelled_at).format('DD.MM.YYYY HH:mm') : ''; break;
+                        case 'cancel_reason': content = item.cancel_reason; break;
+                        case 'card_number': content = item.card_number ? String(item.card_number).replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') : ''; break;
+                        default: content = '';
+                      }
+
+                      return (
+                        <td
+                          key={col.key}
+                          className={`p-3 text-xs border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-white dark:bg-[#1E2021] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'project') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'amount' ? 'font-bold text-slate-900 dark:text-white text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'payment_method' || col.key === 'status' || col.key === 'created_at' || col.key === 'paid_at' || col.key === 'confirmed_at' || col.key === 'cancelled_at' || col.key === 'card_number') ? 'text-center' : ''} ${col.key === 'reason' || col.key === 'accountant' ? 'text-start' : ''}`}
+                          style={{
+                            width: col.width,
+                            minWidth: col.width,
+                            maxWidth: col.width,
+                            left: isRight ? undefined : getPinnedLeft(col.key),
+                            right: isRight ? getPinnedRight(col.key) : undefined,
+                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2')) : 'none'
+                          }}
+                        >
+                          {content}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
@@ -1123,6 +1175,33 @@ const Employee = () => {
           top: 4px;
           right: 4px;
           z-index: 10;
+        }
+
+        .custom-header-checkbox .ant-checkbox-inner {
+          background-color: white !important;
+          border-color: white !important;
+          border-radius: 6px !important;
+          width: 18px !important;
+          height: 18px !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #3f57b3 !important;
+          border-color: #3f57b3 !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-inner::after {
+          border-color: white !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-inner {
+          background-color: #292A2A !important;
+          border-color: #404040 !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #7186ED !important;
+          border-color: #7186ED !important;
         }
       `}</style>
 

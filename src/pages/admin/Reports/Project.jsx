@@ -3,9 +3,8 @@ import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
-import { DatePicker, ConfigProvider, theme } from 'antd'
+import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
-import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
 import { toast } from '../../../Toast/ToastProvider'
@@ -19,7 +18,6 @@ import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 import { FiCalendar } from 'react-icons/fi'
 import { IoCloseCircle } from 'react-icons/io5'
-import { MdExpandMore } from 'react-icons/md'
 
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
@@ -43,6 +41,35 @@ const initialFilters = {
   created_by: ''
 }
 
+const MAIN_COLUMNS = [
+  { key: 'prefix', label: 'Titul', width: 100 },
+  { key: 'title', label: 'Nomi', width: 200 },
+  { key: 'description', label: "Ta'rifi", width: 250 },
+  { key: 'deadline', label: 'Muddati', width: 180 },
+  { key: 'status', label: 'Holati', width: 120 },
+  { key: 'project_price', label: 'Boshqaruvchi bonusi (UZS)', width: 220 },
+  { key: 'created_by_name', label: 'Muallif', width: 220 },
+  { key: 'manager_name', label: 'Boshqaruvchi', width: 220 },
+  { key: 'employees_names', label: 'Xodimlar', width: 220 },
+  { key: 'testers_names', label: 'Sinovchilar', width: 220 },
+]
+
+const GROUP_TASKS = { key: 'tasks', label: 'Vazifalar', colSpan: 8, subWidth: 140 }
+const GROUPS = [GROUP_TASKS]
+
+const GROUP_SUBS = {
+  tasks: [
+    { key: 'tasks_jami', label: 'Jami' },
+    { key: 'tasks_qilish', label: 'Qilish kerak' },
+    { key: 'tasks_jarayonda', label: 'Jarayonda' },
+    { key: 'tasks_muddati', label: "Muddati o'tgan" },
+    { key: 'tasks_bajarilgan', label: 'Bajarilgan' },
+    { key: 'tasks_ishga', label: 'Ishga tushurilgan' },
+    { key: 'tasks_tekshirilgan', label: 'Tekshirilgan' },
+    { key: 'tasks_rad', label: 'Rad etilgan' },
+  ],
+}
+
 const Employee = () => {
   const { isDark } = useTheme()
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
@@ -61,6 +88,60 @@ const Employee = () => {
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
+  const [tablePin, setTablePin] = useState({
+    prefix: false,
+    title: false,
+  })
+
+  const handlePin = (key, value) => {
+    setTablePin(prev => {
+      const next = { ...prev, [key]: value }
+      if (GROUP_SUBS[key]) {
+        GROUP_SUBS[key].forEach(sub => { next[sub.key] = value })
+      }
+      return next
+    })
+  }
+
+  const getPinnedLeft = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+    for (const col of MAIN_COLUMNS) {
+      if (col.key === key) return offset
+      if (tablePin[col.key]) offset += col.width
+    }
+    return undefined
+  }
+
+  const getSubPinnedLeft = (subKey) => {
+    if (!tablePin[subKey]) return undefined
+    let offset = 0
+    for (const col of MAIN_COLUMNS) {
+      if (tablePin[col.key]) offset += col.width
+    }
+    for (const group of GROUPS) {
+      const subs = GROUP_SUBS[group.key]
+      for (const sub of subs) {
+        if (sub.key === subKey) return offset
+        if (tablePin[sub.key]) offset += group.subWidth
+      }
+    }
+    return undefined
+  }
+
+  const getSubPinnedRight = (subKey) => {
+    if (!tablePin[subKey]) return undefined
+    let offset = 0
+    // Only 'tasks' group is at the end (right side)
+    const subs = GROUP_SUBS.tasks
+    const idx = subs.findIndex(s => s.key === subKey)
+    if (idx === -1) return undefined
+
+    for (let i = subs.length - 1; i > idx; i--) {
+      if (tablePin[subs[i].key]) offset += 140
+    }
+    return offset
+  }
 
   useEffect(() => {
     if (!filterModal) return
@@ -592,12 +673,6 @@ const Employee = () => {
     }, {})
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => {
-    if (value === undefined || value === null || value === '') return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
-
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'deadline_min' || key === 'deadline_max') {
@@ -692,7 +767,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-red-100 rounded-xl text-red-600 dark:bg-[#1E2021] text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[#1E2021] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -913,93 +988,122 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs sticky w-[45px] left-0 z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-center" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>№</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[100px] sticky left-[42px] z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-start" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Titul</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[200px] sticky left-[129px] z-20! bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-end" style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>Nomi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[250px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Ta'rifi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[180px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muddati</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[120px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Holati</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi bonusi (UZS)</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Muallif</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Boshqaruvchi</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">Xodimlar</th>
-                  <th rowSpan={2} className="py-2 px-3 text-xs w-[220px] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">Sinovchilar</th>
-                  <th colSpan={8} className="py-2 px-3 text-xs font-bold border-b border-[#e2e6f2] dark:border-[#292A2A] text-center">Vazifalar</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-center" >№</th>
+                  {MAIN_COLUMNS.map((col) => (
+                    <th
+                      key={col.key}
+                      rowSpan={2}
+                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[#e2e6f2] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                      style={{
+                        width: col.width,
+                        minWidth: col.width,
+                        maxWidth: col.width,
+                        left: getPinnedLeft(col.key),
+                        boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1',
+                        textAlign: col.key === 'number' ? 'center' : (col.key === 'title' || col.key === 'description' || col.key === 'project_price' || col.key === 'created_by_name' || col.key === 'manager_name' || col.key === 'employees_names') ? 'end' : (col.key === 'prefix' ? 'start' : 'center')
+                      }}
+                    >
+                      <div className={`flex items-center gap-2 ${col.key === 'number' ? 'justify-center' : (col.key === 'prefix' ? 'justify-start' : 'justify-end')}`}>
+                        <Checkbox
+                          checked={tablePin[col.key]}
+                          onChange={(e) => handlePin(col.key, e.target.checked)}
+                          className="custom-header-checkbox"
+                        />
+                        {col.label}
+                      </div>
+                    </th>
+                  ))}
+                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[#e2e6f2] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>
+                    <div className="flex items-center justify-center gap-2">
+                      <Checkbox
+                        checked={tablePin.tasks}
+                        onChange={(e) => handlePin('tasks', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Vazifalar
+                    </div>
+                  </th>
                 </tr>
-                <tr>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1e2021] min-w-[140px] max-w-[200px]">Jami</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Qilish kerak</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Jarayonda</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Muddati o'tgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Bajarilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Ishga tushurilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Tekshirilgan</th>
-                  <th className="py-2 px-3 text-xs font-bold border-t border-[#e2e6f2] text-center dark:border-[#292A2A] bg-[#7186ED] dark:bg-[#1E2021] min-w-[140px] max-w-[200px]">Rad etilgan</th> 
+                <tr className="bg-[#7186ED] dark:bg-[#1E2021] text-[10px] text-center">
+                  {GROUP_SUBS.tasks.map((sub) => (
+                    <th
+                      key={sub.key}
+                      className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
+                      style={{
+                        width: 140,
+                        minWidth: 140,
+                        maxWidth: 140,
+                        left: getSubPinnedLeft(sub.key),
+                        boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2'
+                      }}
+                    >
+                      <div className="flex items-center gap-0.5 justify-center">
+                        <Checkbox
+                          checked={!!tablePin[sub.key]}
+                          onChange={(e) => handlePin(sub.key, e.target.checked)}
+                          className="custom-header-checkbox scale-75"
+                        />
+                        {sub.label}
+                      </div>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors" key={item.id || index}>
-                    <td className="p-3 text-xs text-slate-500 border-[#e2e6f2] dark:border-[#292A2A] text-center sticky w-[45px] left-0 z-10! bg-white dark:bg-[#1E2021]"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                    <td className={`p-3 text-xs text-slate-500 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 border-r`}>
                       {index + 1}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-[#e2e6f2] dark:border-[#292A2A] text-start sticky left-[42px] z-10! bg-white dark:bg-[#1E2021]"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[#e2e6f2] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.prefix ? 'sticky' : ''}`}
+                      style={{ width: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.prefix}
                     </td>
-                    <td className="p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-[#e2e6f2] dark:border-[#292A2A] sticky left-[129px] z-10! bg-white dark:bg-[#1E2021]"
-                      style={{ boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #CBD5E1' }}>
+                    <td className={`p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-t border-[#e2e6f2] dark:border-[#292A2A] z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.title ? 'sticky' : ''}`}
+                      style={{ width: 200, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.title}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.description ? 'sticky' : ''}`}
+                      style={{ width: 250, left: getPinnedLeft('description'), boxShadow: tablePin.description ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.description}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.deadline ? 'sticky' : ''}`}
+                      style={{ width: 180, left: getPinnedLeft('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.status ? 'sticky' : ''}`}
+                      style={{ width: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {tableStatuses[item?.status]}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className={`p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.project_price ? 'sticky' : ''}`}
+                      style={{ width: 220, left: getPinnedLeft('project_price'), boxShadow: tablePin.project_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.project_price ? formatNum(item.project_price) : ''}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.created_by_name ? 'sticky' : ''}`}
+                      style={{ width: 220, left: getPinnedLeft('created_by_name'), boxShadow: tablePin.created_by_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.created_by_name}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.manager_name ? 'sticky' : ''}`}
+                      style={{ width: 220, left: getPinnedLeft('manager_name'), boxShadow: tablePin.manager_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.manager_name}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-end">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.employees_names ? 'sticky' : ''}`}
+                      style={{ width: 220, left: getPinnedLeft('employees_names'), boxShadow: tablePin.employees_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.employees_names}
                     </td>
-                    <td className="p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.testers_names ? 'sticky' : ''}`}
+                      style={{ width: 220, left: getPinnedLeft('testers_names'), boxShadow: tablePin.testers_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2') : 'none' }}>
                       {item?.testers_names}
                     </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.total || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.todo || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.in_progress || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.overdue || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.done || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.production || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-r border-[#e2e6f2] dark:border-[#292A2A] text-center">
-                      {item?.task_stats?.checked || ''}
-                    </td>
-                    <td className="p-3 text-xs font-bold text-slate-700 dark:text-slate-300 text-center">
-                      {item?.task_stats?.rejected || ''}
-                    </td>
+
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.total || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.todo || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.in_progress || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.overdue || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.done || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.production || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.checked || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2' }}>{item?.task_stats?.rejected || ''}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1037,7 +1141,7 @@ const Employee = () => {
           selectedList={filters.manager ? filters.manager.split(',') : []}
           onConfirm={handleSelectManagerConfirm}
           title="Boshqaruvchi tanlang"
-          param={{roles: "manager"}}
+          param={{ roles: "manager" }}
           onClose={() => setSelectManager(false)}
         />
       )}
@@ -1047,7 +1151,7 @@ const Employee = () => {
           selectedList={filters.created_by ? filters.created_by.split(',') : []}
           onConfirm={handleSelectAuthorConfirm}
           title="Muallif tanlang"
-          param={{roles: "admin"}}
+          param={{ roles: "admin" }}
           onClose={() => setSelectAuthor(false)}
         />
       )}
@@ -1061,6 +1165,47 @@ const Employee = () => {
           onClose={() => setSelectTester(false)}
         />
       )}
+
+      <style>{`
+        .filter-notif::before {
+          content: '';
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #3f57b3;
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          z-index: 10;
+        }
+
+        .custom-header-checkbox .ant-checkbox-inner {
+          background-color: white !important;
+          border-color: white !important;
+          border-radius: 6px !important;
+          width: 18px !important;
+          height: 18px !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #3f57b3 !important;
+          border-color: #3f57b3 !important;
+        }
+        
+        .custom-header-checkbox .ant-checkbox-inner::after {
+          border-color: white !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-inner {
+          background-color: #292A2A !important;
+          border-color: #404040 !important;
+        }
+
+        .dark .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+          background-color: #7186ED !important;
+          border-color: #7186ED !important;
+        }
+      `}</style>
 
     </div >
   )
