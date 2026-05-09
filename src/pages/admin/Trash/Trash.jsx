@@ -416,13 +416,185 @@ function TasksTab() {
   )
 }
 
+/* ── Meetings Tab ── */
+function MeetingsTab() {
+  const [meetings, setMeetings]   = useState([])
+  const [loading, setLoading]     = useState(true)
+  const [search, setSearch]       = useState('')
+  const [confirmDelete, setConfirmDelete]   = useState(null)
+  const [confirmRestore, setConfirmRestore] = useState(null)
+  const [actionLoading, setActionLoading]   = useState(false)
+
+  const fetchData = useCallback(async (q = '') => {
+    setLoading(true)
+    try {
+      const params = { page_size: 100 }
+      if (q) params.search = q
+      const res = await axiosAPI.get('/meetings/trash/', { params })
+      const payload = res.data?.data ?? res.data
+      const list = Array.isArray(payload) ? payload : (payload.results ?? [])
+      setMeetings(list)
+    } catch (err) {
+      toast.error('Xatolik', getErrorMessage(err))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    const t = setTimeout(() => fetchData(search), 400)
+    return () => clearTimeout(t)
+  }, [search, fetchData])
+
+  const doRestore = async (id) => {
+    setActionLoading(true)
+    try {
+      await axiosAPI.post(`/meetings/${id}/restore/`)
+      setMeetings(prev => prev.filter(m => m.id !== id))
+      toast.success("Yig'ilish tiklandi", "Yig'ilish avvalgi holatiga qaytarildi")
+    } catch (err) {
+      toast.error('Xatolik', err?.response?.data?.error?.errorMsg || getErrorMessage(err))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const doDelete = async (id) => {
+    setActionLoading(true)
+    try {
+      await axiosAPI.delete(`/meetings/${id}/hard_delete/`)
+      setMeetings(prev => prev.filter(m => m.id !== id))
+      toast.delete("Muvaffaqiyatli o'chirildi", "Ma'lumot butunlay o'chirildi")
+    } catch (err) {
+      toast.error('Xatolik', err?.response?.data?.error?.errorMsg || getErrorMessage(err))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const minutesToDisplay = (mins) => {
+    if (!mins) return '—'
+    if (mins >= 60 && mins % 60 === 0) return `${mins / 60} soat`
+    return `${mins} daqiqa`
+  }
+
+  return (
+    <div className="flex flex-col flex-1 min-h-0 gap-4">
+      {/* Search */}
+      <div className="relative w-[220px] shrink-0">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]"
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Yig'ilishni izlash"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border
+            bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            focus:border-[var(--accent-sub)]"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="flex-1 overflow-auto">
+        <table className="w-full text-sm whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                  Tashkilotchi
+                </span>
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Boshlanish vaqti</th>
+              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Davomiyligi</th>
+              <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Tugatildimi?</th>
+              <th className="px-4 py-3 w-10" />
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <SkeletonRows cols={8} />
+            ) : meetings.map((m, i) => {
+              const organizer = m.participants_info?.find(u => u.id === m.organizer) ?? m.participants_info?.[0]
+              return (
+                <tr key={m.id}
+                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2">
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] font-medium">{m.uid || '—'}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{m.title}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{organizer?.username || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{fmtDate(m.start_time)}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{minutesToDisplay(m.duration_minutes)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${m.is_completed ? 'bg-[#22c55e]' : 'bg-[var(--error-sub)]'}`}>
+                      {m.is_completed
+                        ? <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        : <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                      }
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <RowMenu
+                      onRestore={() => setConfirmRestore(m.id)}
+                      onDelete={() => setConfirmDelete(m.id)}
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+
+        {!loading && meetings.length === 0 && (
+          <EmptyState
+            icon="/imgs/yigilishlarIcon.svg"
+            title="Chiqindi qutisi bo'sh"
+            description="O'chirilgan yig'ilishlar bu yerda ko'rinadi"
+          />
+        )}
+      </div>
+
+      <ConfirmationModal
+        showModal={!!confirmRestore}
+        title="Tiklashni tasdiqlaysizmi?"
+        description="Tanlangan yig'ilish avvalgi holatiga qaytariladi"
+        buttonText={actionLoading ? 'Tiklanmoqda...' : 'Tiklash'}
+        confirmIcon={<FaCheck size={13} />}
+        confirmColor="bg-[#22c55e] hover:bg-green-600"
+        onClose={() => setConfirmRestore(null)}
+        onAction={() => { doRestore(confirmRestore); setConfirmRestore(null) }}
+      />
+      <ConfirmationModal
+        showModal={!!confirmDelete}
+        title="Butunlay o'chirmoqchimisiz?"
+        description="Bu amalni bekor qilib bo'lmaydi. Ma'lumotlar butunlay o'chiriladi"
+        buttonText={actionLoading ? "O'chirilmoqda..." : "O'chirish"}
+        confirmIcon={<FaTrashCan size={13} />}
+        confirmColor="bg-[var(--error-strong)] hover:bg-red-600"
+        onClose={() => setConfirmDelete(null)}
+        onAction={() => { doDelete(confirmDelete); setConfirmDelete(null) }}
+      />
+    </div>
+  )
+}
+
 /* ── Main Page ── */
 export default function TrashPage() {
   const [activeTab, setActiveTab] = useState('projects')
 
   const tabs = [
-    { id: 'projects', label: 'Loyihalar' },
-    { id: 'tasks',    label: 'Vazifalar' },
+    { id: 'projects',  label: 'Loyihalar' },
+    { id: 'tasks',     label: 'Vazifalar' },
+    { id: 'meetings',  label: "Yig'ilishlar" },
   ]
 
   return (
@@ -447,7 +619,7 @@ export default function TrashPage() {
       </div>
 
       <div className="flex flex-col flex-1 min-h-0 pt-4">
-        {activeTab === 'projects' ? <ProjectsTab /> : <TasksTab />}
+        {activeTab === 'projects' ? <ProjectsTab /> : activeTab === 'tasks' ? <TasksTab /> : <MeetingsTab />}
       </div>
     </div>
   )

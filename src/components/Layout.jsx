@@ -587,7 +587,8 @@ export default function Layout() {
         <>
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAttendanceMeetingId(null)} />
           <MeetingAttendanceModal 
-            meetingId={activeAttendanceMeetingId} 
+            meetingId={activeAttendanceMeetingId}
+            closeMeetingOnSave
             onClose={() => setActiveAttendanceMeetingId(null)} 
           />
         </>
