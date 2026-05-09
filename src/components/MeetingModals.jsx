@@ -26,7 +26,7 @@ function UserAvatar({ user }) {
   )
 }
 
-export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish", date = "" }) {
+export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish", date = "", closeMeetingOnSave = false }) {
   const [participants, setParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -100,17 +100,35 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
         axiosAPI.patch(`/meeting-attendance/${p.id}/`, { is_attended: attendanceMap[p.id] })
       )
       await Promise.all(promises)
-      toast.success("Ishtirokchilar tasdiqlandi.", `"${dynamicTitle}" yig'ilishida qatnashganlar tasdiqlandi.`)
+
+      // Agar yakunlash rejimida bo'lsa — meetni tugatish
+      if (closeMeetingOnSave) {
+        try {
+          await axiosAPI.post(`/meetings/${meetingId}/close/`)
+        } catch (closeErr) {
+          // Agar allaqachon yopilgan bo'lsa (400/409) — xatoni e'tiborsiz qoldiramiz
+          const status = closeErr?.response?.status
+          if (status !== 400 && status !== 409) {
+            toast.error("Xatolik", "Yig'ilishni yakunlashda xatolik yuz berdi")
+            setSaving(false)
+            return
+          }
+        }
+        toast.success("Yig'ilish yakunlandi", `"${dynamicTitle}" yig'ilishi yakunlandi va davomat saqlandi.`)
+      } else {
+        toast.success("Ishtirokchilar tasdiqlandi.", `"${dynamicTitle}" yig'ilishida qatnashganlar tasdiqlandi.`)
+      }
+
       onClose()
     } catch {
-      toast.error("Xatolik", "Tasdiqlashda xatolik yuz berdi")
+      toast.error("Xatolik", "Davomatni saqlashda xatolik yuz berdi")
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[#F8F9FC] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#E2E6F2] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-[9999999] flex w-full sm:w-[500px] flex-col bg-[#F8F9FC] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#E2E6F2] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-6  shrink-0 bg-[#F8F9FC] dark:bg-[#1C1D1D]">
         <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E9ECF5] dark:bg-[#292A2A] text-[#1A1D2E] dark:text-white cursor-pointer hover:bg-[#E2E6F2] dark:hover:bg-[#333435]">

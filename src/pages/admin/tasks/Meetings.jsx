@@ -8,6 +8,7 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
+import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 
 const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
 const DURATION_UNITS = ['daqiqa', 'soat']
@@ -552,7 +553,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 }
 
 /* -- EditMeetingModal -- */
-function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit = true }) {
+function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit = true, onFinish }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -611,17 +612,6 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
       if (mins) body.duration_minutes = mins
 
       await onSave(meeting.id, body)
-
-      // is_completed true bo'lsa  /close/ endpoint orqali yopamiz
-      // faqat avval yopilmagan bo'lsa
-      if (form.is_completed && !meeting.is_completed) {
-        try {
-          await axiosAPI.post(`/meetings/${meeting.id}/close/`)
-        } catch (closeErr) {
-          toast.error('Yopishda xatolik', parseApiError(closeErr, "Yig'ilishni yopishda xatolik"))
-        }
-      }
-
       onClose()
     } catch (err) {
       toast.error('Xatolik', parseApiError(err, "Yig'ilish yangilashda xatolik"))
@@ -799,12 +789,16 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
             <div className="flex items-center gap-2.5">
-              <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
-              <button type="button"
-                onClick={() => canEdit && set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full ${canEdit ? 'cursor-pointer' : 'cursor-default'} ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
+              {!meeting.is_completed && onFinish && (
+                <button
+                  type="button"
+                  onClick={() => { onClose(); onFinish(meeting.id) }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer text-[#22c55e] border border-[#22c55e]/30 hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                  Yakunlash
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
@@ -1146,7 +1140,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
 
 /* -- RowMenu -- */
-function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
+function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   useEffect(() => {
@@ -1164,19 +1158,26 @@ function RowMenu({ onDetail, onEdit, onDelete, onClose: onCloseMeeting }) {
         </svg>
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-1 z-50 w-44 rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+        <div className="absolute top-full right-0 mt-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           <button onClick={() => { onDetail(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
             Ko'rish
           </button>
           <button onClick={() => { onEdit(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer  border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
             Tahrirlash
           </button>
+          {!isCompleted && (
+            <button onClick={() => { onFinish(); setOpen(false) }}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+              Yakunlash
+            </button>
+          )}
           <button onClick={() => { onDelete(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer ">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#2A1A1A] cursor-pointer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
             O'chirish
           </button>
@@ -1207,6 +1208,7 @@ export default function MeetingsPage() {
   const [meetingLoading, setMeetingLoading] = useState(false)
   const [projects, setProjects] = useState([])
   const [users, setUsers] = useState([])
+  const [attendanceMeetingId, setAttendanceMeetingId] = useState(null)
   const scrollRef = useRef(null)
 
   /* load projects & users once */
@@ -1447,7 +1449,8 @@ export default function MeetingsPage() {
                         <RowMenu
                           onDetail={() => loadMeetingDetail(m.id, 'edit')}
                           onEdit={() => loadMeetingDetail(m.id, 'edit')}
-                          onCloseMeeting={() => handleClose(m.id)}
+                          onFinish={() => setAttendanceMeetingId(m.id)}
+                          isCompleted={!!m.is_completed}
                           onDelete={() => handleDelete(m.id)}
                         />
                       )}
@@ -1491,6 +1494,7 @@ export default function MeetingsPage() {
       {editItem && (
         <EditMeetingModal meeting={editItem} onClose={() => setEditItem(null)}
           onSave={handleEdit} projects={projects} users={users}
+          onFinish={(id) => { setEditItem(null); setAttendanceMeetingId(id) }}
           canEdit={(() => {
             const isAdminOrManager = user?.active_role === 'admin' || user?.active_role === 'manager'
             const isOwner = editItem.organizer === user?.id || editItem.created_by === user?.id
@@ -1504,6 +1508,16 @@ export default function MeetingsPage() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
         </div>
+      )}
+      {attendanceMeetingId && (
+        <>
+          <div className="fixed inset-0 z-[9999] bg-black/30" onClick={() => setAttendanceMeetingId(null)} />
+          <MeetingAttendanceModal
+            meetingId={attendanceMeetingId}
+            closeMeetingOnSave
+            onClose={() => { setAttendanceMeetingId(null); loadMeetings(filters, search, 1) }}
+          />
+        </>
       )}
     </div>
   )
