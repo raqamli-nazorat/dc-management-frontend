@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { axiosAPI } from "../../../../service/axiosAPI";
 import { toast } from "../../../../Toast/ToastProvider";
@@ -83,10 +83,10 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
 
                     {/* Modal Header */}
                     <div className="flex items-center px-6 py-5 border-b border-b-gray-100 dark:border-[#292A2A]">
-                         <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-white">
+                         <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-white">
                               <FaArrowLeft size={18} />
                          </button>
-                         <h2 className="ml-2 text-[17px] font-bold text-[#1A1D2E] dark:text-white">Loyiha tanlang</h2>
+                         <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-white">Loyiha tanlang</h2>
                     </div>
 
                     <div className="p-6">

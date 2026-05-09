@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, use } from 'react'
+﻿import { useState, useEffect, useCallback, use } from 'react'
 import { MdArrowForward, MdDelete } from 'react-icons/md'
 import { FaArrowLeft, FaXmark } from 'react-icons/fa6'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -138,31 +138,31 @@ export default function UsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
           <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[#5B6078] dark:text-[#C2C8E0] cursor-pointer  z-10">
+            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="text-[#1A1D2E] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
+                className="text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
               >
                 <FaArrowLeft size={16} />
               </button>
-              <h2 className="text-lg font-bold text-[#1A1D2E] dark:text-[#FFFFFF]">Foydalanuvchini o'chirmoqchimisiz?</h2>
+              <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">Foydalanuvchini o'chirmoqchimisiz?</h2>
             </div>
-            <p className="text-sm text-[#8F95A8] dark:text-[#C2C8E0] mb-6">
+            <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mb-6">
               Bu foydalanuvchi tizimdan o'chiriladi va unga tegishli ma'lumotlar o'chirish mumkin.
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer bg-[#E02D2D] text-white hover:bg-[#c42424]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer bg-[var(--error-strong)] text-white hover:bg-[#c42424]"
               >
                 O'chirish
               </button>
@@ -175,7 +175,7 @@ export default function UsersPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1
-            className="text-[#1A1D2E] dark:text-[#FFFFFF]"
+            className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
             style={{ fontSize: 24, fontWeight: 800 }}
           >
             Foydalanuvchilar
@@ -184,7 +184,7 @@ export default function UsersPage() {
             <button
               onClick={cancelSelecting}
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
-              bg-[#DADFF0] text-[#1A1D2E] hover:bg-[#c8ceea]
+              bg-[#DADFF0] text-[var(--text-strong)] hover:bg-[#c8ceea]
               dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
             >
               <FaXmark size={14} />
@@ -194,7 +194,7 @@ export default function UsersPage() {
             <button
               onClick={startSelecting}
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
-              bg-[#DADFF0] text-[#1A1D2E] hover:bg-[#c8ceea]
+              bg-[#DADFF0] text-[var(--text-strong)] hover:bg-[#c8ceea]
               dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
             >
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:invert" />
@@ -207,7 +207,7 @@ export default function UsersPage() {
         <div className="flex flex-wrap gap-2">
           {/* Search */}
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -216,7 +216,7 @@ export default function UsersPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 outline-none 
-              bg-white border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
+              bg-white border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
               dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
             />
@@ -246,29 +246,29 @@ export default function UsersPage() {
           <table className="w-full rounded-2xl" style={{ fontSize: 13 }}>
             <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[#191a1a] shadow-xs">
               <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
-                <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: '#5B6078' }}>
+                <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                   {selecting ? (
                     <span className="flex items-center gap-2">
-                      <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[#3F57B3]" />
+                      <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer accent-[var(--accent-strong)]" />
                       <span>ID</span>
                     </span>
                   ) : '№'}
                 </th>
-                <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>Ism Sharifi</th>
-                <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: '#5B6078' }}>
+                <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>Ism Sharifi</th>
+                <th className="px-4 py-3 text-left" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
                     Lavozim
                   </span>
                 </th>
-                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>
+                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                   <span className="flex items-center justify-end gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-red-500 inline-block shrink-0" />
                     Rol
                   </span>
                 </th>
-                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Oylik maosh (UZS)</th>
-                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: '#5B6078' }}>Balans (UZS)</th>
+                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>Oylik maosh (UZS)</th>
+                <th className="px-4 py-3 text-right" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>Balans (UZS)</th>
               </tr>
             </thead>
             <tbody>
@@ -295,39 +295,39 @@ export default function UsersPage() {
                           checked={selected.has(u.id)}
                           onChange={() => toggleOne(u.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="cursor-pointer accent-[#3F57B3] shrink-0"
+                          className="cursor-pointer accent-[var(--accent-strong)] shrink-0"
                         />
-                        <span className="text-[#8F95A8]" style={{ fontWeight: 500 }}>{idx + 1}</span>
+                        <span className="text-[var(--text-soft)]" style={{ fontWeight: 500 }}>{idx + 1}</span>
                       </span>
                     ) : (
-                      <span className="text-[#8F95A8]" style={{ fontWeight: 500 }}>{idx + 1}</span>
+                      <span className="text-[var(--text-soft)]" style={{ fontWeight: 500 }}>{idx + 1}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{u.name || u.username || '—'}</td>
-                  <td className="px-4 py-3 text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>{positions?.find(p => p.id === u.position_info?.id)?.name || '—'}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{u.name || u.username || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}>{positions?.find(p => p.id === u.position_info?.id)?.name || '—'}</td>
                   <td
-                    className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}
+                    className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}
                     title={u?.roles?.map(r => Roles[r])?.join(', ')}
                   >
                     {statuses(u.roles)}
                   </td>
-                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>
-                  <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white" style={{ fontWeight: 500 }}>{fmt(u.balance)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}>{fmt(u.balance)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           {users.length === 0 && (
-            <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">Foydalanuvchilar topilmadi</div>
+            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Foydalanuvchilar topilmadi</div>
           )}
         </div>
 
         {/* Selection bar */}
         {selecting && selected.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
-          bg-white border border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
-            <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
-            <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer bg-[#FFF2F2] text-[#E02D2D] hover:bg-[#F8D7DA] dark:bg-[#E02D2D]/10 dark:text-[#FA5252] dark:hover:bg-[#E02D2D]/20">
+          bg-white border border-[var(--stroke-sub)] dark:bg-[#222323] dark:border-[#292A2A]">
+            <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
+            <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer bg-[#FFF2F2] text-[var(--error-strong)] hover:bg-[#F8D7DA] dark:bg-[var(--error-strong)]/10 dark:text-[var(--error-sub)] dark:hover:bg-[var(--error-strong)]/20">
               <MdDelete size={16} />
               O'chirish
             </button>

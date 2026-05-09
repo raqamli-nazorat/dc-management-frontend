@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer
@@ -22,8 +22,8 @@ function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
   return (
     <div className={`px-3 py-2 rounded-xl shadow-xl border text-xs z-50
-      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-white border-[#E2E6F2] text-[#1A1D2E]'}`}>
-      {label && <p className="font-semibold mb-1 text-[#8F95A8]">{label}</p>}
+      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-white border-[var(--stroke-sub)] text-[var(--text-strong)]'}`}>
+      {label && <p className="font-semibold mb-1 text-[var(--text-soft)]">{label}</p>}
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
@@ -39,8 +39,8 @@ const CustomDot = (props) => {
   if (!cx || !cy) return null
   return (
     <g>
-      <line x1={cx} y1={cy} x2={cx} y2={500} stroke={isDark ? '#292A2A' : '#E2E6F2'} strokeWidth={1.5} />
-      <circle cx={cx} cy={cy} r={6} stroke={isDark ? '#fff' : '#1A1D2E'} strokeWidth={3} fill={isDark ? '#1C1D1D' : '#fff'} />
+      <line x1={cx} y1={cy} x2={cx} y2={500} stroke={isDark ? '#292A2A' : 'var(--stroke-sub)'} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={6} stroke={isDark ? '#fff' : 'var(--text-strong)'} strokeWidth={3} fill={isDark ? '#1C1D1D' : '#fff'} />
     </g>
   )
 }
@@ -90,8 +90,8 @@ export default function AnalyticsPage() {
             onClick={() => setPeriod(p.value)}
             className={`px-4 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors
               ${period === p.value
-                ? 'bg-[#F8F9FC] dark:bg-[#2A2B2B] text-[#1A1D2E] dark:text-white shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]'
-                : 'text-[#8F95A8] hover:text-[#1A1D2E] dark:hover:text-white border border-transparent'}`}
+                ? 'bg-[var(--bg-elevation-1)] dark:bg-[#2A2B2B] text-[var(--text-strong)] dark:text-white shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-strong)] dark:hover:text-white border border-transparent'}`}
           >
             {p.label}
           </button>
@@ -163,7 +163,7 @@ export default function AnalyticsPage() {
     }
   }
 
-  const textColor  = '#8F95A8'
+  const textColor  = 'var(--text-soft)'
   const projectMax = Math.max(5, ...projectData.map(d => Number(d.value) || 0))
   const projectTop = Math.ceil(projectMax / 5) * 5
   const projectTicks = Array.from({ length: projectTop / 5 + 1 }, (_, i) => i * 5)
@@ -179,10 +179,10 @@ export default function AnalyticsPage() {
 
       {/* Vazifalar Line Chart */}
       <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex-1 flex flex-col min-h-0">
-        <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Vazifalar</h3>
+        <h3 className="text-[17px] font-bold text-[var(--text-strong)] dark:text-white mb-6 shrink-0">Vazifalar</h3>
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
+            <svg className="animate-spin w-6 h-6 text-[var(--accent-sub)]" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
@@ -193,13 +193,13 @@ export default function AnalyticsPage() {
               <LineChart data={taskData} margin={{ top: 20, right: 40, left: 40, bottom: 30 }}>
                 <XAxis
                   dataKey="name"
-                  tick={{ fill: '#8F95A8', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }}
+                  tick={{ fill: 'var(--text-soft)', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }}
                   axisLine={false} tickLine={false} dy={15} interval={0}
                   padding={{ left: 30, right: 30 }}
                 />
                 <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ fill: 'transparent', stroke: 'transparent' }} />
                 <Line type="monotone" dataKey="prevValue" name="O'tgan davr" stroke="#D0CCF7" strokeWidth={2} strokeDasharray="5 5" dot={false} activeDot={false} />
-                <Line type="monotone" dataKey="value" name="Vazifalar" stroke="#526ED3" strokeWidth={2.5}
+                <Line type="monotone" dataKey="value" name="Vazifalar" stroke="var(--accent-sub)" strokeWidth={2.5}
                   dot={(props) => <CustomDot {...props} isDark={isDark} />} activeDot={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -212,10 +212,10 @@ export default function AnalyticsPage() {
 
         {/* Loyihalar Bar Chart */}
         <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
-          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Loyihalar</h3>
+          <h3 className="text-[17px] font-bold text-[var(--text-strong)] dark:text-white mb-6 shrink-0">Loyihalar</h3>
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
-              <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
+              <svg className="animate-spin w-6 h-6 text-[var(--accent-sub)]" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
@@ -226,7 +226,7 @@ export default function AnalyticsPage() {
                 <BarChart data={projectData} margin={{ top: 10, right: 10, left: -25, bottom: 15 }} barSize={34}>
                   <XAxis
                     dataKey="name"
-                    tick={{ fill: '#5B6078', fontSize: 12, fontWeight: 500 }}
+                    tick={{ fill: 'var(--text-sub)', fontSize: 12, fontWeight: 500 }}
                     axisLine={false} tickLine={false} dy={15}
                   />
                   <YAxis
@@ -246,10 +246,10 @@ export default function AnalyticsPage() {
 
         {/* Yig'ilishlar Donut Chart */}
         <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
-          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Yig'ilishlar dinamikasi</h3>
+          <h3 className="text-[17px] font-bold text-[var(--text-strong)] dark:text-white mb-6 shrink-0">Yig'ilishlar dinamikasi</h3>
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
-              <svg className="animate-spin w-6 h-6 text-[#526ED3]" viewBox="0 0 24 24" fill="none">
+              <svg className="animate-spin w-6 h-6 text-[var(--accent-sub)]" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
                       stroke="none" startAngle={90} endAngle={-270} cornerRadius={5}
                     >
                       {meetingData.map((_, i) => (
-                        <Cell key={i} fill={meetingData.every(d => d.value === 0) ? '#E2E6F2' : MEETING_DONUT_COLORS[i % 3]} />
+                        <Cell key={i} fill={meetingData.every(d => d.value === 0) ? 'var(--stroke-sub)' : MEETING_DONUT_COLORS[i % 3]} />
                       ))}
                     </Pie>
                     <Tooltip content={<CustomTooltip isDark={isDark} />} />
@@ -280,8 +280,8 @@ export default function AnalyticsPage() {
               {/* Legend */}
               <div className="flex-1 flex flex-col mr-4">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-[14px] text-[#1A1D2E] dark:text-white font-medium">Umumiy soni:</span>
-                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">
+                  <span className="text-[14px] text-[var(--text-strong)] dark:text-white font-medium">Umumiy soni:</span>
+                  <span className="text-[14px] text-[var(--text-strong)] dark:text-[#C2C8E0]">
                     {stats.meetings} / {stats.total_duration_minutes} daqiqa
                   </span>
                 </div>
@@ -290,9 +290,9 @@ export default function AnalyticsPage() {
                     <div key={i} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ background: MEETING_DONUT_COLORS[i] }} />
-                        <span className="text-[14px] text-[#5B6078] dark:text-[#C2C8E0]">{item.name}</span>
+                        <span className="text-[14px] text-[var(--text-sub)] dark:text-[#C2C8E0]">{item.name}</span>
                       </div>
-                      <span className="text-[14px] font-medium text-[#1A1D2E] dark:text-white">{item.value}</span>
+                      <span className="text-[14px] font-medium text-[var(--text-strong)] dark:text-white">{item.value}</span>
                     </div>
                   ))}
                 </div>

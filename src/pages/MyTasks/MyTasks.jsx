@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { usePageAction } from '../../context/PageActionContext'
 import { FaRegBookmark } from 'react-icons/fa6'
 import { MdCheckCircle, MdCheck } from 'react-icons/md'
@@ -9,7 +9,7 @@ import EmptyState from '../../components/EmptyState'
 
 /* Rang → CSS qiymatlari */
 const COLOR_MAP = {
-  yellow: { bg: '#FFD200', text: '#1A1D2E' },
+  yellow: { bg: '#FFD200', text: 'var(--text-strong)' },
   blue:   { bg: '#005FF9', text: '#ffffff' },
   green:  { bg: '#15B036', text: '#ffffff' },
   red:    { bg: '#FF2E2E', text: '#ffffff' },
@@ -92,7 +92,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 
       {/* Karta tanasi */}
       <div className="bg-[#F4F6FD] dark:bg-[#222323] rounded-[24px] px-6 pt-5 pb-7 -mt-3 relative z-10">
-        <h3 className="text-[15px] font-bold text-[#1A1D2E] dark:text-white mb-5">
+        <h3 className="text-[15px] font-bold text-[var(--text-strong)] dark:text-white mb-5">
           {task.title}
         </h3>
 
@@ -107,7 +107,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
                 className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer
                   ${item.is_done
                     ? 'bg-[#4A65D8] text-white'
-                    : 'bg-[#E2E6F2] dark:bg-[#3A3B3B] text-transparent group-hover:bg-[#D0D5E2] dark:group-hover:bg-[#4A4B4B]'
+                    : 'bg-[var(--stroke-sub)] dark:bg-[#3A3B3B] text-transparent group-hover:bg-[var(--stroke-strong)] dark:group-hover:bg-[#4A4B4B]'
                   }`}
               >
                 {item.is_done && <MdCheck size={14} />}
@@ -115,8 +115,8 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
               <span
                 className={`flex-1 text-[13px] font-medium transition-colors
                   ${item.is_done
-                    ? 'text-[#5B6078] dark:text-[#C2C8E0] line-through'
-                    : 'text-[#8F95A8] dark:text-[#8E95B5]'
+                    ? 'text-[var(--text-sub)] dark:text-[#C2C8E0] line-through'
+                    : 'text-[var(--text-soft)] dark:text-[#8E95B5]'
                   }`}
               >
                 {item.title}
@@ -137,7 +137,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 
           {/* Yangi subtask qo'shish */}
           <div className="flex items-center gap-3 mt-2">
-            <div className="w-[22px] h-[22px] rounded-full bg-[#E2E6F2] dark:bg-[#3A3B3B] shrink-0" />
+            <div className="w-[22px] h-[22px] rounded-full bg-[var(--stroke-sub)] dark:bg-[#3A3B3B] shrink-0" />
             <input
               type="text"
               value={newItemTitle}
@@ -148,15 +148,15 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
               placeholder="Subtask qo'shish..."
               disabled={addingItem}
               className="flex-1 bg-transparent outline-none text-[13px]
-                text-[#5B6078] dark:text-[#C2C8E0]
-                placeholder:text-[#D0D5E2] dark:placeholder:text-[#4A4B4B]
+                text-[var(--text-sub)] dark:text-[#C2C8E0]
+                placeholder:text-[var(--stroke-strong)] dark:placeholder:text-[#4A4B4B]
                 disabled:opacity-50"
             />
             {newItemTitle.trim() && (
               <button
                 onClick={handleAddItem}
                 disabled={addingItem}
-                className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#3F57B3] hover:bg-[#4A65D8] transition-colors cursor-pointer disabled:opacity-50"
+                className="w-6 h-6 flex items-center justify-center rounded-lg bg-[var(--accent-strong)] hover:bg-[#4A65D8] transition-colors cursor-pointer disabled:opacity-50"
               >
                 {addingItem ? (
                   <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
@@ -173,7 +173,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
           </div>
 
           {(!task.items || task.items.length === 0) && !newItemTitle && (
-            <p className="text-[12px] text-[#B6BCCB] dark:text-[#474848] italic">
+            <p className="text-[12px] text-[var(--text-disabled)] dark:text-[#474848] italic">
               Subtasklar yo'q
             </p>
           )}
@@ -187,13 +187,13 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 function SkeletonCard() {
   return (
     <div className="w-[320px] rounded-[24px] overflow-hidden shadow-sm bg-white dark:bg-[#1C1D1D] animate-pulse">
-      <div className="h-[56px] bg-[#E2E6F2] dark:bg-[#2A2B2B]" />
+      <div className="h-[56px] bg-[var(--stroke-sub)] dark:bg-[#2A2B2B]" />
       <div className="bg-[#F4F6FD] dark:bg-[#222323] rounded-[24px] px-6 pt-5 pb-7 -mt-3">
-        <div className="h-4 w-2/3 bg-[#E2E6F2] dark:bg-[#2A2B2B] rounded-lg mb-5" />
+        <div className="h-4 w-2/3 bg-[var(--stroke-sub)] dark:bg-[#2A2B2B] rounded-lg mb-5" />
         {[1, 2, 3, 4].map(i => (
           <div key={i} className="flex items-center gap-3 mb-3">
-            <div className="w-[22px] h-[22px] rounded-full bg-[#E2E6F2] dark:bg-[#2A2B2B] shrink-0" />
-            <div className="h-3 flex-1 bg-[#E2E6F2] dark:bg-[#2A2B2B] rounded-lg" />
+            <div className="w-[22px] h-[22px] rounded-full bg-[var(--stroke-sub)] dark:bg-[#2A2B2B] shrink-0" />
+            <div className="h-3 flex-1 bg-[var(--stroke-sub)] dark:bg-[#2A2B2B] rounded-lg" />
           </div>
         ))}
       </div>
@@ -381,7 +381,7 @@ export default function MyTasks() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-[28px] font-bold text-[#1A1D2E] dark:text-white">
+      <h1 className="text-[28px] font-bold text-[var(--text-strong)] dark:text-white">
         Kundalik rejalar
       </h1>
 

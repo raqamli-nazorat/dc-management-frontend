@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates/"
@@ -10,7 +10,7 @@ import { FiCalendar } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { UserPickerModal, SelectedUsersField } from "../Components/UserPickerModal"
 
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 
 const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const { isDark } = useTheme()
@@ -162,7 +162,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078] ${err ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
 
   const statusList = Array.isArray(STATUS_API) ? STATUS_API : Object.entries(STATUS_API || {}).map(([value, label]) => ({ value, label }))
   const currentStatusLabel = statusList.find(s => s.value === form.status)?.label || 'Holati tanlang'
@@ -179,12 +179,12 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           {/* header */}
           <div className="px-7 pt-7 pb-4 sticky top-0 bg-white dark:bg-[#111111] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                 <FaArrowLeft size={17} />
               </button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha qo'shish</h2>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha qo'shish</h2>
             </div>
-            <p className="text-sm text-[#5B6078]">Loyiha nomi va asosiy ma'lumotlarni to'ldiring</p>
+            <p className="text-sm text-[var(--text-sub)]">Loyiha nomi va asosiy ma'lumotlarni to'ldiring</p>
           </div>
 
           {/* body */}
@@ -206,18 +206,18 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   <button
                     type="button"
                     onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}
+                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
                     disabled
                   >
                     <span>{currentStatusLabel}</span>
-                    <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
+                    <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {statusList.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < statusList.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < statusList.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -235,7 +235,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   className={inputCls(errors.description) + ' resize-none'} />
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
-                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                    className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
@@ -247,29 +247,29 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} dark:bg-[#191A1A]`}>
-                    <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} dark:bg-[#191A1A]`}>
+                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {form.manager && (
                         <span onMouseDown={e => { e.stopPropagation(); set('manager', null) }}
-                          className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                          className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
                       )}
-                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
+                      <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                          <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                             {u.username?.slice(0, 2).toUpperCase()}
                           </div>
                           <div className="min-w-0">
                             <p className="truncate">{u.username}</p>
-                            {u.position && <p className="text-xs text-[#8F95A8] truncate">{u.position}</p>}
+                            {u.position && <p className="text-xs text-[var(--text-soft)] truncate">{u.position}</p>}
                           </div>
                         </button>
                       ))}
@@ -380,11 +380,11 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <div className="px-7 py-5 flex items-center justify-end">
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
                 {loading ? (
                   <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

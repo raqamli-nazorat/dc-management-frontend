@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import './styles/variables.css';
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
@@ -37,10 +38,10 @@
 /* Custom scrollbar — global */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #D0D5E2 transparent;
+  scrollbar-color: var(--stroke-strong) transparent;
 }
 .dark * {
-  scrollbar-color: #3A3B3B transparent;
+  scrollbar-color: var(--bg-elevation-3) transparent;
 }
 *::-webkit-scrollbar {
   width: 4px;
@@ -50,18 +51,18 @@
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: #D0D5E2;
+  background: var(--stroke-strong);
   border-radius: 99px;
 }
 .dark *::-webkit-scrollbar-thumb {
-  background: #3A3B3B;
+  background: var(--bg-elevation-3);
 }
 
 /* modal-scroll alias (kept for compatibility) */
 .modal-scroll::-webkit-scrollbar { width: 4px; }
 .modal-scroll::-webkit-scrollbar-track { background: transparent; }
-.modal-scroll::-webkit-scrollbar-thumb { background: #D0D5E2; border-radius: 99px; }
-.dark .modal-scroll::-webkit-scrollbar-thumb { background: #3A3B3B; }
+.modal-scroll::-webkit-scrollbar-thumb { background: var(--stroke-strong); border-radius: 99px; }
+.dark .modal-scroll::-webkit-scrollbar-thumb { background: var(--bg-elevation-3); }
 
 /* Date/time input — dark mode color fix */
 input[type="date"]::-webkit-datetime-edit,
@@ -75,22 +76,8 @@ input[type="time"]::-webkit-datetime-edit-fields-wrapper,
 input[type="time"]::-webkit-datetime-edit-text,
 input[type="time"]::-webkit-datetime-edit-hour-field,
 input[type="time"]::-webkit-datetime-edit-minute-field {
-  color: #1A1D2E;
+  color: var(--text-strong);
   transition: color 0.2s;
-}
-
-.dark input[type="date"]::-webkit-datetime-edit,
-.dark input[type="date"]::-webkit-datetime-edit-fields-wrapper,
-.dark input[type="date"]::-webkit-datetime-edit-text,
-.dark input[type="date"]::-webkit-datetime-edit-month-field,
-.dark input[type="date"]::-webkit-datetime-edit-day-field,
-.dark input[type="date"]::-webkit-datetime-edit-year-field,
-.dark input[type="time"]::-webkit-datetime-edit,
-.dark input[type="time"]::-webkit-datetime-edit-fields-wrapper,
-.dark input[type="time"]::-webkit-datetime-edit-text,
-.dark input[type="time"]::-webkit-datetime-edit-hour-field,
-.dark input[type="time"]::-webkit-datetime-edit-minute-field {
-  color: #FFFFFF;
 }
 
 /* Kanban ustun ichidagi scroll ko'rinmasin */

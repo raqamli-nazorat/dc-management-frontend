@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+﻿import { useEffect, useState } from "react"
 import { FaArrowLeft, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { DatePicker, TimePicker, ConfigProvider, theme } from "antd"
 import dayjs from "dayjs"
@@ -7,7 +7,7 @@ import { useAuth } from "../../../../../context/AuthContext"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 
 const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filter = {}, useDropdown }) => {
     const { user } = useAuth()
@@ -55,9 +55,9 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
         { label: 'Bekor qilingan', value: 'cancelled' },
     ]
 
-    const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
-    const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
-    const inputBox = 'flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] '
+    const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[var(--stroke-sub)] dark:border-[#292A2A] ${val ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
+    const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
+    const inputBox = 'flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] focus-within:border-[var(--accent-sub)] '
 
     const selectedMgr = users.find(u => u.id === f.manager)
     const selectedEmp = users.find(u => u.id === f.employee)
@@ -85,12 +85,12 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                     {/* Header */}
                     <div className="px-7 pt-7 pb-3">
                         <div className="flex items-center gap-3 mb-1.5">
-                            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                 <FaArrowLeft size={17} />
                             </button>
-                            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
+                            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Filtrlash</h2>
                         </div>
-                        <p className="text-sm text-[#5B6078]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+                        <p className="text-sm text-[var(--text-sub)]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
                     </div>
 
                     {/* Body */}
@@ -106,19 +106,19 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                         <span className="flex-1 text-left truncate">{selectedMgr?.username || 'Tanlang'}</span>
                                         <div className="flex items-center gap-1 shrink-0 ml-1">
                                             {f.manager
-                                                ? <span onMouseDown={e => { e.stopPropagation(); set('manager', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                                                : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrDd.open ? 'rotate-180' : ''}`} />}
+                                                ? <span onMouseDown={e => { e.stopPropagation(); set('manager', '') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+                                                : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${mgrDd.open ? 'rotate-180' : ''}`} />}
                                         </div>
                                     </button>
                                     {mgrDd.open && (
                                         <div className={ddList}>
                                             {(user.active_role === "manager" ? [user] : user.active_role === "employee" ? employees : managers).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
-                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                                                    <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                                                    <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                                                         {(u.username ?? '?').slice(0, 2).toUpperCase()}
                                                     </div>
-                                                    <p className={`text-sm truncate ${f.manager === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6] font-semibold' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
+                                                    <p className={`text-sm truncate ${f.manager === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
                                                 </button>
                                             ))}
                                         </div>
@@ -134,15 +134,15 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                         <span className="flex-1 text-left truncate">{STATUS_API.find(s => s.value === f.status)?.label || 'Tanlang'}</span>
                                         <div className="flex items-center gap-1 shrink-0 ml-1">
                                             {f.status
-                                                ? <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                                                : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${stsDd.open ? 'rotate-180' : ''}`} />}
+                                                ? <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+                                                : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${stsDd.open ? 'rotate-180' : ''}`} />}
                                         </div>
                                     </button>
                                     {stsDd.open && (
                                         <div className={ddList}>
                                             {STATUS_API.map((s, i) => (
                                                 <button key={s.value} type="button" onClick={() => { set('status', s.value); stsDd.setOpen(false) }}
-                                                    className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                                                    className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                                                     {s.label}
                                                 </button>
                                             ))}
@@ -159,19 +159,19 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                         <span className="flex-1 text-left truncate">{selectedEmp?.username || 'Tanlang'}</span>
                                         <div className="flex items-center gap-1 shrink-0 ml-1">
                                             {f.employee
-                                                ? <span onMouseDown={e => { e.stopPropagation(); set('employee', '') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                                                : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${empDd.open ? 'rotate-180' : ''}`} />}
+                                                ? <span onMouseDown={e => { e.stopPropagation(); set('employee', '') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+                                                : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${empDd.open ? 'rotate-180' : ''}`} />}
                                         </div>
                                     </button>
                                     {empDd.open && (
                                         <div className={ddList}>
                                             {(user.active_role === "manager" ? employees : user.active_role === "employee" ? [user] : users).map((u, i, arr) => (
                                                 <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
-                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                                                    <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                                                    className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                                                    <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                                                         {(u.username ?? '?').slice(0, 2).toUpperCase()}
                                                     </div>
-                                                    <p className={`text-sm truncate ${f.employee === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6] font-semibold' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
+                                                    <p className={`text-sm truncate ${f.employee === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
                                                 </button>
                                             ))}
                                         </div>
@@ -186,14 +186,14 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="flex items-center gap-2">
                                     <div className={`${inputBox} flex-1 min-w-0`}>
-                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
+                                        <span className="text-xs text-[var(--text-sub)] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
                                         <DatePicker
                                             format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.startFromD ? dayjs(f.startFromD) : null}
                                             onChange={(v) => set('startFromD', v ? v.format('YYYY-MM-DD') : '')}
                                             variant="borderless"
-                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
                                         />
                                     </div>
@@ -204,7 +204,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                             value={f.startFromT ? dayjs(f.startFromT, 'HH:mm') : null}
                                             onChange={(v) => set('startFromT', v ? v.format('HH:mm') : '')}
                                             variant="borderless"
-                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
                                             showNow={false}
                                         />
@@ -212,14 +212,14 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className={`${inputBox} flex-1 min-w-0`}>
-                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
+                                        <span className="text-xs text-[var(--text-sub)] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
                                         <DatePicker
                                             format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.startToD ? dayjs(f.startToD) : null}
                                             onChange={(v) => set('startToD', v ? v.format('YYYY-MM-DD') : '')}
                                             variant="borderless"
-                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
                                         />
                                     </div>
@@ -230,7 +230,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                             value={f.startToT ? dayjs(f.startToT, 'HH:mm') : null}
                                             onChange={(v) => set('startToT', v ? v.format('HH:mm') : '')}
                                             variant="borderless"
-                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
                                             showNow={false}
                                         />
@@ -245,14 +245,14 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="flex items-center gap-2">
                                     <div className={`${inputBox} flex-1 min-w-0`}>
-                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
+                                        <span className="text-xs text-[var(--text-sub)] dark:text-[#C2C8E0] shrink-0 select-none">dan:</span>
                                         <DatePicker
                                             format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.deadFromD ? dayjs(f.deadFromD) : null}
                                             onChange={(v) => set('deadFromD', v ? v.format('YYYY-MM-DD') : '')}
                                             variant="borderless"
-                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
                                         />
                                     </div>
@@ -263,7 +263,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                             value={f.deadFromT ? dayjs(f.deadFromT, 'HH:mm') : null}
                                             onChange={(v) => set('deadFromT', v ? v.format('HH:mm') : '')}
                                             variant="borderless"
-                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
                                             showNow={false}
                                         />
@@ -271,14 +271,14 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className={`${inputBox} flex-1 min-w-0`}>
-                                        <span className="text-xs text-[#5B6078] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
+                                        <span className="text-xs text-[var(--text-sub)] dark:text-[#C2C8E0] shrink-0 select-none">gacha:</span>
                                         <DatePicker
                                             format="DD.MM.YYYY"
                                             placeholder=""
                                             value={f.deadToD ? dayjs(f.deadToD) : null}
                                             onChange={(v) => set('deadToD', v ? v.format('YYYY-MM-DD') : '')}
                                             variant="borderless"
-                                            className="flex-1 text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="flex-1 text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>}
                                         />
                                     </div>
@@ -289,7 +289,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                                             value={f.deadToT ? dayjs(f.deadToT, 'HH:mm') : null}
                                             onChange={(v) => set('deadToT', v ? v.format('HH:mm') : '')}
                                             variant="borderless"
-                                            className="w-[85px] text-xs p-0 bg-transparent text-[#1A1D2E] dark:text-white"
+                                            className="w-[85px] text-xs p-0 bg-transparent text-[var(--text-strong)] dark:text-white"
                                             suffixIcon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>}
                                             showNow={false}
                                         />
@@ -302,11 +302,11 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                     {/* Footer */}
                     <div className="px-7 py-5 flex items-center justify-end gap-3 ">
                         <button onClick={() => setF(empty_filter)}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
                             <FaXmark size={13} /> Tozalash
                         </button>
                         <button onClick={() => onApply(f)}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                             </svg>

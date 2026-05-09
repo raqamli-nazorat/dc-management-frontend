@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePageAction } from '../../../context/PageActionContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -113,28 +113,28 @@ const ApplicationDetail = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="w-8 h-8 border-2 border-[#3F57B3] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--accent-strong)] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   if (!application) {
     return (
-      <div className="py-16 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+      <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
         Ariza topilmadi
       </div>
     )
   }
 
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] disabled:cursor-default`
-  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] disabled:cursor-default`
+  const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
 
 
   return (
     <>
       <div className="flex flex-col gap-2.5">
         <h1
-          className="text-[#1A1D2E] dark:text-white"
+          className="text-[var(--text-strong)] dark:text-white"
           style={{ fontSize: 24, fontWeight: 800 }}
         >
           Ma'lumotlar
@@ -152,7 +152,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.full_name); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -179,7 +179,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.phone); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -196,7 +196,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.telegram); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -226,7 +226,7 @@ const ApplicationDetail = () => {
           <div>
             <label className={labelCls}>Rezyume (CV)</label>
             <div
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-white border-[#E2E6F2] text-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#C2C8E0]"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-white border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#C2C8E0]"
             >
               <FaFileLines size={14} className="shrink-0" />
               <a
@@ -245,7 +245,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.portfolio); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -296,7 +296,7 @@ const ApplicationDetail = () => {
                 <button
                   onClick={() => openModal('accepted')}
                   style={{ fontSize: 14, color: '#FFFFFF' }}
-                  className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[var(--accent-sub)] font-semibold  hover:opacity-80 flex items-center gap-2"
                 >
                   <FaCheck size={15} />
                   Qabul qilindi
@@ -306,7 +306,7 @@ const ApplicationDetail = () => {
               <button
                 onClick={handleSave}
                 style={{ fontSize: 14, color: '#FFFFFF' }}
-                className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! dark:disabled:bg-[#222323]! disabled:text-gray-500!"
+                className="px-4 py-2.5 rounded-xl bg-[var(--accent-sub)] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! dark:disabled:bg-[#222323]! disabled:text-gray-500!"
                 disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
               >
                 <FaCheck size={15} />
@@ -355,7 +355,7 @@ const ApplicationDetail = () => {
               <button
                 onClick={handleStatusUpdate}
                 disabled={isSubmitting}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 ${modalStatus === 'accepted' ? 'bg-[#3F57B3]' : 'bg-[#fa5252]'}`}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 ${modalStatus === 'accepted' ? 'bg-[var(--accent-strong)]' : 'bg-[#fa5252]'}`}
               >
                 {isSubmitting ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

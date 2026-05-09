@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getRouteRole } from '../components/ProtectedRoute'
@@ -143,7 +143,7 @@ export default function Login() {
         >
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-[#526ED3] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--accent-sub)] flex items-center justify-center shrink-0">
               <img src="/imgs/Logo.png" alt="logo" className="w-6 h-6 object-contain" />
             </div>
             <span className="font-semibold text-base text-[#1a1a2e] dark:text-white" style={{ fontFamily: '"Manrope", sans-serif' }}>
@@ -153,7 +153,7 @@ export default function Login() {
 
           {/* Sarlavha */}
           <h1
-            className="mb-7 text-[#1A1D2E] dark:text-white"
+            className="mb-7 text-[var(--text-strong)] dark:text-white"
             style={{ fontWeight: 800, fontSize: 28, fontFamily: '"Manrope", sans-serif' }}
           >
             Kirish
@@ -169,7 +169,7 @@ export default function Login() {
               onChange={e => { setLoginVal(e.target.value); if (!isThrottled) setError('') }}
               disabled={isThrottled}
               className="w-full px-4 py-3.5 rounded-xl text-sm outline-none
-                bg-[#F8F9FC] border border-[#EEF1F7] text-[#1A1D2E] placeholder-[#B6BCCB]
+                bg-[var(--bg-elevation-1)] border border-[#EEF1F7] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
                 focus:border-[#EEF1F7] dark:focus:border-[#474848]
                 dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]
                 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -185,7 +185,7 @@ export default function Login() {
                 onChange={e => { setParolVal(e.target.value); if (!isThrottled) setError('') }}
                 disabled={isThrottled}
                 className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm outline-none
-                  bg-[#F8F9FC] border border-[#EEF1F7] text-[#1A1D2E] placeholder-[#B6BCCB]
+                  bg-[var(--bg-elevation-1)] border border-[#EEF1F7] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
                   focus:border-[#EEF1F7] dark:focus:border-[#474848]
                   dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]
                   disabled:opacity-60 disabled:cursor-not-allowed"
@@ -196,7 +196,7 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPass(p => !p)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer flex items-center
-                    text-[#9AA1B5] hover:text-[#5B6078] dark:text-[#757575] dark:hover:text-[#8E95B5]"
+                    text-[#9AA1B5] hover:text-[var(--text-sub)] dark:text-[#757575] dark:hover:text-[#8E95B5]"
                 >
                   {showPass ? <LuEyeClosed size={20} /> : <LuEye size={20} />}
                 </button>
@@ -206,18 +206,18 @@ export default function Login() {
             {/* Throttle xabari */}
             {isThrottled && (
               <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-semibold text-[#FA5252]" style={{ fontFamily: '"Manrope", sans-serif' }}>
+                <p className="text-sm font-semibold text-[var(--error-sub)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
                   Kirish vaqtincha bloklandi
                 </p>
-                <p className="text-sm text-[#5B6078] dark:text-[#8E95B5]" style={{ fontFamily: '"Manrope", sans-serif' }}>
-                  Qayta urinish uchun: <span className="font-bold text-[#1A1D2E] dark:text-white">{formatTime(throttleSecs)}</span>
+                <p className="text-sm text-[var(--text-sub)] dark:text-[#8E95B5]" style={{ fontFamily: '"Manrope", sans-serif' }}>
+                  Qayta urinish uchun: <span className="font-bold text-[var(--text-strong)] dark:text-white">{formatTime(throttleSecs)}</span>
                 </p>
               </div>
             )}
 
             {/* Oddiy xato */}
             {!isThrottled && error && (
-              <p className="text-sm text-[#FA5252]" style={{ fontFamily: '"Manrope", sans-serif' }}>{error}</p>
+              <p className="text-sm text-[var(--error-sub)]" style={{ fontFamily: '"Manrope", sans-serif' }}>{error}</p>
             )}
 
             {/* Tugma */}
@@ -226,8 +226,8 @@ export default function Login() {
               disabled={loading || !filled || isThrottled}
               className={`w-full py-3.5 rounded-xl font-semibold text-sm duration-200 mt-1
                 ${filled && !isThrottled
-                  ? 'bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer'
-                  : 'bg-[#E9ECF5] text-[#B6BCCB] cursor-not-allowed dark:bg-[#F2F1F0] dark:text-[#757575]'
+                  ? 'bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] cursor-pointer'
+                  : 'bg-[var(--bg-elevation-2)] text-[var(--text-disabled)] cursor-not-allowed dark:bg-[#F2F1F0] dark:text-[#757575]'
                 }`}
               style={{ fontFamily: '"Manrope", sans-serif' }}
             >
