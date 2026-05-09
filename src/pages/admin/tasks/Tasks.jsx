@@ -146,6 +146,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               ? provided.draggableProps.style?.transition
               : undefined,
             opacity: snapshot.isDragging ? 0.95 : 1,
+            zIndex: snapshot.isDragging ? 9999 : 'auto',
             boxShadow: snapshot.isDragging
               ? '0 8px 24px rgba(0,0,0,0.35)'
               : '0 1px 4px rgba(0,0,0,0.12)',
@@ -156,14 +157,13 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               : 'border-[#E8EBF4] dark:border-[#333535]'}`}
         >
           <div className="flex ">
-            <div className="flex-1 px-2 py-1.5 flex    h-35 flex-col gap-1.5">
+            <div className="flex-1 px-2 py-1.5 flex    h-40 flex-col gap-1.5">
 
-              {/* Title */}
-              <p className=" w-full text-[13px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2">
-                {
-                  card.title
-                }
-
+              {/* Title — har doim 2 qator balandlik, matn oshsa kesiladi */}
+              <p className="w-full text-[13px] font-bold text-[#1A1D2E] dark:text-white leading-snug line-clamp-2"
+                style={{ minHeight: 'calc(1.25em * 2)' }}
+                title={card.title || ''}>
+                {card.title}
               </p>
 
               {/* UID (flag icon) + reopened_count */}
@@ -335,7 +335,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[9999]  flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] p-7 flex flex-col gap-5">
         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] dark:bg-[#292A2A] text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#E2E6F2] cursor-pointer">
@@ -425,7 +425,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
 
   return (
     <div
-      className={`flex flex-col min-w-0 transition-opacity duration-300 ${isDimmed ? 'opacity-40 grayscale-[30%]' : 'opacity-100'}`}
+      className={`flex  flex-col min-w-0 transition-opacity duration-300 ${isDimmed ? 'opacity-40 grayscale-[30%]' : 'opacity-100'}`}
       style={{
         flex: '1 1 0',
         willChange: isDraggingGlobal ? 'opacity' : 'auto',
@@ -652,8 +652,9 @@ export default function TasksPage() {
   }
 
   // Kanban uchun barcha vazifalarni yuklash (pagination yo'q, ko'proq yuklash)
-  const loadKanbanTasks = useCallback(async (f = filters, q = search) => {
-    setKanbanLoading(true)
+  // silent=true bo'lsa loading spinner ko'rsatilmaydi (status o'zgarishidan keyin)
+  const loadKanbanTasks = useCallback(async (f = filters, q = search, silent = false) => {
+    if (!silent) setKanbanLoading(true)
     try {
       const params = { page_size: 200 }
       if (q) params.search = q
@@ -671,7 +672,7 @@ export default function TasksPage() {
     } catch (err) {
       toast.error('Xatolik', "Kanban ma'lumotlarini yuklashda xatolik")
     } finally {
-      setKanbanLoading(false)
+      if (!silent) setKanbanLoading(false)
     }
   }, [filters, search])
   const switchToTable = () => setViewMode('table')
@@ -710,7 +711,7 @@ export default function TasksPage() {
     try {
       await axiosAPI.patch(`/tasks/${taskId}/change-status/`, { status: newStatus })
       setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
-      loadKanbanTasks(filters, search)
+      loadKanbanTasks(filters, search, true)
     } catch (err) {
       // Rollback
       setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: srcStatus } : c))
@@ -796,7 +797,7 @@ export default function TasksPage() {
       <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate} onDragStart={onDragStart}>
         <div
           className="flex flex-col bg-[#F8F9FC] dark:bg-[#191A1A]"
-          style={{ height: 'calc(100vh - 57px)' }}
+          style={{ height: 'calc(99vh - 57px)' }}
         >
           {kanbanLoading ? (
             <div className="flex items-center justify-center h-full">
@@ -807,7 +808,7 @@ export default function TasksPage() {
             </div>
           ) : (
             <div
-              className="flex gap-2 px-3 pt-3 bg-white dark:bg-[#191A1A] pb-3 h-full"
+              className="flex gap-2 px-3 pt-3  dark:bg-[#191A1A] pb-3 h-full"
               style={{ overflow: 'hidden' }}
             >
               {COLUMNS.map(col => {
@@ -874,7 +875,7 @@ export default function TasksPage() {
                   : t
               ))
               setRejectionPending(null)
-              loadKanbanTasks(filters, search)
+              loadKanbanTasks(filters, search, true)
             }}
           />
         )}
@@ -892,7 +893,7 @@ export default function TasksPage() {
 
   /* ── TABLE VIEW ── */
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col h-full gap-4" >
 
       <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Vazifalar</h1>
 
@@ -968,8 +969,29 @@ export default function TasksPage() {
                   onClick={() => loadTaskDetail(t.id)}
                   className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
                   <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
-                  <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title || t.name}</td>
+                  <td className="px-4 py-3 text-xs font-medium" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center gap-1.5 group">
+                      <span className="text-[#8F95A8] dark:text-[#C2C8E0]">{t.uid || idx + 1}</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(t.uid || String(idx + 1)).then(() => {
+                            toast.success('Nusxa olindi', t.uid || String(idx + 1))
+                          }).catch(() => {})
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A] text-[#8F95A8] hover:text-[#526ED3] cursor-pointer"
+                        title="Nusxa olish"
+                      >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white max-w-[220px]">
+                    <span className="block truncate" title={t.title || t.name || ''}>
+                      {t.title || t.name}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || t.project || '—')}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.created_by_info?.username || t.creator || '—'}</td>
                   <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.assignee_info?.username || t.assignee || '—'}</td>
