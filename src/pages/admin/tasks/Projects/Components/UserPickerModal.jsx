@@ -107,6 +107,10 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                 <div className="min-w-0 flex-1">
                                     <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{u.username}</p>
                                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate">
+                                        {
+                                            console.log(u)
+
+                                        }
                                         {u?.position_info?.name || '—'}
                                     </p>
                                 </div>
@@ -151,7 +155,8 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
                                 key={u.id}
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]"
                             >
-                                {u.username}|{u?.position_info.name}
+
+                                {u?.username} | {u?.position_info?.name || u?.position}
                                 <span
                                     onMouseDown={e => { e.stopPropagation(); onRemove(u.id) }}
                                     className="hover:opacity-70 cursor-pointer ml-0.5 flex items-center">
