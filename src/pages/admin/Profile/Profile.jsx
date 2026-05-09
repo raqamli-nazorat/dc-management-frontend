@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { toast } from '../../../Toast/ToastProvider'
+import { FiPlus } from 'react-icons/fi'
 
 /* ── Change Password Modal ── */
 function ChangePasswordModal({ onClose }) {
@@ -246,16 +247,11 @@ const formatPhone = (v) => {
   return v
 }
 
-const formatCard = (v) => {
-  if (!v) return null
-  const digits = v.replace(/\D/g, '')
-  // 16 raqam → XXXX XXXX XXXX XXXX
-  if (digits.length === 16) {
-    return `${digits.slice(0, 4)} ${digits.slice(4, 8)} ${digits.slice(8, 12)} ${digits.slice(12, 16)}`
-  }
-  return v
+const formatCard = (val) => {
+  if (!val) return '';
+  let digits = val.replace(/\D/g, '').slice(0, 16);
+  return digits.match(/.{1,4}/g)?.join(' ') || digits;
 }
-
 /* ── Social Field with copy ── */
 function SocialField({ label, value, icon, placeholder }) {
   const [copied, setCopied] = useState(false)
@@ -441,16 +437,28 @@ export default function ProfilePage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passportOpen, setPassportOpen] = useState(false)
 
+  const [data, setData] = useState({})
+
+  const set = (k, v) => setData(prev => ({ ...prev, [k]: v }))
+
+  const getProfile = async () => {
+    try {
+      const { data } = await axiosAPI.get('/users/me/')
+      setProfile(data?.data ?? data)
+      setData(data?.data ?? data)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    axiosAPI.get('/users/me/')
-      .then(res => setProfile(res.data?.data ?? res.data))
-      .catch(() => setProfile(null))
-      .finally(() => setLoading(false))
+    getProfile()
   }, [])
 
   if (loading) return <Skeleton />
 
-  const data = profile || {}
   const fullName = data.full_name || data.username || authUser?.username || 'Foydalanuvchi'
   const initials = fullName.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
   const role = (data.roles?.[0] || authUser?.roles?.[0] || 'admin')
@@ -463,14 +471,78 @@ export default function ProfilePage() {
     try { social = JSON.parse(data.social_links) } catch { social = {} }
   }
 
+  const handleSave = async () => {
+    const isCardChanged = data.card_number !== profile.card_number && data.card_number.trim() !== "";
+    const isSocialChanged = JSON.stringify(data.social_links || "") !== JSON.stringify(profile.social_links || "");
+
+    try {
+      if (isCardChanged && isSocialChanged) {
+        const resCard = await axiosAPI.put("users/me/card-number/", {
+          card_number: data.card_number.replace(/\s/g, '')
+        })
+        const resLinks = await axiosAPI.put("users/me/social-links/", {
+          social_links: data.social_links
+        })
+
+        getProfile()
+        
+        toast.success("Ma'lumotlar yangilandi!", `${resCard.data.data.message}, ${resLinks.data.data.message}`)
+      } else if (isCardChanged) {
+        const resCard = await axiosAPI.put("users/me/card-number/", {
+          card_number: data.card_number.replace(/\s/g, '')
+        })
+        console.log(resCard);
+
+        getProfile()
+        toast.success("Ma'lumotlar yangilandi!", resCard.data.data.message)
+      } else if (isSocialChanged) {
+        const resLinks = await axiosAPI.put("users/me/social-links/", {
+          social_links: data.social_links
+        })
+
+        getProfile()
+        toast.success("Ma'lumotlar yangilandi!", resLinks.data.data.message)
+      }
+    } catch (error) {
+
+      const errData = error?.response?.data?.error;
+
+      // Field-level detail xatolarini chiqarish (masalan: password, name ...)
+      let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+
+      if (errData?.details && typeof errData.details === 'object') {
+        const serverErrors = {};
+        Object.entries(errData.details).forEach(([key, messages]) => {
+          let field = key;
+          if (key === 'fixed_salary') field = 'salary';
+          if (key === 'passport_series') field = 'passportSeria';
+          serverErrors[field] = Array.isArray(messages) ? messages[0] : messages;
+        });
+        setErrors(serverErrors);
+
+        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        if (detailMsgs) errMsg = detailMsgs;
+      } else if (errData?.errorMsg) {
+        errMsg = errData.errorMsg;
+      } else if (typeof error?.response?.data === 'string') {
+        errMsg = error.response.data;
+      }
+      toast.error("Xatolik yuz berdi.", errMsg)
+    }
+  }
+
   const rowCls = 'grid grid-cols-2 gap-4'
 
+  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+
+
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-3 w-full">
       <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Shaxsiy kabinet</h1>
 
       {/* Avatar + Name */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2.5">
         {data.avatar ? (
           <img src={data.avatar} alt="avatar"
             className="w-[72px] h-[72px] rounded-2xl object-cover shrink-0" />
@@ -496,6 +568,23 @@ export default function ProfilePage() {
       <div className={rowCls}>
         <Field label="Oylik maosh (UZS)" value={fmtNum(data.fixed_salary)} />
         <Field label="Balansi (UZS)" value={fmtNum(data.balance)} />
+      </div>
+
+      <div className={rowCls}>
+        <SocialField label="Telifon raqami" value={formatCard(data.phone_number)} />
+
+        <div>
+          <label className={labelCls}>Karta raqami</label>
+
+          <input
+            className={inputCls}
+            type="text"
+            inputMode="numeric"
+            placeholder="0000 0000 0000 0000"
+            value={data.card_number || ''}
+            onChange={e => set('card_number', formatCard(e.target.value))}
+          />
+        </div>
       </div>
 
       {/* Viloyat + Tuman */}
@@ -546,41 +635,38 @@ export default function ProfilePage() {
         </Field>
       </div>
 
-      {/* Telefon + Karta */}
-      <div className={rowCls}>
-        <SocialField label="Telefon raqami" value={formatPhone(data.phone_number)} />
-        <SocialField label="Karta raqami" value={formatCard(data.card_number)} />
-      </div>
-
       {/* Social Links */}
-      <div className="grid grid-cols-3 gap-4">
-        {Array.isArray(social) ? (
-          social.map((link, i) => (
-            <SocialField
-              key={i}
-              label={`${i + 1}.Havola`}
-              value={link}
-              icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#5B6078] dark:text-[#C2C8E0] shrink-0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>}
-            />
-          ))
-        ) : (
-          [
-            {
-              key: 'github', label: 'GitHub', value: social.github,
-              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#1A1D2E] dark:text-white shrink-0"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" /></svg>
-            },
-            {
-              key: 'linkedin', label: 'LinkedIn', value: social.linkedin,
-              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#0077B5] shrink-0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
-            },
-            {
-              key: 'telegram', label: 'Telegram', value: social.telegram,
-              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#229ED9] shrink-0"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
-            },
-          ].map(({ key, label, value, icon }) => (
-            <SocialField key={key} label={label} value={value} icon={icon} />
-          ))
-        )}
+      <div className="grid grid-cols-3 gap-3">
+        {data.social_links?.map((link, index) => (
+          <div key={index} className="flex items-end gap-3">
+            <div className="flex-1">
+              <label className={labelCls}>{index + 1}.Havola qo'shish</label>
+              <input
+                className={inputCls}
+                placeholder="Havola yuklang"
+                value={link}
+                onChange={e => {
+                  const newLinks = [...data.social_links];
+                  newLinks[index] = e.target.value;
+                  set('social_links', newLinks);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (index === data.social_links?.length - 1 && index < 4) {
+                  set('social_links', [...data.social_links, '']);
+                } else {
+                  set('social_links', data.social_links?.filter((_, i) => i !== index))
+                }
+              }}
+              className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+            >
+              {index === data.social_links?.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
+            </button>
+          </div>
+        ))}
       </div>
 
       {/* Lavozim + Rol */}
@@ -616,6 +702,21 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E2E6F2] dark:border-[#292A2A]">
+        <button
+          onClick={() => setData(profile)}
+          className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
+        >
+          Tozalash
+        </button>
+        <button
+          onClick={handleSave}
+          className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[#3F57B3] hover:bg-[#32458C]"
+        >
+          Saqlash
+        </button>
       </div>
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}

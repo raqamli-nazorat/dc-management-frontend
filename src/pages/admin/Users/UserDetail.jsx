@@ -78,7 +78,7 @@ const UserDetail = () => {
             const { data } = await axiosAPI.get(`users/${id}`)
             setUser(data.data)
             if (!refresh) setLoading(false)
-                 
+
             if (refresh) {
                 toast.success("Ma'lumotlar yangilandi!")
             }
@@ -291,9 +291,8 @@ const UserDetail = () => {
     if (loading) return <span>Loading...</span>
     if (!user) return <span>User not found</span>
 
-    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border 
-      bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB]
-      dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+    
     const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
 
     return (
@@ -542,8 +541,8 @@ const UserDetail = () => {
                     </div>
 
                     {/* Social Links + Lavozim + Rol */}
-                    <div className="grid grid-cols-4 gap-3">
-                        <div className="col-span-2 grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="col-span-1 flex flex-col gap-3">
                             {form.links?.map((link, index) => (
                                 <div key={index} className="flex items-end gap-3">
                                     <div className="flex-1">
@@ -559,62 +558,52 @@ const UserDetail = () => {
                                             }}
                                         />
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            if (index === form.links.length - 1 && index < 4) {
-                                                set('links', [...form.links, '']);
-                                            } else {
-                                                set('links', form.links.filter((_, i) => i !== index))
-                                            }
-                                        }}
-                                        className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
-                                    >
-                                        {index === form.links.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
-                                    </button>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="flex items-center mb-auto justify-between mt-5">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                        <div className="flex flex-col gap-5">
+                            <div className="flex items-center mb-auto justify-between mt-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                        <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                    </div>
+                                    <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Lavozimi</span>
                                 </div>
-                                <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Lavozimi</span>
+
+                                <Dropdown
+                                    width={170}
+                                    options={positions.map(p => p.name)}
+                                    value={form.position_info?.name || ''}
+                                    onChange={v => {
+                                        const selectedPosition = positions.find(p => p.name === v);
+                                        set('position_info', selectedPosition || null);
+                                    }}
+                                    placeholder='Lavozimni tanlang'
+                                    padding="10px 12px"
+                                />
                             </div>
 
-                            <Dropdown
-                                width={170}
-                                options={positions.map(p => p.name)}
-                                value={form.position_info?.name || ''}
-                                onChange={v => {
-                                    const selectedPosition = positions.find(p => p.name === v);
-                                    set('position_info', selectedPosition || null);
-                                }}
-                                placeholder='Lavozimni tanlang'
-                                padding="10px 12px"
-                            />
-                        </div>
-
-                        <div className="flex items-center mb-auto gap-3 mt-5">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+                            <div className="flex items-center mb-auto justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                        <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+                                    </div>
+                                    <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Roli</span>
                                 </div>
-                                <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Roli</span>
-                            </div>
 
-                            <Dropdown
-                                width={170}
-                                options={Object.values(Roles)}
-                                value={form.roles}
-                                onChange={v => set('roles', v)}
-                                multiple
-                                placeholder={form.roles?.length === 0 ? "Rolni tanlang" : "Tanlangan rollar:"}
-                                padding="10px 12px"
-                            />
+                                <Dropdown
+                                    width={170}
+                                    options={Object.values(Roles)}
+                                    value={form.roles}
+                                    onChange={v => set('roles', v)}
+                                    multiple
+                                    placeholder={form.roles?.length === 0 ? "Rolni tanlang" : "Tanlangan rollar:"}
+                                    padding="10px 12px"
+                                />
+                            </div>
                         </div>
+
                     </div>
 
 
