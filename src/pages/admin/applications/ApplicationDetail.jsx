@@ -321,15 +321,15 @@ const ApplicationDetail = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => setIsModalOpen(false)} />
-          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-[#141414] p-6 border border-white/5">
+          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-white dark:bg-[#141414] p-6 border border-white/5">
             <div className="flex items-center gap-3 mb-5">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-white hover:opacity-70 cursor-pointer"
+                className="dark:text-white text-black hover:opacity-70 cursor-pointer"
               >
                 <FaArrowLeft size={18} />
               </button>
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold dark:text-white text-black">
                 Xulosa kiriting
               </h2>
             </div>
@@ -341,7 +341,7 @@ const ApplicationDetail = () => {
                   setModalConclusion(e.target.value)
                   if (e.target.value.trim()) setError('')
                 }}
-                className={`w-full h-[150px] p-4 rounded-xl bg-transparent border ${error ? 'border-[#fa5252]' : 'border-white/10'} text-white text-sm outline-none resize-none placeholder-white/20 focus:border-white/30 transition-colors`}
+                className={`w-full h-[150px] p-4 rounded-xl dark:bg-[#141414] border ${error ? 'border-[#fa5252]' : 'border-slate-300'} dark:text-white text-black text-sm placeholder:text-gray-500 outline-none resize-none dark:placeholder-white/20 dark:focus:border-white/20 dark:border-[#292A2A] focus:border-slate-400 transition-colors`}
                 placeholder="Xulosangizni shu yerga yozing..."
               />
               {error && (
