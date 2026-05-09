@@ -95,25 +95,24 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClick={onClose}
         >
             <div
-                className="w-full max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[#292A2A]"
+                className="w-full  h-[600px] flex flex-col max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden  "
                 onClick={(e) => e.stopPropagation()}
             >
-                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
-                    <FaXmark size={16} />
-                </button>
+
 
                 {/* Modal Header */}
-                <div className="flex items-center px-6 py-5 border-b border-b-gray-100 dark:border-[#292A2A]">
+                <div className="flex items-center px-6 py-5 ">
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-white">
                         <FaArrowLeft size={18} />
                     </button>
                     <h2 className="ml-2 text-[17px] font-bold text-[#1A1D2E] dark:text-white">{title}</h2>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 pt-0      flex flex-col flex-1  ">
                     {/* Controls: Select All & Search */}
                     <div className="flex items-center gap-3 mb-6">
                         <button
@@ -136,7 +135,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     </div>
 
                     {/* Employee List */}
-                    <div className="space-y-3 min-h-[400px] max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-3 flex-1 h-[340px] max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
                         {employees?.map((emp) => {
                             const isSelected = selectedIds.includes(emp.id);
                             return (
@@ -184,7 +183,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex items-center justify-between mt-8 pt-2">
+                    <div className="flex  items-center justify-between mt-8 pt-6">
                         <span className="text-gray-500 dark:text-[#8E95B5] font-medium text-sm">
                             {selectedIds.length} ta tanlangan
                         </span>

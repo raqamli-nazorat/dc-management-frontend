@@ -20,6 +20,18 @@ const HOLAT_LIST = [
   { label: 'Bekor qilingan', value: 'cancelled' },
 ]
 
+// Joriy oyning birinchi va oxirgi sanasini YYYY-MM-DD formatda qaytaradi
+function getMonthRange() {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const lastDay = new Date(y, now.getMonth() + 1, 0).getDate()
+  return {
+    from: `${y}-${m}-01`,
+    to: `${y}-${m}-${String(lastDay).padStart(2, '0')}`,
+  }
+}
+
 export const TASK_EMPTY_FILTER = {
   projects: [],
   created_by: [],
@@ -31,6 +43,17 @@ export const TASK_EMPTY_FILTER = {
   deadFromT: '',
   deadToD: '',
   deadToT: '',
+}
+
+function getDefaultFilter() {
+  const { from, to } = getMonthRange()
+  return {
+    ...TASK_EMPTY_FILTER,
+    deadFromD: from,
+    deadFromT: '00:00',
+    deadToD: to,
+    deadToT: '23:59',
+  }
 }
 
 /* ─── SimpleDropdown — { label, value } yoki string options ─── */
@@ -158,8 +181,8 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[90vh]">
+      <div className="fixed inset-0 " />
+      <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[90vh]">
 
         {/* Header */}
         <div className="px-7 pt-7 pb-4 shrink-0">
@@ -225,7 +248,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-between shrink-0 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+        <div className="px-7 py-5 flex items-center justify-between shrink-0 ">
           <span className="text-sm text-[#8F95A8]">{local.length} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button
@@ -255,26 +278,25 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 export default function TaskFilterModal({ onClose, onApply, initial }) {
   const { user } = useAuth()
 
-  const [f, setF] = useState({ ...TASK_EMPTY_FILTER, ...initial })
+  const [f, setF] = useState(() => ({ ...getDefaultFilter(), ...initial }))
   const set = (k, v) => setF(p => ({ ...p, [k]: v }))
   const [subModal, setSubModal] = useState(null) // 'project' | 'author'
 
   const [projectsList, setProjectsList] = useState([])
   const [authorsList, setAuthorsList] = useState([])
+  const [allUsersList, setAllUsersList] = useState([])
 
   const handleSelectEmployees = (selectedIds) => {
-    // Map IDs to full objects using authorsList
     const selectedObjects = selectedIds.map(id => {
-      return authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
+      return allUsersList.find(a => a.id === id) || authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
     })
     setF(prev => ({ ...prev, created_by: selectedObjects }))
     setSubModal(null)
   }
 
   const handleSelectAssignee = (selectedIds) => {
-    // Map IDs to full objects using authorsList
     const selectedObjects = selectedIds.map(id => {
-      return authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
+      return allUsersList.find(a => a.id === id) || authorsList.find(a => a.id === id) || { id, username: `ID: ${id}` }
     })
     setF(prev => ({ ...prev, assignee: selectedObjects }))
     setSubModal(null)
@@ -296,9 +318,16 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           }).catch(() => { })
       })
 
+    // Admin/manager uchun muallif ro'yxati
     axiosAPI.get('/users/all/', { params: { roles: 'admin' } })
       .then(res => {
         setAuthorsList(res.data?.data?.results || [])
+      }).catch(() => { })
+
+    // Barcha userlar — xodim tanlashda username topish uchun
+    axiosAPI.get('/users/all/', { params: { page_size: 500 } })
+      .then(res => {
+        setAllUsersList(res.data?.data?.results || [])
       }).catch(() => { })
   }, [])
 
@@ -327,7 +356,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col">
 
           {/* Header */}
           <div className="px-7 pt-7 pb-3">
@@ -341,7 +370,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           </div>
 
           {/* Body */}
-          <div className="px-7 pb-5 pt-2 flex flex-col gap-4">
+          <div className="px-7 pb-5 pt-2 flex flex-col gap-4 flex-1">
 
             {/* Loyiha */}
             <MultiChipField
@@ -411,19 +440,27 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
             <div>
               <label className={labelCls}>Muddat oralig'i</label>
               <div className="grid grid-cols-4 gap-2">
-                <DateTimeBox type="date" placeholder="dan" value={f.deadFromD} onChange={v => set('deadFromD', v)} />
+                <DateTimeBox type="date" placeholder="dan" value={f.deadFromD}
+                  onChange={v => {
+                    set('deadFromD', v)
+                    if (v && !f.deadFromT) set('deadFromT', '23:59')
+                  }} />
                 <DateTimeBox type="time" value={f.deadFromT} onChange={v => set('deadFromT', v)} />
-                <DateTimeBox type="date" placeholder="gacha" value={f.deadToD} onChange={v => set('deadToD', v)} />
+                <DateTimeBox type="date" placeholder="gacha" value={f.deadToD}
+                  onChange={v => {
+                    set('deadToD', v)
+                    if (v && !f.deadToT) set('deadToT', '23:59')
+                  }} />
                 <DateTimeBox type="time" value={f.deadToT} onChange={v => set('deadToT', v)} />
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="px-7 py-5 flex items-center justify-end">
+          <div className="px-7 py-5 flex items-center  justify-end">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setF({ ...TASK_EMPTY_FILTER })}
+                onClick={() => setF(getDefaultFilter())}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                   text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
               >
@@ -459,7 +496,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           param={{ roles: "admin" }}
           title='Muallif tanlash'
           selectedList={f.created_by ? f.created_by.map(u => u.id || u) : []}
-          onConfirm={handleSelectEmployees}
+           onConfirm={handleSelectEmployees}
         />
       )}
 
@@ -467,7 +504,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
         <EmployeeStep
           onClose={() => setSubModal(null)}
           employee_role={user.active_role !== "admin" ? "employee" : "all"}
-          title='Xodim tanlash'
+          title='Xodim tanlang'
           selectedList={f.assignee ? f.assignee.map(u => u.id || u) : []}
           onConfirm={handleSelectAssignee}
         />
