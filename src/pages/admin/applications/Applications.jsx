@@ -198,27 +198,38 @@ const ApplicationsPage = () => {
           >
             Arizalar
           </h1>
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Ism Sharifi bo'yicha izlash"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
-                style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
-              />
+          <div className="flex items-center justify-between gap-5">
+            <div className="flex items-center gap-5">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Ism Sharifi bo'yicha izlash"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+                  style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
+                />
+              </div>
+              <button
+                onClick={() => setFilterModal(true)}
+                className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
+              >
+                <LuFilter size={16} />
+                Filtrlash
+              </button>
             </div>
-            <button
-              onClick={() => setFilterModal(true)}
-              className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
-            >
-              <LuFilter size={16} />
-              Filtrlash
-            </button>
+            <div className="relative group flex items-center gap-2">
+              <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF] bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                Arizalar tashqi platforma orqali yuboriladi va ushbu tizimda yaratilmaydi.
+              </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
+                <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
+              </button>
+            </div>
           </div>
 
           <div
