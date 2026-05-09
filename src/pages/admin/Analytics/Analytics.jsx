@@ -7,21 +7,14 @@ import { useTheme } from '../../../context/ThemeContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { usePageAction } from '../../../context/PageActionContext'
 
+// period value → months soni
 const PERIODS = [
-  { label: '1 oy', value: '1m' },
-  { label: '3 oy', value: '3m' },
-  { label: '6 oy', value: '6m' },
-  { label: '1 yil', value: '1y' },
+  { label: '1 oy',  value: 1  },
+  { label: '3 oy',  value: 3  },
+  { label: '6 oy',  value: 6  },
+  { label: '1 yil', value: 12 },
 ]
 
-const PERIOD_ALIASES = {
-  '1m': ['1m', 'month', '1_month'],
-  '3m': ['3m', 'quarter', '3_months'],
-  '6m': ['6m', 'half_year', '6_months'],
-  '1y': ['1y', 'year', '12_months'],
-}
-
-// Custom Colors matching Figma
 const PROJECT_BAR_COLORS = ['#A3E635', '#74BDB1', '#212121', '#ED2E2E', '#D9D9D9']
 const MEETING_DONUT_COLORS = ['#39c239', '#92bfff', '#fa5252']
 
@@ -41,37 +34,53 @@ function CustomTooltip({ active, payload, label, isDark }) {
   )
 }
 
-// Custom Dot for Line Chart
 const CustomDot = (props) => {
-  const { cx, cy, isDark } = props;
-  if (!cx || !cy) return null;
+  const { cx, cy, isDark } = props
+  if (!cx || !cy) return null
   return (
     <g>
-      <line x1={cx} y1={cy} x2={cx} y2={500} stroke={isDark ? "#292A2A" : "#E2E6F2"} strokeWidth={1.5} />
-      <circle cx={cx} cy={cy} r={6} stroke={isDark ? "#fff" : "#1A1D2E"} strokeWidth={3} fill={isDark ? "#1C1D1D" : "#fff"} />
+      <line x1={cx} y1={cy} x2={cx} y2={500} stroke={isDark ? '#292A2A' : '#E2E6F2'} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={6} stroke={isDark ? '#fff' : '#1A1D2E'} strokeWidth={3} fill={isDark ? '#1C1D1D' : '#fff'} />
     </g>
-  );
-};
+  )
+}
+
+// 0 bo'lganda ham minimal balandlik beradigan custom bar shape
+const MinBarShape = (props) => {
+  const { x, y, width, height, fill, index } = props
+  const MIN_H = 8
+  const r = 10
+  const h = Math.max(height, MIN_H)
+  const actualY = y + height - h
+  return (
+    <rect
+      x={x}
+      y={actualY}
+      width={width}
+      height={h}
+      rx={r}
+      ry={r}
+      fill={PROJECT_BAR_COLORS[index % PROJECT_BAR_COLORS.length]}
+    />
+  )
+}
 
 export default function AnalyticsPage() {
   const { isDark } = useTheme()
-  const { registerCustomAction, clearCustomAction, registerNavbarExtra, clearNavbarExtra } = usePageAction()
-  const [period, setPeriod] = useState('1m')
+  const { registerCustomAction, clearCustomAction } = usePageAction()
+  const [period, setPeriod] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const [stats, setStats] = useState({
-    tasks: 0,
-    projects: 0,
-    meetings: 0,
-    taskCompletionRate: 0,
-    total_duration_minutes: 0
+    tasks: 0, projects: 0, meetings: 0,
+    taskCompletionRate: 0, total_duration_minutes: 0
   })
-
-  const [taskData, setTaskData] = useState([])
+  const [taskData, setTaskData]       = useState([])
   const [projectData, setProjectData] = useState([])
   const [meetingData, setMeetingData] = useState([])
 
+  // Navbar period selector
   useEffect(() => {
     const selector = (
       <div className="flex items-center gap-1 p-1 rounded-xl bg-white dark:bg-[#1E2021] shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]">
@@ -88,73 +97,61 @@ export default function AnalyticsPage() {
           </button>
         ))}
       </div>
-    );
-    registerCustomAction(selector);
-    return () => clearCustomAction();
+    )
+    registerCustomAction(selector)
+    return () => clearCustomAction()
   }, [period, registerCustomAction, clearCustomAction])
 
-  useEffect(() => {
-    fetchAll()
-  }, [period])
+  useEffect(() => { fetchAll() }, [period])
 
   const fetchAll = async () => {
     setLoading(true)
     setError('')
     try {
-      const periodCandidates = PERIOD_ALIASES[period] ?? [period]
-      const paramCandidates = [
-        ...periodCandidates.map((v) => ({ period: v })),
-        ...periodCandidates.map((v) => ({ range: v })),
-      ]
-      let res = null
-      for (const params of paramCandidates) {
-        try {
-          const attempt = await axiosAPI.get('/users/me/period-statistics/', { params })
-          if ((attempt.data?.success ?? true) && attempt.data?.data) {
-            res = attempt
-            break
-          }
-        } catch { }
-      }
-      if (!res) throw new Error('No working period parameter')
+      const res = await axiosAPI.get('/users/me/period-statistics/', {
+        params: { months: period }
+      })
 
       const payload = res.data?.data ?? {}
-      const taskStats = payload.tasks ?? {}
+      const taskStats    = payload.tasks    ?? {}
       const projectStats = payload.projects ?? {}
       const meetingStats = payload.meetings ?? {}
 
-      const offsets = [4, -2, 6, -5, 3, -1, 5];
+      // Vazifalar — line chart
+      const offsets = [4, -2, 6, -5, 3, -1, 5]
       const tData = [
-        { name: 'Qilish kerak', value: taskStats.todo ?? 0 },
-        { name: 'Jarayonda', value: taskStats.in_progress ?? 0 },
-        { name: 'Bajarilgan', value: taskStats.done ?? 0 },
-        { name: 'Ishga tushurilgan', value: taskStats.production ?? 0 },
-        { name: 'Tekshirilgan', value: taskStats.checked ?? 0 },
-        { name: 'Rad etilgan', value: taskStats.rejected_tasks ?? 0 },
-        { name: "Muddati o'tgan", value: taskStats.overdue ?? 0 },
-      ];
-      setTaskData(tData.map((d, i) => ({ ...d, prevValue: Math.max(0, d.value + offsets[i]) })));
+        { name: 'Qilish kerak',      value: taskStats.todo            ?? 0 },
+        { name: 'Jarayonda',         value: taskStats.in_progress     ?? 0 },
+        { name: 'Bajarilgan',        value: taskStats.done            ?? 0 },
+        { name: 'Ishga tushurilgan', value: taskStats.production      ?? 0 },
+        { name: 'Tekshirilgan',      value: taskStats.checked         ?? 0 },
+        { name: 'Rad etilgan',       value: taskStats.rejected_tasks  ?? 0 },
+        { name: "Muddati o'tgan",    value: taskStats.overdue         ?? 0 },
+      ]
+      setTaskData(tData.map((d, i) => ({ ...d, prevValue: Math.max(0, d.value + offsets[i]) })))
 
+      // Loyihalar — bar chart (real data, no fallback)
       setProjectData([
-        { name: 'Tugatilgan', value: projectStats.completed ?? 109 },
-        { name: 'Jarayonda', value: projectStats.active ?? 67 },
-        { name: 'Bekor qilingan', value: projectStats.cancelled ?? 13 },
-        { name: 'Muddati o\'tgan', value: projectStats.overdue ?? 5 },
-        { name: 'Rejalashtirilgan', value: projectStats.planning ?? 58 },
+        { name: 'Tugatilgan',       value: projectStats.completed ?? 0 },
+        { name: 'Jarayonda',        value: projectStats.active    ?? 0 },
+        { name: 'Bekor qilingan',   value: projectStats.cancelled ?? 0 },
+        { name: "Muddati o'tgan",   value: projectStats.overdue   ?? 0 },
+        { name: 'Rejalashtirilgan', value: projectStats.planning  ?? 0 },
       ])
 
+      // Yig'ilishlar — donut chart
       setMeetingData([
-        { name: 'Qatnashdi', value: meetingStats.attended ?? 0 },
-        { name: 'Sababli', value: meetingStats.unexcused ?? 0 },
-        { name: 'Sababsiz', value: meetingStats.missed ?? 0 },
+        { name: 'Qatnashdi',  value: meetingStats.attended   ?? 0 },
+        { name: 'Sababli',    value: meetingStats.with_reason ?? 0 },
+        { name: 'Sababsiz',   value: meetingStats.unexcused  ?? 0 },
       ])
 
       setStats({
-        tasks: taskStats.total ?? 0,
-        projects: projectStats.total ?? 0,
-        meetings: meetingStats.total ?? 0,
-        taskCompletionRate: taskStats.completion_rate ?? 0,
-        total_duration_minutes: meetingStats.total_duration_minutes ?? 1220
+        tasks:                taskStats.total                  ?? 0,
+        projects:             projectStats.total               ?? 0,
+        meetings:             meetingStats.total               ?? 0,
+        taskCompletionRate:   taskStats.completion_rate        ?? 0,
+        total_duration_minutes: meetingStats.total_duration_minutes ?? 0,
       })
     } catch {
       setError("Analitika ma'lumotlarini yuklab bo'lmadi")
@@ -166,11 +163,10 @@ export default function AnalyticsPage() {
     }
   }
 
-  const textColor = isDark ? '#8F95A8' : '#8F95A8'
-  const projectMax = Math.max(20, ...projectData.map((item) => Number(item.value) || 0))
+  const textColor  = '#8F95A8'
+  const projectMax = Math.max(5, ...projectData.map(d => Number(d.value) || 0))
   const projectTop = Math.ceil(projectMax / 5) * 5
   const projectTicks = Array.from({ length: projectTop / 5 + 1 }, (_, i) => i * 5)
-
 
   return (
     <div className="flex flex-col gap-4 h-[calc(100vh-120px)] w-full overflow-hidden">
@@ -198,15 +194,13 @@ export default function AnalyticsPage() {
                 <XAxis
                   dataKey="name"
                   tick={{ fill: '#8F95A8', fontSize: 15, fontWeight: 500, pointerEvents: 'none' }}
-                  axisLine={false}
-                  tickLine={false}
-                  dy={15}
-                  interval={0}
+                  axisLine={false} tickLine={false} dy={15} interval={0}
                   padding={{ left: 30, right: 30 }}
                 />
                 <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ fill: 'transparent', stroke: 'transparent' }} />
                 <Line type="monotone" dataKey="prevValue" name="O'tgan davr" stroke="#D0CCF7" strokeWidth={2} strokeDasharray="5 5" dot={false} activeDot={false} />
-                <Line type="monotone" dataKey="value" name="Vazifalar" stroke="#526ED3" strokeWidth={2.5} dot={(props) => <CustomDot {...props} isDark={isDark} />} activeDot={false} />
+                <Line type="monotone" dataKey="value" name="Vazifalar" stroke="#526ED3" strokeWidth={2.5}
+                  dot={(props) => <CustomDot {...props} isDark={isDark} />} activeDot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -215,6 +209,7 @@ export default function AnalyticsPage() {
 
       {/* Bottom Row */}
       <div className="grid grid-cols-2 gap-4 h-[300px] shrink-0">
+
         {/* Loyihalar Bar Chart */}
         <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
           <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-6 shrink-0">Loyihalar</h3>
@@ -226,13 +221,21 @@ export default function AnalyticsPage() {
               </svg>
             </div>
           ) : (
-            <div className="flex-1 min-h-0 relative ">
+            <div className="flex-1 min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={projectData} margin={{ top: 10, right: 10, left: -25, bottom: 15 }} barSize={34}>
-                  <XAxis dataKey="name" tick={{ fill: '#5B6078', fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} dy={15} />
-                  <YAxis tick={{ fill: textColor, fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, projectTop]} ticks={projectTicks} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: '#5B6078', fontSize: 12, fontWeight: 500 }}
+                    axisLine={false} tickLine={false} dy={15}
+                  />
+                  <YAxis
+                    tick={{ fill: textColor, fontSize: 12 }}
+                    axisLine={false} tickLine={false}
+                    domain={[0, projectTop]} ticks={projectTicks}
+                  />
                   <Tooltip content={<CustomTooltip isDark={isDark} />} cursor={{ fill: 'transparent' }} />
-                  <Bar dataKey="value" name="Loyihalar" radius={[10, 10, 10, 10]}>
+                  <Bar dataKey="value" name="Loyihalar" shape={<MinBarShape />} radius={[10, 10, 10, 10]}>
                     {projectData.map((_, i) => <Cell key={i} fill={PROJECT_BAR_COLORS[i % 5]} />)}
                   </Bar>
                 </BarChart>
@@ -257,19 +260,17 @@ export default function AnalyticsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={meetingData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="50%"
-                      outerRadius="95%"
-                      paddingAngle={4}
-                      dataKey="value"
-                      stroke="none"
-                      startAngle={90}
-                      endAngle={-270}
-                      cornerRadius={5}
+                      data={meetingData.every(d => d.value === 0)
+                        ? meetingData.map(d => ({ ...d, value: 1 }))
+                        : meetingData}
+                      cx="50%" cy="50%"
+                      innerRadius="50%" outerRadius="95%"
+                      paddingAngle={4} dataKey="value"
+                      stroke="none" startAngle={90} endAngle={-270} cornerRadius={5}
                     >
-                      {meetingData.map((_, i) => <Cell key={i} fill={MEETING_DONUT_COLORS[i % 3]} />)}
+                      {meetingData.map((_, i) => (
+                        <Cell key={i} fill={meetingData.every(d => d.value === 0) ? '#E2E6F2' : MEETING_DONUT_COLORS[i % 3]} />
+                      ))}
                     </Pie>
                     <Tooltip content={<CustomTooltip isDark={isDark} />} />
                   </PieChart>
@@ -280,7 +281,9 @@ export default function AnalyticsPage() {
               <div className="flex-1 flex flex-col mr-4">
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-[14px] text-[#1A1D2E] dark:text-white font-medium">Umumiy soni:</span>
-                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">{stats.meetings} / {stats.total_duration_minutes} daqiqa</span>
+                  <span className="text-[14px] text-[#1A1D2E] dark:text-[#C2C8E0]">
+                    {stats.meetings} / {stats.total_duration_minutes} daqiqa
+                  </span>
                 </div>
                 <div className="flex flex-col gap-4">
                   {meetingData.map((item, i) => (
