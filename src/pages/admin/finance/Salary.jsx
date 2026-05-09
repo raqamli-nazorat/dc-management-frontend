@@ -544,8 +544,8 @@ export default function SalaryPage() {
             <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
             bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A]
             opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-              Ish haqi har oyning 4-sanasidan boshlab tasdiqlanadi.
-            </div>
+              Tasdiqlash orqali ish haqi yakuniy hisob bo‘yicha hisoblanadi.
+             </div>
             <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
               <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />

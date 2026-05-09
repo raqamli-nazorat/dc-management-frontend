@@ -24,3 +24,5 @@ export function parseApiError(err, fallback = 'Xatolik yuz berdi') {
   }
   return errorMsg || fallback
 }
+
+
