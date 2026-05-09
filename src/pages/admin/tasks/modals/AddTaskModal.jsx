@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react"
+﻿import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
 import { labelCls } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
@@ -39,23 +39,23 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error })
         <button type="button" onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
             bg-white dark:bg-[#191A1A]
-            ${error ? "border-red-400" : "border-[#E2E6F2] dark:border-[#292A2A]"}
-            ${value ? "text-[#1A1D2E] dark:text-white" : "text-[#5B6078] dark:text-[#5B6078]"}`}>
+            ${error ? "border-red-400" : "border-[var(--stroke-sub)] dark:border-[#292A2A]"}
+            ${value ? "text-[var(--text-strong)] dark:text-white" : "text-[var(--text-sub)] dark:text-[var(--text-sub)]"}`}>
           <span className="flex-1 text-left truncate">{selected?.label || placeholder}</span>
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
-            {value && <span onMouseDown={e => { e.stopPropagation(); onChange("") }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>}
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? "rotate-180" : ""}`} />
+            {value && <span onMouseDown={e => { e.stopPropagation(); onChange("") }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>}
+            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? "rotate-180" : ""}`} />
           </div>
         </button>
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
         {open && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer
                   ${i < options.length - 1 ? "border-b border-[#F1F3F9] dark:border-[#2A2B2B]" : ""}
-                  ${value === o.value ? "bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]" : "text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]"}`}>
+                  ${value === o.value ? "bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]" : "text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]"}`}>
                 {o.label}
               </button>
             ))}
@@ -90,8 +90,8 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
           onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
             bg-white dark:bg-[#191A1A]
-            ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#5B6078]'}`}
+            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+            ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-sub)]'}`}
         >
           <span className="flex-1 text-left truncate">
             {selected ? selected.title : 'Loyiha tanlang'}
@@ -100,12 +100,12 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
             {value && (
               <span
                 onMouseDown={e => { e.stopPropagation(); onChange('') }}
-                className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"
+                className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"
               >
                 <FaXmark size={11} />
               </span>
             )}
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
@@ -114,10 +114,10 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
         {/* Dropdown */}
         {open && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             <div className="overflow-y-auto max-h-64">
               {projects.length === 0 && (
-                <p className="text-sm text-[#8F95A8] text-center py-6">Loyihalar topilmadi</p>
+                <p className="text-sm text-[var(--text-soft)] text-center py-6">Loyihalar topilmadi</p>
               )}
               {projects.map(p => {
                 const isActive = String(value) === String(p.id)
@@ -128,21 +128,21 @@ function ProjectDropdownLocal({ value, onChange, error, projects }) {
                     onClick={() => { onChange(String(p.id)); setOpen(false) }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer transition-colors
                       border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0
-                      ${isActive ? 'bg-[#F1F3F9] dark:bg-[#252626]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
+                      ${isActive ? 'bg-[#F1F3F9] dark:bg-[#252626]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'}`}
                   >
                     {/* Left: title + description */}
                     <div className="flex flex-col min-w-0 flex-1 pr-3">
-                      <span className="text-sm font-semibold truncate leading-snug text-[#1A1D2E] dark:text-white">
+                      <span className="text-sm font-semibold truncate leading-snug text-[var(--text-strong)] dark:text-white">
                         {p.title}
                       </span>
                       {p.description && (
-                        <span className="text-xs text-[#8F95A8] dark:text-[#5B6078] truncate leading-snug mt-0.5">
+                        <span className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate leading-snug mt-0.5">
                           {p.description}
                         </span>
                       )}
                     </div>
                     {/* Right: date */}
-                    <span className="shrink-0 text-sm text-[#8F95A8] dark:text-[#5B6078] font-medium">
+                    <span className="shrink-0 text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] font-medium">
                       {fmtProjectDate(p.deadline)}
                     </span>
                   </button>
@@ -182,37 +182,37 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
         {/* Header */}
         <div className="px-6 pt-6 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
           <div className="flex items-center gap-3 mb-3">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
-            <h2 className="text-lg font-extrabold text-[#1A1D2E] dark:text-white">{title}</h2>
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
+            <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-white">{title}</h2>
           </div>
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[#526ED3]" />
+              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[var(--accent-sub)]" />
           </div>
         </div>
         {/* List */}
         <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-2">
-          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
+          {filtered.length === 0 && <p className="text-sm text-[var(--text-soft)] text-center py-8">Foydalanuvchi topilmadi</p>}
           {filtered.map(u => {
             const isSel = temp?.id === u.id
             return (
               <button key={u.id} onClick={() => setTemp(isSel ? null : u)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left transition-colors
-                  ${isSel ? "bg-[#EEF1FB] border-[#526ED3] dark:bg-[#292A2A] dark:border-[#3F57B3]" : "bg-white border-[#EEF1F7] hover:bg-[#F8F9FC] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]"}`}>
+                  ${isSel ? "bg-[#EEF1FB] border-[var(--accent-sub)] dark:bg-[#292A2A] dark:border-[var(--accent-strong)]" : "bg-white border-[#EEF1F7] hover:bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]"}`}>
                 {/* Radio circle */}
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
-                  ${isSel ? "bg-[#3F57B3] border-[#3F57B3]" : "border-[#D0D5E2] dark:border-[#474848]"}`}>
+                  ${isSel ? "bg-[var(--accent-strong)] border-[var(--accent-strong)]" : "border-[var(--stroke-strong)] dark:border-[#474848]"}`}>
                   {isSel && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
-                <div className="w-9 h-9 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate">{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position || "Ko'rsatilmagan"}</p>
+                  <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{u.username}</p>
+                  <p className="text-xs text-[var(--text-soft)] truncate">{u.position || "Ko'rsatilmagan"}</p>
                 </div>
               </button>
             )
@@ -220,12 +220,12 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
         </div>
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-          <span className="text-sm text-[#5B6078] dark:text-[#C2C8E0]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
+          <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={12} /> Tozalash
             </button>
-            <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
               <FaCheck size={12} /> Tanlash
             </button>
           </div>
@@ -352,7 +352,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
   }
 
   const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[#1A1D2E] placeholder-[#5B6078] dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078] ${err ? "border-red-400" : "border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]"}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)] ${err ? "border-red-400" : "border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]"}`
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -444,10 +444,10 @@ export default function AddTaskModal({ onClose, onAdd }) {
           {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-4 shrink-0  rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Vazifa qo'shish</h2>
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Vazifa qo'shish</h2>
             </div>
-            <p className="text-sm text-[#5B6078] ">Yangi vazifa yaratish uchun ma'lumotlarni kiriting</p>
+            <p className="text-sm text-[var(--text-sub)] ">Yangi vazifa yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
           {/* -- Scroll qilinadigan content -- */}
@@ -472,7 +472,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                   placeholder="Tavsifni yozing" rows={3} className={inputCls(false) + " resize-none pr-8"} />
                 {form.description && (
                   <button type="button" onClick={() => set("description", "")}
-                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                    className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
@@ -491,23 +491,23 @@ export default function AddTaskModal({ onClose, onAdd }) {
               <button type="button"
                 onClick={() => form.project ? setPickerOpen(true) : null}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-                  ${form.project ? 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[#526ED3]' : 'cursor-default bg-[#F8F9FC] dark:bg-[#1A1B1B]'}
-                  border-[#E2E6F2] dark:border-[#292A2A]`}
+                  ${form.project ? 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[var(--accent-sub)]' : 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B]'}
+                  border-[var(--stroke-sub)] dark:border-[#292A2A]`}
               >
                 <span
-                  className={assigneeLabel ? "text-[#1A1D2E] dark:text-white flex-1 text-left truncate" : "text-[#5B6078] flex-1 text-left"}
+                  className={assigneeLabel ? "text-[var(--text-strong)] dark:text-white flex-1 text-left truncate" : "text-[var(--text-sub)] flex-1 text-left"}
                 >
                   {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || "Topshiruvchi tanlang")}
                 </span>
                 <div className="flex items-center gap-1.5 shrink-0 ml-1">
                   {form.assignees.length > 0 && (
                     <span
-                      onMouseDown={e => { e.stopPropagation(); set("assignees", []) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"
+                      onMouseDown={e => { e.stopPropagation(); set("assignees", []) }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"
                     >
                       <FaXmark size={11} />
                     </span>
                   )}
-                  {form.project && <FaChevronDown size={11} className="text-[#8F95A8]" />}
+                  {form.project && <FaChevronDown size={11} className="text-[var(--text-soft)]" />}
                 </div>
               </button>
             </div>
@@ -603,13 +603,13 @@ export default function AddTaskModal({ onClose, onAdd }) {
               <div className="flex flex-wrap gap-2">
                 {/* Yuklangan fayllar */}
                 {attachments.map((att, i) => (
-                  <div key={i} className="relative w-20 h-20 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] overflow-hidden bg-[#F8F9FC] dark:bg-[#191A1A] flex items-center justify-center group">
+                  <div key={i} className="relative w-20 h-20 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] flex items-center justify-center group">
                     {att.preview ? (
                       <img src={att.preview} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center gap-1 px-1">
-                        <FaPaperclip size={16} className="text-[#526ED3]" />
-                        <span className="text-[9px] text-[#5B6078] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
+                        <FaPaperclip size={16} className="text-[var(--accent-sub)]" />
+                        <span className="text-[9px] text-[var(--text-sub)] dark:text-[#C2C8E0] text-center truncate w-full px-1">{att.file.name}</span>
                       </div>
                     )}
                     <button
@@ -626,7 +626,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[#8F95A8] hover:border-[#526ED3] hover:text-[#526ED3] cursor-pointer transition-colors"
+                  className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)] cursor-pointer transition-colors"
                 >
                   <FaPaperclip size={16} />
                   <span className="text-[10px] font-medium">Fayl</span>
@@ -656,11 +656,11 @@ export default function AddTaskModal({ onClose, onAdd }) {
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-end gap-3  shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
             <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
               <FaXmark size={13} /> Yopish
             </button>
             <button onClick={handleSubmit} disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
               {loading
                 ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                 : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>

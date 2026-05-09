@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+﻿import { useEffect, useState } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import dayjs from 'dayjs'
 import { DatePicker, TimePicker, ConfigProvider, theme } from 'antd'
@@ -9,7 +9,7 @@ import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
 
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 
 const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL }) => {
     const { isDark } = useTheme()
@@ -205,9 +205,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-white text-[#1A1D2E] placeholder-[#8F95A8]
-    dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]
-    ${err ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)]
+    dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)]
+    ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
 
     return (
         <>
@@ -221,18 +221,18 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     {/* Header */}
                     <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-white dark:bg-[#111111]">
                         <div className="flex items-center gap-3 mb-1">
-                            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                 <FaArrowLeft size={17} />
                             </button>
-                            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha tahrirlash</h2>
+                            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha tahrirlash</h2>
                         </div>
-                        <p className="text-sm text-[#1A1D2E] dark:text-white">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
+                        <p className="text-sm text-[var(--text-strong)] dark:text-white">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
                     </div>
 
                     {loading ? (
                         <div className="flex flex-col items-center justify-center gap-5 h-[500px]">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0]"> Ma'lumotlar yuklanmoqda...</p>
+                            <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]"> Ma'lumotlar yuklanmoqda...</p>
                         </div>
                     ) : (
                         <div className="px-7 pb-4 flex flex-col gap-4 h-[500px] max-h-[70vh] overflow-y-auto">
@@ -250,18 +250,18 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         <button type="button" onClick={() => setStatusOpen(o => !o)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
                     bg-white dark:bg-[#191A1A]
-                    ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-                    ${form.status ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+                    ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+                    ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
                                             <span>{STATUS_LABEL[form.status] || 'Holati tanlang'}</span>
-                                            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
+                                            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {statusOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                                                 {Object.values(STATUS_LABEL).map((s, i) => (
                                                     <button key={s} type="button" onClick={() => { set('status', Object.keys(STATUS_LABEL).find(key => STATUS_LABEL[key] === s)); setStatusOpen(false) }}
                                                         className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                           ${i < Object.values(STATUS_LABEL).length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                          ${form.status === s ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          ${form.status === s ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                                                         {s}
                                                     </button>
                                                 ))}
@@ -281,7 +281,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         className={inputCls(false) + ' resize-none'} />
                                     {form.description && (
                                         <button type="button" onClick={() => set('description', '')}
-                                            className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                                            className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                                             <FaXmark size={12} />
                                         </button>
                                     )}
@@ -296,7 +296,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         <div onClick={() => setMgrOpen(!mgrOpen)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
                     bg-white dark:bg-[#191A1A]
-                    ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#2A2B2B]'} ${mgrOpen ? 'border-[#526ED3]' : ''}`}>
+                    ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#2A2B2B]'} ${mgrOpen ? 'border-[var(--accent-sub)]' : ''}`}>
                                             {mgrOpen ? (
                                                 <input
                                                     autoFocus
@@ -306,32 +306,32 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                         setMgrQuery(e.target.value)
                                                         getEmployee({ search: e.target.value })
                                                     }}
-                                                    className="flex-1 outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]"
+                                                    className="flex-1 outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]"
                                                 />
                                             ) : (
-                                                <span className={form.manager ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}>
+                                                <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                                                     {form.manager || 'Menejer tanlang'}
                                                 </span>
                                             )}
                                             <div className="flex items-center gap-1.5 shrink-0">
                                                 {form.manager && !mgrOpen && (
                                                     <span onMouseDown={e => { e.stopPropagation(); setForm(p => ({ ...p, manager: '', manager_id: null })) }}
-                                                        className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
+                                                        className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
                                                 )}
-                                                <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
+                                                <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
                                             </div>
                                         </div>
                                         {mgrOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
                                                 {employees.filter(e => e.roles?.includes('manager')).map((u, i) => (
                                                     <button key={u.id} type="button" onClick={() => { setForm(p => ({ ...p, manager: u.username, manager_id: u.id })); setMgrOpen(false); setMgrQuery('') }}
-                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                                                        <div className="w-6 h-6 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-[10px] font-bold text-[#526ED3] shrink-0">
+                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                                                        <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                                                             {u.username?.slice(0, 2).toUpperCase()}
                                                         </div>
                                                         <div className="min-w-0 text-left">
                                                             <p className="truncate">{u.username}</p>
-                                                            {u.position && <p className="text-xs text-[#8F95A8] truncate">{u.position}</p>}
+                                                            {u.position && <p className="text-xs text-[var(--text-soft)] truncate">{u.position}</p>}
                                                         </div>
                                                     </button>
                                                 ))}
@@ -446,9 +446,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-white dark:bg-[#111111]">
                         {!loading &&
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
+                                <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Muzlatilganmi ?</span>
                                 <button type="button" onClick={() => set('is_hidden', !form.is_hidden)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${!form.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${!form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
                                     <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${!form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
@@ -456,11 +456,11 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                         <div className="flex items-center gap-3">
                             <button onClick={onClose}
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
                                 <FaXmark size={13} /> Yopish
                             </button>
                             <button onClick={saveChanges}
-                                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
                                 <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                                     <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>

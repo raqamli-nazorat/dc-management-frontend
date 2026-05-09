@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { FaCheck, FaArrowLeft } from 'react-icons/fa6'
 import { axiosAPI } from '../service/axiosAPI'
 import { toast } from '../Toast/ToastProvider'
@@ -20,7 +20,7 @@ function UserAvatar({ user }) {
     )
   }
   return (
-    <div className="w-10 h-10 rounded-full bg-[#E2E6F2] dark:bg-[#333435] flex items-center justify-center text-xs font-bold text-[#5B6078] dark:text-[#C2C8E0] shrink-0">
+    <div className="w-10 h-10 rounded-full bg-[var(--stroke-sub)] dark:bg-[#333435] flex items-center justify-center text-xs font-bold text-[var(--text-sub)] dark:text-[#C2C8E0] shrink-0">
       {initials}
     </div>
   )
@@ -128,29 +128,29 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-[9999999] flex w-full sm:w-[500px] flex-col bg-[#F8F9FC] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#E2E6F2] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-[9999999] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D] shadow-2xl border-l border-[var(--stroke-sub)] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-6  shrink-0 bg-[#F8F9FC] dark:bg-[#1C1D1D]">
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E9ECF5] dark:bg-[#292A2A] text-[#1A1D2E] dark:text-white cursor-pointer hover:bg-[#E2E6F2] dark:hover:bg-[#333435]">
+      <div className="flex items-center gap-3 px-6 py-6  shrink-0 bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D]">
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-elevation-2)] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435]">
           <FaArrowLeft size={14} />
         </button>
-        <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilish ishtirokchilarini belgilang</h2>
+        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilish ishtirokchilarini belgilang</h2>
       </div>
 
       <div className="flex items-center justify-between px-6 mt-6 mb-3 shrink-0">
-        <h3 className="text-[13px] font-extrabold text-[#1A1D2E] dark:text-white">Qatnashgan xodimlarni tanlang</h3>
+        <h3 className="text-[13px] font-extrabold text-[var(--text-strong)] dark:text-white">Qatnashgan xodimlarni tanlang</h3>
         <div className="text-right">
-          <p className="text-[13px] font-bold text-[#1A1D2E] dark:text-white">{dynamicTitle}</p>
-          <p className="text-[11px] font-medium text-[#5B6078] dark:text-[#8E95B5] mt-0.5">{dynamicDate}</p>
+          <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{dynamicTitle}</p>
+          <p className="text-[11px] font-medium text-[var(--text-sub)] dark:text-[#8E95B5] mt-0.5">{dynamicDate}</p>
         </div>
       </div>
 
       {/* List */}
       <div className="flex-1 overflow-y-auto px-6 pb-24 flex flex-col gap-2">
         {loading ? (
-          <p className="text-sm text-[#8F95A8] text-center mt-10">Yuklanmoqda...</p>
+          <p className="text-sm text-[var(--text-soft)] text-center mt-10">Yuklanmoqda...</p>
         ) : participants.length === 0 ? (
-          <p className="text-sm text-[#8F95A8] text-center mt-10">Ishtirokchilar topilmadi</p>
+          <p className="text-sm text-[var(--text-soft)] text-center mt-10">Ishtirokchilar topilmadi</p>
         ) : (
           participants.map(p => {
             const checked = !!attendanceMap[p.id]
@@ -159,10 +159,10 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
               <div
                 key={p.id}
                 onClick={() => toggle(p.id)}
-                className="flex items-center gap-3 px-4 py-3 bg-[#F8F9FC] dark:bg-[#252626] rounded-2xl border border-[#E2E6F2] dark:border-[#333435] cursor-pointer hover:border-[#d2d5df] dark:hover:border-[#7F95E6] transition-colors"
+                className="flex items-center gap-3 px-4 py-3 bg-[var(--bg-elevation-1)] dark:bg-[#252626] rounded-2xl border border-[var(--stroke-sub)] dark:border-[#333435] cursor-pointer hover:border-[#d2d5df] dark:hover:border-[#7F95E6] transition-colors"
               >
                 {/* Checkbox */}
-                <div className={`w-[22px] h-[22px] rounded-md border flex items-center justify-center shrink-0 transition-colors ${checked ? 'bg-[#3F57B3] border-[#3F57B3]' : 'bg-[#F1F3F9] dark:bg-[#333435] border-[#D0D5E2] dark:border-[#474848]'}`}>
+                <div className={`w-[22px] h-[22px] rounded-md border flex items-center justify-center shrink-0 transition-colors ${checked ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'bg-[#F1F3F9] dark:bg-[#333435] border-[var(--stroke-strong)] dark:border-[#474848]'}`}>
                   {checked && <FaCheck size={11} color="white" />}
                 </div>
 
@@ -171,8 +171,8 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-bold text-[#1A1D2E] dark:text-white truncate">{u.username || "Noma'lum"}</p>
-                  <p className="text-[12px] font-medium text-[#8F95A8] dark:text-[#8E95B5] truncate mt-0.5">{u.position || 'Xodim'}</p>
+                  <p className="text-[14px] font-bold text-[var(--text-strong)] dark:text-white truncate">{u.username || "Noma'lum"}</p>
+                  <p className="text-[12px] font-medium text-[var(--text-soft)] dark:text-[#8E95B5] truncate mt-0.5">{u.position || 'Xodim'}</p>
                 </div>
 
                 
@@ -187,7 +187,7 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
         <button
           onClick={handleSave}
           disabled={saving || loading}
-          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[#3F57B3] text-white text-[14px] font-bold hover:bg-[#526ED3] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[#3F57B3]/30"
+          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--accent-strong)] text-white text-[14px] font-bold hover:bg-[var(--accent-sub)] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[var(--accent-strong)]/30"
         >
           {saving ? 'Tasdiqlanmoqda...' : <><FaCheck size={14} /> Tasdiqlash</>}
         </button>
@@ -215,19 +215,19 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[#F8F9FC] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#EEF1F7] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#EEF1F7] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
       <div className="flex items-center gap-3 px-6 py-6 border-b border-[#EEF1F7] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#1C1D1D]">
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F3F9] dark:bg-[#292A2A] text-[#1A1D2E] dark:text-white cursor-pointer hover:bg-[#E2E6F2] dark:hover:bg-[#333435]">
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F3F9] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435]">
           <FaArrowLeft size={14} />
         </button>
-        <h2 className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilishga qatnashmadingiz</h2>
+        <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilishga qatnashmadingiz</h2>
       </div>
 
       <div className="flex items-start justify-between px-6 mt-6 mb-4 shrink-0">
-        <h3 className="text-[13px] font-bold text-[#1A1D2E] dark:text-white max-w-[200px] leading-tight">Yig'ilishga qatnashmaganligingiz sababini yozing</h3>
+        <h3 className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white max-w-[200px] leading-tight">Yig'ilishga qatnashmaganligingiz sababini yozing</h3>
         <div className="text-right shrink-0">
-           <p className="text-[13px] font-bold text-[#1A1D2E] dark:text-white">{meetingTitle}</p>
-           <p className="text-[11px] font-medium text-[#8F95A8] dark:text-[#8E95B5] mt-0.5">{meetingDate}</p>
+           <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{meetingTitle}</p>
+           <p className="text-[11px] font-medium text-[var(--text-soft)] dark:text-[#8E95B5] mt-0.5">{meetingDate}</p>
         </div>
       </div>
 
@@ -236,12 +236,12 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
           value={reason} 
           onChange={e => setReason(e.target.value)} 
           placeholder="Sababni yozing..." 
-          className="w-full h-36 px-4 py-3 bg-white dark:bg-[#252626] rounded-2xl border border-[#E2E6F2] dark:border-[#333435] text-[14px] font-medium text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] resize-none outline-none focus:border-[#3F57B3]"
+          className="w-full h-36 px-4 py-3 bg-white dark:bg-[#252626] rounded-2xl border border-[var(--stroke-sub)] dark:border-[#333435] text-[14px] font-medium text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
         />
       </div>
 
       <div className="absolute bottom-0 left-0 w-full px-6 py-4 bg-white dark:bg-[#1C1D1D] border-t border-[#EEF1F7] dark:border-[#292A2A] flex justify-end">
-         <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[#3F57B3] text-white text-[14px] font-bold hover:bg-[#526ED3] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[#3F57B3]/30">
+         <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--accent-strong)] text-white text-[14px] font-bold hover:bg-[var(--accent-sub)] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[var(--accent-strong)]/30">
            {saving ? 'Yuborilmoqda...' : <><FaCheck size={14} /> Yuborish</>}
          </button>
       </div>
@@ -320,39 +320,39 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[#F8F9FC] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#EEF1F7] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D] shadow-2xl border-l border-[#EEF1F7] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-6 ">
         <button
           onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#E9ECF5] dark:bg-[#292A2A] text-[#1A1D2E] dark:text-white cursor-pointer hover:bg-[#E2E6F2] dark:hover:bg-[#333435]"
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-elevation-2)] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435]"
         >
           <FaArrowLeft size={14} />
         </button>
-        <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilishga qatnashmadingiz</h2>
+        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilishga qatnashmadingiz</h2>
       </div>
 
       {/* Subheader */}
       <div className="flex items-start justify-between px-6 mt-6 mb-4 shrink-0">
-        <h3 className="text-[13px] font-bold text-[#1A1D2E] dark:text-white max-w-[220px] leading-tight">
+        <h3 className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white max-w-[220px] leading-tight">
           Yig'ilishga qatnashmaganligingiz sababini yozing
         </h3>
         <div className="text-right shrink-0">
-          <p className="text-[13px] font-bold text-[#1A1D2E] dark:text-white">{meetingTitle}</p>
-          <p className="text-[11px] font-medium text-[#8F95A8] dark:text-[#8E95B5] mt-0.5">{meetingDate}</p>
+          <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{meetingTitle}</p>
+          <p className="text-[11px] font-medium text-[var(--text-soft)] dark:text-[#8E95B5] mt-0.5">{meetingDate}</p>
         </div>
       </div>
 
       {/* Body */}
       <div className="px-6 flex-1">
         {loading ? (
-          <p className="text-sm text-[#8F95A8] text-center mt-10">Yuklanmoqda...</p>
+          <p className="text-sm text-[var(--text-soft)] text-center mt-10">Yuklanmoqda...</p>
         ) : (
           <textarea
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder="Sababni yozing..."
-            className="w-full h-36 px-4 py-3 bg-white dark:bg-[#252626] rounded-2xl border border-[#E2E6F2] dark:border-[#333435] text-[14px] font-medium text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] resize-none outline-none focus:border-[#3F57B3]"
+            className="w-full h-36 px-4 py-3 bg-white dark:bg-[#252626] rounded-2xl border border-[var(--stroke-sub)] dark:border-[#333435] text-[14px] font-medium text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
           />
         )}
       </div>
@@ -362,7 +362,7 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
         <button
           onClick={handleSave}
           disabled={saving || loading || !attendanceId}
-          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[#3F57B3] text-white text-[14px] font-bold hover:bg-[#526ED3] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[#3F57B3]/30"
+          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--accent-strong)] text-white text-[14px] font-bold hover:bg-[var(--accent-sub)] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[var(--accent-strong)]/30"
         >
           {saving ? 'Yuborilmoqda...' : <><FaCheck size={14} /> Yuborish</>}
         </button>

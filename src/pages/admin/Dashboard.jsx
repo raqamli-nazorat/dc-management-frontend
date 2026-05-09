@@ -1,4 +1,4 @@
-import { useAuth } from '../../context/AuthContext'
+﻿import { useAuth } from '../../context/AuthContext'
 
 export default function AdminDashboard() {
   const { user } = useAuth()
@@ -9,7 +9,7 @@ export default function AdminDashboard() {
         Xush kelibsiz, {user?.name} 👋
       </h1>
       <div className="rounded-xl border flex items-center justify-center min-h-[60vh] text-sm
-        bg-white border-[#E2E6F2] text-[#8F95A8]
+        bg-white border-[var(--stroke-sub)] text-[var(--text-soft)]
         dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#C2C8E0]">
         Dashboard tez orada tayyor bo'ladi
       </div>

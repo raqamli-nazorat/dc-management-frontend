@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -10,7 +10,7 @@ import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
 import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 const DURATION_UNITS = ['daqiqa', 'soat']
 
 /* -- helpers -- */
@@ -106,29 +106,29 @@ function ProjectDropdown({ value, onChange, error, projects = [] }) {
         <button type="button" onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
             bg-white dark:bg-[#191A1A]
-            ${error ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-            ${selected ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}>
+            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+            ${selected ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{selected?.title || 'Loyiha tanlang'}</span>
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
             {selected
-              ? <span onMouseDown={e => { e.stopPropagation(); onChange(null) }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-              : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+              ? <span onMouseDown={e => { e.stopPropagation(); onChange(null) }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+              : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
             }
           </div>
         </button>
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
         {open && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {projects.length === 0 && (
-              <p className="px-4 py-3 text-sm text-[#8F95A8]">Loyihalar topilmadi</p>
+              <p className="px-4 py-3 text-sm text-[var(--text-soft)]">Loyihalar topilmadi</p>
             )}
             {projects.map((p, i) => (
               <button key={p.id} type="button" onClick={() => { onChange(p.id); setOpen(false) }}
                 className={`w-full flex items-center justify-between px-4 py-3 text-left  cursor-pointer
                   ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                  ${value === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                <p className={`text-sm font-medium truncate ${value === p.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{p.title}</p>
+                  ${value === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                <p className={`text-sm font-medium truncate ${value === p.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{p.title}</p>
               </button>
             ))}
           </div>
@@ -147,23 +147,23 @@ function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
       <div className="flex gap-2">
         <input type="number" min="1" value={value} onChange={e => onValueChange(e.target.value)}
           placeholder="40"
-          className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none border border-[#E2E6F2] dark:border-[#292A2A]
-            bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] focus:border-[#526ED3] " />
+          className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none border border-[var(--stroke-sub)] dark:border-[#292A2A]
+            bg-white dark:bg-[#191A1A] text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] " />
         <div className="relative w-28">
           <button type="button" onClick={() => setOpen(o => !o)}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-              bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] text-[#1A1D2E] dark:text-white">
+              bg-white dark:bg-[#191A1A] border-[var(--stroke-sub)] dark:border-[#292A2A] text-[var(--text-strong)] dark:text-white">
             <span>{unit}</span>
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
           </button>
           {open && (
             <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-xl shadow-xl border overflow-hidden
-              bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+              bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
               {DURATION_UNITS.map((u, i) => (
                 <button key={u} type="button" onClick={() => { onUnitChange(u); setOpen(false) }}
                   className={`w-full text-left px-3 py-2.5 text-sm  cursor-pointer
                     ${i < DURATION_UNITS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                    ${unit === u ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                    ${unit === u ? 'bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                   {u}
                 </button>
               ))}
@@ -211,60 +211,60 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
       <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
-            <h2 className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilishga qatnashishlar</h2>
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
+            <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilishga qatnashishlar</h2>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={toggleAll}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0">
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border border-[var(--stroke-sub)] dark:border-[#292A2A]
+                text-[var(--text-sub)] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
               Barchasini tanlash
             </button>
             <div className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Ism bo'yicha izlash"
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs outline-none border border-[#E2E6F2] dark:border-[#292A2A]
-                  bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs outline-none border border-[var(--stroke-sub)] dark:border-[#292A2A]
+                  bg-white dark:bg-[#191A1A] text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
             </div>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-6 pb-2 flex flex-col gap-2">
-          {filtered.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Foydalanuvchi topilmadi</p>}
+          {filtered.length === 0 && <p className="text-sm text-[var(--text-soft)] text-center py-8">Foydalanuvchi topilmadi</p>}
           {filtered.map(u => {
             const checked = sel.has(u.id)
             return (
               <button key={u.id} type="button" onClick={() => toggle(u.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
-                  ${checked ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1E2340] dark:border-[#526ED3]'
-                    : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}>
+                  ${checked ? 'border-[var(--accent-sub)] bg-[#EEF1FB] dark:bg-[#1E2340] dark:border-[var(--accent-sub)]'
+                    : 'border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'}`}>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 
-                  ${checked ? 'bg-[#3F57B3] border-[#3F57B3]' : 'border-[#D0D5E2] dark:border-[#474848]'}`}>
+                  ${checked ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[#474848]'}`}>
                   {checked && <FaCheck size={9} className="text-white" />}
                 </div>
-                <div className="w-8 h-8 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                   {(u.username ?? '?').slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-semibold truncate ${checked ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
-                  <p className="text-xs text-[#8F95A8] truncate">{u.position_info?.name || u.position || '—'}</p>
+                  <p className={`text-sm font-semibold truncate ${checked ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
+                  <p className="text-xs text-[var(--text-soft)] truncate">{u.position_info?.name || u.position || '—'}</p>
                 </div>
               </button>
             )
           })}
         </div>
         <div className="px-6 py-4 flex items-center justify-between gap-3 shrink-0 border-t border-[#F1F3F9] dark:border-[#292A2A]">
-          <span className="text-sm text-[#8F95A8]">{sel.size} ta tanlangan</span>
+          <span className="text-sm text-[var(--text-soft)]">{sel.size} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button onClick={() => setSel(new Set())}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-[#5B6078] dark:text-[#C2C8E0]
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-sub)] dark:text-[#C2C8E0]
                 hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer ">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={() => onApply(users.filter(u => sel.has(u.id)))}
-              className="flex items-center gap-2 px-5 py-2 rounded-2xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer ">
+              className="flex items-center gap-2 px-5 py-2 rounded-2xl text-sm font-bold bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] cursor-pointer ">
               <FaCheck size={12} /> Qo'shish
             </button>
           </div>
@@ -339,7 +339,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
   }
 
   const inputCls = err =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white dark:bg-[#191A1A] text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border  bg-white dark:bg-[#191A1A] text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -380,10 +380,10 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
           {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 ">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilish qo'shish</h2>
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilish qo'shish</h2>
             </div>
-            <p className="text-sm text-[#8F95A8] ">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
+            <p className="text-sm text-[var(--text-soft)] ">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
           </div>
 
           {/* -- Scroll qilinadigan content -- */}
@@ -419,7 +419,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                   className={inputCls(errors.description) + ' resize-none pr-8'} />
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
-                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                    className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
@@ -459,11 +459,11 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
               </div>
               <div>
                 <label className={labelCls}>Davomiyligi</label>
-                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[#526ED3] ${errors.durationVal ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'}`}>
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white dark:bg-[#191A1A] focus-within:border-[var(--accent-sub)] ${errors.durationVal ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}`}>
                   <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
                     placeholder="0"
-                    className="flex-1 min-w-0 w-8 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
-                  <span className="shrink-0 text-xs text-[#8F95A8] dark:text-[#5B6078] whitespace-nowrap">daqiqa</span>
+                    className="flex-1 min-w-0 w-8 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
+                  <span className="shrink-0 text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] whitespace-nowrap">daqiqa</span>
                 </div>
                 {errors.durationVal && <p className="text-xs text-red-500 mt-1">*Kiriting</p>}
               </div>
@@ -473,19 +473,19 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
                 onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
-                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#111111] p-3 flex flex-col transition-all
-                  ${!form.project || membersLoading ? 'cursor-default' : 'cursor-pointer hover:border-[#526ED3]'}
+                className={`w-full min-h-[100px] rounded-[24px] border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#111111] p-3 flex flex-col transition-all
+                  ${!form.project || membersLoading ? 'cursor-default' : 'cursor-pointer hover:border-[var(--accent-sub)]'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
-                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">
+                    <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-4 text-center">
                       {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : 'Quyidagi tugma orqali qidiring va tanlang'}
                     </p>
                     <div className={`inline-flex items-center gap-1 p-2 rounded-xl text-sm font-medium
                       ${!form.project || membersLoading
                         ? 'bg-[#F1F3F9] text-[#C2C8E0] dark:bg-[#1C1D1D] dark:text-[#474848]'
-                        : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] cursor-pointer'}`}>
+                        : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] cursor-pointer'}`}>
                       {membersLoading ? (
                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                       ) : (
@@ -497,7 +497,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {form.participants.map(u => (
-                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[#1A1D2E] dark:text-white text-xs border border-[#E2E6F2] dark:border-[#292A2A]">
+                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[var(--text-strong)] dark:text-white text-xs border border-[var(--stroke-sub)] dark:border-[#292A2A]">
                         <span className="font-medium text-[13px]">
                           {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
                         </span>
@@ -506,7 +506,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
                           onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
                           className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
                         >
-                          <FaXmark size={12} className="text-[#8F95A8]" />
+                          <FaXmark size={12} className="text-[var(--text-soft)]" />
                         </button>
                       </div>
                     ))}
@@ -520,19 +520,19 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
           <div className="px-7 py-5 flex items-center justify-end gap-3 shrink-0 bg-white dark:bg-[#111111]">
 
             {/* <div className="flex items-center gap-2.5">
-              <span className="text-sm font-medium text-[#1A1D2E] dark:text-[#C2C8E0]">Tugatildimi?</span>
+              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[#C2C8E0]">Tugatildimi?</span>
               <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_completed ? 'bg-black dark:bg-white' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div> */}
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
                 {loading
                   ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                   : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -590,7 +590,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
   }
 
   const inputCls = (err, ro = !canEdit) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[#1A1D2E] dark:text-white placeholder-[#8F95A8] dark:placeholder-[#5B6078] ${ro ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B] cursor-default' : 'bg-white dark:bg-[#191A1A]'} ${err ? 'border-red-400' : 'border-[#E2E6F2] dark:border-[#292A2A]'} ${!ro ? 'focus:border-[#526ED3]' : ''}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] dark:placeholder-[var(--text-sub)] ${ro ? 'bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] cursor-default' : 'bg-white dark:bg-[#191A1A]'} ${err ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} ${!ro ? 'focus:border-[var(--accent-sub)]' : ''}`
 
   const handleSubmit = async () => {
     if (!canEdit) return
@@ -642,12 +642,12 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
           {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">
                 {canEdit ? "Yig'ilishni tahrirlash" : "Yig'ilish ma'lumotlari"}
               </h2>
             </div>
-            <p className="text-sm text-[#8F95A8] ml-8">
+            <p className="text-sm text-[var(--text-soft)] ml-8">
               {canEdit ? "Yig'ilish ma'lumotlarini yangilang" : "Yig'ilish haqida to'liq ma'lumot"}
             </p>
           </div>
@@ -680,8 +680,8 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
                 <div className={inputCls(false)}>
                   {form.link
                     ? <a href={form.link} target="_blank" rel="noreferrer"
-                        className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline break-all">{form.link}</a>
-                    : <span className="text-[#8F95A8]">—</span>}
+                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{form.link}</a>
+                    : <span className="text-[var(--text-soft)]">—</span>}
                 </div>
               )}
             </div>
@@ -694,7 +694,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
                   className={inputCls(false) + ' resize-none' + (canEdit ? ' pr-8' : '')} />
                 {form.description && canEdit && (
                   <button type="button" onClick={() => set('description', '')}
-                    className="absolute top-2.5 right-2.5 text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                    className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
@@ -730,12 +730,12 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
               </div>
               <div>
                 <label className={labelCls}>Davomiyligi</label>
-                <div className={`flex rounded-xl border overflow-hidden ${!canEdit ? 'bg-[#F8F9FC] dark:bg-[#1A1B1B] border-[#E2E6F2] dark:border-[#292A2A]' : 'bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] focus-within:border-[#526ED3]'}`}>
+                <div className={`flex rounded-xl border overflow-hidden ${!canEdit ? 'bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] border-[var(--stroke-sub)] dark:border-[#292A2A]' : 'bg-white dark:bg-[#191A1A] border-[var(--stroke-sub)] dark:border-[#292A2A] focus-within:border-[var(--accent-sub)]'}`}>
                   <input type="number" min="1" value={form.durationVal}
                     onChange={e => canEdit && set('durationVal', e.target.value)}
                     readOnly={!canEdit} placeholder="40"
-                    className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
-                  <span className="flex items-center px-2 text-xs text-[#5B6078] dark:text-[#C2C8E0] border-l border-[#E2E6F2] dark:border-[#292A2A] whitespace-nowrap">
+                    className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
+                  <span className="flex items-center px-2 text-xs text-[var(--text-sub)] dark:text-[#C2C8E0] border-l border-[var(--stroke-sub)] dark:border-[#292A2A] whitespace-nowrap">
                     {form.durationUnit === 'soat' ? 'soat' : 'daqiqa'}
                   </span>
                 </div>
@@ -746,17 +746,17 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
                 onClick={() => canEdit && setShowParticipants(true)}
-                className={`w-full min-h-[100px] rounded-[24px] border border-[#E2E6F2] dark:border-[#292A2A] p-3 flex flex-col transition-all
-                  ${canEdit ? 'bg-white dark:bg-[#111111] cursor-pointer hover:border-[#526ED3]' : 'bg-[#F8F9FC] dark:bg-[#1A1B1B] cursor-default'}
+                className={`w-full min-h-[100px] rounded-[24px] border border-[var(--stroke-sub)] dark:border-[#292A2A] p-3 flex flex-col transition-all
+                  ${canEdit ? 'bg-white dark:bg-[#111111] cursor-pointer hover:border-[var(--accent-sub)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] cursor-default'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
-                    <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-4 text-center">
+                    <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-4 text-center">
                       {canEdit ? "Quyidagi tugma orqali qidiring va tanlang" : "Qatnashchilar yo'q"}
                     </p>
                     {canEdit && (
-                      <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[#7F95E6] text-sm">
+                      <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] text-sm">
                         <FaPlus size={15} />
                         Qatnashchilarni qo'shing
                       </div>
@@ -765,7 +765,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {form.participants.map(u => (
-                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[#1A1D2E] dark:text-white text-xs border border-[#E2E6F2] dark:border-[#292A2A]">
+                      <div key={u.id} className="inline-flex items-center gap-1 px-1 py-0.5 rounded-xl bg-[#F1F3F9] dark:bg-[#1C1D1D] text-[var(--text-strong)] dark:text-white text-xs border border-[var(--stroke-sub)] dark:border-[#292A2A]">
                         <span className="font-medium text-[13px]">
                           {u.username}{(u.position_info?.name || u.position) ? ` | ${u.position_info?.name || u.position}` : ''}
                         </span>
@@ -775,7 +775,7 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
                             onClick={ev => { ev.stopPropagation(); set('participants', form.participants.filter(p => p.id !== u.id)) }}
                             className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-1 cursor-pointer"
                           >
-                            <FaXmark size={12} className="text-[#8F95A8]" />
+                            <FaXmark size={12} className="text-[var(--text-soft)]" />
                           </button>
                         )}
                       </div>
@@ -802,12 +802,12 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
                 <FaXmark size={13} /> Yopish
               </button>
               {canEdit && (
                 <button onClick={handleSubmit} disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
                   {loading
                     ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                     : <FaCheck size={13} />
@@ -844,7 +844,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const fieldCls = "px-3 py-2.5 rounded-xl text-sm border border-[#E2E6F2] dark:border-[#292A2A] bg-[#F8F9FC] dark:bg-[#1A1B1B] text-[#1A1D2E] dark:text-white"
+  const fieldCls = "px-3 py-2.5 rounded-xl text-sm border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] text-[var(--text-strong)] dark:text-white"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -857,12 +857,12 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
         {/* Header */}
         <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A]">
           <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Yig'ilish ma'lumotlari</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilish ma'lumotlari</h2>
           </div>
-          <p className="text-sm text-[#8F95A8] ml-8">Yig'ilish haqida to'liq ma'lumot</p>
+          <p className="text-sm text-[var(--text-soft)] ml-8">Yig'ilish haqida to'liq ma'lumot</p>
         </div>
 
         {/* Scrollable content */}
@@ -871,21 +871,21 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           {/* Loyiha */}
           <div>
             <label className={labelCls}>Loyiha</label>
-            <div className={fieldCls}>{project?.title || <span className="text-[#8F95A8]">—</span>}</div>
+            <div className={fieldCls}>{project?.title || <span className="text-[var(--text-soft)]">—</span>}</div>
           </div>
 
           {/* Nomi + Jarima */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Nomi</label>
-              <div className={fieldCls}>{meeting.title || <span className="text-[#8F95A8]">—</span>}</div>
+              <div className={fieldCls}>{meeting.title || <span className="text-[var(--text-soft)]">—</span>}</div>
             </div>
             <div>
               <label className={labelCls}>Jarima foizi (%)</label>
               <div className={fieldCls}>
                 {meeting.penalty_percentage
                   ? `${Math.abs(parseFloat(meeting.penalty_percentage))} %`
-                  : <span className="text-[#8F95A8]">—</span>}
+                  : <span className="text-[var(--text-soft)]">—</span>}
               </div>
             </div>
           </div>
@@ -896,8 +896,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className={fieldCls}>
               {meeting.link
                 ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                    className="text-[#3F57B3] dark:text-[#7F95E6] hover:underline break-all">{meeting.link}</a>
-                : <span className="text-[#8F95A8]">—</span>}
+                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{meeting.link}</a>
+                : <span className="text-[var(--text-soft)]">—</span>}
             </div>
           </div>
 
@@ -905,7 +905,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           <div>
             <label className={labelCls}>Tavsifi</label>
             <div className={fieldCls + " min-h-[80px] whitespace-pre-wrap"}>
-              {meeting.description || <span className="text-[#8F95A8]">—</span>}
+              {meeting.description || <span className="text-[var(--text-soft)]">—</span>}
             </div>
           </div>
 
@@ -914,8 +914,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div className="col-span-2">
               <label className={labelCls}>Boshlanish sanasi</label>
               <div className={`${fieldCls} flex items-center justify-between`}>
-                <span>{startDate ? startDate.split('-').reverse().join('.') : <span className="text-[#8F95A8]">—</span>}</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
+                <span>{startDate ? startDate.split('-').reverse().join('.') : <span className="text-[var(--text-soft)]">—</span>}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-soft)] ml-1">
                   <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
               </div>
@@ -923,8 +923,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Vaqti</label>
               <div className={`${fieldCls} flex items-center justify-between`}>
-                <span>{startTime || <span className="text-[#8F95A8]">—</span>}</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#8F95A8] ml-1">
+                <span>{startTime || <span className="text-[var(--text-soft)]">—</span>}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-soft)] ml-1">
                   <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                 </svg>
               </div>
@@ -932,8 +932,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <div>
               <label className={labelCls}>Davomiyligi</label>
               <div className={`${fieldCls} flex items-center gap-1.5`}>
-                <span>{durVal || <span className="text-[#8F95A8]">—</span>}</span>
-                {durVal && <span className="text-xs text-[#8F95A8]">{durUnit}</span>}
+                <span>{durVal || <span className="text-[var(--text-soft)]">—</span>}</span>
+                {durVal && <span className="text-xs text-[var(--text-soft)]">{durUnit}</span>}
               </div>
             </div>
           </div>
@@ -941,10 +941,10 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           {/* Tugatildimi */}
           <div className="flex items-center gap-3">
             <label className={labelCls + " mb-0"}>Tugatildimi?</label>
-            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-white' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-white' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
               <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
             </div>
-            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">
+            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">
               {meeting.is_completed ? 'Ha' : "Yo'q"}
             </span>
           </div>
@@ -952,14 +952,14 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           {/* Qatnashchilar */}
           <div>
             <label className={labelCls}>Qatnashchilar</label>
-            <div className="px-3 py-2.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-[#F8F9FC] dark:bg-[#1A1B1B] flex flex-wrap gap-1.5 min-h-[44px] items-start">
+            <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] flex flex-wrap gap-1.5 min-h-[44px] items-start">
               {meeting.participants_info?.length > 0
                 ? meeting.participants_info.map(u => (
-                  <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#1E2340] dark:text-[#7F95E6]">
+                  <span key={u.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#1E2340] dark:text-[var(--accent-soft)]">
                     {u.username}{u.position ? ` | ${u.position}` : ''}
                   </span>
                 ))
-                : <span className="text-sm text-[#8F95A8]">Qatnashchilar yo'q</span>
+                : <span className="text-sm text-[var(--text-soft)]">Qatnashchilar yo'q</span>
               }
             </div>
           </div>
@@ -969,7 +969,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
         {/* Footer — faqat Yopish */}
         <div className="px-7 py-4 flex items-center justify-end border-t border-[#F1F3F9] dark:border-[#292A2A] shrink-0 bg-white dark:bg-[#111111]">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Yopish
           </button>
         </div>
@@ -1040,14 +1040,14 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
         className={`w-${size} h-${size} rounded-full object-cover shrink-0`} />
     }
     return (
-      <div className={`w-${size} h-${size} rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0`}>
+      <div className={`w-${size} h-${size} rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0`}>
         {initials}
       </div>
     )
   }
 
-  const ddBase = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B] overflow-hidden'
-  const triggerCls = (val) => `w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
+  const ddBase = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B] overflow-hidden'
+  const triggerCls = (val) => `w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] border-[var(--stroke-sub)] dark:border-[#292A2A] ${val ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -1060,10 +1060,10 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
         {/* Header */}
         <div className="px-6 pt-6 pb-5 ">
           <div className="flex items-center gap-3 mb-1">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={16} /></button>
-            <h2 className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={16} /></button>
+            <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-white">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#5B6078]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+          <p className="text-sm text-[var(--text-sub)]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
 
         <div className="px-6 pb-4 flex flex-1 flex-col gap-4">
@@ -1077,13 +1077,13 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   {selectedOrg ? (
                     <>
                       
-                      <span className="flex-1 text-left truncate text-[#1A1D2E] dark:text-white">{selectedOrg.username}</span>
-                      <span onMouseDown={e => { e.stopPropagation(); setOrganizer('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer ml-auto shrink-0"><FaXmark size={11} /></span>
+                      <span className="flex-1 text-left truncate text-[var(--text-strong)] dark:text-white">{selectedOrg.username}</span>
+                      <span onMouseDown={e => { e.stopPropagation(); setOrganizer('') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer ml-auto shrink-0"><FaXmark size={11} /></span>
                     </>
                   ) : (
                     <>
                       <span className="flex-1 text-left">Tanlang</span>
-                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform shrink-0 ${orgDd.open ? 'rotate-180' : ''}`} />
+                      <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform shrink-0 ${orgDd.open ? 'rotate-180' : ''}`} />
                     </>
                   )}
                 </button>
@@ -1091,21 +1091,21 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <div className={ddBase} style={{ maxHeight: 260, width:250,  }}>
                     {/* <div className="px-3 py-2 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
                       <input autoFocus value={orgSearch} onChange={e => setOrgSearch(e.target.value)}
-                        placeholder="Qidirish..." className="w-full text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
+                        placeholder="Qidirish..." className="w-full text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
                     </div> */}
                     <div className="overflow-y-auto" style={{ maxHeight: 200 }}>
                       {filteredManagers.length === 0
-                        ? <p className="px-4 py-3 text-sm text-[#8F95A8] text-center">Topilmadi</p>
+                        ? <p className="px-4 py-3 text-sm text-[var(--text-soft)] text-center">Topilmadi</p>
                         : filteredManagers.map((u, i) => (
                           <button key={u.id} type="button"
                             onClick={() => { setOrganizer(u.id); orgDd.setOpen(false); setOrgSearch('') }}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors
                               ${i < filteredManagers.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                              ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                              ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                             <Avatar user={u} size={8} />
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold truncate ${organizer === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
-                              <p className="text-xs text-[#8F95A8] truncate capitalize">
+                              <p className={`text-sm font-semibold truncate ${organizer === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
+                              <p className="text-xs text-[var(--text-soft)] truncate capitalize">
                                 {(() => {
                                   const allRoles = [u.active_role, ...(u.roles ?? [])].filter(Boolean)
                                   if (allRoles.includes('admin')) return 'Administrator'
@@ -1114,7 +1114,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                                 })()}
                               </p>
                             </div>
-                            {organizer === u.id && <FaCheck size={11} className="text-[#3F57B3] shrink-0" />}
+                            {organizer === u.id && <FaCheck size={11} className="text-[var(--accent-strong)] shrink-0" />}
                           </button>
                         ))
                       }
@@ -1132,8 +1132,8 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <span className="flex-1 text-left truncate">{selectedPrj?.title || 'Tanlang'}</span>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     {project
-                      ? <span onMouseDown={e => { e.stopPropagation(); setProject('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${prjDd.open ? 'rotate-180' : ''}`} />}
+                      ? <span onMouseDown={e => { e.stopPropagation(); setProject('') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+                      : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${prjDd.open ? 'rotate-180' : ''}`} />}
                   </div>
                 </button>
                 {prjDd.open && (
@@ -1141,22 +1141,22 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                  
                     <div className="overflow-y-auto" style={{ maxHeight: 200 }}>
                       {filteredProjects.length === 0
-                        ? <p className="px-4 py-3 text-sm text-[#8F95A8] text-center">Topilmadi</p>
+                        ? <p className="px-4 py-3 text-sm text-[var(--text-soft)] text-center">Topilmadi</p>
                         : filteredProjects.map((p, i) => (
                           <button key={p.id} type="button"
                             onClick={() => { setProject(p.id); prjDd.setOpen(false); setPrjSearch('') }}
                             className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors
                               ${i < filteredProjects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                              ${project === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                              ${project === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold truncate ${project === p.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{p.title}</p>
-                              {p.description && <p className="text-xs text-[#8F95A8] truncate mt-0.5">{p.description}</p>}
+                              <p className={`text-sm font-semibold truncate ${project === p.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{p.title}</p>
+                              {p.description && <p className="text-xs text-[var(--text-soft)] truncate mt-0.5">{p.description}</p>}
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               {(p.deadline || p.end_date) && (
-                                <span className="text-[11px] text-[#8F95A8] whitespace-nowrap">{fmtDate(p.deadline || p.end_date)}</span>
+                                <span className="text-[11px] text-[var(--text-soft)] whitespace-nowrap">{fmtDate(p.deadline || p.end_date)}</span>
                               )}
-                              {project === p.id && <FaCheck size={11} className="text-[#3F57B3]" />}
+                              {project === p.id && <FaCheck size={11} className="text-[var(--accent-strong)]" />}
                             </div>
                           </button>
                         ))
@@ -1175,8 +1175,8 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   <span className="flex-1 text-left truncate">{STATUS_OPTIONS.find(s => s.value === status)?.label || 'Tanlang'}</span>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     {status
-                      ? <span onMouseDown={e => { e.stopPropagation(); setStatus('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${stsDd.open ? 'rotate-180' : ''}`} />}
+                      ? <span onMouseDown={e => { e.stopPropagation(); setStatus('') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
+                      : <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${stsDd.open ? 'rotate-180' : ''}`} />}
                   </div>
                 </button>
                 {stsDd.open && (
@@ -1185,7 +1185,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                       <button key={s.value} type="button" onClick={() => { setStatus(s.value); stsDd.setOpen(false) }}
                         className={`w-full px-4 py-2.5 text-left text-sm cursor-pointer
                           ${i < STATUS_OPTIONS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                          ${status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                          ${status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
                         {s.label}
                       </button>
                     ))}
@@ -1208,11 +1208,11 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
         {/* Footer */}
         <div className="px-6 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <button onClick={reset}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply({ organizer, project, status, dateFrom, dateTo })}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
@@ -1238,20 +1238,20 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted }) {
   return (
     <div ref={ref} className="relative flex justify-end">
       <button onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
-        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[#8F95A8] cursor-pointer ">
+        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[var(--text-soft)] cursor-pointer ">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" />
         </svg>
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+        <div className="absolute top-full right-0 mt-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           <button onClick={() => { onDetail(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
             Ko'rish
           </button>
           <button onClick={() => { onEdit(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
             Tahrirlash
           </button>
@@ -1454,11 +1454,11 @@ export default function MeetingsPage() {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Yig'ilishlar</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white">Yig'ilishlar</h1>
 
       <div className="flex items-center gap-2">
         <div className="relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#C2C8E0]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
@@ -1466,21 +1466,21 @@ export default function MeetingsPage() {
             onChange={e => setSearchInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[220px]
-              bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#5B6078] focus:border-[#526ED3]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#5B6078]" />
+              bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
+              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[var(--text-sub)]" />
         </div>
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
-            bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+            bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
           <LuFilter size={13} /> Filtrlash
-          {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
+          {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
@@ -1513,13 +1513,13 @@ export default function MeetingsPage() {
                   <tr key={m.id}
                     className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
                     onClick={() => loadMeetingDetail(m.id, 'edit')}>
-                    <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0]  font-medium">{idx + 1}</td>
-                    <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0]  font-medium">{m.uid || ''}</td>
-                    <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{m.title}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{organizer?.username || ''}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{project?.title || ''}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{fmtDt(m.start_time)}</td>
-                    <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">
+                    <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0]  font-medium">{idx + 1}</td>
+                    <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0]  font-medium">{m.uid || ''}</td>
+                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{m.title}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{organizer?.username || ''}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{project?.title || ''}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{fmtDt(m.start_time)}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">
                       {durVal ? `${durVal} ${durUnit}` : ''}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -1556,7 +1556,7 @@ export default function MeetingsPage() {
           />
         )}
         {loadingMore && (
-          <div className="py-4 text-center text-sm text-[#B6BCCB] dark:text-[#8E95B5]">
+          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />

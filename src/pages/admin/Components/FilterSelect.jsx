@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState } from "react"
 import { MdCancel, MdCheck, MdExpandMore } from "react-icons/md"
 
 const FilterSelect = ({
@@ -90,14 +90,14 @@ const FilterSelect = ({
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} text-[var(--text-strong)] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
                 {multiple && hasValue ? (
                     <div className="flex items-center gap-2 flex-1 overflow-hidden">
-                        <span className="text-[#1A1D2E] dark:text-[#FFFFFF] truncate">{placeholder}</span>
-                        <span className="flex items-center justify-center bg-[#F1F3F9] dark:bg-[#303131] text-[#3F57B3] dark:text-[#FFFFFF] rounded-full min-w-[20px] h-5 px-1.5 text-[11px] font-bold">
+                        <span className="text-[var(--text-strong)] dark:text-[#FFFFFF] truncate">{placeholder}</span>
+                        <span className="flex items-center justify-center bg-[#F1F3F9] dark:bg-[#303131] text-[var(--accent-strong)] dark:text-[#FFFFFF] rounded-full min-w-[20px] h-5 px-1.5 text-[11px] font-bold">
                             {selectedOptions.length}
                         </span>
                     </div>
@@ -116,7 +116,7 @@ const FilterSelect = ({
                         size={16}
                         className={`absolute transition-all duration-300 ease-in-out ${(hasValue && isBtnHovered) ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
                             } ${open ? 'rotate-180' : ''}`}
-                        style={{ color: isDark ? '#8E95B5' : '#8F95A8' }}
+                        style={{ color: isDark ? '#8E95B5' : 'var(--text-soft)' }}
                     />
 
                     <MdCancel
@@ -124,7 +124,7 @@ const FilterSelect = ({
                         onClick={handleClear}
                         className={`absolute cursor-pointer transition-all duration-300 ease-in-out hover:text-red-500 ${(hasValue && isBtnHovered) ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
                             }`}
-                        style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
+                        style={{ color: isDark ? '#FFFFFF' : 'var(--text-soft)' }}
                     />
                 </div>
             </button>
@@ -178,16 +178,16 @@ const FilterSelect = ({
                                 style={{
                                     fontSize: 13,
                                     fontWeight: 500,
-                                    color: isDark ? '#FFFFFF' : '#1A1D2E',
+                                    color: isDark ? '#FFFFFF' : 'var(--text-strong)',
                                     background: isSelected
                                         ? (isDark ? '#303131' : '#F1F3F9')
                                         : hovered === opt.value
-                                            ? (isDark ? '#222323' : '#F8F9FC')
+                                            ? (isDark ? '#222323' : 'var(--bg-elevation-1)')
                                             : 'transparent',
                                 }}
                             >
                                 <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{opt.label}</span>
-                                {multiple && isSelected && <MdCheck size={16} className="text-[#3F57B3]" />}
+                                {multiple && isSelected && <MdCheck size={16} className="text-[var(--accent-strong)]" />}
                             </button>
                         )
                     })}

@@ -31,7 +31,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
       <div className="fixed inset-0 bg-black/60" />
        <button onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
-            bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+            bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
           <FaXmark size={14} />
         </button>
 
@@ -44,11 +44,11 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         <div className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-              <FaArrowLeft className="dark:text-white text-[#1A1D2E]" size={16} />
+              <FaArrowLeft className="dark:text-white text-[var(--text-strong)]" size={16} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-[#FFFFFF]">Filtrlash</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[#FFFFFF]">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[#5B6078] dark:text-[#C2C8E0] mb-5">
+          <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0] mb-5">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
+                  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="dan: 0"
                 value={f.amount__gte}
@@ -108,7 +108,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] focus:border-[#526ED3]
+                  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
                   dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
                 placeholder="gacha: 0"
                 value={f.amount__lte}
@@ -150,12 +150,12 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+              bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>

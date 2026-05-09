@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -92,10 +92,10 @@ function ChangePasswordModal({ onClose }) {
 
   const inputCls = (err) => [
     'w-full px-4 py-3 rounded-xl text-sm outline-none border  pr-11',
-    'bg-white text-[#1A1D2E] placeholder-[#8F95A8]',
-    'dark:bg-[#191A1A] dark:text-white dark:placeholder-[#5B6078]',
+    'bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)]',
+    'dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)]',
     err ? 'border-red-400 dark:border-red-500'
-      : 'border-[#E2E6F2] dark:border-[#292A2A] focus:border-[#526ED3]',
+      : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]',
   ].join(' ')
 
   return (
@@ -103,17 +103,17 @@ function ChangePasswordModal({ onClose }) {
       <div className="fixed inset-0 bg-black/60" />
       <button onClick={onClose}
         className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full z-10 cursor-pointer 
-          bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+          bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
         <FaXmark size={14} />
       </button>
       <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] p-7">
         <div className="flex items-center gap-3 mb-1.5">
-          <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer transition-opacity">
+          <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer transition-opacity">
             <FaArrowLeft size={16} />
           </button>
-          <h2 className="text-xl font-extrabold text-[#1A1D2E] dark:text-white">Parolni o'zgartirish</h2>
+          <h2 className="text-xl font-extrabold text-[var(--text-strong)] dark:text-white">Parolni o'zgartirish</h2>
         </div>
-        <p className="text-sm text-[#5B6078] dark:text-[#8F95A8] mb-6">
+        <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-6">
           Xavfsizlik uchun joriy parolingizni kiriting va yangi parol o'rnating
         </p>
         <div className="flex flex-col gap-4">
@@ -123,7 +123,7 @@ function ChangePasswordModal({ onClose }) {
             { key: 'confirm', label: 'Parolni tasdiqlash', placeholder: 'Yangi parolni qayta kiriting' },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label className="block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5">{label}</label>
+              <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5">{label}</label>
               <div className="relative">
                 <input
                   type={show[key] ? 'text' : 'password'}
@@ -133,7 +133,7 @@ function ChangePasswordModal({ onClose }) {
                   className={inputCls(errors[key])}
                 />
                 <button type="button" onClick={() => setShow(p => ({ ...p, [key]: !p[key] }))}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-[#5B6078] cursor-pointer">
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] hover:text-[var(--text-sub)] cursor-pointer">
                   {show[key] ? <FaEyeSlash size={15} /> : <FaEye size={15} />}
                 </button>
               </div>
@@ -144,12 +144,12 @@ function ChangePasswordModal({ onClose }) {
         <div className="flex items-center justify-end gap-3 mt-7">
           <button onClick={onClose} disabled={loading}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={handleSave} disabled={loading}
             className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer
-              bg-[#3F57B3] text-white hover:bg-[#526ED3] disabled:opacity-60">
+              bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
             {loading ? (
               <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -195,16 +195,16 @@ function PassportViewer({ url, onClose }) {
           />
         ) : (
           <div className="bg-white dark:bg-[#1C1D1D] rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#526ED3]">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--accent-sub)]">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
-            <p className="text-[#1A1D2E] dark:text-white font-semibold text-sm">Fayl brauzerda ochiladi</p>
+            <p className="text-[var(--text-strong)] dark:text-white font-semibold text-sm">Fayl brauzerda ochiladi</p>
             <a
               href={url}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#3F57B3] text-white hover:bg-[#526ED3]  cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]  cursor-pointer"
             >
               Ochish
             </a>
@@ -216,12 +216,12 @@ function PassportViewer({ url, onClose }) {
 }
 
 
-const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-white border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
+const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
 
 function Field({ label, value, children, align = 'right', rightIcon }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8]">{label}</span>
+      <span className="text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">{label}</span>
       {children ?? (
         <div className={boxCls + ` min-h-[42px] flex items-center ${align === 'left' ? 'justify-between text-left' : 'justify-end text-right'}`}>
           <span>{value ?? ''}</span>
@@ -266,19 +266,19 @@ function SocialField({ label, value, icon, placeholder }) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-[#5B6078] dark:text-[#8F95A8] flex items-center gap-1.5">
+      <span className="text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)] flex items-center gap-1.5">
         {icon}
         {label}
       </span>
       <div className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 group'}>
-        <span className={`flex-1 truncate text-sm text-left ${!value ? 'text-[#B6BCCB] dark:text-[#474848]' : ''}`}>
+        <span className={`flex-1 truncate text-sm text-left ${!value ? 'text-[var(--text-disabled)] dark:text-[#474848]' : ''}`}>
           {value || placeholder}
         </span>
         {value && (
           <button
             onClick={handleCopy}
             title="Nusxa olish"
-            className="shrink-0 cursor-pointer text-[#8F95A8] hover:text-[#526ED3]"
+            className="shrink-0 cursor-pointer text-[var(--text-soft)] hover:text-[var(--accent-sub)]"
           >
             {copied ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#22c55e]">
@@ -388,22 +388,22 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[#526ED3] transition-colors"
+        className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
       >
-        <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">
+        <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
           {ROLE_LABELS[activeRole] || activeRole || 'Tanlash'}
         </span>
         {loading
-          ? <svg className="animate-spin w-2.5 h-2.5 text-[#8F95A8] shrink-0" viewBox="0 0 24 24" fill="none">
+          ? <svg className="animate-spin w-2.5 h-2.5 text-[var(--text-soft)] shrink-0" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
-          : <FaChevronDown className={`w-2.5 h-2.5 text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+          : <FaChevronDown className={`w-2.5 h-2.5 text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
         }
       </button>
       {open && (
         <div className="absolute bottom-full right-0 mb-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden
-          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           {roles.map((r, i) => (
             <button
               key={r}
@@ -412,8 +412,8 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
               className={`w-full flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
                 ${i < roles.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                 ${r === activeRole
-                  ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
-                  : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'
+                  ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
+                  : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'
                 }`}
             >
               <span>{ROLE_LABELS[r] || r}</span>
@@ -533,13 +533,13 @@ export default function ProfilePage() {
 
   const rowCls = 'grid grid-cols-2 gap-4'
 
-  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+  const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
 
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white">Shaxsiy kabinet</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white">Shaxsiy kabinet</h1>
 
       {/* Avatar + Name */}
       <div className="flex items-center gap-2.5">
@@ -547,16 +547,16 @@ export default function ProfilePage() {
           <img src={data.avatar} alt="avatar"
             className="w-[72px] h-[72px] rounded-2xl object-cover shrink-0" />
         ) : (
-          <div className="w-[72px] h-[72px] rounded-2xl bg-[#526ED3] flex items-center justify-center text-white text-2xl font-bold shrink-0">
+          <div className="w-[72px] h-[72px] rounded-2xl bg-[var(--accent-sub)] flex items-center justify-center text-white text-2xl font-bold shrink-0">
             {initials}
           </div>
         )}
         <div>
-          <p className="text-lg font-bold text-[#1A1D2E] dark:text-white">{fullName}</p>
+          <p className="text-lg font-bold text-[var(--text-strong)] dark:text-white">{fullName}</p>
           <button
             onClick={() => setShowPasswordModal(true)}
             className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
-              border-[#E2E6F2] text-[#5B6078] hover:bg-[#F1F3F9]
+              border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[#F1F3F9]
               dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
           >
             <FaPencil size={10} /> Parol o'zgartish
@@ -589,8 +589,8 @@ export default function ProfilePage() {
 
       {/* Viloyat + Tuman */}
       <div className={rowCls}>
-        <Field label="Viloyat" value={data.region || 'Viloyat tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[#8F95A8]" />} />
-        <Field label="Tuman" value={data.district || 'Tuman tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[#8F95A8]" />} />
+        <Field label="Viloyat" value={data.region || 'Viloyat tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[var(--text-soft)]" />} />
+        <Field label="Tuman" value={data.district || 'Tuman tanlang'} align="left" rightIcon={<FaChevronDown className="w-3.5 h-3.5 text-[var(--text-soft)]" />} />
       </div>
 
       {/* Passport + Passport rasmi */}
@@ -607,8 +607,8 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6078" strokeWidth="2" className="shrink-0 dark:stroke-[#8F95A8]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="2" className="shrink-0 dark:stroke-[var(--text-soft)]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
               </svg>
@@ -616,14 +616,14 @@ export default function ProfilePage() {
                 href={data.passport_image}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-[#5B6078] dark:text-[#8F95A8] hover:underline truncate max-w-[200px]"
+                className="font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)] hover:underline truncate max-w-[200px]"
               >
                 {data.passport_image.split('/').pop() || "Ma'lumot.pdf"}
               </a>
-              <span className="text-xs text-[#B6BCCB] shrink-0 ml-1">1487 KB</span>
+              <span className="text-xs text-[var(--text-disabled)] shrink-0 ml-1">1487 KB</span>
             </div>
           ) : (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px] flex items-center justify-start gap-2 text-[#B6BCCB]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px] flex items-center justify-start gap-2 text-[var(--text-disabled)]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -661,7 +661,7 @@ export default function ProfilePage() {
                   set('social_links', data.social_links?.filter((_, i) => i !== index))
                 }
               }}
-              className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+              className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] flex items-center justify-center text-[var(--text-strong)] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
             >
               {index === data.social_links?.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
             </button>
@@ -671,21 +671,21 @@ export default function ProfilePage() {
 
       {/* Lavozim + Rol */}
       <div className={rowCls}>
-        <div className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FC]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+        <div className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
-            <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Lavozimi</span>
+            <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
           </div>
-          <div className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
-            <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">{data.position || 'Admin'}</span>
-            <FaChevronDown className="w-2.5 h-2.5 text-[#8F95A8]" />
+          <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+            <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">{data.position || 'Admin'}</span>
+            <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
           </div>
         </div>
 
-        <div className="w-full px-4 py-2.5 rounded-xl  bg-[#F8F9FC]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+        <div className="w-full px-4 py-2.5 rounded-xl  bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
-            <span className="text-sm font-bold text-[#1A1D2E] dark:text-white">Roli</span>
+            <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
           </div>
           {data.roles?.length > 1 ? (
             <RoleDropdown
@@ -694,26 +694,26 @@ export default function ProfilePage() {
               onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
             />
           ) : (
-            <div className="px-3 py-1.5 rounded-lg border border-[#E2E6F2] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
-              <span className="text-xs font-semibold text-[#1A1D2E] dark:text-white">
+            <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+              <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
                 {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
               </span>
-              <FaChevronDown className="w-2.5 h-2.5 text-[#8F95A8]" />
+              <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E2E6F2] dark:border-[#292A2A]">
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[#292A2A]">
         <button
           onClick={() => setData(profile)}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#5B6078] bg-[#F1F3F9] hover:bg-[#E2E6F2] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
+          className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
         >
           Tozalash
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[#3F57B3] hover:bg-[#32458C]"
+          className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C]"
         >
           Saqlash
         </button>

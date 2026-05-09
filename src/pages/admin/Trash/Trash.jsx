@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+﻿import { useState, useRef, useEffect, useCallback } from 'react'
 import { FaEllipsisVertical, FaCheck, FaTrashCan } from 'react-icons/fa6'
 import { ConfirmationModal } from '../../../components/ConfirmationModal'
 import { toast } from '../../../Toast/ToastProvider'
@@ -28,24 +28,24 @@ function RowMenu({ onRestore, onDelete }) {
     <div ref={ref} className="relative flex justify-end">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-[#8F95A8] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]  cursor-pointer"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-soft)] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]  cursor-pointer"
       >
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-9 z-50 w-[180px] rounded-2xl shadow-xl border overflow-hidden
-          bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
           <button
             onClick={() => { onRestore(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#1A1D2E] dark:text-white
-              hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]"
+            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
+              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]"
           >
             <FaCheck size={13} className="text-[#22c55e]" />
             Tiklash
           </button>
           <button
             onClick={() => { onDelete(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#E02D2D]
+            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--error-strong)]
               hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A]  cursor-pointer"
           >
             <FaTrashCan size={13} />
@@ -140,7 +140,7 @@ function ProjectsTab() {
     <div className="flex flex-col flex-1 min-h-0 gap-4">
       {/* Search */}
       <div className="relative w-[220px] shrink-0">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]"
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]"
           width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
@@ -150,9 +150,9 @@ function ProjectsTab() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
-              border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
-            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]
-            focus:border-[#526ED3]"
+              border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            focus:border-[var(--accent-sub)]"
         />
       </div>
 
@@ -160,7 +160,7 @@ function ProjectsTab() {
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
@@ -181,16 +181,16 @@ function ProjectsTab() {
             ) : projects.map((p, i) => (
               <tr key={p.id}
                 className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
-                <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
-                <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{p.title}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{p.manager_info?.username || '—'}</td>
+                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
+                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{p.title}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{p.manager_info?.username || '—'}</td>
                 <td className="px-4 py-3 text-right">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[#292A2A] dark:text-[#C2C8E0]">
                     {statusLabel(p.status)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDate(p.created_at)}</td>
-                <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDate(p.deadline)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(p.created_at)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(p.deadline)}</td>
                 <td className="px-4 py-3">
                   <RowMenu
                     onRestore={() => setConfirmRestore(p.id)}
@@ -227,7 +227,7 @@ function ProjectsTab() {
         description="Bu amalni bekor qilib bo'lmaydi. Ma'lumotlar butunlay o'chiriladi"
         buttonText={actionLoading ? "O'chirilmoqda..." : "O'chirish"}
         confirmIcon={<FaTrashCan size={13} />}
-        confirmColor="bg-[#E02D2D] hover:bg-red-600"
+        confirmColor="bg-[var(--error-strong)] hover:bg-red-600"
         onClose={() => setConfirmDelete(null)}
         onAction={() => { doDelete(confirmDelete); setConfirmDelete(null) }}
       />
@@ -315,7 +315,7 @@ function TasksTab() {
     <div className="flex flex-col flex-1 min-h-0 gap-4">
       {/* Search */}
       <div className="relative w-[220px] shrink-0">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8]"
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]"
           width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
@@ -325,9 +325,9 @@ function TasksTab() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
-            bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8]
-            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[#5B6078]
-            focus:border-[#526ED3]"
+            bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            focus:border-[var(--accent-sub)]"
         />
       </div>
 
@@ -335,7 +335,7 @@ function TasksTab() {
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[#E2E6F2] dark:border-[#292A2A]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
               <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Loyiha</th>
@@ -359,19 +359,19 @@ function TasksTab() {
             ) : tasks.map((t, i) => (
               <tr key={t.id}
                 className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
-                <td className="px-4 py-3 text-[#8F95A8] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
-                <td className="px-4 py-3 font-medium text-[#1A1D2E] dark:text-white">{t.title}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.created_by_info?.username || '—'}</td>
-                <td className="px-4 py-3 text-[#1A1D2E] dark:text-white">{t.assignee_info?.username || '—'}</td>
-                <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{typeLabel(t.type)}</td>
-                <td className="px-4 py-3 text-right font-medium text-[#1A1D2E] dark:text-white">{priorityLabel(t.priority)}</td>
+                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
+                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{t.title}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.created_by_info?.username || '—'}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.assignee_info?.username || '—'}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{typeLabel(t.type)}</td>
+                <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-white">{priorityLabel(t.priority)}</td>
                 <td className="px-4 py-3 text-right">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[#E2E6F2] text-[#5B6078] dark:border-[#292A2A] dark:text-[#C2C8E0]">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[#292A2A] dark:text-[#C2C8E0]">
                     {statusLabel(t.status)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[#1A1D2E] dark:text-white">{fmtDate(t.deadline)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(t.deadline)}</td>
                 <td className="px-4 py-3">
                   <RowMenu
                     onRestore={() => setConfirmRestore(t.id)}
@@ -408,7 +408,7 @@ function TasksTab() {
         description="Bu amalni bekor qilib bo'lmaydi. Ma'lumotlar butunlay o'chiriladi"
         buttonText={actionLoading ? "O'chirilmoqda..." : "O'chirish"}
         confirmIcon={<FaTrashCan size={13} />}
-        confirmColor="bg-[#E02D2D] hover:bg-red-600"
+        confirmColor="bg-[var(--error-strong)] hover:bg-red-600"
         onClose={() => setConfirmDelete(null)}
         onAction={() => { doDelete(confirmDelete); setConfirmDelete(null) }}
       />
@@ -427,9 +427,9 @@ export default function TrashPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-white shrink-0">Chiqindi qutisi</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white shrink-0">Chiqindi qutisi</h1>
 
-      <div className="flex items-center gap-1 border-b border-[#E2E6F2] dark:border-[#292A2A] shrink-0 mt-4">
+      <div className="flex items-center gap-1 border-b border-[var(--stroke-sub)] dark:border-[#292A2A] shrink-0 mt-4">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -437,8 +437,8 @@ export default function TrashPage() {
             className={[
               'px-4 py-2.5 text-sm font-semibold cursor-pointer border-b-2 -mb-px',
               activeTab === tab.id
-                ? 'border-[#526ED3] text-[#526ED3] dark:text-[#7F95E6] dark:border-[#7F95E6]'
-                : 'border-transparent text-[#5B6078] dark:text-[#8F95A8] hover:text-[#1A1D2E] dark:hover:text-white',
+                ? 'border-[var(--accent-sub)] text-[var(--accent-sub)] dark:text-[var(--accent-soft)] dark:border-[var(--accent-soft)]'
+                : 'border-transparent text-[var(--text-sub)] dark:text-[var(--text-soft)] hover:text-[var(--text-strong)] dark:hover:text-white',
             ].join(' ')}
           >
             {tab.label}

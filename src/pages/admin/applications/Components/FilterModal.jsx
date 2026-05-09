@@ -1,11 +1,11 @@
-import { FaXmark } from "react-icons/fa6"
+﻿import { FaXmark } from "react-icons/fa6"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 import { FaArrowLeft } from "react-icons/fa"
 import { useEffect, useState } from "react"
 import { Status, useDistricts, usePositions, useRegions } from "../../../../MostUsesDates"
 import FilterSelect from "../../Components/FilterSelect"
 
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 
 const EMPTY_FILTER = {
     status: '',
@@ -85,12 +85,12 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                         {/* Header */}
                         <div className="px-7 pt-7 pb-3">
                             <div className="flex items-center gap-3 mb-1.5">
-                                <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                                <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                     <FaArrowLeft size={17} />
                                 </button>
-                                <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
+                                <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Filtrlash</h2>
                             </div>
-                            <p className="text-sm text-[#5B6078] ">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+                            <p className="text-sm text-[var(--text-sub)] ">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
                         </div>
 
                         {/* Body */}
@@ -177,12 +177,12 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                         {/* Footer */}
                         <div className="w-full flex justify-between items-center">
                             <div className="flex items-center gap-3 px-7 py-5">
-                                <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Bu talabami</span>
+                                <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Bu talabami</span>
 
                                 <button
                                     type="button"
                                     onClick={() => set('is_student', !f.is_student)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[#3F57B3]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}
                                 >
                                     <span
                                         className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
@@ -192,13 +192,13 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                             <div className="px-7 py-5 flex items-center justify-end gap-3">
                                 <button
                                     onClick={handleClear}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]"
                                 >
                                     <FaXmark size={13} /> Tozalash
                                 </button>
                                 <button
                                     onClick={handleApply}
-                                    className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]"
                                 >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                         <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />

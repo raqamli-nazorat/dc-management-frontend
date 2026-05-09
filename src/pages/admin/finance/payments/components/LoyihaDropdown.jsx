@@ -1,4 +1,4 @@
-import { FaXmark, FaChevronDown } from 'react-icons/fa6'
+﻿import { FaXmark, FaChevronDown } from 'react-icons/fa6'
 import { useDropdown } from '../useDropdown'
 import { labelCls, fmtDate } from '../constants'
 
@@ -10,7 +10,7 @@ import { labelCls, fmtDate } from '../constants'
 function ProjectList({ projects, value, onChange, setOpen }) {
   if (!projects.length) {
     return (
-      <div className="px-4 py-3 text-sm text-[#8F95A8] dark:text-[#C2C8E0]">
+      <div className="px-4 py-3 text-sm text-[var(--text-soft)] dark:text-[#C2C8E0]">
         Loyihalar topilmadi
       </div>
     )
@@ -22,19 +22,19 @@ function ProjectList({ projects, value, onChange, setOpen }) {
       onClick={() => { onChange(String(p.id)); setOpen(false) }}
       className={`w-full text-left px-4 py-3  cursor-pointer
         ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#292A2A]' : ''}
-        ${String(value) === String(p.id) ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}
+        ${String(value) === String(p.id) ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className={`text-sm font-semibold truncate ${String(value) === String(p.id) ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-[#FFFFFF]'}`}>
+          <p className={`text-sm font-semibold truncate ${String(value) === String(p.id) ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[#FFFFFF]'}`}>
             {p.title}
           </p>
           {p.description && (
-            <p className="text-xs text-[#8F95A8] dark:text-[#C2C8E0] truncate mt-0.5">{p.description}</p>
+            <p className="text-xs text-[var(--text-soft)] dark:text-[#C2C8E0] truncate mt-0.5">{p.description}</p>
           )}
         </div>
         {p.deadline && (
-          <span className="text-xs text-[#8F95A8] dark:text-[#C2C8E0] shrink-0 mt-0.5">
+          <span className="text-xs text-[var(--text-soft)] dark:text-[#C2C8E0] shrink-0 mt-0.5">
             {fmtDate(p.deadline).split(',')[0]}
           </span>
         )}
@@ -55,23 +55,23 @@ export function LoyihaDropdown({ value, onChange, projects = [], disabled = fals
         <button type="button" onClick={() => !disabled && setOpen(o => !o)}
           disabled={disabled}
           className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
-            ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#5B6078] dark:text-[#C2C8E0]'}
-            ${disabled ? 'opacity-50 cursor-not-allowed bg-[#F8F9FC] dark:bg-[#1A1B1B] pointer-events-none' : 'cursor-pointer'}`}>
+            bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
+            ${value ? 'text-[var(--text-strong)] dark:text-[#FFFFFF]' : 'text-[var(--text-sub)] dark:text-[#C2C8E0]'}
+            ${disabled ? 'opacity-50 cursor-not-allowed bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] pointer-events-none' : 'cursor-pointer'}`}>
           <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
           <div className="flex items-center gap-1 shrink-0 ml-1">
             {value && !disabled && (
-              <span className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer"
+              <span className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[#8E95B5] cursor-pointer"
                 onMouseDown={e => { e.stopPropagation(); onChange('') }}>
                 <FaXmark size={11} />
               </span>
             )}
-            <FaChevronDown size={11} className={`text-[#8F95A8] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
+            <FaChevronDown size={11} className={`text-[var(--text-soft)] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
-            bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
+            bg-white border-[var(--stroke-sub)] dark:bg-[#222323] dark:border-[#292A2A]">
             <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />
           </div>
         )}
@@ -92,24 +92,24 @@ export function LoyihaDropdownForm({ value, onChange, error, projects = [], disa
         disabled={disabled}
         className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border 
           bg-white dark:bg-[#191A1A]
-          ${error ? 'border-red-400 dark:border-red-500' : 'border-[#E2E6F2] dark:border-[#292A2A]'}
-          ${value ? 'text-[#1A1D2E] dark:text-[#FFFFFF]' : 'text-[#8F95A8] dark:text-[#C2C8E0]'}
-          ${disabled ? 'opacity-60 cursor-not-allowed bg-[#F8F9FC] dark:bg-[#1A1B1B]' : 'cursor-pointer'}`}>
+          ${error ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+          ${value ? 'text-[var(--text-strong)] dark:text-[#FFFFFF]' : 'text-[var(--text-soft)] dark:text-[#C2C8E0]'}
+          ${disabled ? 'opacity-60 cursor-not-allowed bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B]' : 'cursor-pointer'}`}>
         <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
         <div className="flex items-center gap-1 shrink-0 ml-1">
           {value && !disabled && (
-            <span className="text-[#B6BCCB] hover:text-[#5B6078] dark:text-[#8E95B5] cursor-pointer"
+            <span className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[#8E95B5] cursor-pointer"
               onMouseDown={e => { e.stopPropagation(); onChange('') }}>
               <FaXmark size={11} />
             </span>
           )}
-          <FaChevronDown size={11} className={`text-[#8F95A8] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
+          <FaChevronDown size={11} className={`text-[var(--text-soft)] dark:text-[#C2C8E0] transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
       </button>
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
       {open && !disabled && (
         <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
-          bg-white border-[#E2E6F2] dark:bg-[#222323] dark:border-[#292A2A]">
+          bg-white border-[var(--stroke-sub)] dark:bg-[#222323] dark:border-[#292A2A]">
           <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />
         </div>
       )}

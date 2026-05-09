@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
@@ -7,7 +7,7 @@ import EmployeeStep from '../../Reports/Modals/EmployeeStep'
 import { useAuth } from '../../../../context/AuthContext'
 
 /* ─── constants ─── */
-const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
 
 const HOLAT_LIST = [
   { label: 'Bajarilishi kerak', value: 'todo' },
@@ -83,8 +83,8 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
           type="button"
           onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-            bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]
-            ${value ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`}
+            bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
+            ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
         >
           <span className="flex-1 text-left truncate">
             {selectedLabel || placeholder}
@@ -92,17 +92,17 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
             {value && (
               <span onMouseDown={e => { e.stopPropagation(); onChange('') }}
-                className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer">
+                className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                 <FaXmark size={11} />
               </span>
             )}
-            <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${open ? 'rotate-180' : ''}`} />
+            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
         {open && (
           <div className="absolute top-full left-0 mt-1 z-[70] w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
             {options.map((o, i) => (
               <button
                 key={getVal(o)}
@@ -111,8 +111,8 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
                 className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm cursor-pointer
                   ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
                   ${value === getVal(o)
-                    ? 'bg-[#EEF1FB] text-[#3F57B3] font-semibold dark:bg-[#292A2A] dark:text-[#7F95E6]'
-                    : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}
+                    ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
+                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}
               >
                 {typeof o === 'object' ? o.label : (renderOption ? renderOption(o) : o)}
               </button>
@@ -133,17 +133,17 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
         type="button"
         onClick={onClick}
         className="w-full min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border  cursor-pointer text-left
-          bg-white border-[#E2E6F2] dark:bg-[#191A1A] dark:border-[#292A2A]"
+          bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]"
       >
         {selected?.length === 0 ? (
-          <span className="flex-1 text-sm text-[#8F95A8] dark:text-[#5B6078]">{placeholder}</span>
+          <span className="flex-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)]">{placeholder}</span>
         ) : (
           <span className="flex flex-wrap gap-1.5 flex-1">
             {selected?.map(item => (
               <span
                 key={item.id || item}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
-                  bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]"
+                  bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]"
               >
                 <span className="truncate max-w-[130px]">
                   {renderChip ? renderChip(item) : (item.username || item.name || item)}
@@ -158,7 +158,7 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
             ))}
           </span>
         )}
-        <FaChevronRight size={11} className="text-[#8F95A8] shrink-0 ml-auto" />
+        <FaChevronRight size={11} className="text-[var(--text-soft)] shrink-0 ml-auto" />
       </button>
     </div>
   )
@@ -187,10 +187,10 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
         {/* Header */}
         <div className="px-7 pt-7 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
-            <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Loyiha tanlang</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha tanlang</h2>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -200,19 +200,19 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                   ? setLocal([])
                   : setLocal(projectsList.map(p => ({ id: p.id, name: p.title })))
               }
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E2E6F2] dark:border-[#292A2A]
-                text-[#5B6078] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[var(--stroke-sub)] dark:border-[#292A2A]
+                text-[var(--text-sub)] dark:text-[#C2C8E0] hover:bg-[#F1F3F9] dark:hover:bg-[#1C1D1D] cursor-pointer  shrink-0"
             >
               <LuSlidersHorizontal size={12} /> Barchasi tanlash
             </button>
-            <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-              <LuSearch size={13} className="text-[#8F95A8] shrink-0" />
+            <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
+              <LuSearch size={13} className="text-[var(--text-soft)] shrink-0" />
               <input
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Loyiha nomi bo'yicha izlash"
-                className="flex-1 text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]"
+                className="flex-1 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]"
               />
             </div>
           </div>
@@ -220,7 +220,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 
         {/* List */}
         <div className="flex-1 overflow-y-auto px-7 pb-2 flex flex-col gap-2">
-          {filtered?.length === 0 && <p className="text-sm text-[#8F95A8] text-center py-8">Loyiha topilmadi</p>}
+          {filtered?.length === 0 && <p className="text-sm text-[var(--text-soft)] text-center py-8">Loyiha topilmadi</p>}
           {filtered?.map(p => {
             const checked = !!local.find(x => x.id === p.id)
             return (
@@ -230,18 +230,18 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                 onClick={() => toggle(p)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${checked
-                    ? 'border-[#526ED3] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[#526ED3]'
-                    : 'border-[#E2E6F2] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[#F8F9FC] dark:hover:bg-[#222323]'}`}
+                    ? 'border-[var(--accent-sub)] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[var(--accent-sub)]'
+                    : 'border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'}`}
               >
                 <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center 
-                  ${checked ? 'border-[#526ED3] bg-[#526ED3]' : 'border-[#C2C8E0] dark:border-[#474848]'}`}>
+                  ${checked ? 'border-[var(--accent-sub)] bg-[var(--accent-sub)]' : 'border-[#C2C8E0] dark:border-[#474848]'}`}>
                   {checked && (
                     <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
                       <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-[#1A1D2E] dark:text-white truncate flex-1">{p.title}</p>
+                <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate flex-1">{p.title}</p>
               </button>
             )
           })}
@@ -249,18 +249,18 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
 
         {/* Footer */}
         <div className="px-7 py-5 flex items-center justify-between shrink-0 ">
-          <span className="text-sm text-[#8F95A8]">{local.length} ta tanlangan</span>
+          <span className="text-sm text-[var(--text-soft)]">{local.length} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setLocal([])}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
+                text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]"
             >
               <FaXmark size={13} /> Tozalash
             </button>
             <button
               onClick={() => onApply(local)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]"
             >
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -361,12 +361,12 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           {/* Header */}
           <div className="px-7 pt-7 pb-3">
             <div className="flex items-center gap-3 mb-1.5">
-              <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
                 <FaArrowLeft size={17} />
               </button>
-              <h2 className="text-[20px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Filtrlash</h2>
             </div>
-            <p className="text-sm text-[#5B6078]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
+            <p className="text-sm text-[var(--text-sub)]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
           </div>
 
           {/* Body */}
@@ -462,13 +462,13 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
               <button
                 onClick={() => setF(getDefaultFilter())}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                  text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]"
+                  text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]"
               >
                 <FaXmark size={13} /> Tozalash
               </button>
               <button
                 onClick={() => onApply(f)}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />

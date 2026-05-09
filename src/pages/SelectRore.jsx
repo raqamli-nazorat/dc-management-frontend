@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PiBuildingsBold } from "react-icons/pi";
 import { SlGlobe } from "react-icons/sl";
@@ -70,10 +70,10 @@ const SelectRore = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F1F3F9] dark:bg-[#111111]" style={{ fontFamily: '"Manrope", sans-serif' }}>
             <div className="bg-white dark:bg-[#191A1A] rounded-[32px] p-10 shadow-[0_4px_32px_rgba(0,0,0,0.04)] w-full max-w-[480px] border border-[#EEF1F7] dark:border-[#292A2A]">
-                <h1 className="text-[28px] font-extrabold text-[#1A1D2E] dark:text-white mb-3 leading-[1.2]">
+                <h1 className="text-[28px] font-extrabold text-[var(--text-strong)] dark:text-white mb-3 leading-[1.2]">
                     Siz dasturni bir nechta rol bilan foydalanishingiz mumkin
                 </h1>
-                <p className="text-[#5B6078] dark:text-[#8E95B5] text-sm mb-9 font-medium">
+                <p className="text-[var(--text-sub)] dark:text-[#8E95B5] text-sm mb-9 font-medium">
                     Quyidagilardan birini tanlang.
                 </p>
 
@@ -86,13 +86,13 @@ const SelectRore = () => {
                                 onClick={() => setSelectedRole(role.id)}
                                 className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-200 border-2 text-left w-full group
                                     ${isSelected
-                                        ? 'border-[#526ED3] bg-[#F8F9FC] dark:bg-[#222323] dark:border-[#526ED3]'
-                                        : 'border-transparent bg-[#F1F3F9]/50 hover:bg-[#E9ECF5] dark:bg-[#222323] dark:hover:bg-[#2A2B2B]'
+                                        ? 'border-[var(--accent-sub)] bg-[var(--bg-elevation-1)] dark:bg-[#222323] dark:border-[var(--accent-sub)]'
+                                        : 'border-transparent bg-[#F1F3F9]/50 hover:bg-[var(--bg-elevation-2)] dark:bg-[#222323] dark:hover:bg-[#2A2B2B]'
                                     }`
                                 }
                             >
                                 <div className={`flex items-center justify-center w-6 h-6 transition-colors
-                                    ${isSelected ? 'text-[#526ED3]' : 'text-[#1A1D2E] dark:text-white opacity-80 group-hover:opacity-100'}`
+                                    ${isSelected ? 'text-[var(--accent-sub)]' : 'text-[var(--text-strong)] dark:text-white opacity-80 group-hover:opacity-100'}`
                                 }>
                                     {role.type === 'icon' ? (
                                         <role.icon size={20} />
@@ -105,7 +105,7 @@ const SelectRore = () => {
                                         />
                                     )}
                                 </div>
-                                <span className={`font-bold text-[15px] transition-colors ${isSelected ? 'text-[#526ED3]' : 'text-[#1A1D2E] dark:text-white'}`}>
+                                <span className={`font-bold text-[15px] transition-colors ${isSelected ? 'text-[var(--accent-sub)]' : 'text-[var(--text-strong)] dark:text-white'}`}>
                                     {role.label}
                                 </span>
                             </button>
@@ -118,8 +118,8 @@ const SelectRore = () => {
                     disabled={!selectedRole || loading}
                     className={`w-full py-4 rounded-2xl font-bold text-base transition-all duration-300 
                         ${selectedRole && !loading
-                            ? 'bg-[#3F57B3] text-white hover:bg-[#526ED3] cursor-pointer shadow-lg shadow-[#3F57B3]/20 active:scale-[0.98]'
-                            : 'bg-[#E9ECF5] text-[#B6BCCB] cursor-not-allowed dark:bg-[#292A2A] dark:text-[#5B6078]'
+                            ? 'bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] cursor-pointer shadow-lg shadow-[var(--accent-strong)]/20 active:scale-[0.98]'
+                            : 'bg-[var(--bg-elevation-2)] text-[var(--text-disabled)] cursor-not-allowed dark:bg-[#292A2A] dark:text-[var(--text-sub)]'
                         }`
                     }
                 >

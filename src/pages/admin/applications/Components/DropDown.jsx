@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState } from "react"
 import { MdCheck, MdExpandMore, MdOutlineClear } from "react-icons/md"
 
 const FilterSelect = ({ options = [], value, onChange, label, multiple = false, width = '100%', disabled, error = false }) => {
@@ -39,15 +39,15 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[#526ED3]' : 'border-[#E2E6F2] dark:border-[#292A2A]'} text-[#1A1D2E] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} text-[var(--text-strong)] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
-                {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[#526ED3]!" size={16} /> : null}
-                <span className={`flex-1 text-left truncate ${display === "Rad etildi" ? "text-red-500!" : display === "Qabul qilindi" ? "text-[#526ED3]!" : ""}`}>{display}</span>
+                {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[var(--accent-sub)]!" size={16} /> : null}
+                <span className={`flex-1 text-left truncate ${display === "Rad etildi" ? "text-red-500!" : display === "Qabul qilindi" ? "text-[var(--accent-sub)]!" : ""}`}>{display}</span>
                 <MdExpandMore
                     size={16}
                     className={`shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-                    style={{ color: isDark ? '#FFFFFF' : '#8F95A8' }}
+                    style={{ color: isDark ? '#FFFFFF' : 'var(--text-soft)' }}
                 />
             </button>
 
@@ -88,15 +88,15 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                 }}
                                 onMouseEnter={() => setHovered(opt)}
                                 onMouseLeave={() => setHovered(null)}
-                                className={`w-full text-left px-3 py-2.5 rounded-xl cursor-pointer  flex items-center justify-between gap-2 ${opt === "Rad etish" ? "text-red-500!" : opt === "Qabul qilish" ? "text-[#526ED3]!" : ""}`}
+                                className={`w-full text-left px-3 py-2.5 rounded-xl cursor-pointer  flex items-center justify-between gap-2 ${opt === "Rad etish" ? "text-red-500!" : opt === "Qabul qilish" ? "text-[var(--accent-sub)]!" : ""}`}
                                 style={{
                                     fontSize: 13,
                                     fontWeight: 500,
-                                    color: isDark ? '#FFFFFF' : '#1A1D2E',
+                                    color: isDark ? '#FFFFFF' : 'var(--text-strong)',
                                     background: isSelected
                                         ? (isDark ? '#303131' : '#F1F3F9')
                                         : hovered === opt
-                                            ? (isDark ? '#222323' : '#F8F9FC')
+                                            ? (isDark ? '#222323' : 'var(--bg-elevation-1)')
                                             : 'transparent',
                                 }}
                             >
@@ -104,7 +104,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                     style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                                     className="flex items-center gap-2"
                                 >
-                                    {opt === "Rad etish" ? <MdOutlineClear className="text-red-500" size={16} /> : opt === "Qabul qilish" ? <MdCheck className="text-[#526ED3]!" size={16} /> : null}
+                                    {opt === "Rad etish" ? <MdOutlineClear className="text-red-500" size={16} /> : opt === "Qabul qilish" ? <MdCheck className="text-[var(--accent-sub)]!" size={16} /> : null}
                                     {opt}
                                 </span>
                             </button>

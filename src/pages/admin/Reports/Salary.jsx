@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
@@ -417,7 +417,7 @@ const Employee = () => {
             body { 
               font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
               font-size: 9px; 
-              color: #1a1d2e;
+              color: var(--text-strong);
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
@@ -656,7 +656,7 @@ const Employee = () => {
       <div className='flex items-center justify-between'>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -664,7 +664,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && search.trim()) {
@@ -722,7 +722,7 @@ const Employee = () => {
               Select: {
                 selectorBg: isDark ? '#222323' : '#ffffff',
                 optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
-                optionActiveBg: isDark ? '#222323' : '#F8F9FC',
+                optionActiveBg: isDark ? '#222323' : 'var(--bg-elevation-1)',
               }
             }
           }}
@@ -978,14 +978,14 @@ const Employee = () => {
                     return (
                       <th
                         key={col.key}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[#e2e6f2] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                         style={{
                           width: col.width,
                           minWidth: col.width,
                           maxWidth: col.width,
                           left: isRight ? undefined : getPinnedLeft(col.key),
                           right: isRight ? getPinnedRight(col.key) : undefined,
-                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2'))) : 'none',
+                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none',
                           textAlign: (col.key === 'number' || col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'center' : (col.key === 'user' || col.key === 'month') ? 'start' : 'end'
                         }}
                       >
@@ -1028,14 +1028,14 @@ const Employee = () => {
                       return (
                         <td
                           key={col.key}
-                          className={`p-3 text-xs border-r border-t border-[#e2e6f2] dark:border-[#292A2A] bg-white dark:bg-[#1E2021] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'month') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'total_amount' || col.key === 'fixed_salary' || col.key === 'kpi_bonus' || col.key === 'penalty_amount' ? 'font-bold text-slate-900 dark:text-white text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'text-center' : ''}`}
+                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#1E2021] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'month') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'total_amount' || col.key === 'fixed_salary' || col.key === 'kpi_bonus' || col.key === 'penalty_amount' ? 'font-bold text-slate-900 dark:text-white text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'text-center' : ''}`}
                           style={{
                             width: col.width,
                             minWidth: col.width,
                             maxWidth: col.width,
                             left: isRight ? undefined : getPinnedLeft(col.key),
                             right: isRight ? getPinnedRight(col.key) : undefined,
-                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 #e2e6f2') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 #e2e6f2'))) : 'none'
+                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none'
                           }}
                         >
                           {content}
@@ -1056,7 +1056,7 @@ const Employee = () => {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background-color: #3f57b3;
+          background-color: var(--accent-strong);
           position: absolute;
           top: 4px;
           right: 4px;
@@ -1072,8 +1072,8 @@ const Employee = () => {
         }
         
         .custom-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
-          background-color: #3f57b3 !important;
-          border-color: #3f57b3 !important;
+          background-color: var(--accent-strong) !important;
+          border-color: var(--accent-strong) !important;
         }
         
         .custom-header-checkbox .ant-checkbox-inner::after {
