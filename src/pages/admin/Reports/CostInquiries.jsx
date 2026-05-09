@@ -7,7 +7,6 @@ import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
 
 const MAIN_COLUMNS = [
-  { key: 'number', label: '№', width: 45 },
   { key: 'user', label: 'Ism Sharifi', width: 180 },
   { key: 'project', label: 'Loyiha nomi', width: 200 },
   { key: 'expense_category', label: 'Xarajat turi', width: 180 },
@@ -1081,6 +1080,8 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
                 <tr>
+                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[#e2e6f2] dark:border-[#292A2A] text-center" >№</th>
+
                   {MAIN_COLUMNS.map((col) => {
                     const isRight = RIGHT_PINNED_KEYS.includes(col.key);
                     return (
@@ -1114,13 +1115,15 @@ const Employee = () => {
 
                 {UserReports.map((item, index) => (
                   <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors">
+                    <td className={`p-3 text-xs text-slate-500 border-t border-[#e2e6f2] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 border-r`}>
+                      {index + 1}
+                    </td>
                     {MAIN_COLUMNS.map((col) => {
                       const isPinned = !!tablePin[col.key];
                       const isRight = RIGHT_PINNED_KEYS.includes(col.key);
 
                       let content = null;
                       switch (col.key) {
-                        case 'number': content = index + 1; break;
                         case 'user': content = item.user; break;
                         case 'project': content = item.project; break;
                         case 'expense_category': content = item.expense_category; break;
