@@ -405,29 +405,46 @@ export default function FinanceHistoryPage() {
       {/* Sticky yuqori qism */}
       <div className="shrink-0 bg-[#F8F9FC] dark:bg-[#191A1A] pb-3">
         <h1 className="text-2xl font-bold text-[#1A1D2E] dark:text-[#FFFFFF] mb-3">Tarix</h1>
-
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
-              width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            <input type="text" placeholder="Qidirish" value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
-              className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
+        <div className="flex justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8F95A8] dark:text-[#C2C8E0]"
+                width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Qidirish" value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
+                className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
                 bg-[#F1F3F9] border border-[#E2E6F2] text-[#1A1D2E] placeholder-[#8F95A8] focus:border-[#526ED3]
                 dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]" />
-          </div>
-          <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
+            </div>
+            <button onClick={() => setShowFilter(true)}
+              className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[#E2E6F2] text-[#5B6078]
               dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
-            <LuFilter size={13} />
-            Filtrlash
-            {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
-          </button>
+              <LuFilter size={13} />
+              Filtrlash
+              {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#3F57B3]" />}
+            </button>
+          </div>
+
+
+          {/* Info tooltip */}
+          <div className="relative group flex items-center gap-2">
+            <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF]
+            bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A]
+            opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+              Tasdiqlash orqali ish haqi yakuniy hisob bo‘yicha hisoblanadi.    </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
+              <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
+            </button>
+          </div>
+
         </div>
+
+
       </div>
 
       {/* Scroll bo'ladigan qism */}
