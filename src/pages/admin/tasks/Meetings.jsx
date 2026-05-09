@@ -986,6 +986,8 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   const [status, setStatus] = useState(initial.status ?? '')
   const [dateFrom, setDateFrom] = useState(initial.dateFrom ?? '')
   const [dateTo, setDateTo] = useState(initial.dateTo ?? '')
+  const [orgSearch, setOrgSearch] = useState('')
+  const [prjSearch, setPrjSearch] = useState('')
 
   const orgDd = useDropdown()
   const prjDd = useDropdown()
@@ -993,35 +995,70 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
   const reset = () => { setOrganizer(''); setProject(''); setStatus(''); setDateFrom(''); setDateTo('') }
 
-  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
-  const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
+  // Faqat admin va manager rollilarni ko'rsatish
+  const managers = users.filter(u => {
+    const allRoles = [u.active_role, ...(u.roles ?? [])].filter(Boolean)
+    return allRoles.includes('admin') || allRoles.includes('manager')
+  })
+
+  const filteredManagers = orgSearch.trim()
+    ? managers.filter(u => u.username?.toLowerCase().includes(orgSearch.toLowerCase()))
+    : managers
+
+  const filteredProjects = prjSearch.trim()
+    ? projects.filter(p => p.title?.toLowerCase().includes(prjSearch.toLowerCase()))
+    : projects
+
+  const selectedOrg = managers.find(u => u.id === organizer)
+  const selectedPrj = projects.find(p => p.id === project)
 
   const STATUS_OPTIONS = [
     { label: 'Tugallangan', value: 'true' },
     { label: 'Tugallanmagan', value: 'false' },
   ]
 
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    }
+  const fmtDate = (iso) => {
+    if (!iso) return ''
+    try {
+      const d = new Date(iso)
+      return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+    } catch { return '' }
+  }
 
-    window.addEventListener("keydown", handleKey)
-    return () => {
-      window.removeEventListener("keydown", handleKey)
-    }
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
   }, [onClose])
+
+  // Avatar komponenti
+  const Avatar = ({ user, size = 8 }) => {
+    const [err, setErr] = useState(false)
+    const initials = (user?.username ?? '?').slice(0, 2).toUpperCase()
+    if (user?.avatar && !err) {
+      return <img src={user.avatar} alt={user.username} onError={() => setErr(true)}
+        className={`w-${size} h-${size} rounded-full object-cover shrink-0`} />
+    }
+    return (
+      <div className={`w-${size} h-${size} rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0`}>
+        {initials}
+      </div>
+    )
+  }
+
+  const ddBase = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border bg-white border-[#E2E6F2] dark:bg-[#1C1D1D] dark:border-[#2A2B2B] overflow-hidden'
+  const triggerCls = (val) => `w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] border-[#E2E6F2] dark:border-[#292A2A] ${val ? 'text-[#1A1D2E] dark:text-white' : 'text-[#8F95A8] dark:text-[#5B6078]'}`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
+      <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
-        <div className="px-6 pt-6 pb-5">
+      <div className="relative flex flex-col w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+
+        {/* Header */}
+        <div className="px-6 pt-6 pb-5 ">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="text-[#1A1D2E] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={16} /></button>
             <h2 className="text-[18px] font-extrabold text-[#1A1D2E] dark:text-white">Filtrlash</h2>
@@ -1029,42 +1066,70 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
           <p className="text-sm text-[#5B6078]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
 
-        <div className="px-6 pb-4 flex flex-col gap-4">
+        <div className="px-6 pb-4 flex flex-1 flex-col gap-4">
           <div className="grid grid-cols-3 gap-3">
+
             {/* Tashkilotchi */}
-            <div ref={orgDd.ref}>
+            <div ref={orgDd.ref} className="col-span-1 ">
               <label className={labelCls}>Tashkilotchi</label>
               <div className="relative">
-                <button type="button" onClick={() => orgDd.setOpen(o => !o)} className={ddBtn(organizer)}>
-                  <span className="flex-1 text-left truncate">{users.find(u => u.id === organizer)?.username || 'Tanlang'}</span>
-                  <div className="flex items-center gap-1 shrink-0 ml-1">
-                    {organizer
-                      ? <span onMouseDown={e => { e.stopPropagation(); setOrganizer('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
-                      : <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform ${orgDd.open ? 'rotate-180' : ''}`} />}
-                  </div>
+                <button type="button" onClick={() => { orgDd.setOpen(o => !o); setOrgSearch('') }} className={triggerCls(organizer)}>
+                  {selectedOrg ? (
+                    <>
+                      
+                      <span className="flex-1 text-left truncate text-[#1A1D2E] dark:text-white">{selectedOrg.username}</span>
+                      <span onMouseDown={e => { e.stopPropagation(); setOrganizer('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer ml-auto shrink-0"><FaXmark size={11} /></span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex-1 text-left">Tanlang</span>
+                      <FaChevronDown size={11} className={`text-[#8F95A8] transition-transform shrink-0 ${orgDd.open ? 'rotate-180' : ''}`} />
+                    </>
+                  )}
                 </button>
                 {orgDd.open && (
-                  <div className={ddList}>
-                    {users.map((u, i) => (
-                      <button key={u.id} type="button" onClick={() => { setOrganizer(u.id); orgDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                        <div className="w-7 h-7 rounded-full bg-[#526ED3]/20 flex items-center justify-center text-xs font-bold text-[#526ED3] shrink-0">
-                          {(u.username ?? '?').slice(0, 2).toUpperCase()}
-                        </div>
-                        <p className={`text-sm font-medium truncate ${organizer === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
-                      </button>
-                    ))}
+                  <div className={ddBase} style={{ maxHeight: 260, width:250,  }}>
+                    {/* <div className="px-3 py-2 border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                      <input autoFocus value={orgSearch} onChange={e => setOrgSearch(e.target.value)}
+                        placeholder="Qidirish..." className="w-full text-sm outline-none bg-transparent text-[#1A1D2E] dark:text-white placeholder-[#8F95A8]" />
+                    </div> */}
+                    <div className="overflow-y-auto" style={{ maxHeight: 200 }}>
+                      {filteredManagers.length === 0
+                        ? <p className="px-4 py-3 text-sm text-[#8F95A8] text-center">Topilmadi</p>
+                        : filteredManagers.map((u, i) => (
+                          <button key={u.id} type="button"
+                            onClick={() => { setOrganizer(u.id); orgDd.setOpen(false); setOrgSearch('') }}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors
+                              ${i < filteredManagers.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
+                              ${organizer === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                            <Avatar user={u} size={8} />
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-semibold truncate ${organizer === u.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{u.username}</p>
+                              <p className="text-xs text-[#8F95A8] truncate capitalize">
+                                {(() => {
+                                  const allRoles = [u.active_role, ...(u.roles ?? [])].filter(Boolean)
+                                  if (allRoles.includes('admin')) return 'Administrator'
+                                  if (allRoles.includes('manager')) return 'Menejer'
+                                  return u.position || ''
+                                })()}
+                              </p>
+                            </div>
+                            {organizer === u.id && <FaCheck size={11} className="text-[#3F57B3] shrink-0" />}
+                          </button>
+                        ))
+                      }
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Loyiha */}
-            <div ref={prjDd.ref}>
+            <div ref={prjDd.ref} className="col-span-1">
               <label className={labelCls}>Loyiha</label>
               <div className="relative">
-                <button type="button" onClick={() => prjDd.setOpen(o => !o)} className={ddBtn(project)}>
-                  <span className="flex-1 text-left truncate">{projects.find(p => p.id === project)?.title || 'Tanlang'}</span>
+                <button type="button" onClick={() => { prjDd.setOpen(o => !o); setPrjSearch('') }} className={triggerCls(project)}>
+                  <span className="flex-1 text-left truncate">{selectedPrj?.title || 'Tanlang'}</span>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     {project
                       ? <span onMouseDown={e => { e.stopPropagation(); setProject('') }} className="text-[#B6BCCB] hover:text-[#5B6078] cursor-pointer"><FaXmark size={11} /></span>
@@ -1072,23 +1137,41 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   </div>
                 </button>
                 {prjDd.open && (
-                  <div className={ddList}>
-                    {projects.map((p, i) => (
-                      <button key={p.id} type="button" onClick={() => { setProject(p.id); prjDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < projects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${project === p.id ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
-                        {p.title}
-                      </button>
-                    ))}
+                  <div className={ddBase} style={{ maxHeight: 260,  width:250}}>
+                 
+                    <div className="overflow-y-auto" style={{ maxHeight: 200 }}>
+                      {filteredProjects.length === 0
+                        ? <p className="px-4 py-3 text-sm text-[#8F95A8] text-center">Topilmadi</p>
+                        : filteredProjects.map((p, i) => (
+                          <button key={p.id} type="button"
+                            onClick={() => { setProject(p.id); prjDd.setOpen(false); setPrjSearch('') }}
+                            className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors
+                              ${i < filteredProjects.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
+                              ${project === p.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-semibold truncate ${project === p.id ? 'text-[#3F57B3] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white'}`}>{p.title}</p>
+                              {p.description && <p className="text-xs text-[#8F95A8] truncate mt-0.5">{p.description}</p>}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {(p.deadline || p.end_date) && (
+                                <span className="text-[11px] text-[#8F95A8] whitespace-nowrap">{fmtDate(p.deadline || p.end_date)}</span>
+                              )}
+                              {project === p.id && <FaCheck size={11} className="text-[#3F57B3]" />}
+                            </div>
+                          </button>
+                        ))
+                      }
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Holati */}
-            <div ref={stsDd.ref}>
+            <div ref={stsDd.ref} className="col-span-1">
               <label className={labelCls}>Holati</label>
               <div className="relative">
-                <button type="button" onClick={() => stsDd.setOpen(o => !o)} className={ddBtn(status)}>
+                <button type="button" onClick={() => stsDd.setOpen(o => !o)} className={triggerCls(status)}>
                   <span className="flex-1 text-left truncate">{STATUS_OPTIONS.find(s => s.value === status)?.label || 'Tanlang'}</span>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     {status
@@ -1097,10 +1180,12 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   </div>
                 </button>
                 {stsDd.open && (
-                  <div className={ddList}>
+                  <div className={ddBase}>
                     {STATUS_OPTIONS.map((s, i) => (
                       <button key={s.value} type="button" onClick={() => { setStatus(s.value); stsDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_OPTIONS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full px-4 py-2.5 text-left text-sm cursor-pointer
+                          ${i < STATUS_OPTIONS.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
+                          ${status === s.value ? 'bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]' : 'text-[#1A1D2E] dark:text-white hover:bg-[#F8F9FC] dark:hover:bg-[#292A2A]'}`}>
                         {s.label}
                       </button>
                     ))}
@@ -1120,13 +1205,14 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
           </div>
         </div>
 
+        {/* Footer */}
         <div className="px-6 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
           <button onClick={reset}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[#5B6078] hover:bg-[#F1F3F9] dark:text-[#8F95A8] dark:hover:bg-[#1C1D1D]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply({ organizer, project, status, dateFrom, dateTo })}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3F57B3] text-white hover:bg-[#526ED3]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
@@ -1219,9 +1305,9 @@ export default function MeetingsPage() {
         setProjects(Array.isArray(list) ? list : [])
       }).catch(() => { })
 
-    axiosAPI.get('/users/', { params: { page_size: 200 } })
+    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
       .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        const list = res.data?.results ?? res.data?.data?.results ?? res.data ?? []
         setUsers(Array.isArray(list) ? list : [])
       }).catch(() => { })
   }, [])
