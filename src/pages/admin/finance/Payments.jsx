@@ -375,8 +375,11 @@ export default function PaymentsPage() {
           onPaid={isAccountant ? handlePaid : null}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
+          showCheckModal={() => setCheckModal(true)}
         />
       )}
+
+      
     </div>
   )
 }

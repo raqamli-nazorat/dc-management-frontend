@@ -497,7 +497,7 @@ export default function ProfilePage() {
         toast.success("Ma'lumotlar yangilandi!", resCard.data.data.message)
       } else if (isSocialChanged) {
         const resLinks = await axiosAPI.put("users/me/social-links/", {
-          social_links: data.social_links
+          social_links: data.social_links.map((item, index) => ({havola: item}))
         })
 
         getProfile()

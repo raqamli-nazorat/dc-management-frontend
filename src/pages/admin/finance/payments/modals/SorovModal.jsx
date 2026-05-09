@@ -310,7 +310,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
               bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
             <img src="/imgs/checkIcon.svg" alt="" className="w-3.5 h-3.5 brightness-0 invert" />
             So'rov yuborish
-          </button>
+          </button>ap
         </div>
       </div>
     </div>

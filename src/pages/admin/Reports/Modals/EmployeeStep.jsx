@@ -96,14 +96,10 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center"
-            onClick={onClose}
         >
             <div
-                className="w-full  h-[600px] flex flex-col max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden  "
-                onClick={(e) => e.stopPropagation()}
+                className="w-full h-[600px] flex flex-col max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden"
             >
-
-
                 {/* Modal Header */}
                 <div className="flex items-center px-6 py-5 ">
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-white">
@@ -112,7 +108,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-white">{title}</h2>
                 </div>
 
-                <div className="p-6 pt-0      flex flex-col flex-1  ">
+                <div className="p-6 pt-0 flex flex-col flex-1">
                     {/* Controls: Select All & Search */}
                     <div className="flex items-center gap-3 mb-6">
                         <button

@@ -62,6 +62,7 @@ function CancelReasonModal({ onCancel, onConfirm }) {
 
 // ── To'lov tasdiqlash modali ─────────────────────────────────
 function PaidConfirmModal({ onCancel, onConfirm }) {
+  
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
@@ -93,7 +94,7 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
 }
 
 // ── Asosiy modal ─────────────────────────────────────────────
-export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm, onCancel }) {
+export default function XarajatDetailModal({ payment, onClose, showCheckModal, onPaid, onConfirm, onCancel }) {
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaidModal, setShowPaidModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -274,6 +275,7 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
             setShowCancelModal(false)
             onCancel(payment.id, reason)
             onClose()
+            showCheckModal()
           }}
         />
       )}
@@ -284,7 +286,6 @@ export default function XarajatDetailModal({ payment, onClose, onPaid, onConfirm
           onCancel={() => setShowPaidModal(false)}
           onConfirm={() => {
             setShowPaidModal(false)
-            onPaid(payment.id)
             onClose()
           }}
         />

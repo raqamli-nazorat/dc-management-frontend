@@ -21,7 +21,7 @@ const labelMap = {
   calendar: 'Kalendar',
   salary: 'Ish haqi bo\'yicha', employee: 'Xodimlar bo\'yicha', archive: 'Arxiv', staff: 'Xodimlar', done: 'Bajarilgan',
   applications: 'Arizalar', positions: 'Lavozimlar', regions: 'Viloyatlar',
-  trash: 'Chiqindi qutisi', profile: 'Shaxsiy kabinet', analytics: "Analitika", meetings: "Yig'ilishlar", my_tasks: "Kundalik rejalar",
+  trash: 'Chiqindi qutisi', profile: 'Shaxsiy kabinet', analytics: "Analitika", meetings: "Yig'ilishlar", my_tasks: "Kundalik rejalar", accountant: "Hisobchi"
 }
 
 const NOTIFS_DATA = [
