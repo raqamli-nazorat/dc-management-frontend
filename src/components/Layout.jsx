@@ -7,7 +7,7 @@ import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
-import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal } from './MeetingModals'
+import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
 
 const labelMap = {
@@ -252,7 +252,8 @@ export default function Layout() {
   const unreadCount = notifs.filter(n => !n.read).length
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
-  const [activeOpenMeeting, setActiveOpenMeeting] = useState(null) // { meetingId, projectId }
+  const [activeOpenMeeting, setActiveOpenMeeting] = useState(null)
+  const [activeExcuseAttendanceId, setActiveExcuseAttendanceId] = useState(null)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -278,6 +279,16 @@ export default function Layout() {
       const projectId = extraData.project_id
       if (meetingId) {
         setActiveOpenMeeting({ meetingId, projectId })
+        setNotifOpen(false)
+        return
+      }
+    }
+
+    // extra_data.action === 'open_attendance' — sabab ko'rish va tasdiqlash modali
+    if (extraData?.action === 'open_attendance') {
+      const attendanceId = extraData.attendance_id
+      if (attendanceId) {
+        setActiveExcuseAttendanceId(attendanceId)
         setNotifOpen(false)
         return
       }
@@ -613,6 +624,16 @@ export default function Layout() {
             meetingId={activeOpenMeeting.meetingId}
             userId={user?.id}
             onClose={() => setActiveOpenMeeting(null)}
+          />
+        </>
+      )}
+
+      {activeExcuseAttendanceId && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveExcuseAttendanceId(null)} />
+          <AttendanceExcuseModal
+            attendanceId={activeExcuseAttendanceId}
+            onClose={() => setActiveExcuseAttendanceId(null)}
           />
         </>
       )}

@@ -418,3 +418,132 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
     </div>
   )
 }
+
+// open_attendance action uchun modal — sabab ko'rish va tasdiqlash
+export function AttendanceExcuseModal({ attendanceId, onClose }) {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    if (!attendanceId) return
+    setLoading(true)
+    axiosAPI.get(`/meeting-attendance/${attendanceId}/`)
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        setData(d)
+      })
+      .catch(() => {
+        toast.error("Xatolik", "Ma'lumotlarni yuklashda xatolik")
+        onClose()
+      })
+      .finally(() => setLoading(false))
+  }, [attendanceId])
+
+  const fmtDate = (iso) => {
+    if (!iso) return ''
+    try {
+      const d = new Date(iso)
+      return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+    } catch { return '' }
+  }
+
+  const handleExcuse = async (isExcused) => {
+    setSaving(true)
+    try {
+      await axiosAPI.patch(`/meeting-attendance/${attendanceId}/`, { is_excused: isExcused })
+      if (isExcused) {
+        toast.success("Sabab tasdiqlandi", "Xodimning sababi tasdiqlandi.")
+      } else {
+        toast.error("Sababsiz belgilandi", "Xodim sababsiz qatnashmagan deb belgilandi.")
+      }
+      onClose()
+    } catch {
+      toast.error("Xatolik", "Saqlashda xatolik yuz berdi")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Meeting sana/vaqtini meeting_info dan olish
+  const meetingTitle = data?.meeting_title || "Yig'ilish"
+  const meetingDate = data?.meeting_start_time ? fmtDate(data.meeting_start_time) : ''
+  const absenceReason = data?.absence_reason || ''
+  const username = data?.user_info?.username || ''
+  const position = data?.user_info?.position || ''
+
+  return (
+    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D] shadow-2xl border-l border-[var(--stroke-sub)] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-6 shrink-0">
+        <button onClick={onClose}
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-elevation-2)] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435]">
+          <FaArrowLeft size={14} />
+        </button>
+        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">
+          Yig'ilishga qatnashmaslik sababi
+        </h2>
+      </div>
+
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <svg className="animate-spin w-6 h-6 text-[var(--accent-sub)]" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+          </svg>
+        </div>
+      ) : (
+        <>
+          {/* Meeting info */}
+          <div className="flex items-start justify-between px-6 mb-4 shrink-0">
+            <div className="flex flex-col gap-0.5">
+              {username && (
+                <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{username}</p>
+              )}
+              {position && (
+                <p className="text-[11px] text-[var(--text-soft)] dark:text-[#8E95B5]">{position}</p>
+              )}
+            </div>
+            <div className="text-right shrink-0 ml-4">
+              <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{meetingTitle}</p>
+              {meetingDate && (
+                <p className="text-[11px] font-medium text-[var(--text-sub)] dark:text-[#8E95B5] mt-0.5">{meetingDate}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Sabab matni */}
+          <div className="px-6 flex-1">
+            <textarea
+              readOnly
+              value={absenceReason || "Sabab ko'rsatilmagan"}
+              className="w-full h-36 px-4 py-3 bg-white dark:bg-[#252626] rounded-2xl border border-[var(--stroke-sub)] dark:border-[#333435] text-[14px] font-medium text-[var(--text-strong)] dark:text-white resize-none outline-none cursor-default"
+            />
+          </div>
+
+          {/* Footer — Sababsiz / Sababli */}
+          <div className="absolute bottom-0 left-0 w-full px-6 py-4 flex items-center justify-end gap-3">
+            <button
+              onClick={() => handleExcuse(false)}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--error-sub)] text-white text-[14px] font-bold hover:opacity-90 disabled:opacity-50 cursor-pointer transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              Sababsiz
+            </button>
+            <button
+              onClick={() => handleExcuse(true)}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#22c55e] text-white text-[14px] font-bold hover:opacity-90 disabled:opacity-50 cursor-pointer transition-colors"
+            >
+              <FaCheck size={13} />
+              Sababli
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

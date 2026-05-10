@@ -601,7 +601,7 @@ export default function TrashPage() {
     <div className="flex flex-col h-full">
       <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white shrink-0">Chiqindi qutisi</h1>
 
-      <div className="flex items-center gap-1 border-b border-[var(--stroke-sub)] dark:border-[#292A2A] shrink-0 mt-4">
+      <div className="flex items-center gap-1 shrink-0 mt-4">
         {tabs.map(tab => (
           <button
             key={tab.id}
