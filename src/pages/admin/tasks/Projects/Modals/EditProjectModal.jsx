@@ -448,8 +448,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Muzlatilganmi ?</span>
                                 <button type="button" onClick={() => set('is_hidden', !form.is_hidden)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${!form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
-                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${!form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
+                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
                         }
