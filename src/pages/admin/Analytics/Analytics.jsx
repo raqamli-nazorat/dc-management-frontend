@@ -213,9 +213,12 @@ export default function AnalyticsPage() {
   const prjTicks = Array.from({ length: Math.floor(prjTop / prjStep) + 1 }, (_, i) => i * prjStep)
   const prjDomain = [0, prjTop]
 
-  // Vazifalar YAxis — 0..100 fixed
-  const taskMax = Math.max(100, ...taskData.map(d => Math.max(d.value, d.prevValue || 0)))
-  const { domain: taskDomain, ticks: taskTicks } = calcYTicks([], taskMax <= 100 ? 100 : taskMax)
+  // Vazifalar YAxis — real dataga moslashgan, step 5, minimum 15
+  const taskMaxVal = Math.max(15, ...taskData.map(d => Math.max(d.value || 0, d.prevValue || 0)))
+  const taskStep = taskMaxVal <= 25 ? 5 : taskMaxVal <= 50 ? 10 : taskMaxVal <= 100 ? 25 : 50
+  const taskTop = Math.ceil(taskMaxVal / taskStep) * taskStep
+  const taskTicks = Array.from({ length: Math.floor(taskTop / taskStep) + 1 }, (_, i) => i * taskStep)
+  const taskDomain = [0, taskTop]
 
   const axisColor = isDark ? '#4A4F5E' : '#8F95A8'
   const gridColor = isDark ? '#2A2B2B' : GRID_COLOR
