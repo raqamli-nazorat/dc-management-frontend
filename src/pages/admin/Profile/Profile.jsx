@@ -321,7 +321,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
     if (role === activeRole) { setOpen(false); return }
     setLoading(true)
     try {
-      await axiosAPI.put('/users/me/change-role/', { active_role: role })
+      await axiosAPI.patch('users/me/', { active_role: role })
       const saved = localStorage.getItem('user')
       if (saved) {
         const u = JSON.parse(saved)
@@ -345,7 +345,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
+        className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center justify-between gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
       >
         <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
           {ROLE_LABELS[activeRole] || activeRole || 'Tanlash'}
@@ -449,16 +449,16 @@ export default function ProfilePage() {
 
   let social = {}
   // Social links — string yoki object bo'lishi mumkin
-  if (typeof data.social_links === 'object' && data.social_links) {
-    social = data.social_links
-  } else if (typeof data.social_links === 'string' && data.social_links) {
-    try { social = JSON.parse(data.social_links) } catch { social = {} }
+  if (typeof data?.social_links === 'object' && data?.social_links) {
+    social = data?.social_links
+  } else if (typeof data.social_links === 'string' && data?.social_links) {
+    try { social = JSON.parse(data?.social_links) } catch { social = {} }
   }
 
-  const isAvatarChanged = data.avatar instanceof File;
-  const isPhoneChanged = (data.phone_number?.replace(/\s/g, '') || '') !== (profile.phone_number?.replace(/\s/g, '') || '');
-  const isCardChanged = (data.card_number?.replace(/\s/g, '') || '') !== (profile.card_number?.replace(/\s/g, '') || '');
-  const isSocialChanged = JSON.stringify(data.social_links || []) !== JSON.stringify(profile.social_links || []);
+  const isAvatarChanged = data?.avatar instanceof File;
+  const isPhoneChanged = (data?.phone_number?.replace(/\s/g, '') || '') !== (profile?.phone_number?.replace(/\s/g, '') || '');
+  const isCardChanged = (data?.card_number?.replace(/\s/g, '') || '') !== (profile?.card_number?.replace(/\s/g, '') || '');
+  const isSocialChanged = JSON.stringify(data?.social_links || []) !== JSON.stringify(profile?.social_links || []);
 
   const isChanged = isAvatarChanged || isPhoneChanged || isCardChanged || isSocialChanged;
 
@@ -662,95 +662,101 @@ export default function ProfilePage() {
         </Field>
       </div>
 
-      {/* Social Links */}
-      <div className="grid grid-cols-3 gap-3">
-        {data.social_links?.map((link, index) => {
-          const isLast = index === data.social_links.length - 1;
+      <div className={rowCls}>
+        {/* Social Links */}
+        <div className="grid grid-cols-3 gap-3">
+          {data.social_links?.map((link, index) => {
+            const isLast = index === data.social_links.length - 1;
 
-          return (
-            <div key={index} className="flex items-end gap-3">
-              <div className="flex-1">
-                <label className={labelCls}>{index + 1}.Havola</label>
-                <div className="relative">
-                  <input
-                    className={inputCls + " pr-10"}
-                    placeholder="Havola yuklang"
-                    value={link}
-                    onChange={e => {
-                      const newLinks = [...data.social_links];
-                      newLinks[index] = e.target.value;
-                      set('social_links', newLinks);
-                    }}
-                  />
+            return (
+              <div key={index} className="flex items-end gap-3">
+                <div className="flex-1">
+                  <label className={labelCls}>{index + 1}.Havola</label>
+                  <div className="relative">
+                    <input
+                      className={inputCls + " pr-10"}
+                      placeholder="Havola yuklang"
+                      value={link}
+                      onChange={e => {
+                        const newLinks = [...data.social_links];
+                        newLinks[index] = e.target.value;
+                        set('social_links', newLinks);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        set('social_links', data.social_links.filter((_, i) => i !== index))
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                    >
+                      <FaXmark size={14} />
+                    </button>
+                  </div>
+                </div>
+                {isLast && index < 4 && (
                   <button
                     type="button"
-                    onClick={() => {
-                      set('social_links', data.social_links.filter((_, i) => i !== index))
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                    onClick={() => set('social_links', [...data.social_links, ''])}
+                    className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
                   >
-                    <FaXmark size={14} />
+                    <FiPlus size={20} />
                   </button>
-                </div>
+                )}
               </div>
-              {isLast && index < 4 && (
-                <button
-                  type="button"
-                  onClick={() => set('social_links', [...data.social_links, ''])}
-                  className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
-                >
-                  <FiPlus size={20} />
-                </button>
-              )}
-            </div>
-          );
-        })}
-        {(!data.social_links || data.social_links.length === 0) && (
-          <button
-            type="button"
-            onClick={() => set('social_links', [''])}
-            className="flex items-center gap-2 py-2 px-3 w-[165px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
-          >
-            <div className="flex items-center justify-center">
-              <FiPlus size={18} />
-            </div>
-            Havola qo'shish
-          </button>
-        )}
-      </div>
-
-      {/* Lavozim + Rol */}
-      <div className={rowCls}>
-        <div className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
-            <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
-          </div>
-          <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
-            <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">{data.position || 'Admin'}</span>
-            <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
-          </div>
+            );
+          })}
+          {(!data.social_links || data.social_links.length === 0) && (
+            <button
+              type="button"
+              onClick={() => set('social_links', [''])}
+              className="flex items-center gap-2 py-2 px-3 w-[165px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
+            >
+              <div className="flex items-center justify-center">
+                <FiPlus size={18} />
+              </div>
+              Havola qo'shish
+            </button>
+          )}
         </div>
 
-        <div className="w-full px-4 py-2.5 rounded-xl  bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
-            <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
-          </div>
-          {data.roles?.length > 1 ? (
-            <RoleDropdown
-              roles={data.roles}
-              activeRole={data.active_role || data.roles[0]}
-              onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
-            />
-          ) : (
+        {/* Lavozim + Rol */}
+        <div className="flex flex-col gap-3">
+          <div className="w-full py-2.5 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+            <div className="flex items-center gap-2.5">
+              <div className='w-[32px] h-[32px] bg-[#e9ecf5] rounded-lg flex justify-center items-center'>
+                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+              </div>
+              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
+            </div>
             <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
-              <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
-                {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
-              </span>
+              <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">{data.position || 'Admin'}</span>
               <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
             </div>
-          )}
+          </div>
+
+          <div className="w-full py-2.5 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
+            <div className="flex items-center gap-2.5">
+              <div className='w-[32px] h-[32px] bg-[#e9ecf5] rounded-lg flex justify-center items-center'>
+                <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+              </div>
+              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
+            </div>
+            {data.roles?.length > 1 ? (
+              <RoleDropdown
+                roles={data.roles}
+                activeRole={data.active_role || data.roles[0]}
+                onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
+              />
+            ) : (
+              <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+                <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
+                  {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
+                </span>
+                <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -766,8 +772,8 @@ export default function ProfilePage() {
       </div>
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
-      {passportOpen && data.passport_image && (
-        <PassportViewer url={data.passport_image} onClose={() => setPassportOpen(false)} />
+      {passportOpen && data?.passport_image && (
+        <PassportViewer url={data?.passport_image} onClose={() => setPassportOpen(false)} />
       )}
 
       {openImg && (
