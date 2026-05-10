@@ -1,12 +1,13 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter } from 'react-icons/lu'
+import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
 
 const MAIN_COLUMNS = [
+  { key: 'number', label: '№', width: 45 },
   { key: 'user', label: 'Ism Sharifi', width: 180 },
   { key: 'project', label: 'Loyiha nomi', width: 200 },
   { key: 'expense_category', label: 'Xarajat turi', width: 180 },
@@ -86,7 +87,7 @@ const initialFilters = {
   expense_category: '',
 }
 
-const Employee = () => {
+const CostInquiries = () => {
   const { isDark } = useTheme()
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
@@ -104,7 +105,7 @@ const Employee = () => {
   const filterButtonRef = useRef(null)
   const RIGHT_PINNED_KEYS = ['created_at', 'paid_at', 'confirmed_at', 'accountant', 'cancelled_at', 'cancel_reason', 'card_number'];
   const [tablePin, setTablePin] = useState({
-    number: false,
+    number: true,
     user: false,
     project: false,
   })
@@ -679,7 +680,6 @@ const Employee = () => {
     })
     setSearch('')
     setFilterModal(false)
-    getEmployeeReports({ params: {} })
     setHasFetched(false)
     setUserReports([])
   }
@@ -755,8 +755,8 @@ const Employee = () => {
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
           onClick={handleFetchReports}
         >
-          <FaRegFile size={15} />
-          Shakllantirish
+          {isLoading ? <LuRefreshCw size={15} className="animate-spin" /> : <FaRegFile size={15} />}
+          {isLoading ? "Shakllantirilmoqda..." : "Shakllantirish"}
         </button>
       </div>
 
@@ -769,13 +769,15 @@ const Employee = () => {
               borderRadius: 12,
               colorPrimary: '#7186ED',
               motion: false,
-              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+              colorBgContainer: isDark ? '#0d1117' : '#ffffff',
+              colorBgElevated: isDark ? '#0d1117' : '#ffffff',
             },
             components: {
               Select: {
-                selectorBg: isDark ? '#222323' : '#ffffff',
-                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
-                optionActiveBg: isDark ? '#222323' : 'var(--bg-elevation-1)',
+                selectorBg: isDark ? '#0d1117' : '#ffffff',
+                optionSelectedBg: isDark ? '#1f2937' : '#F1F3F9',
+                optionActiveBg: isDark ? '#2d3748' : 'var(--bg-elevation-1)',
               }
             }
           }}
@@ -962,7 +964,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectEmployee(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
@@ -986,7 +988,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectAccountant(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer ${filters?.accountants?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.accountants ? `${filters.accountants.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
@@ -1010,7 +1012,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectProject(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer ${filters?.projects?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.projects ? `${filters.projects.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
@@ -1080,14 +1082,13 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center" >№</th>
-
                   {MAIN_COLUMNS.map((col) => {
                     const isRight = RIGHT_PINNED_KEYS.includes(col.key);
                     return (
                       <th
                         key={col.key}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        rowSpan={2}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                         style={{
                           width: col.width,
                           minWidth: col.width,
@@ -1099,11 +1100,13 @@ const Employee = () => {
                         }}
                       >
                         <div className={`flex items-center gap-2 ${col.key === 'number' ? 'justify-center' : (col.key === 'user' || col.key === 'project' || col.key === 'accountant' || col.key === 'reason') ? 'justify-start' : 'justify-end'}`}>
-                          <Checkbox
-                            checked={tablePin[col.key]}
-                            onChange={(e) => handlePin(col.key, e.target.checked)}
-                            className="custom-header-checkbox"
-                          />
+                          {col.key !== 'number' && (
+                            <Checkbox
+                              checked={tablePin[col.key]}
+                              onChange={(e) => handlePin(col.key, e.target.checked)}
+                              className="custom-header-checkbox"
+                            />
+                          )}
                           {col.label}
                         </div>
                       </th>
@@ -1111,19 +1114,17 @@ const Employee = () => {
                   })}
                 </tr>
               </thead>
-              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
+              <tbody className="bg-white dark:bg-[#0d1117] dark:text-[#e6edf3]!">
 
                 {UserReports.map((item, index) => (
-                  <tr key={item.id} className="border-b border-slate-100 dark:border-[var(--stroke-soft)] hover:bg-slate-50 dark:hover:bg-[var(--bg-elevation-1-alt)] transition-colors">
-                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 border-r`}>
-                      {index + 1}
-                    </td>
+                  <tr key={item.id} className="border-b border-slate-100 dark:border-[var(--stroke-soft)]">
                     {MAIN_COLUMNS.map((col) => {
                       const isPinned = !!tablePin[col.key];
                       const isRight = RIGHT_PINNED_KEYS.includes(col.key);
 
                       let content = null;
                       switch (col.key) {
+                        case 'number': content = index + 1; break;
                         case 'user': content = item.user; break;
                         case 'project': content = item.project; break;
                         case 'expense_category': content = item.expense_category; break;
@@ -1145,7 +1146,7 @@ const Employee = () => {
                       return (
                         <td
                           key={col.key}
-                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'project') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'amount' ? 'font-bold text-slate-900 dark:text-[var(--text-strong)] text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'payment_method' || col.key === 'status' || col.key === 'created_at' || col.key === 'paid_at' || col.key === 'confirmed_at' || col.key === 'cancelled_at' || col.key === 'card_number') ? 'text-center' : ''} ${col.key === 'reason' || col.key === 'accountant' ? 'text-start' : ''}`}
+                          className={`p-3 text-[13px] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-white dark:bg-[#0d1117] dark:text-[#e6edf3] ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'project') ? 'font-semibold text-slate-700 dark:text-[#e6edf3] text-start' : (col.key === 'amount' ? 'font-bold text-slate-900 dark:text-[#e6edf3] text-end' : 'text-slate-600 dark:text-[#e6edf3] text-end')} ${(col.key === 'payment_method' || col.key === 'status' || col.key === 'created_at' || col.key === 'paid_at' || col.key === 'confirmed_at' || col.key === 'cancelled_at' || col.key === 'card_number') ? 'text-center' : ''} ${col.key === 'reason' || col.key === 'accountant' ? 'text-start' : ''}`}
                           style={{
                             width: col.width,
                             minWidth: col.width,
@@ -1240,7 +1241,7 @@ const Employee = () => {
   )
 }
 
-export default Employee
+export default CostInquiries
 
 const customSelectStyles = `
   .custom-antd-select .ant-select-selector {

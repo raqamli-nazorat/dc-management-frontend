@@ -1,24 +1,25 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter } from 'react-icons/lu'
+import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
 
 const MAIN_COLUMNS = [
-  { key: 'number', label: '№', width: 45 },
-  { key: 'user', label: 'Ism Sharifi', width: 150 },
-  { key: 'month', label: 'Oy', width: 100 },
-  { key: 'fixed_salary', label: 'Oylik maosh', width: 140 },
-  { key: 'kpi_bonus', label: 'KPI bonus', width: 140 },
-  { key: 'penalty_amount', label: 'Jarima miqdori', width: 140 },
-  { key: 'total_amount', label: 'Jami miqdori', width: 140 },
+  { key: 'number', label: '№', width: 64 },
+  { key: 'user', label: 'Ism Sharifi', width: 213.5 },
+  { key: 'month', label: 'Oy', width: 142.5 },
+  { key: 'fixed_salary', label: 'Oylik maosh', width: 199 },
+  { key: 'kpi_bonus', label: 'KPI bonus', width: 199 },
+  { key: 'penalty_amount', label: 'Jarima miqdori', width: 199.5 },
+  { key: 'total_amount', label: 'Jami miqdori', width: 199.5 },
   { key: 'status', label: 'Holati', width: 120 },
   { key: 'created_at', label: 'Hisoblangan vaqti', width: 140 },
-  { key: 'confirmed_at', label: 'Tasdiqlangan vaqti', width: 140 },
-  { key: 'accountant', label: 'Hisobchi', width: 150 },
+  { key: 'confirmed_at', label: 'Tasdiqlangan vaqti', width: 199 },
+  { key: 'accountant', label: 'Hisobchi', width: 213.5 },
 ]
+
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
 import EmployeeStep from "./Modals/EmployeeStep"
@@ -76,7 +77,7 @@ const initialFilters = {
   penalty_max: '',
 }
 
-const Employee = () => {
+const Salary = () => {
   const { isDark } = useTheme()
   const { setDownload, setPrint, clearDownload, clearPrint } = usePageAction()
   const [search, setSearch] = useState(null)
@@ -92,7 +93,7 @@ const Employee = () => {
   const filterButtonRef = useRef(null)
   const RIGHT_PINNED_KEYS = ['created_at', 'confirmed_at', 'accountant'];
   const [tablePin, setTablePin] = useState({
-    number: false,
+    number: true,
     user: false,
   })
 
@@ -600,12 +601,6 @@ const Employee = () => {
     }, {})
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => {
-    if (value === undefined || value === null || value === '') return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
-
   const showClearButton = Object.keys(filters).some((key) => {
     const value = filters[key];
     if (key === 'created_at_min' || key === 'created_at_max') {
@@ -631,7 +626,6 @@ const Employee = () => {
     })
     setSearch('')
     setFilterModal(false)
-    getEmployeeReports({ params: {} })
     setHasFetched(false)
     setUserReports([])
   }
@@ -701,8 +695,8 @@ const Employee = () => {
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
           onClick={handleFetchReports}
         >
-          <FaRegFile size={15} />
-          Shakllantirish
+          {isLoading ? <LuRefreshCw size={15} className="animate-spin" /> : <FaRegFile size={15} />}
+          {isLoading ? "Shakllantirilmoqda..." : "Shakllantirish"}
         </button>
       </div>
       {/* Filter Panel */}
@@ -716,13 +710,15 @@ const Employee = () => {
               borderRadius: 12,
               colorPrimary: '#7186ED',
               motion: false,
-              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+              colorBgContainer: isDark ? '#0d1117' : '#ffffff',
+              colorBgElevated: isDark ? '#0d1117' : '#ffffff',
             },
             components: {
               Select: {
-                selectorBg: isDark ? '#222323' : '#ffffff',
-                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
-                optionActiveBg: isDark ? '#222323' : 'var(--bg-elevation-1)',
+                selectorBg: isDark ? '#0d1117' : '#ffffff',
+                optionSelectedBg: isDark ? '#1f2937' : '#F1F3F9',
+                optionActiveBg: isDark ? '#2d3748' : 'var(--bg-elevation-1)',
               }
             }
           }}
@@ -805,7 +801,7 @@ const Employee = () => {
                   <button
                     type="button"
                     onClick={() => setSelectEmployee(true)}
-                    className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
+                    className={`relative w-full h-12 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer ${filters?.user?.length > 0 ? 'filter-notif' : ''}`}
                   >
                     <span className="truncate text-sm font-medium">
                       {filters.user ? `${filters.user.split(',').filter(Boolean).length} ta xodim` : 'Xodim tanlang'}
@@ -828,7 +824,7 @@ const Employee = () => {
                   <button
                     type="button"
                     onClick={() => setSelectAccountant(true)}
-                    className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.accountant?.length > 0 ? 'filter-notif' : ''}`}
+                    className={`relative w-full h-12 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer ${filters?.accountant?.length > 0 ? 'filter-notif' : ''}`}
                   >
                     <span className="truncate text-sm font-medium">
                       {filters.accountant ? `${filters.accountant.split(',').filter(Boolean).length} ta hisobchi` : 'Hisobchi tanlang'}
@@ -970,78 +966,179 @@ const Employee = () => {
             className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
             onScroll={handleMoreReportsScroll}
           >
-            <table className="text-left border-collapse w-full min-w-[2000px]">
-              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
+            <table className="text-left border-collapse w-[2000px]">
+              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#7f95e6]">
                 <tr>
-                  {MAIN_COLUMNS.map((col) => {
-                    const isRight = RIGHT_PINNED_KEYS.includes(col.key);
-                    return (
-                      <th
-                        key={col.key}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
-                        style={{
-                          width: col.width,
-                          minWidth: col.width,
-                          maxWidth: col.width,
-                          left: isRight ? undefined : getPinnedLeft(col.key),
-                          right: isRight ? getPinnedRight(col.key) : undefined,
-                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none',
-                          textAlign: (col.key === 'number' || col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'center' : (col.key === 'user' || col.key === 'month') ? 'start' : 'end'
-                        }}
-                      >
-                        <div className={`flex items-center gap-2 ${(col.key === 'number' || col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'justify-center' : (col.key === 'user' || col.key === 'month') ? 'justify-start' : 'justify-end'}`}>
-                          <Checkbox
-                            checked={tablePin[col.key]}
-                            onChange={(e) => handlePin(col.key, e.target.checked)}
-                            className="custom-header-checkbox"
-                          />
-                          {col.label}
-                        </div>
-                      </th>
-                    );
-                  })}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] sticky z-50!`} style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex flex-col items-center gap-1">
+                      №
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.user ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 150, minWidth: 150, maxWidth: 150, left: getPinnedLeft('user'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.user}
+                        onChange={(e) => handlePin('user', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Ism Sharifi
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.month ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getPinnedLeft('month'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.month}
+                        onChange={(e) => handlePin('month', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Oy
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.fixed_salary ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('fixed_salary'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.fixed_salary}
+                        onChange={(e) => handlePin('fixed_salary', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Oylik maosh (UZS)
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.kpi_bonus ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('kpi_bonus'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.kpi_bonus}
+                        onChange={(e) => handlePin('kpi_bonus', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      KPI bonus
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.penalty_amount ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('penalty_amount'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.penalty_amount}
+                        onChange={(e) => handlePin('penalty_amount', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Jarima miqdori (UZS)
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.total_amount ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('total_amount'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.total_amount}
+                        onChange={(e) => handlePin('total_amount', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Jami miqdori
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.status ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 120, minWidth: 120, maxWidth: 120, left: getPinnedLeft('status'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.status}
+                        onChange={(e) => handlePin('status', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Holati
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.created_at ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('created_at'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.created_at}
+                        onChange={(e) => handlePin('created_at', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Hisoblangan vaqti
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.confirmed_at ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('confirmed_at'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.confirmed_at}
+                        onChange={(e) => handlePin('confirmed_at', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Tasdiqlangan vaqti
+                    </div>
+                  </th>
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.accountant ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('accountant'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={tablePin.accountant}
+                        onChange={(e) => handlePin('accountant', e.target.checked)}
+                        className="custom-header-checkbox"
+                      />
+                      Hisobchi
+                    </div>
+                  </th>
+
                 </tr>
               </thead>
-              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
+              <tbody className="bg-white dark:bg-[#7f95e6] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)] hover:bg-slate-50 dark:hover:bg-[var(--bg-elevation-1-alt)] transition-colors" key={item.id || index}>
-                    {MAIN_COLUMNS.map((col) => {
-                      const isPinned = !!tablePin[col.key];
-                      const isRight = RIGHT_PINNED_KEYS.includes(col.key);
-
-                      let content = null;
-                      switch (col.key) {
-                        case 'number': content = index + 1; break;
-                        case 'user': content = item?.user; break;
-                        case 'month': content = item?.month ? dayjs(item.month).format('DD.MM.YYYY') : ''; break;
-                        case 'fixed_salary': content = item?.fixed_salary ? formatNum(item.fixed_salary) : ''; break;
-                        case 'kpi_bonus': content = item?.kpi_bonus ? formatNum(item.kpi_bonus) : ''; break;
-                        case 'penalty_amount': content = item?.penalty_amount ? formatNum(item.penalty_amount) : ''; break;
-                        case 'total_amount': content = item?.total_amount ? formatNum(item.total_amount) : ''; break;
-                        case 'status': content = item?.status; break;
-                        case 'created_at': content = item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''; break;
-                        case 'confirmed_at': content = item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''; break;
-                        case 'accountant': content = item?.accountant; break;
-                        default: content = '';
-                      }
-
-                      return (
-                        <td
-                          key={col.key}
-                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'user' || col.key === 'month') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'total_amount' || col.key === 'fixed_salary' || col.key === 'kpi_bonus' || col.key === 'penalty_amount' ? 'font-bold text-slate-900 dark:text-[var(--text-strong)] text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'created_at' || col.key === 'confirmed_at' || col.key === 'accountant') ? 'text-center' : ''}`}
-                          style={{
-                            width: col.width,
-                            minWidth: col.width,
-                            maxWidth: col.width,
-                            left: isRight ? undefined : getPinnedLeft(col.key),
-                            right: isRight ? getPinnedRight(col.key) : undefined,
-                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none'
-                          }}
-                        >
-                          {content}
-                        </td>
-                      );
-                    })}
+                  <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A]">
+                    <td
+                      className={`p-3 text-[13px] text-[#6E7681] border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#0d1117] dark:text-[#E6EDF3] sticky`}
+                      style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                      {index + 1}
+                    </td>
+                    <td className={`p-3 text-[13px] text-start font-semibold text-slate-700 dark:text-[#E6EDF3] border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#0d1117]  ${tablePin.user ? 'sticky' : ''}`}
+                      style={{
+                        width: 150,
+                        minWidth: 150,
+                        maxWidth: 150,
+                        left: getPinnedLeft('user'),
+                        boxShadow: tablePin.user ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none'
+                      }}>
+                      {item.user}
+                    </td>
+                    <td className={`p-3 text-[13px] border-r text-slate-600 dark:text-[#E6EDF3] border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117]  ${tablePin.month ? 'sticky' : ''}`}
+                      style={{
+                        width: 100,
+                        minWidth: 100,
+                        maxWidth: 100,
+                        left: getPinnedLeft('month'),
+                        boxShadow: tablePin.month ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none'
+                      }}>
+                      {item?.month ? dayjs(item.month).format('DD.MM.YYYY') : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.fixed_salary ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('fixed_salary'), boxShadow: tablePin.fixed_salary ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.fixed_salary ? formatNum(item.fixed_salary) : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.kpi_bonus ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('kpi_bonus'), boxShadow: tablePin.kpi_bonus ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.kpi_bonus ? formatNum(item.kpi_bonus) : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117]  ${tablePin.penalty_amount ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('penalty_amount'), boxShadow: tablePin.penalty_amount ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.penalty_amount ? formatNum(item.penalty_amount) : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.total_amount ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('total_amount'), boxShadow: tablePin.total_amount ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.total_amount ? formatNum(item.total_amount) : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117]  ${tablePin.status ? 'sticky' : ''}`}
+                      style={{ width: 120, minWidth: 120, maxWidth: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.status || ""}
+                    </td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.created_at ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('created_at'), boxShadow: tablePin.created_at ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.confirmed_at ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('confirmed_at'), boxShadow: tablePin.confirmed_at ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.confirmed_at ? dayjs(item.confirmed_at).format('DD.MM.YYYY HH:mm') : ''}
+                    </td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117]  ${tablePin.accountant ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('accountant'), boxShadow: tablePin.accountant ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.accountant || ""}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1115,7 +1212,7 @@ const Employee = () => {
   )
 }
 
-export default Employee
+export default Salary
 
 const customSelectStyles = `
       .custom-antd-select .ant-select-selector {

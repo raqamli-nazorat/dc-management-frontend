@@ -13,7 +13,8 @@ const FilterSelect = ({
     padding = '6px 12px',
     radius = '12px',
     placeholder,
-    className
+    className,
+    with_dots = false
 }) => {
     const [open, setOpen] = useState(false)
     const [hovered, setHovered] = useState(null)
@@ -180,9 +181,9 @@ const FilterSelect = ({
                                     fontWeight: 500,
                                     color: isDark ? '#FFFFFF' : 'var(--text-strong)',
                                     background: isSelected
-                                        ? (isDark ? '#303131' : '#F1F3F9')
+                                        ? (isDark ? '#21262d' : '#F1F3F9')
                                         : hovered === opt.value
-                                            ? (isDark ? '#222323' : 'var(--bg-elevation-1)')
+                                            ? (isDark ? '#21262d' : 'var(--bg-elevation-1)')
                                             : 'transparent',
                                 }}
                             >

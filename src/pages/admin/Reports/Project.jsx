@@ -1,6 +1,6 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter } from 'react-icons/lu'
+import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker, ConfigProvider, theme, Checkbox } from 'antd'
@@ -42,6 +42,7 @@ const initialFilters = {
 }
 
 const MAIN_COLUMNS = [
+  { key: 'number', label: '№', width: 45 },
   { key: 'prefix', label: 'Titul', width: 100 },
   { key: 'title', label: 'Nomi', width: 200 },
   { key: 'description', label: "Ta'rifi", width: 250 },
@@ -89,6 +90,7 @@ const Employee = () => {
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
   const [tablePin, setTablePin] = useState({
+    number: true,
     prefix: false,
     title: false,
   })
@@ -698,7 +700,6 @@ const Employee = () => {
     })
     setSearch('')
     setFilterModal(false)
-    getEmployeeReports({ params: {} })
     setHasFetched(false)
     setUserReports([])
   }
@@ -778,8 +779,8 @@ const Employee = () => {
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
           onClick={handleFetchReports}
         >
-          <FaRegFile size={15} />
-          Shakllantirish
+          {isLoading ? <LuRefreshCw size={15} className="animate-spin" /> : <FaRegFile size={15} />}
+          {isLoading ? "Shakllantirilmoqda..." : "Shakllantirish"}
         </button>
       </div>
 
@@ -794,13 +795,18 @@ const Employee = () => {
               borderRadius: 12,
               colorPrimary: '#7186ED',
               motion: false,
-              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+              colorBgContainer: isDark ? '#0d1117' : '#ffffff',
+              colorBgElevated: isDark ? '#0d1117' : '#ffffff',
             },
             components: {
               Select: {
-                selectorBg: isDark ? '#222323' : '#ffffff',
-                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
-                optionActiveBg: isDark ? '#222323' : 'var(--bg-elevation-1)',
+                selectorBg: isDark ? '#0d1117' : '#ffffff',
+                optionSelectedBg: isDark ? '#1f2937' : '#F1F3F9',
+                optionActiveBg: isDark ? '#2d3748' : 'var(--bg-elevation-1)',
+              },
+              DatePicker: {
+                controlItemBgActive: isDark ? '#1f2937' : 'var(--bg-elevation-1)',
               }
             }
           }}
@@ -871,7 +877,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectAuthor(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
@@ -894,7 +900,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectManager(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.manager ? `${filters.manager.split(',').filter(Boolean).length} ta boshqaruvchi` : 'Boshqaruvchi tanlang'}
@@ -917,7 +923,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectUser(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.employees ? `${filters.employees.split(',').filter(Boolean).length} ta xodim` : 'Xodimlar tanlang'}
@@ -940,7 +946,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectTester(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.testers ? `${filters.testers.split(',').filter(Boolean).length} ta sinovchi` : 'Sinovchilar tanlang'}
@@ -988,12 +994,11 @@ const Employee = () => {
             <table className="text-left border-collapse w-full min-w-[2800px]">
               <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center" >№</th>
                   {MAIN_COLUMNS.map((col) => (
                     <th
                       key={col.key}
                       rowSpan={2}
-                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]  ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                       style={{
                         width: col.width,
                         minWidth: col.width,
@@ -1004,16 +1009,18 @@ const Employee = () => {
                       }}
                     >
                       <div className={`flex items-center gap-2 ${col.key === 'number' ? 'justify-center' : (col.key === 'prefix' ? 'justify-start' : 'justify-end')}`}>
-                        <Checkbox
-                          checked={tablePin[col.key]}
-                          onChange={(e) => handlePin(col.key, e.target.checked)}
-                          className="custom-header-checkbox"
-                        />
+                        {col.key !== 'number' && (
+                          <Checkbox
+                            checked={tablePin[col.key]}
+                            onChange={(e) => handlePin(col.key, e.target.checked)}
+                            className="custom-header-checkbox"
+                          />
+                        )}
                         {col.label}
                       </div>
                     </th>
                   ))}
-                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[var(--stroke-soft)]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center justify-center gap-2">
                       <Checkbox
                         checked={tablePin.tasks}
@@ -1024,11 +1031,11 @@ const Employee = () => {
                     </div>
                   </th>
                 </tr>
-                <tr className="bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] text-[10px] text-center">
+                <tr className="bg-[#7186ED] dark:bg-[#7f95e6] text-[10px] text-center">
                   {GROUP_SUBS.tasks.map((sub) => (
                     <th
                       key={sub.key}
-                      className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
+                      className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
                       style={{
                         width: 140,
                         minWidth: 140,
@@ -1049,61 +1056,61 @@ const Employee = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
+              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22] dark:text-[#e6edf3]!">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)] hover:bg-slate-50 dark:hover:bg-[var(--bg-elevation-1-alt)] transition-colors" key={item.id || index}>
-                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 border-r`}>
+                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)]" key={item.id || index}>
+                    <td className={`p-3 text-[13px] text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22] dark:text-[#e6edf3] sticky left-0 border-r`} style={{ width: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                       {index + 1}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.prefix ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.prefix ? 'sticky' : ''}`}
                       style={{ width: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.prefix}
                     </td>
-                    <td className={`p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.title ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] font-semibold text-end border-r text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.title ? 'sticky' : ''}`}
                       style={{ width: 200, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.title}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.description ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.description ? 'sticky' : ''}`}
                       style={{ width: 250, left: getPinnedLeft('description'), boxShadow: tablePin.description ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.description}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.deadline ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.deadline ? 'sticky' : ''}`}
                       style={{ width: 180, left: getPinnedLeft('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.status ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.status ? 'sticky' : ''}`}
                       style={{ width: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {tableStatuses[item?.status]}
                     </td>
-                    <td className={`p-3 text-xs font-bold text-slate-900 dark:text-[var(--text-strong)] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.project_price ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.project_price ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('project_price'), boxShadow: tablePin.project_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.project_price ? formatNum(item.project_price) : ''}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.created_by_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.created_by_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('created_by_name'), boxShadow: tablePin.created_by_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.created_by_name}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.manager_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.manager_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('manager_name'), boxShadow: tablePin.manager_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.manager_name}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.employees_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.employees_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('employees_names'), boxShadow: tablePin.employees_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.employees_names}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.testers_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.testers_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('testers_names'), boxShadow: tablePin.testers_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.testers_names}
                     </td>
 
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
                   </tr>
                 ))}
               </tbody>
