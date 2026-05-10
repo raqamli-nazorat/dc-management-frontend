@@ -71,7 +71,7 @@ function App() {
 
               {/* ── ADMIN ── */}
               <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AnalyticsPage />} />
                 {commonRoutes('admin')}
               </Route>
 

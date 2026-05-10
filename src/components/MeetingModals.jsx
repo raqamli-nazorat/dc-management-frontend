@@ -26,16 +26,52 @@ function UserAvatar({ user }) {
   )
 }
 
+// Titul raqamini nusxa olish komponenti
+function TitulCopy({ uid }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(uid).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {})
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-1.5 group cursor-pointer w-fit"
+      title="Nusxa olish"
+    >
+      <span className="text-[9px] font-semibold text-[#1A1D2E] dark:text-[#8E95B5] group-hover:text-[var(--accent-sub)] transition-colors">
+        {uid}
+      </span>
+      {copied ? (
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+      ) : (
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className="text-[#1A1D2E] group-hover:text-[var(--accent-sub)] transition-colors">
+          <rect x="9" y="9" width="13" height="13" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      )}
+     
+    </button>
+  )
+}
+
 export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish", date = "", closeMeetingOnSave = false }) {
   const [participants, setParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  // { [attendanceId]: boolean } — original holat
   const [originalState, setOriginalState] = useState({})
-  // { [attendanceId]: boolean } — joriy holat (foydalanuvchi o'zgartirgan)
   const [attendanceMap, setAttendanceMap] = useState({})
   const [dynamicTitle, setDynamicTitle] = useState(title)
   const [dynamicDate, setDynamicDate] = useState(date)
+  const [dynamicUid, setDynamicUid] = useState('')
+  const [dynamicProjectTitle, setDynamicProjectTitle] = useState('')
 
   useEffect(() => {
     setLoading(true)
@@ -45,9 +81,13 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
       axiosAPI.get(`/meeting-attendance/?meeting=${meetingId}`)
     ])
       .then(([meetingRes, attendanceRes]) => {
-        // Meeting ma'lumotlari — data wrapper ni hisobga olish
         const meeting = meetingRes.data?.data || meetingRes.data || {}
         if (meeting.title) setDynamicTitle(meeting.title)
+        if (meeting.uid) setDynamicUid(meeting.uid)
+        // Loyiha nomi — project_info yoki project_title
+        const projTitle = meeting.project_info?.title || meeting.project_title || ''
+        if (projTitle) setDynamicProjectTitle(projTitle)
+
         if (meeting.start_time) {
           const d = new Date(meeting.start_time)
           const day = String(d.getDate()).padStart(2, '0')
@@ -58,7 +98,6 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
           setDynamicDate(`${day}.${month}.${year} ${hours}:${mins}`)
         }
 
-        // Attendance ma'lumotlari — data wrapper ni hisobga olish
         const raw = attendanceRes.data
         const list =
           raw?.data?.results ??
@@ -68,13 +107,11 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
 
         setParticipants(list)
 
-        // Har bir attendance uchun is_attended holatini saqlash
         const map = {}
         list.forEach(p => { map[p.id] = !!p.is_attended })
         setOriginalState(map)
         setAttendanceMap({ ...map })
 
-        // Meeting title fallback
         if (!meeting.title && list.length > 0 && list[0].meeting_title) {
           setDynamicTitle(list[0].meeting_title)
         }
@@ -137,12 +174,23 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
         <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Yig'ilish ishtirokchilarini belgilang</h2>
       </div>
 
-      <div className="flex items-center justify-between px-6 mt-6 mb-3 shrink-0">
-        <h3 className="text-[13px] font-extrabold text-[var(--text-strong)] dark:text-white">Qatnashgan xodimlarni tanlang</h3>
-        <div className="text-right">
-          <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-white">{dynamicTitle}</p>
+      <div className="flex items-center justify-between px-6 mt-4 mb-3 shrink-0">
+        {/* titul */}
+        <div className="flex flex-col gap-0.5">
+          {dynamicUid && (
+            <TitulCopy uid={dynamicUid} />
+          )}
+          <h3 className="text-[13px] font-[500] text-[#1A1D2E] dark:text-white">
+            {dynamicTitle}
+          </h3>
+        </div>
+        <div className="text-right shrink-0 ml-4">
           <p className="text-[11px] font-medium text-[var(--text-sub)] dark:text-[#8E95B5] mt-0.5">{dynamicDate}</p>
         </div>
+      </div>
+
+      <div className="px-6 mb-3 shrink-0">
+        <p className="text-[13px] font-extrabold text-[#1A1D2E] dark:text-white">Qatnashgan xodimlarni tanlang</p>
       </div>
 
       {/* List */}
