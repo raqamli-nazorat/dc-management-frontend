@@ -345,7 +345,7 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center justify-between gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
+        className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#292A2A]! flex items-center justify-between gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
       >
         <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
           {ROLE_LABELS[activeRole] || activeRole || 'Tanlash'}
@@ -744,7 +744,7 @@ export default function ProfilePage() {
                 onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
               />
             ) : (
-              <div className="px-3 py-2.5 rounded-lg border border-[var(--stroke-sub)] flex items-center gap-2 bg-white justify-between dark:border-[#292A2A] w-[200px] dark:bg-[#191A1A]">
+              <div className="px-3 py-2.5 rounded-lg border flex items-center gap-2 bg-white justify-between border-[var(--stroke-sub)] dark:border-[#292A2A]! w-[200px] dark:bg-[#191A1A]">
                 <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
                   {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
                 </span>
