@@ -67,7 +67,7 @@ export default function Login() {
 
       if (result.success) {
         if (result.roles.length === 1) {
-          const role = await axiosAPI.put("users/me/change-role/", { active_role: result.roles[0] })
+          const role = await axiosAPI.patch("users/me/", { active_role: result.roles[0] })
             .then(() => {
               navigate(`/${getRouteRole({ roles: result.roles })}/dashboard`);
 

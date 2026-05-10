@@ -12,6 +12,7 @@ import {
   IconAnalytics, IconSidebarLeft,
 } from './icons'
 import { toast } from '../Toast/ToastProvider'
+import { axiosAPI } from '../service/axiosAPI'
 
 function IconApplications({ size = 20, className = '' }) {
   return (
@@ -224,6 +225,24 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
   const popupRef = useRef(null)
+  
+  const [userSts, setUserSts] = useState({})
+
+  const getUserSts = async () => {
+    try {
+      const { data } = await axiosAPI.get('users/me/efficiency/')
+      setUserSts(data)
+    } catch (error) {
+      console.error(error)
+      toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
+    }
+  }
+
+  useEffect(() => {
+    if (user?.active_role === "employee" || user?.active_role === "manager") {
+      getUserSts()
+    }
+  }, [])
 
   // Outside click — popup yopish
   useEffect(() => {
@@ -504,6 +523,20 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           </NavLink>
         ))}
 
+        {(user?.active_role === "employee" || user?.active_role === "manager") && !isCollapsed && (
+          <div className="flex flex-col justify-start gap-3 ml-3.5 mt-3">
+            <h6 className='flex items-center gap-2 text-[13px] font-medium text-[#1A1D2E]'>
+              <span className='font-extrabold'>
+                57%
+              </span>
+              Samaradorlik
+            </h6>
+            <div className='w-full h-[6px] bg-[#dbdbd9] rounded-full overflow-hidden'>
+              <div className='w-[57%] h-full bg-green-500 rounded-full'></div>
+            </div>
+          </div>
+        )}
+
         {/* Separator */}
         <div className="border-t border-[var(--stroke-sub)] dark:border-[#474848] mx-1 min-w-10" />
 
@@ -616,11 +649,11 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]  cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-sub)] dark:text-[#C2C8E0]">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
+                  {isDark ? (
+                    <img src="/imgs/profileIcon_night.svg" alt="" />
+                  ) : (
+                    <img src="/imgs/profileIcon_light.svg" alt="" />
+                  )}
                   <span className="text-[13px] font-medium text-[var(--text-strong)] dark:text-white">Shaxsiy kabinet</span>
                 </div>
                 <FaChevronRight size={11} className="text-[var(--text-soft)]" />
