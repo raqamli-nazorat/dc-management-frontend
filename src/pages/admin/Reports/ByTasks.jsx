@@ -1,28 +1,29 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter } from 'react-icons/lu'
+import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark } from 'react-icons/fa6'
 import { DatePicker, Select, ConfigProvider, theme, Checkbox } from 'antd'
 import { useTheme } from '../../../context/ThemeContext'
 
 const MAIN_COLUMNS = [
-  { key: 'prefix', label: 'Titul', width: 100 },
-  { key: 'project', label: 'Loyiha nomi', width: 180 },
-  { key: 'title', label: 'Vazifa nomi', width: 180 },
-  { key: 'assignee', label: 'Topshiruvchi', width: 250 },
-  { key: 'created_by', label: 'Muallif', width: 250 },
-  { key: 'priority', label: 'Darajasi', width: 140 },
-  { key: 'status', label: 'Holati', width: 120 },
-  { key: 'type', label: 'Turi', width: 140 },
-  { key: 'task_price', label: 'Vazifa narxi (UZS)', width: 150 },
+  { key: 'number', label: '№', width: 48.5 },
+  { key: 'prefix', label: 'Titul', width: 99 },
+  { key: 'project', label: 'Loyiha nomi', width: 199.5 },
+  { key: 'title', label: 'Vazifa nomi', width: 249 },
+  { key: 'assignee', label: 'Topshiruvchi', width: 249.5 },
+  { key: 'created_by', label: 'Muallif', width: 249 },
+  { key: 'priority', label: 'Darajasi', width: 139 },
+  { key: 'status', label: 'Holati', width: 119.2 },
+  { key: 'type', label: 'Turi', width: 139 },
+  { key: 'task_price', label: 'Vazifa narxi (UZS)', width: 199.5 },
   { key: 'penalty_percentage', label: 'Jarima foizi (%)', width: 150 },
-  { key: 'deadline', label: 'Muddati', width: 150 },
-  { key: 'created_at', label: 'Yaratilgan vaqti', width: 150 },
-  { key: 'sprint', label: 'Sprint raqami', width: 150 },
-  { key: 'position', label: 'Kim uchun', width: 150 },
-  { key: 'reopened_count', label: 'Qaytishlar soni', width: 150 },
-  { key: 'rejection_reason', label: 'Bekor qilish sababi', width: 150 },
+  { key: 'deadline', label: 'Muddati', width: 160 },
+  { key: 'created_at', label: 'Yaratilgan vaqti', width: 159 },
+  { key: 'sprint', label: 'Sprint raqami', width: 149 },
+  { key: 'position', label: 'Kim uchun', width: 179 },
+  { key: 'reopened_count', label: 'Qaytishlar soni', width: 149 },
+  { key: 'rejection_reason', label: 'Bekor qilish sababi', width: 219 },
 ]
 import FilterSelect from '../Components/FilterSelect'
 import { FilterInput } from './Components/FilterInput'
@@ -116,7 +117,7 @@ const Employee = () => {
   const filterButtonRef = useRef(null)
   const RIGHT_PINNED_KEYS = ['deadline', 'created_at', 'sprint', 'position', 'reopened_count', 'rejection_reason'];
   const [tablePin, setTablePin] = useState({
-    number: false,
+    number: true,
     project: false,
   })
 
@@ -692,7 +693,6 @@ const Employee = () => {
     })
     setSearch('')
     setFilterModal(false)
-    getEmployeeReports({ params: {} })
     setHasFetched(false)
     setUserReports([])
   }
@@ -770,8 +770,8 @@ const Employee = () => {
           className={`flex items-center justify-between gap-2 px-4 py-2 bg-green-500 rounded-xl text-white text-sm font-bold cursor-pointer transition-all duration-300 hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-800 disabled:cursor-default`}
           onClick={handleFetchReports}
         >
-          <FaRegFile size={15} />
-          Shakllantirish
+          {isLoading ? <LuRefreshCw size={15} className="animate-spin" /> : <FaRegFile size={15} />}
+          {isLoading ? "Shakllantirilmoqda..." : "Shakllantirish"}
         </button>
       </div>
       {/* Filter Panel */}
@@ -785,13 +785,15 @@ const Employee = () => {
               borderRadius: 12,
               colorPrimary: '#7186ED',
               motion: false,
-              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+              colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+              colorBgContainer: isDark ? '#161b22' : '#ffffff',
+              colorBgElevated: isDark ? '#161b22' : '#ffffff',
             },
             components: {
               Select: {
-                selectorBg: isDark ? '#222323' : '#ffffff',
-                optionSelectedBg: isDark ? '#303131' : '#F1F3F9',
-                optionActiveBg: isDark ? '#222323' : 'var(--bg-elevation-1)',
+                selectorBg: isDark ? '#161b22' : '#ffffff',
+                optionSelectedBg: isDark ? '#161b22' : '#F1F3F9',
+                optionActiveBg: isDark ? '#2d3748' : 'var(--bg-elevation-1)',
               }
             }
           }}
@@ -835,7 +837,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectProject(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.project ? `${filters.project.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
@@ -859,7 +861,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectSubmitter(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.assignee ? `${filters.assignee.split(',').filter(Boolean).length} ta topshiruvchi` : 'Topshiruvchi tanlang'}
@@ -883,7 +885,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectAuthor(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
@@ -908,7 +910,7 @@ const Employee = () => {
             <div>
               <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Darajasi</label>
               <FilterSelect
-                padding='13.5px 12px'
+                padding='13px 12px'
                 placeholder="Darajasini tanlang"
                 options={priority_type}
                 value={filters.priority}
@@ -918,61 +920,48 @@ const Employee = () => {
 
             <div>
               <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Holati</label>
-              <Select
+              <FilterSelect
                 value={filters.status || undefined}
                 onChange={(value) => handleFilterChange('status', value)}
-                getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full py-[10px]! border-slate-200! dark:border-[var(--stroke-soft)]!"
-                size="middle"
-                allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
-                suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[var(--text-soft)]" />}
+                className="w-full py-[12px]! border-slate-200! dark:border-[var(--stroke-soft)]!"
                 placeholder="Holatini tanlang"
-                optionLabelProp="label"
                 options={[
                   {
                     value: 'todo',
-                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#FBC02D]"></span> Qilish kerak</div>
                   },
                   {
                     value: 'in_progress',
-                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5]"></span> Jarayonda</div>
                   },
                   {
                     value: 'done',
-                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#5E35B1]"></span> Bajarilgan</div>
                   },
                   {
                     value: 'production',
                     label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#43A047]"></span> Ishga tushurilgan</div>
                   },
                   {
                     value: 'checked',
                     label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span> Tekshirilgan</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#20FFF6]"></span>Tekshirilgan</div>
                   },
                   {
                     value: 'rejected',
-                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>
+                    label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#E53935]"></span> Rad etilgan</div>
                   },
                   {
                     value: 'overdue',
                     label: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>,
-                    dropdownLabel: <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-[#616161]"></span> Muddati o'tgan</div>
                   }
                 ]}
-                optionRender={(option) => option.data.dropdownLabel || option.data.label}
               />
             </div>
 
             <div>
               <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Turi</label>
               <FilterSelect
-                padding='13.5px 12px'
+                padding='13px 12px'
                 placeholder="Turini tanlang"
                 options={type}
                 value={filters.type}
@@ -984,7 +973,7 @@ const Employee = () => {
             <div>
               <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Sprint</label>
               <FilterSelect
-                padding='13.5px 12px'
+                padding='13px 12px'
                 placeholder="Sprint tanlang"
                 options={sprint}
                 value={filters.sprint}
@@ -999,7 +988,7 @@ const Employee = () => {
             <div className="col-span-2 md:col-span-2">
               <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Kim uchun</label>
               <FilterSelect
-                padding='13.5px 12px'
+                padding='13px 12px'
                 placeholder="Kim uchun"
                 options={positions.map(pos => ({ value: pos.name, label: pos.name }))}
                 value={filters.position}
@@ -1012,13 +1001,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.price_min}
                   onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.price_max}
                   onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
                 />
@@ -1029,13 +1018,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.penalty_min}
                   onChange={(e) => handleFilterChange('penalty_min', formatPercent(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.penalty_max}
                   onChange={(e) => handleFilterChange('penalty_max', formatPercent(e.target.value))}
                 />
@@ -1046,13 +1035,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.reopened_min}
                   onChange={(e) => handleFilterChange('reopened_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-elevation-1-alt)] h-12'
                   value={filters.reopened_max}
                   onChange={(e) => handleFilterChange('reopened_max', formatNum(e.target.value))}
                 />
@@ -1086,90 +1075,230 @@ const Employee = () => {
             className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
             onScroll={handleMoreReportsScroll}
           >
-            <table className="text-left border-collapse min-w-[2800px]">
-              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
+            <table className="text-left border-collapse w-[270px]">
+              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#7f95e6]">
                 <tr>
-                  <th className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] w-[40px] dark:border-[var(--stroke-soft)] text-center" >№</th>
-                  {MAIN_COLUMNS.map((col) => {
-                    const isRight = RIGHT_PINNED_KEYS.includes(col.key);
-                    return (
-                      <th
-                        key={col.key}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
-                        style={{
-                          width: col.width,
-                          minWidth: col.width,
-                          maxWidth: col.width,
-                          left: isRight ? undefined : getPinnedLeft(col.key),
-                          right: isRight ? getPinnedRight(col.key) : undefined,
-                          boxShadow: tablePin[col.key] ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none',
-                          textAlign: (col.key === 'number' || col.key === 'status' || col.key === 'type' || col.key === 'sprint' || col.key === 'reopened_count') ? 'center' : (col.key === 'prefix' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by' || col.key === 'rejection_reason') ? 'start' : 'end'
-                        }}
-                      >
-                        <div className={`flex items-center gap-2 ${(col.key === 'number' || col.key === 'status' || col.key === 'type' || col.key === 'sprint' || col.key === 'reopened_count') ? 'justify-center' : (col.key === 'prefix' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by' || col.key === 'rejection_reason') ? 'justify-start' : 'justify-end'}`}>
-                          <Checkbox
-                            checked={tablePin[col.key]}
-                            onChange={(e) => handlePin(col.key, e.target.checked)}
-                            className="custom-header-checkbox"
-                          />
-                          {col.label}
-                        </div>
-                      </th>
-                    );
-                  })}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] sticky z-50!`}
+                    style={{ width: 49.5, minWidth: 49.5, maxWidth: 49.5, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)', textAlign: 'center' }}>
+                    №
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.prefix ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 100, minWidth: 100, maxWidth: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.prefix} onChange={(e) => handlePin('prefix', e.target.checked)} className="custom-header-checkbox" />
+                      Titul
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.project ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('project'), boxShadow: tablePin.project ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.project} onChange={(e) => handlePin('project', e.target.checked)} className="custom-header-checkbox" />
+                      Loyiha nomi
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.title ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 250, minWidth: 250, maxWidth: 250, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.title} onChange={(e) => handlePin('title', e.target.checked)} className="custom-header-checkbox" />
+                      Vazifa nomi
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.assignee ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 220, minWidth: 220, maxWidth: 220, left: getPinnedLeft('assignee'), boxShadow: tablePin.assignee ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.assignee} onChange={(e) => handlePin('assignee', e.target.checked)} className="custom-header-checkbox" />
+                      Topshiruvchi
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_by ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 220, minWidth: 220, maxWidth: 220, left: getPinnedLeft('created_by'), boxShadow: tablePin.created_by ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.created_by} onChange={(e) => handlePin('created_by', e.target.checked)} className="custom-header-checkbox" />
+                      Muallif
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.priority ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('priority'), boxShadow: tablePin.priority ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
+                    <div className="flex items-center gap-2 justify-end">
+                      <Checkbox checked={tablePin.priority} onChange={(e) => handlePin('priority', e.target.checked)} className="custom-header-checkbox" />
+                      Darajasi
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.status ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 120, minWidth: 120, maxWidth: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.status} onChange={(e) => handlePin('status', e.target.checked)} className="custom-header-checkbox" />
+                      Holati
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.type ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('type'), boxShadow: tablePin.type ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.type} onChange={(e) => handlePin('type', e.target.checked)} className="custom-header-checkbox" />
+                      Turi
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.task_price ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('task_price'), boxShadow: tablePin.task_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
+                    <div className="flex items-center gap-2 justify-end">
+                      <Checkbox checked={tablePin.task_price} onChange={(e) => handlePin('task_price', e.target.checked)} className="custom-header-checkbox" />
+                      Vazifa narxi (UZS)
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.penalty_percentage ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 150, minWidth: 150, maxWidth: 150, left: getPinnedLeft('penalty_percentage'), boxShadow: tablePin.penalty_percentage ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
+                    <div className="flex items-center gap-2 justify-end">
+                      <Checkbox checked={tablePin.penalty_percentage} onChange={(e) => handlePin('penalty_percentage', e.target.checked)} className="custom-header-checkbox" />
+                      Jarima foizi (%)
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.deadline ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 160, minWidth: 160, maxWidth: 160, right: getPinnedRight('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.deadline} onChange={(e) => handlePin('deadline', e.target.checked)} className="custom-header-checkbox" />
+                      Muddati
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_at ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 160, minWidth: 160, maxWidth: 160, right: getPinnedRight('created_at'), boxShadow: tablePin.created_at ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.created_at} onChange={(e) => handlePin('created_at', e.target.checked)} className="custom-header-checkbox" />
+                      Yaratilgan vaqti
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.sprint ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('sprint'), boxShadow: tablePin.sprint ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.sprint} onChange={(e) => handlePin('sprint', e.target.checked)} className="custom-header-checkbox" />
+                      Sprint raqami
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 180, minWidth: 180, maxWidth: 180, right: getPinnedRight('position'), boxShadow: tablePin.position ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
+                    <div className="flex items-center gap-2 justify-end">
+                      <Checkbox checked={tablePin.position} onChange={(e) => handlePin('position', e.target.checked)} className="custom-header-checkbox" />
+                      Kim uchun
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.reopened_count ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('reopened_count'), boxShadow: tablePin.reopened_count ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
+                    <div className="flex items-center gap-2 justify-center">
+                      <Checkbox checked={tablePin.reopened_count} onChange={(e) => handlePin('reopened_count', e.target.checked)} className="custom-header-checkbox" />
+                      Qaytishlar soni
+                    </div>
+                  </th>
+
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.rejection_reason ? 'sticky z-50!' : 'z-20!'}`}
+                    style={{ width: 220, minWidth: 220, maxWidth: 220, right: getPinnedRight('rejection_reason'), boxShadow: tablePin.rejection_reason ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
+                    <div className="flex items-center gap-2 justify-start">
+                      <Checkbox checked={tablePin.rejection_reason} onChange={(e) => handlePin('rejection_reason', e.target.checked)} className="custom-header-checkbox" />
+                      Bekor qilish sababi
+                    </div>
+                  </th>
                 </tr>
               </thead>
-              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
+              <tbody className="bg-white dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)]" key={item.id || index}>
-
-                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 border-r`}>
+                  <tr className="border-b border-slate-100 dark:border-[#292A2A]" key={item.id || index}>
+                    <td className={`p-3 text-[13px] text-[#6E7681] border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center sticky z-10! bg-white dark:bg-[#0d1117] dark:text-[#E6EDF3] border-r`}
+                      style={{ width: 49.5, minWidth: 49.5, maxWidth: 49.5, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                       {index + 1}
                     </td>
 
-                    {MAIN_COLUMNS.map((col) => {
-                      const isPinned = !!tablePin[col.key];
-                      const isRight = RIGHT_PINNED_KEYS.includes(col.key);
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.prefix ? 'sticky' : ''}`}
+                      style={{ width: 100, minWidth: 100, maxWidth: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.prefix}
+                    </td>
 
-                      let content = null;
-                      switch (col.key) {
-                        case 'number': content = index + 1; break;
-                        case 'prefix': content = item?.prefix; break;
-                        case 'project': content = item?.project; break;
-                        case 'title': content = item?.title; break;
-                        case 'assignee': content = item?.assignee; break;
-                        case 'created_by': content = item?.created_by; break;
-                        case 'priority': content = priority_type.find((s) => s?.value === item?.priority)?.label; break;
-                        case 'status': content = status[item?.status]; break;
-                        case 'type': content = type.find((s) => s?.value === item?.type)?.label; break;
-                        case 'task_price': content = item?.task_price ? formatNum(item.task_price) : ''; break;
-                        case 'penalty_percentage': content = item?.penalty_percentage ? Number(item.penalty_percentage) : ''; break;
-                        case 'deadline': content = item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''; break;
-                        case 'created_at': content = item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ''; break;
-                        case 'sprint': content = item?.sprint; break;
-                        case 'position': content = item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : ''; break;
-                        case 'reopened_count': content = item?.reopened_count || ''; break;
-                        case 'rejection_reason': content = item?.rejection_reason; break;
-                        default: content = '';
-                      }
+                    <td className={`p-3 text-[13px] font-semibold text-slate-700 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.project ? 'sticky' : ''}`}
+                      style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('project'), boxShadow: tablePin.project ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.project}
+                    </td>
 
-                      return (
-                        <td
-                          key={col.key}
-                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'project' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'task_price' ? 'font-bold text-slate-900 dark:text-[var(--text-strong)] text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'type' || col.key === 'deadline' || col.key === 'created_at' || col.key === 'sprint' || col.key === 'reopened_count') ? 'text-center' : ''}`}
-                          style={{
-                            width: col.width,
-                            minWidth: col.width,
-                            maxWidth: col.width,
-                            left: isRight ? undefined : getPinnedLeft(col.key),
-                            right: isRight ? getPinnedRight(col.key) : undefined,
-                            boxShadow: isPinned ? (isRight ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : (isDark ? 'inset -1px 0 0 0 #292A2A' : (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'))) : 'none'
-                          }}
-                        >
-                          {content}
-                        </td>
-                      );
-                    })}
+                    <td className={`p-3 text-[13px] font-semibold text-slate-700 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.title ? 'sticky' : ''}`}
+                      style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.title}
+                    </td>
+
+                    <td className={`p-3 text-[13px] font-semibold text-slate-700 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.assignee ? 'sticky' : ''}`}
+                      style={{ width: 250, minWidth: 250, maxWidth: 250, left: getPinnedLeft('assignee'), boxShadow: tablePin.assignee ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.assignee}
+                    </td>
+
+                    <td className={`p-3 text-[13px] font-semibold text-slate-700 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.created_by ? 'sticky' : ''}`}
+                      style={{ width: 250, minWidth: 250, maxWidth: 250, left: getPinnedLeft('created_by'), boxShadow: tablePin.created_by ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.created_by}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.priority ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('priority'), boxShadow: tablePin.priority ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {priority_type.find((s) => s?.value === item?.priority)?.label}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.status ? 'sticky' : ''}`}
+                      style={{ width: 120, minWidth: 120, maxWidth: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {status[item?.status]}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.type ? 'sticky' : ''}`}
+                      style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('type'), boxShadow: tablePin.type ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {type.find((s) => s?.value === item?.type)?.label}
+                    </td>
+
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117] ${tablePin.task_price ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, left: getPinnedLeft('task_price'), boxShadow: tablePin.task_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.task_price ? formatNum(item.task_price) : ''}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117] ${tablePin.penalty_percentage ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, left: getPinnedLeft('penalty_percentage'), boxShadow: tablePin.penalty_percentage ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.penalty_percentage && item?.penalty_percentage != 0 ? Number(item.penalty_percentage) : ''}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.deadline ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ""}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.created_at ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('created_at'), boxShadow: tablePin.created_at ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.created_at ? dayjs(item.created_at).format('DD.MM.YYYY HH:mm') : ""}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.sprint ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('sprint'), boxShadow: tablePin.sprint ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.sprint}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#0d1117] ${tablePin.position ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('position'), boxShadow: tablePin.position ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.position ? item.position.split(',').map(p => p.trim()).join(', ') : ''}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#0d1117] ${tablePin.reopened_count ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('reopened_count'), boxShadow: tablePin.reopened_count ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.reopened_count || ''}
+                    </td>
+
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#E6EDF3] border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#0d1117] ${tablePin.rejection_reason ? 'sticky' : ''}`}
+                      style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('rejection_reason'), boxShadow: tablePin.rejection_reason ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
+                      {item?.rejection_reason}
+                    </td>
                   </tr>
                 ))}
               </tbody>

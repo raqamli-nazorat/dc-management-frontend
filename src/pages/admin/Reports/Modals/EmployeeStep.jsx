@@ -113,7 +113,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     <div className="flex items-center gap-3 mb-6">
                         <button
                             onClick={toggleAll}
-                            className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[#2c2d2d] whitespace-nowrap text-sm font-medium h-10 shadow-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer whitespace-nowrap text-sm font-medium h-10 shadow-sm"
                         >
                             <LuCheckCheck size={18} />
                             Barchasini tanlash
@@ -187,14 +187,14 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setSelectedIds([])}
-                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-[var(--text-strong)] font-semibold hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-xl text-sm"
+                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-[var(--text-strong)] font-semibold hover:bg-gray-100 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer rounded-xl text-sm"
                             >
                                 <IoClose size={20} />
                                 Tozalash
                             </button>
                             <button
                                 onClick={() => onConfirm(selectedIds)}
-                                className="flex items-center gap-2 px-8 py-2.5 bg-[#4F5ECE] text-white font-semibold rounded-2xl hover:bg-[#4351b5] shadow-lg shadow-indigo-200 dark:shadow-none text-sm"
+                                className="flex items-center gap-2 px-8 py-2.5 bg-[#4F5ECE] text-white font-semibold rounded-2xl hover:bg-[#4351b5] cursor-pointer shadow-lg shadow-indigo-200 dark:shadow-none text-sm"
                             >
                                 <IoCheckmarkOutline size={20} />
                                 Qo'shish
