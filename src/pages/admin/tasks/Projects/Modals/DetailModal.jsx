@@ -138,13 +138,14 @@ const DetailModal = ({ id, onClose }) => {
                             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
                                 {project.employees_info?.length > 0
                                     ? project.employees_info.map(e => (
-                                        <span key={e.id} className={tagCls}>{e.username}</span>
+                                        <span key={e.id} className={tagCls}>{e.username} | {e?.position}
+                                        </span>
                                     ))
                                     : project.employees?.length > 0
                                         ? project.employees.map((e, i) => (
                                             <span key={i} className={tagCls}>{e.username || e.name || e}</span>
                                         ))
-                                        : <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)] text-sm self-center">—</span>
+                                        : <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)] text-sm self-center"></span>
                                 }
                             </div>
                         </div>
@@ -155,7 +156,7 @@ const DetailModal = ({ id, onClose }) => {
                             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
                                 {project.testers_info?.length > 0
                                     ? project.testers_info.map(e => (
-                                        <span key={e.id} className={tagCls}>{e.username}</span>
+                                        <span key={e.id} className={tagCls}>{e.username} | {e?.position}</span>
                                     ))
                                     : project.testers?.length > 0
                                         ? project.testers.map((e, i) => (
@@ -200,7 +201,7 @@ const DetailModal = ({ id, onClose }) => {
                 <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-white dark:bg-[#111111]">
                     {!loading &&
                         <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Faolmi?</span>
+                            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Muzlatilganmi?</span>
                             <div className={`relative w-10 h-5 rounded-full pointer-events-none ${!project.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
                                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${!project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                             </div>
