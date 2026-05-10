@@ -16,6 +16,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
   const [deadline] = useState(task?.deadline || null)
   const [selectedColor, setSelectedColor] = useState(task?.color || 'blue')
   const [isStarred, setIsStarred] = useState(false)
+  const [showColors, setShowColors] = useState(false)
   const [loading, setLoading] = useState(false)
 
   /* Subtasklar: tahrirlashda mavjud items, yaratishda 5 ta bo'sh qator */
@@ -115,7 +116,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
 
           {/* Yulduz tugmasi */}
           <button
-            onClick={() => setIsStarred(s => !s)}
+            onClick={() => { setIsStarred(s => !s); setShowColors(s => !s) }}
             className="w-11 h-11 flex items-center justify-center rounded-2xl
               bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)]
               border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]
@@ -186,22 +187,24 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           </div>
 
           {/* Rang tanlash */}
-          <div className="absolute -top-8 right-0 px-3 py-4 rounded-full dark:bg-[var(--bg-elevation-1)] shadow-2xl border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex flex-col gap-4 items-center justify-center shrink-0">
-            {COLORS.map(c => (
-              <button
-                key={c.id}
-                onClick={() => setSelectedColor(c.id)}
-                className="w-11 h-11 rounded-full flex items-center justify-center
-                  transition-transform hover:scale-110 cursor-pointer"
-                style={{
-                  backgroundColor: c.hex,
-                  boxShadow: selectedColor === c.id
-                    ? `0 0 0 2px white, 0 0 0 4px ${c.hex}`
-                    : '0 2px 6px rgba(0,0,0,0.15)',
-                }}
-              />
-            ))}
-          </div>
+          {showColors && (
+            <div className="absolute -top-8 right-0 px-3 py-4 rounded-full bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex flex-col gap-4 items-center justify-center shrink-0">
+              {COLORS.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedColor(c.id)}
+                  className="w-11 h-11 rounded-full flex items-center justify-center
+                    transition-transform hover:scale-110 cursor-pointer"
+                  style={{
+                    backgroundColor: c.hex,
+                    boxShadow: selectedColor === c.id
+                      ? `0 0 0 2px white, 0 0 0 4px ${c.hex}`
+                      : '0 2px 6px rgba(0,0,0,0.15)',
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Footer ── */}
