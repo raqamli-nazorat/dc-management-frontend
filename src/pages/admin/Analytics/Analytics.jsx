@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
   }
 
   // Loyihalar YAxis — real dataga moslashgan, lekin minimum 20 gacha
-  const prjMaxVal = Math.max(20, ...projectData.map(d => Number(d.value) || 0))
+  const prjMaxVal = Math.max(15, ...projectData.map(d => Number(d.value) || 0))
   const prjStep = prjMaxVal <= 20 ? 5 : prjMaxVal <= 50 ? 10 : 25
   const prjTop = Math.ceil(prjMaxVal / prjStep) * prjStep
   const prjTicks = Array.from({ length: Math.floor(prjTop / prjStep) + 1 }, (_, i) => i * prjStep)
