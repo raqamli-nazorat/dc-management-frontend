@@ -216,7 +216,7 @@ function PassportViewer({ url, onClose }) {
 }
 
 
-const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
+const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-[#E2E6F2] opacity-90 border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
 
 function Field({ label, value, children, align = 'right', rightIcon }) {
   return (
@@ -639,10 +639,6 @@ export default function ProfilePage() {
       {/* Social Links */}
       <div className="grid grid-cols-3 gap-3">
         {data.social_links?.map((link, index) => {
-          const apiLinksCount = profile?.social_links
-            ? (Array.isArray(profile.social_links) ? profile.social_links.length : Object.keys(profile.social_links).length)
-            : 0;
-          const isApiLink = index < apiLinksCount;
           const isLast = index === data.social_links.length - 1;
 
           return (
@@ -651,7 +647,7 @@ export default function ProfilePage() {
                 <label className={labelCls}>{index + 1}.Havola qo'shish</label>
                 <div className="relative">
                   <input
-                    className={inputCls + (!isApiLink ? " pr-10" : "")}
+                    className={inputCls + " pr-10"}
                     placeholder="Havola yuklang"
                     value={link}
                     onChange={e => {
@@ -660,17 +656,15 @@ export default function ProfilePage() {
                       set('social_links', newLinks);
                     }}
                   />
-                  {!isApiLink && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        set('social_links', data.social_links.filter((_, i) => i !== index))
-                      }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
-                    >
-                      <FaXmark size={14} />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      set('social_links', data.social_links.filter((_, i) => i !== index))
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                  >
+                    <FaXmark size={14} />
+                  </button>
                 </div>
               </div>
               {isLast && index < 4 && (
@@ -685,6 +679,16 @@ export default function ProfilePage() {
             </div>
           );
         })}
+        {(!data.social_links || data.social_links.length === 0) && (
+          <button
+            type="button"
+            onClick={() => set('social_links', [''])}
+            className="col-span-3 flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] text-[#8F95A8] hover:text-[#526ED3] hover:border-[#526ED3] hover:bg-[#F8F9FC] dark:hover:bg-[#1C1D1D] transition-all cursor-pointer group"
+          >
+            <FiPlus size={20} className="group-hover:scale-110 transition-transform" />
+            <span className="font-semibold text-sm">Ijtimoiy tarmoq havolasini qo'shish</span>
+          </button>
+        )}
       </div>
 
       {/* Lavozim + Rol */}

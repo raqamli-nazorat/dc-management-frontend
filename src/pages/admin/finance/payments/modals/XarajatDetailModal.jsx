@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
 import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
+import { useAuth } from '../../../../../context/AuthContext'
 
 const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
   bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] text-[var(--text-strong)]
@@ -95,6 +96,8 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
 
 // ── Asosiy modal ─────────────────────────────────────────────
 export default function XarajatDetailModal({ payment, onClose, showCheckModal, onPaid, onConfirm, onCancel }) {
+  const { user } = useAuth()
+
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaidModal, setShowPaidModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -108,18 +111,19 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
     })
   }
 
-  const user = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null } })()
   const c = payment.expense_category_info ?? {}
   const isCard = payment.payment_method === 'card'
 
   const activeRole = user?.active_role
   const isAccountant = activeRole === 'accountant'
-  const isOwner = user?.id === payment.user_info?.id
+  const isOwner = user?.id === payment.user_info?.id && user.active_role === 'employee'
 
   // To'lov qildim: faqat accountant + pending
   const showPaid = isAccountant && payment.status === 'pending'
+
   // Tasdiqlash: faqat so'rov egasi + paid
   const showConfirm = isOwner && payment.status === 'paid'
+
   // Rad etish: so'rov egasi yoki hisobchi + pending
   const showCancel = (isOwner || isAccountant) && payment.status === 'pending'
 

@@ -554,7 +554,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                         if (isActive) return
                         try {
                           const { axiosAPI: api } = await import('../service/axiosAPI')
-                          await api.put('/users/me/change-role/', { active_role: role })
+                          await api.patch('users/me/', { active_role: role })
                           const saved = localStorage.getItem('user')
                           if (saved) {
                             const u = JSON.parse(saved)

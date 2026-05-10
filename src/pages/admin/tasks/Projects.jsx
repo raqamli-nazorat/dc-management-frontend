@@ -1300,7 +1300,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
           </div>
           <div className="px-7 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Faolmi?</span>
+              <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
               <button type="button" onClick={() => set('is_active', !form.is_active)}
                 className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_active ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
                 <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />

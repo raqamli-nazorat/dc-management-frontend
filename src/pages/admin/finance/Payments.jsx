@@ -123,19 +123,18 @@ export default function PaymentsPage() {
   const { user } = useAuth()
 
   // ── Rol aniqlash ──
-  const roles = user?.roles ?? []
-  const activeRole = user?.active_role
-  const isEmployee = roles.includes('employee')
-  const isManager = roles.includes('manager')
-  const isAdmin = roles.includes('admin') || roles.includes('superadmin')
-  const isAccountant = activeRole === 'accountant'
-  const isAuditor = activeRole === 'auditor' || (roles.includes('auditor') && !activeRole)
+  const roles = user?.active_role ?? []
+  const isEmployee = roles === 'employee'
+  const isManager = roles === 'manager'
+  const isAdmin = roles === 'admin' || roles === 'superadmin'
+  const isAccountant = roles === 'accountant'
+  const isAuditor = roles === 'auditor'
 
   // employee → my_requests=true majburiy; qolganlar → false (hammasi ko'rinadi)
   const forceMyRequests = isEmployee && !isManager && !isAdmin && !isAccountant
 
-  // So'rov yuborish: admin, manager, employee (accountant va auditor emas)
-  const canSendRequest = !isAuditor && (isAdmin || isManager || isEmployee)
+  // So'rov yuborish: manager, employee (accountant va auditor emas)
+  const canSendRequest = !isAuditor && (isManager || isEmployee)
 
   // Tanlash/o'chirish: faqat o'z so'rovlarini o'chirishi mumkin bo'lganlar
   // (admin ham o'z so'rovlarini o'chira oladi, lekin boshqalarnikini emas — backend hal qiladi)

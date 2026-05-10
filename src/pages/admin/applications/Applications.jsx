@@ -134,6 +134,9 @@ const ApplicationsPage = () => {
     }
   }
 
+  const roles = user?.active_role
+  const isAuditor = roles === 'auditor'
+
   const statuses = (status) => {
     switch (status) {
       case 'accepted':
@@ -281,6 +284,7 @@ const ApplicationsPage = () => {
                         value={statuses(application.status)}
                         onChange={(value) => openConfirmModal(application, value)}
                         width='150px'
+                        disabled={isAuditor}
                       />
                     </td>
                     <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white font-medium">

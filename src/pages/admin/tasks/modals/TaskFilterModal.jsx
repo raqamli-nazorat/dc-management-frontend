@@ -496,7 +496,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           param={{ roles: "admin,manager" }}
           title='Muallif tanlash'
           selectedList={f.created_by ? f.created_by.map(u => u.id || u) : []}
-           onConfirm={handleSelectEmployees}
+          onConfirm={handleSelectEmployees}
         />
       )}
 

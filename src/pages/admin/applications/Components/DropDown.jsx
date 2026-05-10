@@ -39,7 +39,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} text-[var(--text-strong)] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-white border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} text-[var(--text-strong)] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9] dark:disabled:bg-[#292A2A]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
                 {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[var(--accent-sub)]!" size={16} /> : null}

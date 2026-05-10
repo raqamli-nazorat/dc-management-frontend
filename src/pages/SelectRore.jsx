@@ -49,7 +49,7 @@ const SelectRore = () => {
 
         setLoading(true);
         try {
-            await axiosAPI.put("users/me/change-role/", { active_role: selectedRole });
+            await axiosAPI.patch("users/me/", { active_role: selectedRole });
 
             // user yangilash
             const updatedUser = { ...user, active_role: selectedRole };

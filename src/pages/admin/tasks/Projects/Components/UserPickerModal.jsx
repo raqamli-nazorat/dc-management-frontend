@@ -139,6 +139,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
 }
 
 export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
+    console.log(selected);
     return (
         <div>
             <label className={labelCls}>{label}</label>
