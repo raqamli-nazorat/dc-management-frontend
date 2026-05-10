@@ -41,13 +41,17 @@ export default function UsersPage() {
   const [selected, setSelected] = useState(new Set())
   const [showModal, setShowModal] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const getUsers = async (params) => {
+    setLoading(true);
     try {
       const { data } = await axiosAPI.get(`users/`, { params })
       setUsers(data.data.results)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -317,7 +321,10 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
-          {users.length === 0 && (
+          {loading && (
+            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Yuklanmoqda...</div>
+          )}
+          {users?.length === 0 && !loading && (
             <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Foydalanuvchilar topilmadi</div>
           )}
         </div>

@@ -216,7 +216,7 @@ function PassportViewer({ url, onClose }) {
 }
 
 
-const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-[#E2E6F2] opacity-90 border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#222323] dark:border-[#292A2A] dark:text-white'
+const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-[#E2E6F2] opacity-90 border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#1c1d1d] dark:border-[#292A2A] dark:text-white'
 
 function Field({ label, value, children, align = 'right', rightIcon }) {
   return (
@@ -252,50 +252,6 @@ const formatCard = (val) => {
   if (!val) return '';
   let digits = val.replace(/\D/g, '').slice(0, 16);
   return digits.match(/.{1,4}/g)?.join(' ') || digits;
-}
-/* ── Social Field with copy ── */
-function SocialField({ label, value, icon, placeholder }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
-    if (!value) return
-    navigator.clipboard.writeText(value).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)] flex items-center gap-1.5">
-        {icon}
-        {label}
-      </span>
-      <div className={boxCls + ' min-h-[42px] flex items-center justify-between gap-2 group'}>
-        <span className={`flex-1 truncate text-sm text-left ${!value ? 'text-[var(--text-disabled)] dark:text-[#474848]' : ''}`}>
-          {value || placeholder}
-        </span>
-        {value && (
-          <button
-            onClick={handleCopy}
-            title="Nusxa olish"
-            className="shrink-0 cursor-pointer text-[var(--text-soft)] hover:text-[var(--accent-sub)]"
-          >
-            {copied ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#22c55e]">
-                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            )}
-          </button>
-        )}
-      </div>
-    </div>
-  )
 }
 
 /* ── Skeleton ── */
@@ -437,6 +393,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passportOpen, setPassportOpen] = useState(false)
+  const [openImg, setOpenImg] = useState(false)
 
   const [data, setData] = useState({})
 
@@ -449,23 +406,49 @@ export default function ProfilePage() {
       setData(data?.data ?? data)
     } catch (error) {
       console.error(error)
+      toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
     } finally {
       setLoading(false)
     }
   }
 
+  const getUserSts = async () => {
+    try {
+      const { data } = await axiosAPI.get('users/me/efficiency/')
+
+      console.log(data);
+    } catch (error) {
+      console.error(error)
+      toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
+    }
+  }
+
   useEffect(() => {
+    if (authUser?.active_role === "employee" || authUser?.active_role === "manager") {
+      getUserSts()
+    }
     getProfile()
+  }, [])
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setOpenImg(false)
+        setShowPasswordModal(false)
+        setPassportOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
   }, [])
 
   if (loading) return <Skeleton />
 
   const fullName = data.full_name || data.username || authUser?.username || 'Foydalanuvchi'
-  const initials = fullName.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
   const role = (data.roles?.[0] || authUser?.roles?.[0] || 'admin')
 
-  // Social links — string yoki object bo'lishi mumkin
   let social = {}
+  // Social links — string yoki object bo'lishi mumkin
   if (typeof data.social_links === 'object' && data.social_links) {
     social = data.social_links
   } else if (typeof data.social_links === 'string' && data.social_links) {
@@ -557,6 +540,7 @@ export default function ProfilePage() {
               src={typeof data.avatar === 'string' ? data.avatar : URL.createObjectURL(data.avatar)}
               alt={data.name}
               className="w-full h-full object-cover"
+              onClick={() => setOpenImg(true)}
             />
           ) : (
             <div
@@ -650,7 +634,7 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2]  dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2]  dark:bg-[#1c1d1d] flex items-center justify-start gap-2 min-h-[42px]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="2" className="shrink-0 dark:stroke-[var(--text-soft)]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -666,7 +650,7 @@ export default function ProfilePage() {
               <span className="text-xs text-[var(--text-disabled)] shrink-0 ml-1">1487 KB</span>
             </div>
           ) : (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#222323] min-h-[42px] flex items-center justify-start gap-2 text-[var(--text-disabled)]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2] dark:bg-[#1c1d1d] min-h-[42px] flex items-center justify-start gap-2 text-[var(--text-disabled)]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -785,6 +769,32 @@ export default function ProfilePage() {
       {passportOpen && data.passport_image && (
         <PassportViewer url={data.passport_image} onClose={() => setPassportOpen(false)} />
       )}
+
+      {openImg && (
+        <div
+          className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4 transition-opacity duration-200"
+          onClick={() => setOpenImg(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setOpenImg(false)}
+              className="absolute top-7 right-7 cursor-pointer p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all z-10"
+            >
+              <FaXmark size={15} />
+            </button>
+
+            <img
+              src={typeof data.avatar === 'string' ? data.avatar : data.avatar ? URL.createObjectURL(data.avatar) : ''}
+              alt="Avatar"
+              className="w-[300px] h-[300px] object-contain"
+            />
+          </div>
+        </div>
+      )}
+
 
       <style>{
         `
