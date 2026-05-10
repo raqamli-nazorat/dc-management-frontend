@@ -603,7 +603,7 @@ const UserDetail = () => {
                                 </div>
 
                                 <Dropdown
-                                    width={170}
+                                    width={200}
                                     options={positions.map(p => p.name)}
                                     value={form.position_info?.name || ''}
                                     onChange={v => {
@@ -624,7 +624,7 @@ const UserDetail = () => {
                                 </div>
 
                                 <Dropdown
-                                    width={170}
+                                    width={200}
                                     options={Object.values(Roles)}
                                     value={form.roles}
                                     onChange={v => set('roles', v)}

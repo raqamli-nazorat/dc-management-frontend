@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck, FaCamera, FaUser } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { getErrorMessage } from '../../../service/getErrorMessage'
@@ -233,19 +233,20 @@ function Field({ label, value, children, align = 'right', rightIcon }) {
 }
 
 /* ── Format helpers ── */
-const formatPhone = (v) => {
-  if (!v) return null
-  // Faqat raqamlarni olish
-  const digits = v.replace(/\D/g, '')
-  // +998XXXXXXXXX → +998 XX XXX XX XX
-  if (digits.length === 12 && digits.startsWith('998')) {
-    return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 10)} ${digits.slice(10, 12)}`
-  }
-  if (digits.length === 9) {
-    return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`
-  }
-  return v
+const formatPhone = (val) => {
+  let digits = val.replace(/\D/g, '');
+  if (digits.length < 3) return '+998';
+  if (!digits.startsWith('998')) digits = '998' + digits;
+
+  digits = digits.slice(0, 12);
+  let res = '+' + digits.slice(0, 3);
+  if (digits.length > 3) res += ' ' + digits.slice(3, 5);
+  if (digits.length > 5) res += ' ' + digits.slice(5, 8);
+  if (digits.length > 8) res += ' ' + digits.slice(8, 10);
+  if (digits.length > 10) res += ' ' + digits.slice(10, 12);
+  return res;
 }
+
 
 const formatCard = (val) => {
   if (!val) return '';
@@ -471,60 +472,66 @@ export default function ProfilePage() {
     try { social = JSON.parse(data.social_links) } catch { social = {} }
   }
 
-  const isCardChanged = data.card_number !== profile.card_number && data.card_number.trim() !== "";
-  const isSocialChanged = JSON.stringify(data.social_links || "") !== JSON.stringify(profile.social_links || "");
+  const isAvatarChanged = data.avatar instanceof File;
+  const isPhoneChanged = (data.phone_number?.replace(/\s/g, '') || '') !== (profile.phone_number?.replace(/\s/g, '') || '');
+  const isCardChanged = (data.card_number?.replace(/\s/g, '') || '') !== (profile.card_number?.replace(/\s/g, '') || '');
+  const isSocialChanged = JSON.stringify(data.social_links || []) !== JSON.stringify(profile.social_links || []);
 
-  const isChanged = isCardChanged || isSocialChanged
+  const isChanged = isAvatarChanged || isPhoneChanged || isCardChanged || isSocialChanged;
 
   const handleSave = async () => {
     try {
-      if (isCardChanged && isSocialChanged) {
-        const resCard = await axiosAPI.put("users/me/card-number/", {
-          card_number: data.card_number.replace(/\s/g, '')
-        })
-        const resLinks = await axiosAPI.put("users/me/social-links/", {
-          social_links: data.social_links
-        })
+      const formData = new FormData()
+      let hasChanges = false
 
-        getProfile()
-
-        toast.success("Ma'lumotlar yangilandi!", `${resCard.data.data.message}, ${resLinks.data.data.message}`)
-      } else if (isCardChanged) {
-        const resCard = await axiosAPI.put("users/me/card-number/", {
-          card_number: data.card_number.replace(/\s/g, '')
-        })
-
-        getProfile()
-        toast.success("Ma'lumotlar yangilandi!", resCard.data.data.message)
-      } else if (isSocialChanged) {
-        const resLinks = await axiosAPI.put("users/me/social-links/", {
-          social_links: data.social_links
-        })
-
-        getProfile()
-        toast.success("Ma'lumotlar yangilandi!", resLinks.data.data.message)
+      // Avatar (File object bo'lsa)
+      if (data.avatar instanceof File) {
+        formData.append('avatar', data.avatar)
+        hasChanges = true
       }
+
+      // Telefon raqami (faqat raqamlarni solishtiramiz)
+      const cleanPhone = (val) => String(val || '').replace(/\s/g, '')
+      if (cleanPhone(data.phone_number) !== cleanPhone(profile.phone_number)) {
+        formData.append('phone_number', cleanPhone(data.phone_number))
+        hasChanges = true
+      }
+
+      // Karta raqami (bo'shliqlarni olib tashlab solishtiramiz)
+      const cleanCard = (val) => String(val || '').replace(/\s/g, '')
+      if (cleanCard(data.card_number) !== cleanCard(profile.card_number)) {
+        formData.append('card_number', cleanCard(data.card_number))
+        hasChanges = true
+      }
+
+      // Social Links (JSON holatida solishtiramiz)
+      const currentLinks = JSON.stringify(data.social_links || [])
+      const initialLinks = JSON.stringify(profile.social_links || [])
+      if (currentLinks !== initialLinks) {
+        // Backend ijtimoiy tarmoqlarni JSON string ko'rinishida kutishi mumkin
+        formData.append('social_links', JSON.stringify(data.social_links))
+        hasChanges = true
+      }
+
+      if (!hasChanges) {
+        toast.info("O'zgarish yo'q")
+        return
+      }
+
+      const res = await axiosAPI.patch("users/me/", formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      const resData = res.data?.data ?? res.data
+      toast.success("Ma'lumotlar yangilandi!", resData?.message || "O'zgarishlar saqlandi")
+      getProfile()
     } catch (error) {
-
       const errData = error?.response?.data?.error;
-
-      // Field-level detail xatolarini chiqarish (masalan: password, name ...)
-      let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+      let errMsg = error?.response?.data?.error?.errorMsg || "Xatolik yuz berdi";
 
       if (errData?.details && typeof errData.details === 'object') {
-        const serverErrors = {};
-        Object.entries(errData.details).forEach(([key, messages]) => {
-          let field = key;
-          if (key === 'fixed_salary') field = 'salary';
-          if (key === 'passport_series') field = 'passportSeria';
-          serverErrors[field] = Array.isArray(messages) ? messages[0] : messages;
-        });
-        setErrors(serverErrors);
-
-        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        const detailMsgs = Object.values(errData.details).flat().join(', ');
         if (detailMsgs) errMsg = detailMsgs;
-      } else if (errData?.errorMsg) {
-        errMsg = errData.errorMsg;
       } else if (typeof error?.response?.data === 'string') {
         errMsg = error.response.data;
       }
@@ -544,14 +551,39 @@ export default function ProfilePage() {
 
       {/* Avatar + Name */}
       <div className="flex items-center gap-2.5">
-        {data.avatar ? (
-          <img src={data.avatar} alt="avatar"
-            className="w-[72px] h-[72px] rounded-2xl object-cover shrink-0" />
-        ) : (
-          <div className="w-[72px] h-[72px] rounded-2xl bg-[var(--accent-sub)] flex items-center justify-center text-white text-2xl font-bold shrink-0">
-            {initials}
-          </div>
-        )}
+        <div className="relative overflow-hidden avatar w-[80px] h-[80px] rounded-xl">
+          {data.avatar ? (
+            <img
+              src={typeof data.avatar === 'string' ? data.avatar : URL.createObjectURL(data.avatar)}
+              alt={data.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-full h-full rounded-xl bg-gradient-to-br from-[#bdc4eb] to-[#a1abf7] flex items-center justify-center  cursor-pointer"
+              onClick={() => document.getElementById('avatar-input').click()}
+            >
+              <FaUser color="#fff" size={50} />
+            </div>
+          )}
+          <label>
+            <span className="bg-[#3F67FF] rounded-full p-1.5 absolute left-[55px] bottom-0 cursor-pointer cam">
+              <FaCamera className="text-white" size={13} />
+            </span>
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              id='avatar-input'
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (file) {
+                  set('avatar', file)
+                }
+              }}
+            />
+          </label>
+        </div>
         <div>
           <p className="text-lg font-bold text-[var(--text-strong)] dark:text-white">{fullName}</p>
           <button
@@ -579,7 +611,7 @@ export default function ProfilePage() {
             type="text"
             inputMode="numeric"
             placeholder="+998 90 123 45 67"
-            data value={data.phone_number}
+            value={formatPhone(data.phone_number) || ''}
             onChange={e => set('phone_number', formatPhone(e.target.value))}
           />
         </div>
@@ -618,7 +650,7 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2]  dark:bg-[#222323] flex items-center justify-start gap-2 min-h-[42px]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="2" className="shrink-0 dark:stroke-[var(--text-soft)]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -629,7 +661,7 @@ export default function ProfilePage() {
                 rel="noreferrer"
                 className="font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)] hover:underline truncate max-w-[200px]"
               >
-                {data.passport_image.split('/').pop() || "Ma'lumot.pdf"}
+                {data.passport_image.split('/').pop().split("?")[0] || "Ma'lumot.pdf"}
               </a>
               <span className="text-xs text-[var(--text-disabled)] shrink-0 ml-1">1487 KB</span>
             </div>
@@ -753,6 +785,20 @@ export default function ProfilePage() {
       {passportOpen && data.passport_image && (
         <PassportViewer url={data.passport_image} onClose={() => setPassportOpen(false)} />
       )}
+
+      <style>{
+        `
+          .cam{
+              transition: all 0.3s;
+              transform: translateY(25px);
+              opacity: 0;
+          }
+          .avatar:hover .cam{
+              transform: translateY(0) !important;
+              opacity: 1 !important;
+          }
+        `
+      }</style>
     </div>
   )
 }
