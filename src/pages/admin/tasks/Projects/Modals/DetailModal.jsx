@@ -138,13 +138,14 @@ const DetailModal = ({ id, onClose }) => {
                             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
                                 {project.employees_info?.length > 0
                                     ? project.employees_info.map(e => (
-                                        <span key={e.id} className={tagCls}>{e.username}</span>
+                                        <span key={e.id} className={tagCls}>{e.username} | {e?.position}
+                                        </span>
                                     ))
                                     : project.employees?.length > 0
                                         ? project.employees.map((e, i) => (
                                             <span key={i} className={tagCls}>{e.username || e.name || e}</span>
                                         ))
-                                        : <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)] text-sm self-center">—</span>
+                                        : <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)] text-sm self-center"></span>
                                 }
                             </div>
                         </div>
@@ -155,7 +156,7 @@ const DetailModal = ({ id, onClose }) => {
                             <div className={fCls + ' flex flex-wrap gap-1.5 min-h-[46px] py-2'}>
                                 {project.testers_info?.length > 0
                                     ? project.testers_info.map(e => (
-                                        <span key={e.id} className={tagCls}>{e.username}</span>
+                                        <span key={e.id} className={tagCls}>{e.username} | {e?.position}</span>
                                     ))
                                     : project.testers?.length > 0
                                         ? project.testers.map((e, i) => (
