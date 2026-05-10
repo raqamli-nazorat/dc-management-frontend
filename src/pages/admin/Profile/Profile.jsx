@@ -719,7 +719,7 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-2">
           <div className="w-full py-2.5 mt-3 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
             <div className="flex items-center gap-2.5">
-              <div className='w-[32px] h-[32px] bg-[#e9ecf5] rounded-lg flex justify-center items-center'>
+              <div className='w-[32px] h-[32px] bg-[#e9ecf5] dark:bg-[#21262d] rounded-lg flex justify-center items-center'>
                 <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
               </div>
               <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
@@ -732,7 +732,7 @@ export default function ProfilePage() {
 
           <div className="w-full py-2.5 mt-1 rounded-xl bg-[var(--bg-elevation-1)]  dark:bg-[#1C1D1D]  flex items-center justify-between min-h-[42px]">
             <div className="flex items-center gap-2.5">
-              <div className='w-[32px] h-[32px] bg-[#e9ecf5] rounded-lg flex justify-center items-center'>
+              <div className='w-[32px] h-[32px] bg-[#e9ecf5] dark:bg-[#21262d] rounded-lg flex justify-center items-center'>
                 <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
               </div>
               <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
