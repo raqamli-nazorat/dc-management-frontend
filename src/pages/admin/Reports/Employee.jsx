@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter, LuUserPlus } from 'react-icons/lu'
 import { FaAngleDown, FaChevronDown } from 'react-icons/fa'
@@ -70,7 +70,7 @@ const initialFilters = {
 }
 
 const MAIN_COLUMNS = [
-  { key: 'number', label: '№', width: 45 },
+  { key: 'number', label: '№', width: 49.5 },
   { key: 'username', label: 'Ism Sharifi', width: 221.5 },
   { key: 'position', label: 'Lavozim', width: 199.5 },
   { key: 'region', label: 'Viloyati', width: 177 },
@@ -144,7 +144,7 @@ const Employee = () => {
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
 
-  const [tablePin, setTablePin] = useState({})
+  const [tablePin, setTablePin] = useState({ number: true })
 
   const handlePin = (key, value) => {
     setTablePin(prev => {
@@ -813,10 +813,9 @@ const Employee = () => {
       joined_max: null
     })
     setSearch('')
-    setFilterModal(false)
-    getEmployeeReports({ params: {} })
-    setHasFetched(false)
     setUserReports([])
+    setHasFetched(false)
+    setFilterModal(false)
   }
 
   const handleSelectEmployeeConfirm = (selected) => {
@@ -829,10 +828,6 @@ const Employee = () => {
 
     getEmployeeReports({ params, search })
   }
-
-  // const handlePin = (key, value) => {
-  //   setTablePin(prev => ({ ...prev, [key]: value }))
-  // }
 
   return (
     <div className="relative">
