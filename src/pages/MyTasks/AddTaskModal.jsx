@@ -85,14 +85,14 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
       <button
         onClick={onClose}
         className="absolute top-8 right-6 w-8 h-8 flex items-center justify-center rounded-full
-            bg-[#F1F3F9] dark:bg-[#292A2A] text-[var(--text-sub)] dark:text-[#C2C8E0]
-            hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435] transition-colors cursor-pointer"
+            bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)]
+            hover:bg-[var(--stroke-sub)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
       >
         <FaXmark size={13} />
       </button>
 
       {/* Modal */}
-      <div className="relative w-full max-w-[640px] h-[80vh]! bg-white dark:bg-[#1C1D1D] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-[640px] h-[80vh]! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
 
         {/* ── Header ── */}
         <div className="flex items-start justify-between mb-6">
@@ -100,15 +100,15 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
             <div className="flex items-center gap-3">
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
               >
-                <FaArrowLeft className="text-[var(--text-strong)] dark:text-white" size={18} />
+                <FaArrowLeft className="text-[var(--text-strong)] dark:text-[var(--text-strong)]" size={18} />
               </button>
-              <h2 className="text-[22px] font-bold text-[var(--text-strong)] dark:text-white">
+              <h2 className="text-[22px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {isEdit ? "Vazifani tahrirlash" : "Vazifa qo'shish"}
               </h2>
             </div>
-            <p className="text-[14px] text-[var(--text-soft)] dark:text-[#8E95B5] mt-1 ml-10">
+            <p className="text-[14px] text-[var(--text-soft)] dark:text-[var(--text-soft)] mt-1 ml-10">
               O'zingiz uchun vazifa yarating.
             </p>
           </div>
@@ -117,8 +117,8 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           <button
             onClick={() => setIsStarred(s => !s)}
             className="w-11 h-11 flex items-center justify-center rounded-2xl
-              bg-[var(--bg-elevation-1)] dark:bg-[#222323]
-              border border-[#F1F3F9] dark:border-[#292A2A]
+              bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)]
+              border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]
               text-[var(--accent-strong)] hover:opacity-80 transition-opacity cursor-pointer"
           >
             {isStarred ? <FaStar size={20} /> : <FaRegStar size={20} />}
@@ -128,7 +128,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         {/* ── Form tanasi ── */}
         <div className="flex relative gap-5 mb-8">
           {/* Vazifa nomi + subtasklar */}
-          <div className="w-full max-h-[350px] overflow-y-auto bg-[var(--bg-elevation-1)] dark:bg-[#222323] rounded-[24px] p-6 pr-20! flex flex-col gap-4 border border-[#F1F3F9] dark:border-[#2A2B2B]">
+          <div className="w-full max-h-[350px] overflow-y-auto bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)] rounded-[24px] p-6 pr-20! flex flex-col gap-4 border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
             {/* Vazifa nomi */}
             <input
               type="text"
@@ -136,7 +136,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="bg-transparent outline-none text-[15px] font-bold
-                text-[var(--text-strong)] dark:text-white
+                text-[var(--text-strong)] dark:text-[var(--text-strong)]
                 placeholder:text-[var(--text-disabled)] dark:placeholder:text-[#474848]"
             />
 
@@ -145,14 +145,14 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
               <div className="flex flex-col gap-4 mt-1">
                 {subtasks.map((sub, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-[22px] h-[22px] rounded-full bg-[var(--stroke-sub)] dark:bg-[#3A3B3B] shrink-0" />
+                    <div className="w-[22px] h-[22px] rounded-full bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] shrink-0" />
                     <input
                       type="text"
                       value={sub}
                       onChange={e => handleSubtaskChange(e.target.value, i)}
                       placeholder={i === 0 ? "Subtask qo'shing..." : ''}
                       className="flex-1 bg-transparent outline-none text-[13px]
-                        text-[var(--text-sub)] dark:text-[#C2C8E0]
+                        text-[var(--text-sub)] dark:text-[var(--text-sub)]
                         placeholder:text-[var(--stroke-strong)] dark:placeholder:text-[#4A4B4B]"
                     />
                   </div>
@@ -169,14 +169,14 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
                 {task.items.map(item => (
                   <div key={item.id} className="flex items-center gap-3">
                     <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0
-                      ${item.is_done ? 'bg-[#4A65D8]' : 'bg-[var(--stroke-sub)] dark:bg-[#3A3B3B]'}`}>
+                      ${item.is_done ? 'bg-[#4A65D8]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
                       {item.is_done && (
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
                     </div>
-                    <span className={`text-[13px] font-medium ${item.is_done ? 'text-[var(--text-sub)] line-through' : 'text-[var(--text-soft)] dark:text-[#8E95B5]'}`}>
+                    <span className={`text-[13px] font-medium ${item.is_done ? 'text-[var(--text-sub)] line-through' : 'text-[var(--text-soft)] dark:text-[var(--text-soft)]'}`}>
                       {item.title}
                     </span>
                   </div>
@@ -186,7 +186,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           </div>
 
           {/* Rang tanlash */}
-          <div className="absolute -top-8 right-0 px-3 py-4 rounded-full dark:bg-[#222323] shadow-2xl border border-[#F1F3F9] dark:border-[#2A2B2B] flex flex-col gap-4 items-center justify-center shrink-0">
+          <div className="absolute -top-8 right-0 px-3 py-4 rounded-full dark:bg-[var(--bg-elevation-1)] shadow-2xl border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex flex-col gap-4 items-center justify-center shrink-0">
             {COLORS.map(c => (
               <button
                 key={c.id}
@@ -209,8 +209,8 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           <button
             onClick={onClose}
             className="flex items-center gap-2 px-6 py-3.5 rounded-[16px] font-bold cursor-pointer
-              text-[var(--text-strong)] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] transition-colors"
+              text-[var(--text-strong)] dark:text-[var(--text-strong)]
+              hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors"
           >
             <FaXmark size={14} />
             Bekor qilish

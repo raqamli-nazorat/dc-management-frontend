@@ -1,7 +1,7 @@
 ﻿export default function EmptyState({ icon, iconNode, title, description }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <div className="w-16 h-16 rounded-2xl bg-[#F1F3F9] dark:bg-[#222323] flex items-center justify-center">
+      <div className="w-16 h-16 rounded-2xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] flex items-center justify-center">
         {iconNode ? (
           <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)] opacity-60">{iconNode}</span>
         ) : (
@@ -9,9 +9,9 @@
         )}
       </div>
       <div className="text-center">
-        <p className="text-[15px] font-bold text-[var(--text-strong)] dark:text-[#FFFFFF] mb-1">{title}</p>
+        <p className="text-[15px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-1">{title}</p>
         {description && (
-          <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0]">{description}</p>
+          <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)]">{description}</p>
         )}
       </div>
     </div>

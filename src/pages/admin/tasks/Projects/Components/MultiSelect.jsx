@@ -52,12 +52,12 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
             <div
                 onClick={() => setOpen(!open)}
                 className={`min-h-[42px] w-full relative flex flex-wrap gap-1.5 px-3 py-2 rounded-xl border  cursor-text
-              bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
+              bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
               ${open ? 'border-[var(--accent-sub)] dark:border-[var(--accent-sub)]' : ''}`}>
                 {selected.map(s => (
                     <span key={s.username || Math.random()}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
-                  bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]">
+                  bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]">
                         {s?.username || '—'} | {Roles[s?.roles?.[0]] || '—'}
                         <button type="button" onMouseDown={e => { e.stopPropagation(); remove(s.username) }}
                             className="hover:opacity-70 cursor-pointer ml-0.5">
@@ -71,7 +71,7 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
                         value={query}
                         onChange={e => { onSearch(e.target.value); setQuery(e.target.value) }}
                         placeholder={selected.length === 0 ? placeholder : ''}
-                        className="flex-1 min-w-[80px] text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
+                        className="flex-1 min-w-[80px] text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
                 ) : selected.length === 0 && (
                     <span className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] select-none">{placeholder}</span>
                 )}
@@ -84,7 +84,7 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
                             width: coords.width,
                             zIndex: 9999
                         }}
-                        className="rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B] dark:text-white"
+                        className="rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]"
                     >
                         {options.map(o => {
                             const isSelected = selected.some(s => s.username === o?.username)
@@ -96,14 +96,14 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
                                         e.preventDefault()
                                         toggleItem(o)
                                     }}
-                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0 transition-colors
-                      ${isSelected ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'}`}>
+                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 transition-colors
+                      ${isSelected ? 'bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'}`}>
                                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors
                       ${isSelected ? 'bg-[var(--accent-strong)] text-white' : 'bg-[var(--accent-sub)]/20 text-[var(--accent-sub)]'}`}>
                                         {isSelected ? <FaCheck size={10} /> : (o?.username || '??').slice(0, 2).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm font-medium leading-tight truncate ${isSelected ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{o?.username || '—'}</p>
+                                        <p className={`text-sm font-medium leading-tight truncate ${isSelected ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)]'}`}>{o?.username || '—'}</p>
                                         <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate">{Array.isArray(o?.roles) ? o.roles.map(r => Roles[r] || r).join(', ') : '—'}</p>
                                     </div>
                                     {isSelected && (

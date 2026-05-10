@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -264,23 +264,23 @@ export default function PaymentsPage() {
     }
   }
 
-  const thCls = 'px-4 py-3 font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]'
+  const thCls = 'px-4 py-3 font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)]">
 
       {/* ── Yuqori qism ── */}
-      <div className="shrink-0 bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]">
+      <div className="shrink-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
 
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">Xarajat so'rovlari</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Xarajat so'rovlari</h1>
         </div>
 
         {/* Search + Filter */}
         <div className="flex items-center gap-2 mb-3">
           <div className="relative">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#C2C8E0]"
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-sub)]"
               width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
@@ -289,12 +289,12 @@ export default function PaymentsPage() {
               onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
               className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
                 bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
-                dark:bg-[#222323] dark:border-[#474848] dark:text-[#FFFFFF] dark:placeholder-[#C2C8E0]" />
+                dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]" />
           </div>
           <button onClick={() => setShowFilter(true)}
             className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
             <LuFilter size={13} />
             Filtrlash
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
@@ -305,7 +305,7 @@ export default function PaymentsPage() {
       {/* ── Jadval ── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-auto">
         {loading ? (
-          <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Yuklanmoqda...</div>
+          <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Yuklanmoqda...</div>
         ) : payments.length === 0 ? (
           <EmptyState
             icon="/imgs/xarajatlarIcon.svg"
@@ -314,18 +314,18 @@ export default function PaymentsPage() {
           />
         ) : (
           <table className="w-full text-sm whitespace-nowrap">
-            <thead className="sticky top-0 z-10 bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]">
-              <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-                <th className={`${thCls} text-left w-10 bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>№</th>
-                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Xodim</th>
-                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Xarajat turi</th>
-                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Toifa</th>
-                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Summa (UZS)</th>
-                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Yaratilgan</th>
-                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>To'langan</th>
-                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Tasdiqlangan</th>
-                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Loyiha</th>
-                <th className={`${thCls} text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]`}>Holat</th>
+            <thead className="sticky top-0 z-10 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
+              <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+                <th className={`${thCls} text-left w-10 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>№</th>
+                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Xodim</th>
+                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Xarajat turi</th>
+                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Toifa</th>
+                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Summa (UZS)</th>
+                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Yaratilgan</th>
+                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>To'langan</th>
+                <th className={`${thCls} text-right bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Tasdiqlangan</th>
+                <th className={`${thCls} text-left bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Loyiha</th>
+                <th className={`${thCls} text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]`}>Holat</th>
               </tr>
             </thead>
             <tbody>
@@ -336,17 +336,17 @@ export default function PaymentsPage() {
                       .then(detail => setDetailPayment(detail))
                       .catch(() => setDetailPayment(p))
                   }}
-                  className="group border-b border-[#EEF1F7] dark:border-[#292A2A]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
-                  <td className="px-4 py-3 w-10 text-[var(--text-strong)] dark:text-[#FFFFFF]">{idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[#FFFFFF]">{p.user_info?.username ?? ''}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[#FFFFFF]">{typeLabel(p.type)}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[#FFFFFF]">{p.expense_category_info?.title ?? ''}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-[var(--text-strong)] dark:text-[#FFFFFF]">{fmt(p.amount)}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[#FFFFFF]">{fmtDate(p.created_at)}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[#FFFFFF]">{fmtDate(p.paid_at)}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[#FFFFFF]">{fmtDate(p.confirmed_at)}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[#FFFFFF]">{p.project_info?.title ?? ''}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] 
+                  className="group border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
+                  <td className="px-4 py-3 w-10 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.user_info?.username ?? ''}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{typeLabel(p.type)}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.expense_category_info?.title ?? ''}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmt(p.amount)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.created_at)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.paid_at)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.confirmed_at)}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.project_info?.title ?? ''}</td>
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] 
                   group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] ">
                     <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(p.status)}`}>
                       {statusLabel(p.status)}
@@ -358,7 +358,7 @@ export default function PaymentsPage() {
           </table>
         )}
         {loadingMore && (
-          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>

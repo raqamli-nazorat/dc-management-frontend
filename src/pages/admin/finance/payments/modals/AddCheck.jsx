@@ -1,4 +1,4 @@
-import { FiArrowLeft, FiInfo, FiX, FiArrowRight, FiFileText } from "react-icons/fi"
+﻿import { FiArrowLeft, FiInfo, FiX, FiArrowRight, FiFileText } from "react-icons/fi"
 import { useState } from "react"
 import { FaArrowLeft } from "react-icons/fa"
 import { TbArrowUpRight } from "react-icons/tb"
@@ -48,16 +48,16 @@ const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
 
-            <div className="w-[620px] h-[500px] bg-white dark:bg-[#1A1B1B] rounded-[32px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden py-6 px-4 flex flex-col gap-8">
+            <div className="w-[620px] h-[500px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[32px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden py-6 px-4 flex flex-col gap-8">
 
                 {/* Header Section */}
                 <div className="flex items-start justify-between">
-                    <div className="flex flex-col gap-3 pl-4 border-b border-b-gray-100 dark:border-[#292A2A]">
+                    <div className="flex flex-col gap-3 pl-4 border-b border-b-gray-100 dark:border-[var(--stroke-soft)]">
                         <div className="flex items-center">
-                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-white">
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-[var(--text-strong)]">
                                 <FaArrowLeft size={18} />
                             </button>
-                            <h2 className="ml-2 text-[20px] font-bold text-[#1A1D2E] dark:text-white">To'lov chekini yuklang.</h2>
+                            <h2 className="ml-2 text-[20px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">To'lov chekini yuklang.</h2>
                         </div>
                         <p className="font-medium text-[13px] text-[#5B6078]">
                             To‘lov tasdiqlanishi uchun чек yoki kvitansiyani yuklang.
@@ -65,10 +65,10 @@ const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
                     </div>
 
                     <div className="relative group flex items-center gap-2">
-                        <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[#FFFFFF] bg-white dark:bg-[#222323] border border-[#E2E6F2] dark:border-[#292A2A] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                        <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[var(--text-strong)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[#E2E6F2] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
                             Chek faylini hozir yuklamasangiz ham bo‘ladi. Uni keyinroq qo‘shishingiz mumkin.
                         </div>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
                             <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
                         </button>

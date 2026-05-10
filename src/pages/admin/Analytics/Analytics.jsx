@@ -9,19 +9,19 @@ import { usePageAction } from '../../../context/PageActionContext'
 
 /* ── Konstantalar ─────────────────────────────────────────── */
 const PERIODS = [
-  { label: '1 oy',  value: 1  },
-  { label: '3 oy',  value: 3  },
-  { label: '6 oy',  value: 6  },
+  { label: '1 oy', value: 1 },
+  { label: '3 oy', value: 3 },
+  { label: '6 oy', value: 6 },
   { label: '1 yil', value: 12 },
 ]
 
 // Figma rang kodlari — loyihalar bar chart
 const PROJECT_COLORS = {
-  completed:  '#99CC00',  // Tugatilgan — yashil
-  active:     '#82C0C0',  // Jarayonda  — teal
-  cancelled:  '#D2D8EC',  // Bekor      — kulrang-ko'k
-  overdue:    '#EF161E',  // Muddati    — qizil
-  planning:   '#D8D8D8',  // Rejalashtirilgan — och kulrang
+  completed: '#99CC00',  // Tugatilgan — yashil
+  active: '#82C0C0',  // Jarayonda  — teal
+  cancelled: '#D2D8EC',  // Bekor      — kulrang-ko'k
+  overdue: '#EF161E',  // Muddati    — qizil
+  planning: '#D8D8D8',  // Rejalashtirilgan — och kulrang
 }
 const PROJECT_COLOR_LIST = Object.values(PROJECT_COLORS)
 
@@ -36,7 +36,7 @@ function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
   return (
     <div className={`px-3 py-2 rounded-xl shadow-xl border text-xs z-50
-      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-white border-[#E8EAF0] text-[#1A1D2E]'}`}>
+      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-[var(--bg-elevation-1-alt)] border-[#E8EAF0] text-[#1A1D2E]'}`}>
       {label && <p className="font-semibold mb-1 text-[#8F95A8]">{label}</p>}
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2">
@@ -125,19 +125,19 @@ export default function AnalyticsPage() {
     tasks: 0, projects: 0, meetings: 0,
     taskCompletionRate: 0, total_duration_minutes: 0,
   })
-  const [taskData, setTaskData]       = useState([])
+  const [taskData, setTaskData] = useState([])
   const [projectData, setProjectData] = useState([])
   const [meetingData, setMeetingData] = useState([])
 
   /* ── Navbar period selector ── */
   useEffect(() => {
     const selector = (
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-white dark:bg-[#1E2021] shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]">
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] shadow-sm border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
         {PERIODS.map(p => (
           <button key={p.value} onClick={() => setPeriod(p.value)}
             className={`px-4 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors
               ${period === p.value
-                ? 'bg-[#F8F9FC] dark:bg-[#2A2B2B] text-[#1A1D2E] dark:text-white shadow-sm border border-[#EEF1F7] dark:border-[#292A2A]'
+                ? 'bg-[#F8F9FC] dark:bg-[var(--bg-elevation-2)] text-[#1A1D2E] dark:text-[var(--text-strong)] shadow-sm border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]'
                 : 'text-[#8F95A8] hover:text-[#1A1D2E] dark:hover:text-white border border-transparent'}`}>
             {p.label}
           </button>
@@ -155,45 +155,45 @@ export default function AnalyticsPage() {
     setError('')
     try {
       const res = await axiosAPI.get('/users/me/period-statistics/', { params: { months: period } })
-      const payload      = res.data?.data ?? {}
-      const taskStats    = payload.tasks    ?? {}
+      const payload = res.data?.data ?? {}
+      const taskStats = payload.tasks ?? {}
       const projectStats = payload.projects ?? {}
       const meetingStats = payload.meetings ?? {}
 
       // Vazifalar — line chart (prevValue = o'tgan davr simulyatsiyasi)
       const offsets = [4, -2, 6, -5, 3, -1, 5]
       const tData = [
-        { name: 'Qilish kerak',      value: taskStats.todo           ?? 0 },
-        { name: 'Jarayonda',         value: taskStats.in_progress    ?? 0 },
-        { name: 'Bajarilgan',        value: taskStats.done           ?? 0 },
-        { name: 'Ishga tushurilgan', value: taskStats.production     ?? 0 },
-        { name: 'Tekshirilgan',      value: taskStats.checked        ?? 0 },
-        { name: 'Rad etilgan',       value: taskStats.rejected_tasks ?? 0 },
-        { name: "Muddati o'tgan",    value: taskStats.overdue        ?? 0 },
+        { name: 'Qilish kerak', value: taskStats.todo ?? 0 },
+        { name: 'Jarayonda', value: taskStats.in_progress ?? 0 },
+        { name: 'Bajarilgan', value: taskStats.done ?? 0 },
+        { name: 'Ishga tushurilgan', value: taskStats.production ?? 0 },
+        { name: 'Tekshirilgan', value: taskStats.checked ?? 0 },
+        { name: 'Rad etilgan', value: taskStats.rejected_tasks ?? 0 },
+        { name: "Muddati o'tgan", value: taskStats.overdue ?? 0 },
       ]
       setTaskData(tData.map((d, i) => ({ ...d, prevValue: Math.max(0, d.value + offsets[i]) })))
 
       // Loyihalar — bar chart
       setProjectData([
-        { name: 'Tugatilgan',       value: projectStats.completed ?? 0 },
-        { name: 'Jarayonda',        value: projectStats.active    ?? 0 },
-        { name: 'Bekor',            value: projectStats.cancelled ?? 0 },
-        { name: 'Muddati',          value: projectStats.overdue   ?? 0 },
-        { name: 'Rejalashtirilgan', value: projectStats.planning  ?? 0 },
+        { name: 'Tugatilgan', value: projectStats.completed ?? 0 },
+        { name: 'Jarayonda', value: projectStats.active ?? 0 },
+        { name: 'Bekor', value: projectStats.cancelled ?? 0 },
+        { name: 'Muddati', value: projectStats.overdue ?? 0 },
+        { name: 'Rejalashtirilgan', value: projectStats.planning ?? 0 },
       ])
 
       // Yig'ilishlar — donut
       setMeetingData([
-        { name: 'Qatnashdi', value: meetingStats.attended    ?? 0 },
-        { name: 'Sababli',   value: meetingStats.with_reason ?? 0 },
-        { name: 'Sababsiz',  value: meetingStats.unexcused   ?? 0 },
+        { name: 'Qatnashdi', value: meetingStats.attended ?? 0 },
+        { name: 'Sababli', value: meetingStats.with_reason ?? 0 },
+        { name: 'Sababsiz', value: meetingStats.unexcused ?? 0 },
       ])
 
       setStats({
-        tasks:                  taskStats.total                    ?? 0,
-        projects:               projectStats.total                 ?? 0,
-        meetings:               meetingStats.total                 ?? 0,
-        taskCompletionRate:     taskStats.completion_rate          ?? 0,
+        tasks: taskStats.total ?? 0,
+        projects: projectStats.total ?? 0,
+        meetings: meetingStats.total ?? 0,
+        taskCompletionRate: taskStats.completion_rate ?? 0,
         total_duration_minutes: meetingStats.total_duration_minutes ?? 0,
       })
     } catch {
@@ -233,8 +233,8 @@ export default function AnalyticsPage() {
       )}
 
       {/* ── Vazifalar Line Chart ── */}
-      <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex-1 flex flex-col min-h-0">
-        <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-4 shrink-0">Vazifalar</h3>
+      <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] p-6 flex-1 flex flex-col min-h-0">
+        <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)] mb-4 shrink-0">Vazifalar</h3>
         {loading ? <Spinner /> : (
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
@@ -305,8 +305,8 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-2 gap-4 h-[300px] shrink-0">
 
         {/* Loyihalar Bar Chart */}
-        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
-          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-4 shrink-0">Loyihalar</h3>
+        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] p-6 flex flex-col">
+          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)] mb-4 shrink-0">Loyihalar</h3>
           {loading ? <Spinner /> : (
             <div className="flex-1 min-h-0">
               <ResponsiveContainer width="100%" height="100%">
@@ -347,7 +347,7 @@ export default function AnalyticsPage() {
                   />
 
                   <Bar dataKey="value" name="Loyihalar" shape={<RoundedBar />} radius={[8, 8, 0, 0]}>
-                   
+
                     {projectData.map((_, i) => (
                       <Cell key={i} fill={PROJECT_COLOR_LIST[i % PROJECT_COLOR_LIST.length]} />
                     ))}
@@ -359,8 +359,8 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Yig'ilishlar Donut Chart */}
-        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[#1E2021] p-6 flex flex-col">
-          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-white mb-4 shrink-0">Yig'ilishlar dinamikasi</h3>
+        <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] p-6 flex flex-col">
+          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)] mb-4 shrink-0">Yig'ilishlar dinamikasi</h3>
           {loading ? <Spinner /> : (
             <div className="flex-1 flex items-center gap-6">
 
@@ -403,23 +403,23 @@ export default function AnalyticsPage() {
               <div className="flex-1 flex flex-col gap-1 min-w-0">
                 {/* Umumiy */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[13px] font-[500] text-[#000000] dark:text-[#8B949E]">Umumiy soni:</span>
-                  <span className="text-[13px] font-semibold text-[#1A1D2E] dark:text-white">
+                  <span className="text-[13px] font-[500] text-[#000000] dark:text-[var(--text-sub)]">Umumiy soni:</span>
+                  <span className="text-[13px] font-semibold text-[#1A1D2E] dark:text-[var(--text-strong)]">
                     {stats.meetings} / {stats.total_duration_minutes} daqiqa
                   </span>
                 </div>
 
                 {/* Har bir qator */}
                 {meetingData.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#E8EAF0] dark:border-[#292A2A] last:border-0">
+                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#E8EAF0] dark:border-[var(--stroke-soft)] last:border-0">
                     <div className="flex items-center gap-2.5">
                       <span
                         className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ background: MEETING_COLORS[i] }}
                       />
-                      <span className="text-[13px] text-[#000000] dark:text-[#8B949E]">{item.name}</span>
+                      <span className="text-[13px] text-[#000000] dark:text-[var(--text-sub)]">{item.name}</span>
                     </div>
-                    <span className="text-[14px] font-bold text-[#1A1D2E] dark:text-white">{item.value}</span>
+                    <span className="text-[14px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">{item.value}</span>
                   </div>
                 ))}
               </div>

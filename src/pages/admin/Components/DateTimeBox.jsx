@@ -79,7 +79,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[var(--stroke-sub)] dark:border-[#2A2B2B] p-3 select-none"
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
       style={{ minWidth: 260, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
       {/* Header */}
@@ -87,7 +87,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={prevMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer"
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
@@ -95,9 +95,9 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={() => setShowYearMonth(s => !s)}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] cursor-pointer"
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer"
         >
-          <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">
+          <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
             {MONTH_NAMES[viewMonth]} {viewYear}
           </span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`text-[var(--text-soft)] transition-transform ${showYearMonth ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
@@ -106,7 +106,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={nextMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer"
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
         </button>
@@ -116,7 +116,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
       {showYearMonth && (
         <div className="mb-2 flex gap-2">
           {/* Month list */}
-          <div className="flex-1 max-h-40 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A]">
+          <div className="flex-1 max-h-40 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
             {MONTH_NAMES.map((mn, i) => (
               <button
                 key={mn}
@@ -124,15 +124,15 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 onClick={() => { setViewMonth(i); setShowYearMonth(false) }}
                 className={`w-full text-left px-3 py-1.5 text-xs cursor-pointer
                   ${i === viewMonth
-                    ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
-                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}
+                    ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {mn}
               </button>
             ))}
           </div>
           {/* Year list */}
-          <div className="w-20 max-h-40 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A]">
+          <div className="w-20 max-h-40 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
             {years.map(y => (
               <button
                 key={y}
@@ -140,8 +140,8 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 onClick={() => { setViewYear(y); setShowYearMonth(false) }}
                 className={`w-full text-left px-3 py-1.5 text-xs cursor-pointer
                   ${y === viewYear
-                    ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
-                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}
+                    ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {y}
               </button>
@@ -169,8 +169,8 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
                   ${isSelected(d)
                     ? 'bg-[var(--accent-strong)] text-white'
                     : isToday(d)
-                    ? 'border-2 border-[var(--accent-strong)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A]'
-                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]'}`}
+                    ? 'border-2 border-[var(--accent-strong)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)]'
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {d}
               </button>
@@ -180,11 +180,11 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
         <button
           type="button"
           onClick={() => { onChange(''); onClose() }}
-          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]"
+          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]"
         >
           Tozalash
         </button>
@@ -197,7 +197,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
             onChange(`${t.getFullYear()}-${mm}-${dd}`)
             onClose()
           }}
-          className="text-xs text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A] font-semibold"
+          className="text-xs text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)] font-semibold"
         >
           Bugun
         </button>
@@ -253,16 +253,16 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-white dark:bg-[#1C1D1D] border-[var(--stroke-sub)] dark:border-[#2A2B2B] p-3 select-none"
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
       style={{ minWidth: 160, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
-      <p className="text-xs font-semibold text-[var(--text-sub)] dark:text-[#C2C8E0] mb-2 text-center">Vaqt tanlang</p>
+      <p className="text-xs font-semibold text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-2 text-center">Vaqt tanlang</p>
 
       <div className="flex gap-2">
         {/* Hours */}
         <div className="flex-1">
           <p className="text-[10px] text-center text-[var(--text-soft)] mb-1 font-medium">Soat</p>
-          <div ref={hourRef} className="h-44 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] scroll-smooth">
+          <div ref={hourRef} className="h-44 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] scroll-smooth">
             {Array.from({ length: 24 }, (_, i) => (
               <button
                 key={i}
@@ -271,7 +271,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 className={`w-full text-center py-1.5 text-sm cursor-pointer transition-colors
                   ${i === hour
                     ? 'bg-[var(--accent-strong)] text-white font-bold'
-                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]'}`}
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {String(i).padStart(2, '0')}
               </button>
@@ -282,7 +282,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
         {/* Minutes */}
         <div className="flex-1">
           <p className="text-[10px] text-center text-[var(--text-soft)] mb-1 font-medium">Daqiqa</p>
-          <div ref={minRef} className="h-44 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] scroll-smooth">
+          <div ref={minRef} className="h-44 overflow-y-auto rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] scroll-smooth">
             {Array.from({ length: 60 }, (_, i) => (
               <button
                 key={i}
@@ -291,7 +291,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 className={`w-full text-center py-1.5 text-sm cursor-pointer transition-colors
                   ${i === min
                     ? 'bg-[var(--accent-strong)] text-white font-bold'
-                    : 'text-[var(--text-strong)] dark:text-white hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]'}`}
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {String(i).padStart(2, '0')}
               </button>
@@ -300,11 +300,11 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
         <button
           type="button"
           onClick={() => { setHour(0); setMin(0); onChange('00:00'); onClose() }}
-          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]"
+          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]"
         >
           Tozalash
         </button>
@@ -319,7 +319,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
             apply(h, m)
             onClose()
           }}
-          className="text-xs text-[var(--accent-strong)] dark:text-[var(--accent-soft)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A] font-semibold"
+          className="text-xs text-[var(--accent-strong)] dark:text-[var(--accent-soft)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)] font-semibold"
         >
           Hozir
         </button>
@@ -422,8 +422,8 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
   // ── STYLES ────────────────────────────────────────────────
   const wrapCls = `
     relative flex items-center gap-1.5 px-3 py-2.5 rounded-xl border
-    bg-white dark:bg-[#191A1A]
-    ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+    ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
     ${!error && !disabled ? 'focus-within:border-[var(--accent-sub)] dark:focus-within:border-[var(--accent-sub)]' : ''}
     transition-colors
     ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
@@ -431,8 +431,8 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
 
   const inputCls = `
     flex-1 min-w-0 text-sm outline-none bg-transparent
-    text-[var(--text-strong)] dark:text-white
-    placeholder-[var(--text-disabled)] dark:placeholder-[#474848]
+    text-[var(--text-strong)] dark:text-[var(--text-strong)]
+    placeholder-[var(--text-disabled)] dark:placeholder-[var(--text-sub)]
     ${disabled ? 'cursor-not-allowed' : ''}
   `
 

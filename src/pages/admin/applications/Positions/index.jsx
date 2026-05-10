@@ -80,14 +80,14 @@ const ApplicationsPage = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col justify-start gap-4">
           <h1
-            className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
+            className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
             style={{ fontSize: 24, fontWeight: 800 }}
           >
             Lavozimlar
           </h1>
           <div className="flex items-center gap-5">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input
@@ -95,7 +95,7 @@ const ApplicationsPage = () => {
                 placeholder="Izlash..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+                className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               />
             </div>
@@ -104,7 +104,7 @@ const ApplicationsPage = () => {
           <div className="max-h-[80vh] overflow-y-auto rounded-xl">
             <table className="w-full" style={{ fontSize: 13 }}>
               <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[#191a1a] shadow-xs">
-                <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                     №
                   </th>
@@ -123,23 +123,23 @@ const ApplicationsPage = () => {
                   <tr
                     key={application.id}
                     // onClick={() => navigate(`/admin/applications/position/detail/${application.id}`)}
-                    className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                    className=" cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
                   >
-                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{idx + 1}</td>
-                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white font-medium">
+                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
                       {application?.name || '—'}
                     </td>
-                    <td className="px-4 py-3 text-left text-[var(--text-strong)] dark:text-white font-medium">
+                    <td className="px-4 py-3 text-left text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
                       {dayjs(application?.created_at).format('DD.MM.YYYY HH:mm') || '—'}
                     </td>
                     <td className='flex justify-end pr-6 py-3' onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
                         onClick={() => setShowConfirm(application)}
-                        className={`relative w-10 h-5 rounded-full  cursor-pointer ${application?.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}
+                        className={`relative w-10 h-5 rounded-full  cursor-pointer ${application?.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                       >
                         <span
-                          className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${application?.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
+                          className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${application?.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
                         />
                       </button>
                     </td>
@@ -148,7 +148,7 @@ const ApplicationsPage = () => {
               </tbody>
             </table>
             {applications.length === 0 && (
-              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Arizalar topilmadi</div>
+              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Arizalar topilmadi</div>
             )}
           </div>
         </div>

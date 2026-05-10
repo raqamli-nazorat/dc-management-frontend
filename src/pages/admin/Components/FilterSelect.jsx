@@ -90,14 +90,14 @@ const FilterSelect = ({
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-white border ${error ? 'border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} text-[var(--text-strong)] dark:bg-[#222323] dark:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
+                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-elevation-1-alt)] border ${error ? 'border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
                 {multiple && hasValue ? (
                     <div className="flex items-center gap-2 flex-1 overflow-hidden">
-                        <span className="text-[var(--text-strong)] dark:text-[#FFFFFF] truncate">{placeholder}</span>
-                        <span className="flex items-center justify-center bg-[#F1F3F9] dark:bg-[#303131] text-[var(--accent-strong)] dark:text-[#FFFFFF] rounded-full min-w-[20px] h-5 px-1.5 text-[11px] font-bold">
+                        <span className="text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{placeholder}</span>
+                        <span className="flex items-center justify-center bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--text-strong)] rounded-full min-w-[20px] h-5 px-1.5 text-[11px] font-bold">
                             {selectedOptions.length}
                         </span>
                     </div>
@@ -132,7 +132,7 @@ const FilterSelect = ({
             {open && (
                 <div
                     ref={dropdownRef}
-                    className="rounded-2xl shadow-xl bg-white dark:bg-[#1C1D1D]"
+                    className="rounded-2xl shadow-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]"
                     style={{
                         position: 'fixed',
                         top: dropPos.dropUp ? 'auto' : dropPos.top,

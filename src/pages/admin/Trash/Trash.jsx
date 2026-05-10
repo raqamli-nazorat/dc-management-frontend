@@ -28,17 +28,17 @@ function RowMenu({ onRestore, onDelete }) {
     <div ref={ref} className="relative flex justify-end">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-soft)] hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A]  cursor-pointer"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer"
       >
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-9 z-50 w-[180px] rounded-2xl shadow-xl border overflow-hidden
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           <button
             onClick={() => { onRestore(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
-              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]"
+            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
           >
             <FaCheck size={13} className="text-[#22c55e]" />
             Tiklash
@@ -60,10 +60,10 @@ function RowMenu({ onRestore, onDelete }) {
 /* ── Skeleton rows ── */
 function SkeletonRows({ cols = 6 }) {
   return Array.from({ length: 4 }).map((_, i) => (
-    <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+    <tr key={i} className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
       {Array.from({ length: cols }).map((__, j) => (
         <td key={j} className="px-4 py-3">
-          <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 0 ? 24 : '80%' }} />
+          <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" style={{ width: j === 0 ? 24 : '80%' }} />
         </td>
       ))}
     </tr>
@@ -151,7 +151,7 @@ function ProjectsTab() {
           onChange={e => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
               border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
             focus:border-[var(--accent-sub)]"
         />
       </div>
@@ -160,18 +160,18 @@ function ProjectsTab() {
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                   Menejer
                 </span>
               </th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Yaratilgan</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Muddati</th>
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
@@ -180,17 +180,17 @@ function ProjectsTab() {
               <SkeletonRows cols={7} />
             ) : projects.map((p, i) => (
               <tr key={p.id}
-                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
-                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
-                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{p.title}</td>
-                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{p.manager_info?.username || '—'}</td>
+                className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
+                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">{i + 1}</td>
+                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.title}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.manager_info?.username || '—'}</td>
                 <td className="px-4 py-3 text-right">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[#292A2A] dark:text-[#C2C8E0]">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]">
                     {statusLabel(p.status)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(p.created_at)}</td>
-                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(p.deadline)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.created_at)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.deadline)}</td>
                 <td className="px-4 py-3">
                   <RowMenu
                     onRestore={() => setConfirmRestore(p.id)}
@@ -325,8 +325,8 @@ function TasksTab() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
-            bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
             focus:border-[var(--accent-sub)]"
         />
       </div>
@@ -335,21 +335,21 @@ function TasksTab() {
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Loyiha</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratuvchi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Loyiha</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Yaratuvchi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                   Topshiruvchi
                 </span>
               </th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Turi</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Darajasi</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Turi</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Darajasi</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Muddati</th>
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
@@ -358,20 +358,20 @@ function TasksTab() {
               <SkeletonRows cols={10} />
             ) : tasks.map((t, i) => (
               <tr key={t.id}
-                className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
-                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{t.uid || i + 1}</td>
-                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{t.title}</td>
-                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
-                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.created_by_info?.username || '—'}</td>
-                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.assignee_info?.username || '—'}</td>
-                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{typeLabel(t.type)}</td>
-                <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-white">{priorityLabel(t.priority)}</td>
+                className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 ">
+                <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">{t.uid || i + 1}</td>
+                <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.title}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || '—')}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.created_by_info?.username || '—'}</td>
+                <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.assignee_info?.username || '—'}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{typeLabel(t.type)}</td>
+                <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{priorityLabel(t.priority)}</td>
                 <td className="px-4 py-3 text-right">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[#292A2A] dark:text-[#C2C8E0]">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]">
                     {statusLabel(t.status)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDate(t.deadline)}</td>
+                <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(t.deadline)}</td>
                 <td className="px-4 py-3">
                   <RowMenu
                     onRestore={() => setConfirmRestore(t.id)}
@@ -494,8 +494,8 @@ function MeetingsTab() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border
-            bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-            dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
             focus:border-[var(--accent-sub)]"
         />
       </div>
@@ -504,19 +504,19 @@ function MeetingsTab() {
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">UID</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                   Tashkilotchi
                 </span>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Boshlanish vaqti</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Davomiyligi</th>
-              <th className="px-4 py-3 text-center font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Tugatildimi?</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Boshlanish vaqti</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Davomiyligi</th>
+              <th className="px-4 py-3 text-center font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Tugatildimi?</th>
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
@@ -527,13 +527,13 @@ function MeetingsTab() {
               const organizer = m.participants_info?.find(u => u.id === m.organizer) ?? m.participants_info?.[0]
               return (
                 <tr key={m.id}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2">
-                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{i + 1}</td>
-                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] font-medium">{m.uid || '—'}</td>
-                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{m.title}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{organizer?.username || '—'}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{fmtDate(m.start_time)}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{minutesToDisplay(m.duration_minutes)}</td>
+                  className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/2 dark:hover:bg-white/2">
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">{i + 1}</td>
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] font-medium">{m.uid || '—'}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{m.title}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{organizer?.username || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(m.start_time)}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{minutesToDisplay(m.duration_minutes)}</td>
                   <td className="px-4 py-3 text-center">
                     <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${m.is_completed ? 'bg-[#22c55e]' : 'bg-[var(--error-sub)]'}`}>
                       {m.is_completed
@@ -599,7 +599,7 @@ export default function TrashPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white shrink-0">Chiqindi qutisi</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] shrink-0">Chiqindi qutisi</h1>
 
       <div className="flex items-center gap-1 shrink-0 mt-4">
         {tabs.map(tab => (

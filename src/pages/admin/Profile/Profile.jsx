@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck, FaCamera, FaUser } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -92,10 +92,10 @@ function ChangePasswordModal({ onClose }) {
 
   const inputCls = (err) => [
     'w-full px-4 py-3 rounded-xl text-sm outline-none border  pr-11',
-    'bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)]',
-    'dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)]',
+    'bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]',
+    'dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]',
     err ? 'border-red-400 dark:border-red-500'
-      : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]',
+      : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]',
   ].join(' ')
 
   return (
@@ -103,15 +103,15 @@ function ChangePasswordModal({ onClose }) {
       <div className="fixed inset-0 bg-black/60" />
       <button onClick={onClose}
         className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full z-10 cursor-pointer 
-          bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0]">
+          bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)]">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] p-7">
+      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] p-7">
         <div className="flex items-center gap-3 mb-1.5">
-          <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer transition-opacity">
+          <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer transition-opacity">
             <FaArrowLeft size={16} />
           </button>
-          <h2 className="text-xl font-extrabold text-[var(--text-strong)] dark:text-white">Parolni o'zgartirish</h2>
+          <h2 className="text-xl font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Parolni o'zgartirish</h2>
         </div>
         <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-6">
           Xavfsizlik uchun joriy parolingizni kiriting va yangi parol o'rnating
@@ -123,7 +123,7 @@ function ChangePasswordModal({ onClose }) {
             { key: 'confirm', label: 'Parolni tasdiqlash', placeholder: 'Yangi parolni qayta kiriting' },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5">{label}</label>
+              <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">{label}</label>
               <div className="relative">
                 <input
                   type={show[key] ? 'text' : 'password'}
@@ -144,7 +144,7 @@ function ChangePasswordModal({ onClose }) {
         <div className="flex items-center justify-end gap-3 mt-7">
           <button onClick={onClose} disabled={loading}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={handleSave} disabled={loading}
@@ -194,12 +194,12 @@ function PassportViewer({ url, onClose }) {
             className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain"
           />
         ) : (
-          <div className="bg-white dark:bg-[#1C1D1D] rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+          <div className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--accent-sub)]">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
-            <p className="text-[var(--text-strong)] dark:text-white font-semibold text-sm">Fayl brauzerda ochiladi</p>
+            <p className="text-[var(--text-strong)] dark:text-[var(--text-strong)] font-semibold text-sm">Fayl brauzerda ochiladi</p>
             <a
               href={url}
               target="_blank"
@@ -216,7 +216,7 @@ function PassportViewer({ url, onClose }) {
 }
 
 
-const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-[#E2E6F2] opacity-90 border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#1c1d1d] dark:border-[#292A2A] dark:text-white'
+const boxCls = 'w-full px-4 py-2.5 rounded-xl text-sm border bg-[#E2E6F2] opacity-90 border-[#E2E6F2] text-[#1A1D2E] dark:bg-[#1c1d1d] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
 
 function Field({ label, value, children, align = 'right', rightIcon }) {
   return (
@@ -256,8 +256,8 @@ const formatCard = (val) => {
 
 /* ── Skeleton ── */
 function Skeleton() {
-  const bar = 'h-9 rounded-xl bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse'
-  const lbl = 'h-3 w-24 rounded bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse mb-1.5'
+  const bar = 'h-9 rounded-xl bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse'
+  const lbl = 'h-3 w-24 rounded bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse mb-1.5'
   const row = (
     <div className="grid grid-cols-2 gap-4">
       {[0, 1].map(i => (
@@ -270,12 +270,12 @@ function Skeleton() {
   )
   return (
     <div className="flex flex-col gap-5 w-full">
-      <div className="h-7 w-48 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" />
+      <div className="h-7 w-48 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" />
       <div className="flex items-center gap-4">
-        <div className="w-[72px] h-[72px] rounded-2xl bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse shrink-0" />
+        <div className="w-[72px] h-[72px] rounded-2xl bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse shrink-0" />
         <div className="flex flex-col gap-2">
-          <div className="h-5 w-48 rounded bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" />
-          <div className="h-7 w-32 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" />
+          <div className="h-5 w-48 rounded bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" />
+          <div className="h-7 w-32 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" />
         </div>
       </div>
       {row}{row}{row}
@@ -345,9 +345,9 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
         type="button"
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center justify-between gap-2 bg-white dark:bg-[#191A1A] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
+        className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] flex items-center justify-between gap-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] cursor-pointer hover:border-[var(--accent-sub)] transition-colors"
       >
-        <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
+        <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
           {ROLE_LABELS[activeRole] || activeRole || 'Tanlash'}
         </span>
         {loading
@@ -360,17 +360,17 @@ function RoleDropdown({ roles, activeRole, onChangeRole }) {
       </button>
       {open && (
         <div className="absolute bottom-full right-0 mb-1 z-50 w-48 rounded-2xl shadow-xl border overflow-hidden
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {roles.map((r, i) => (
             <button
               key={r}
               type="button"
               onClick={() => handleChange(r)}
               className={`w-full flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
-                ${i < roles.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
+                ${i < roles.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
                 ${r === activeRole
-                  ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
-                  : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'
+                  ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
+                  : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'
                 }`}
             >
               <span>{ROLE_LABELS[r] || r}</span>
@@ -524,13 +524,13 @@ export default function ProfilePage() {
 
   const rowCls = 'grid grid-cols-2 gap-4'
 
-  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[var(--text-sub)] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[#E2E6F2] text-[#1A1D2E] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]`
 
 
   return (
     <div className="flex flex-col gap-2.5 w-full">
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white">Shaxsiy kabinet</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Shaxsiy kabinet</h1>
 
       {/* Avatar + Name */}
       <div className="flex items-center gap-2.5">
@@ -569,12 +569,12 @@ export default function ProfilePage() {
           </label>
         </div>
         <div>
-          <p className="text-lg font-bold text-[var(--text-strong)] dark:text-white">{fullName}</p>
+          <p className="text-lg font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fullName}</p>
           <button
             onClick={() => setShowPasswordModal(true)}
             className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
-              border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[#F1F3F9]
-              dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+              border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)]
+              dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             <FaPencil size={10} /> Parol o'zgartish
           </button>
@@ -634,7 +634,7 @@ export default function ProfilePage() {
         </Field>
         <Field label="Passport rasmi">
           {data.passport_image ? (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2]  dark:bg-[#1c1d1d] flex items-center justify-start gap-2 min-h-[42px]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[#E2E6F2]  dark:bg-[#1c1d1d] flex items-center justify-start gap-2 min-h-[42px]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="2" className="shrink-0 dark:stroke-[var(--text-soft)]">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -650,7 +650,7 @@ export default function ProfilePage() {
               <span className="text-xs text-[var(--text-disabled)] shrink-0 ml-1">1487 KB</span>
             </div>
           ) : (
-            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[#292A2A] bg-[#E2E6F2] dark:bg-[#1c1d1d] min-h-[42px] flex items-center justify-start gap-2 text-[var(--text-disabled)]">
+            <div className="w-full px-4 py-2.5 rounded-xl text-sm border border-dashed border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[#E2E6F2] dark:bg-[#1c1d1d] min-h-[42px] flex items-center justify-start gap-2 text-[var(--text-disabled)]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -693,7 +693,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => set('social_links', [...data.social_links, ''])}
-                    className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                    className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
                   >
                     <FiPlus size={20} />
                   </button>
@@ -705,7 +705,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => set('social_links', [''])}
-              className="flex items-center gap-2 py-1 px-2 w-[180px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
+              className="flex items-center gap-2 py-1 px-2 w-[180px] cursor-pointer text-[#3F57B3] dark:text-[var(--text-soft)] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]"
             >
               <div className="w-9 h-9 flex items-center justify-center">
                 <FiPlus size={18} />
@@ -722,10 +722,10 @@ export default function ProfilePage() {
               <div className='w-[32px] h-[32px] bg-[#e9ecf5] dark:bg-[#21262d] rounded-lg flex justify-center items-center'>
                 <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
               </div>
-              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
+              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Lavozimi</span>
             </div>
-            <div className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#292A2A] flex items-center justify-between bg-white dark:bg-[#191A1A]">
-              <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">{data.position || 'Admin'}</span>
+            <div className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] flex items-center justify-between bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+              <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{data.position || 'Admin'}</span>
               <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
             </div>
           </div>
@@ -735,7 +735,7 @@ export default function ProfilePage() {
               <div className='w-[32px] h-[32px] bg-[#e9ecf5] dark:bg-[#21262d] rounded-lg flex justify-center items-center'>
                 <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
               </div>
-              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
+              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Roli</span>
             </div>
             {data.roles?.length > 1 ? (
               <RoleDropdown
@@ -744,8 +744,8 @@ export default function ProfilePage() {
                 onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
               />
             ) : (
-              <div className="px-3 py-2.5 rounded-lg border border-[var(--stroke-sub)] flex items-center gap-2 bg-white justify-between dark:border-[#292A2A] w-[200px] dark:bg-[#191A1A]">
-                <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
+              <div className="px-3 py-2.5 rounded-lg border border-[var(--stroke-sub)] flex items-center gap-2 bg-[var(--bg-elevation-1-alt)] justify-between dark:border-[var(--stroke-soft)] w-[200px] dark:bg-[var(--bg-base)]">
+                <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                   {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
                 </span>
                 <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
@@ -755,7 +755,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[#292A2A]">
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
         <button
           onClick={handleSave}
           disabled={!isChanged}
@@ -777,7 +777,7 @@ export default function ProfilePage() {
           onClick={() => setOpenImg(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-hidden"
+            className="bg-[var(--bg-elevation-1-alt)] rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <button

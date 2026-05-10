@@ -156,28 +156,28 @@ const ApplicationsPage = () => {
       {confirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
-          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-            <button onClick={() => setConfirmModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+            <button onClick={() => setConfirmModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setConfirmModal(false)}
-                className="text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
+                className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer"
               >
                 <FaArrowLeft size={16} />
               </button>
-              <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">
+              <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {confirmApplication?.status === "Qabul qilish" ? 'Nomzodni qabul qilasizmi?' : confirmApplication.status === "Rad etish" ? "Nomzodni rad etasizmi?" : "Nomzodni kutishga qo'yasizmi?"}
               </h2>
             </div>
-            <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mb-6">
+            <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-6">
               {confirmApplication?.status === "Qabul qilish" ? 'Nomzod ishga qabul qilish jarayoniga o‘tkaziladi' : confirmApplication.status === "Rad etish" ? "Nomzod ushbu bosqichdan o‘tkazilmaydi" : "Nomzod kutishga qo'yiladi"}
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmModal(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
@@ -196,7 +196,7 @@ const ApplicationsPage = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col justify-start gap-4">
           <h1
-            className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
+            className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
             style={{ fontSize: 24, fontWeight: 800 }}
           >
             Arizalar
@@ -204,7 +204,7 @@ const ApplicationsPage = () => {
           <div className="flex items-center justify-between gap-5">
             <div className="flex items-center gap-5">
               <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                 </svg>
                 <input
@@ -212,23 +212,23 @@ const ApplicationsPage = () => {
                   placeholder="Ism Sharifi bo'yicha izlash"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+                  className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                   style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
                 />
               </div>
               <button
                 onClick={() => setFilterModal(true)}
-                className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 dark:bg-[#1E2021] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
+                className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 dark:bg-[var(--bg-elevation-1)] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
               >
                 <LuFilter size={16} />
                 Filtrlash
               </button>
             </div>
             <div className="relative group flex items-center gap-2">
-              <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[#FFFFFF] bg-white dark:bg-[#222323] border border-[var(--stroke-sub)] dark:border-[#292A2A] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+              <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[var(--text-strong)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
                 Arizalar tashqi platforma orqali yuboriladi va ushbu tizimda yaratilmaydi.
               </div>
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
               <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
                 <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
               </button>
@@ -241,7 +241,7 @@ const ApplicationsPage = () => {
           >
             <table className="w-full" style={{ fontSize: 13 }}>
               <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[#191a1a] shadow-xs">
-                <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                     №
                   </th>
@@ -265,18 +265,18 @@ const ApplicationsPage = () => {
                   <tr
                     key={application.id}
                     onClick={() => navigate(`/${user.active_role}/applications/detail/${application.id}`)}
-                    className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                    className=" cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
                   >
-                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{application?.full_name || '—'}</td>
-                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white font-medium">
+                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
+                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{application?.full_name || '—'}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
                       {application?.position_info.name || '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white font-medium">
+                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
                       {application?.region_info.name || '—'}
                     </td>
                     <td
-                      className="px-4 py-3 flex justify-end text-[var(--text-strong)] dark:text-white font-bold"
+                      className="px-4 py-3 flex justify-end text-[var(--text-strong)] dark:text-[var(--text-strong)] font-bold"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <DropDown
@@ -287,7 +287,7 @@ const ApplicationsPage = () => {
                         disabled={isAuditor}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white font-medium">
+                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
                       {dayjs(application?.created_at).format('DD.MM.YYYY HH:mm') || '—'}
                     </td>
                     <td className='px-4 py-3 flex justify-center'>
@@ -300,9 +300,9 @@ const ApplicationsPage = () => {
               </tbody>
             </table>
             {applications.length === 0 && !loading ? (
-              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Arizalar topilmadi</div>
+              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Arizalar topilmadi</div>
             ) : loading ? (
-              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Arizalar yuklanmoqda...</div>
+              <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Arizalar yuklanmoqda...</div>
             ) : null}
           </div>
         </div>

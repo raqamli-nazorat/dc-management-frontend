@@ -839,7 +839,7 @@ const Employee = () => {
       <div className='flex items-center justify-between'>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -847,7 +847,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && search.trim()) {
@@ -863,7 +863,7 @@ const Employee = () => {
               e.preventDefault()
               setFilterModal(prev => !prev)
             }}
-            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] rounded-xl text-slate-600 text-sm font-semibold dark:text-white! cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
+            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[var(--bg-elevation-1)] rounded-xl text-slate-600 text-sm font-semibold dark:text-[var(--text-strong)]! cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${showClearButton ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
             Filtrlash
@@ -873,7 +873,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[#222323] text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[var(--bg-elevation-1)] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -924,10 +924,10 @@ const Employee = () => {
                     value={filters.joined_min}
                     onChange={(value) => handleFilterChange('joined_min', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Boshlanish sana'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
                 <div className="relative flex-1">
@@ -937,10 +937,10 @@ const Employee = () => {
                     format="DD.MM.YYYY HH:mm"
                     onChange={(value) => handleFilterChange('joined_max', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Tugash sana'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
               </div>
@@ -975,7 +975,7 @@ const Employee = () => {
             <div className="col-span-12 md:col-span-4 lg:col-span-1 flex items-end justify-end">
               <button
                 onClick={() => setSelectEmployee(true)}
-                className={`h-11 px-5 flex  relative items-center justify-center cursor-pointer bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  ${filters?.users?.length > 0 ? 'filter-notif' : ''}`}
+                className={`h-11 px-5 flex  relative items-center justify-center cursor-pointer bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  ${filters?.users?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <LuUserPlus size={20} />
               </button>
@@ -989,12 +989,12 @@ const Employee = () => {
               <div className="flex items-center gap-3">
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.salary_min}
                   onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
                 />
                 <FilterInput
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   label="gacha"
                   value={filters.salary_max}
                   onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
@@ -1007,13 +1007,13 @@ const Employee = () => {
               <div className="flex items-center gap-3">
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.balance_min}
                   onChange={(e) => handleFilterChange('balance_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.balance_max}
                   onChange={(e) => handleFilterChange('balance_max', formatNum(e.target.value))}
                 />
@@ -1028,10 +1028,10 @@ const Employee = () => {
                     value={filters.project_status || undefined}
                     onChange={(value) => handleFilterChange('project_status', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full py-[10px]! border-slate-200! dark:border-[#292A2A]!"
+                    className="w-full py-[10px]! border-slate-200! dark:border-[var(--stroke-soft)]!"
                     size="middle"
-                    allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[#8E95B5]" /> }}
-                    suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
+                    suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[var(--text-soft)]" />}
                     placeholder="Jami"
                     optionLabelProp="label"
                     options={[
@@ -1066,13 +1066,13 @@ const Employee = () => {
                 </div>
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.projects_min}
                   onChange={(e) => handleFilterChange('projects_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.projects_max}
                   onChange={(e) => handleFilterChange('projects_max', formatNum(e.target.value))}
                 />
@@ -1090,10 +1090,10 @@ const Employee = () => {
                     value={filters.task_status || undefined}
                     onChange={(value) => handleFilterChange('task_status', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full py-[10px]! border-slate-200! dark:border-[#292A2A]!"
+                    className="w-full py-[10px]! border-slate-200! dark:border-[var(--stroke-soft)]!"
                     size="middle"
-                    allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[#8E95B5]" /> }}
-                    suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[#8E95B5]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
+                    suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[var(--text-soft)]" />}
                     placeholder="Jami"
                     optionLabelProp="label"
                     options={[
@@ -1138,13 +1138,13 @@ const Employee = () => {
                 </div>
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.tasks_min}
                   onChange={(e) => handleFilterChange('tasks_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.tasks_max}
                   onChange={(e) => handleFilterChange('tasks_max', formatNum(e.target.value))}
                 />
@@ -1168,7 +1168,7 @@ const Employee = () => {
                     label="dan"
                     value={filters.meetings_min}
                     onChange={(e) => handleFilterChange('meetings_min', formatNum(e.target.value))}
-                    className='bg-white'
+                    className='bg-[var(--bg-elevation-1-alt)]'
                   />
                 </div>
                 <div className="col-span-1 relative">
@@ -1176,7 +1176,7 @@ const Employee = () => {
                     label="gacha"
                     value={filters.meetings_max}
                     onChange={(e) => handleFilterChange('meetings_max', formatNum(e.target.value))}
-                    className='bg-white'
+                    className='bg-[var(--bg-elevation-1-alt)]'
                   />
                 </div>
 
@@ -1202,13 +1202,13 @@ const Employee = () => {
                   label="dan"
                   value={filters.expenses_amount_min}
                   onChange={(e) => handleFilterChange('expenses_amount_min', formatNum(e.target.value))}
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.expenses_amount_max}
                   onChange={(e) => handleFilterChange('expenses_amount_max', formatNum(e.target.value))}
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                 />
               </div>
             </div>
@@ -1230,14 +1230,14 @@ const Employee = () => {
                   value={filters.payrolls_amount_min}
                   onChange={(e) => handleFilterChange('payrolls_amount_min', formatNum(e.target.value))}
                   isFine={filters.salary_type === SalaryType[1].value}
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.payrolls_amount_max}
                   onChange={(e) => handleFilterChange('payrolls_amount_max', formatNum(e.target.value))}
                   isFine={filters.salary_type === SalaryType[1].value}
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                 />
               </div>
             </div>
@@ -1248,35 +1248,35 @@ const Employee = () => {
 
       {/* Table Section */}
       {isLoading ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col items-center justify-center border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col items-center justify-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
         </div>
       ) : !hasFetched ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col justify-center items-center border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col justify-center items-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
         </div>
       ) : UserReports.length === 0 ? (
-        <div className="mt-6 rounded-2xl border h-[74vh] flex flex-col items-center justify-center border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+        <div className="mt-6 rounded-2xl border h-[74vh] flex flex-col items-center justify-center border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
         </div>
       ) : (
         <div
-          className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
+          className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
           onScroll={handleMoreReportsScroll}
         >
           <table className="text-left border-collapse w-[4500px]">
-            <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
+            <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
               <tr>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex flex-col items-center gap-1">
                     №
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.username ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('username'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.username ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('username'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.username}
@@ -1286,7 +1286,7 @@ const Employee = () => {
                     Ism Sharifi
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('position'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('position'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.position}
@@ -1296,7 +1296,7 @@ const Employee = () => {
                     Lavozim
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.region ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('region'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.region ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('region'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.region}
@@ -1306,7 +1306,7 @@ const Employee = () => {
                     Viloyati
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.district ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('district'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.district ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('district'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.district}
@@ -1316,7 +1316,7 @@ const Employee = () => {
                     Tumani
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.phone_number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('phone_number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.phone_number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('phone_number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.phone_number}
@@ -1326,7 +1326,7 @@ const Employee = () => {
                     Telefon raqami
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.fixed_salary ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('fixed_salary'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.fixed_salary ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('fixed_salary'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.fixed_salary}
@@ -1336,7 +1336,7 @@ const Employee = () => {
                     Oylik maosh (UZS)
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start transition-all duration-300 ${tablePin.balance ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('balance'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start transition-all duration-300 ${tablePin.balance ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('balance'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.balance}
@@ -1346,7 +1346,7 @@ const Employee = () => {
                     Balans (UZS)
                   </div>
                 </th>
-                <th colSpan={6} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('projects'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={6} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('projects'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.projects}
@@ -1356,7 +1356,7 @@ const Employee = () => {
                     Loyihalar
                   </div>
                 </th>
-                <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.tasks}
@@ -1366,7 +1366,7 @@ const Employee = () => {
                     Vazifalar
                   </div>
                 </th>
-                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.meetings ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('meetings'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.meetings ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('meetings'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.meetings}
@@ -1376,7 +1376,7 @@ const Employee = () => {
                     Yig'ilishlar
                   </div>
                 </th>
-                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.expenses ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('expenses'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.expenses ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('expenses'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.expenses}
@@ -1386,7 +1386,7 @@ const Employee = () => {
                     Xarajat so'rovlari (UZS)
                   </div>
                 </th>
-                <th colSpan={3} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.payroll ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('payroll'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={3} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.payroll ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('payroll'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.payroll}
@@ -1396,7 +1396,7 @@ const Employee = () => {
                     Ish haqi (UZS)
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-2 text-xs bg-[#7186ED] font-bold border-[var(--stroke-sub)] text-center dark:bg-[#1e2021]! dark:border-[#292A2A] transition-all duration-300 ${tablePin.date_joined ? 'sticky right-0 z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-2 text-xs bg-[#7186ED] font-bold border-[var(--stroke-sub)] text-center dark:bg-[#1e2021]! dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.date_joined ? 'sticky right-0 z-50!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                   <Checkbox
                     checked={tablePin.date_joined}
                     onChange={(e) => handlePin('date_joined', e.target.checked)}
@@ -1406,9 +1406,9 @@ const Employee = () => {
                 </th>
               </tr>
 
-              <tr className="bg-[#7186ED] dark:bg-[#1E2021] text-[10px] text-center">
+              <tr className="bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] text-[10px] text-center">
                 {GROUP_SUBS.projects.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1417,7 +1417,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.tasks.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1426,7 +1426,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.meetings.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1435,7 +1435,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.expenses.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1444,7 +1444,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.payroll.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1453,15 +1453,15 @@ const Employee = () => {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
+            <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
               {UserReports.map((item, index) => (
-                <tr key={item.id} className="border-b border-slate-100 dark:border-[#292A2A]">
+                <tr key={item.id} className="border-b border-slate-100 dark:border-[var(--stroke-soft)]">
                   <td
-                    className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.number ? 'sticky' : ''}`}
+                    className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.number ? 'sticky' : ''}`}
                     style={{ width: 45, left: getPinnedLeft('number'), boxShadow: tablePin.number ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {index + 1}
                   </td>
-                  <td className={`p-3 text-xs text-start font-semibold text-slate-700 dark:text-slate-200 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.username ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs text-start font-semibold text-slate-700 dark:text-slate-200 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.username ? 'sticky' : ''}`}
                     style={{
                       width: 200,
                       left: getPinnedLeft('username'),
@@ -1469,7 +1469,7 @@ const Employee = () => {
                     }}>
                     {item.username}
                   </td>
-                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.position ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.position ? 'sticky' : ''}`}
                     style={{
                       width: 180,
                       left: getPinnedLeft('position'),
@@ -1477,70 +1477,70 @@ const Employee = () => {
                     }}>
                     {item.position}
                   </td>
-                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.region ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.region ? 'sticky' : ''}`}
                     style={{ width: 160, left: getPinnedLeft('region'), boxShadow: tablePin.region ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item.region}
                   </td>
-                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.district ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.district ? 'sticky' : ''}`}
                     style={{ width: 160, left: getPinnedLeft('district'), boxShadow: tablePin.district ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item.district}
                   </td>
-                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.phone_number ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.phone_number ? 'sticky' : ''}`}
                     style={{ width: 180, left: getPinnedLeft('phone_number'), boxShadow: tablePin.phone_number ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item.phone_number}
                   </td>
-                  <td className={`p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.fixed_salary ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs font-bold text-slate-900 dark:text-[var(--text-strong)] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.fixed_salary ? 'sticky' : ''}`}
                     style={{ width: 180, left: getPinnedLeft('fixed_salary'), boxShadow: tablePin.fixed_salary ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item.fixed_salary && Number(item.fixed_salary) > 0 ? Number(item.fixed_salary).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.balance ? 'sticky' : ''}`}
+                  <td className={`p-3 text-xs font-bold text-slate-900 dark:text-[var(--text-strong)] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.balance ? 'sticky' : ''}`}
                     style={{ width: 180, left: getPinnedLeft('balance'), boxShadow: tablePin.balance ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item.balance && Number(item.balance) > 0 ? Number(item.balance).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.total || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_tugatilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_tugatilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.completed || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_jarayonda ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.in_progress || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_bekor ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_bekor'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.cancelled || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_muddati ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.overdue || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.projects_rejalashtirilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_rejalashtirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.planning || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.total || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_tugatilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_tugatilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.completed || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.in_progress || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_bekor ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_bekor'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.cancelled || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.overdue || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.projects_rejalashtirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('projects_rejalashtirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.projects?.planning || ""}</td>
 
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.total || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.todo || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.in_progress || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.overdue || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.done || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.production || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.checked || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.rejected || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.total || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.todo || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.in_progress || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.overdue || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.done || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.production || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.checked || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.tasks?.rejected || ""}</td>
 
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.meetings_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.total || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.meetings_qatnashgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_qatnashgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.attended || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.meetings_sababli ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_sababli'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.missed_excused || ""}</td>
-                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.meetings_sababsiz ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_sababsiz'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.missed_unexcused || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.meetings_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.total || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.meetings_qatnashgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_qatnashgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.attended || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.meetings_sababli ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_sababli'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.missed_excused || ""}</td>
+                  <td className={`p-3 text-xs text-center border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.meetings_sababsiz ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 100, left: getSubPinnedLeft('meetings_sababsiz'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.report?.meetings?.missed_unexcused || ""}</td>
 
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.expenses_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.expenses_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.expense_requests_amount?.total ? Number(item.report.expense_requests_amount.total).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.expenses_kutilmoqda ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_kutilmoqda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.expenses_kutilmoqda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_kutilmoqda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.expense_requests_amount?.pending ? Number(item.report.expense_requests_amount.pending).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.expenses_tolandi ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_tolandi'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.expenses_tolandi ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_tolandi'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.expense_requests_amount?.pain ? Number(item.report.expense_requests_amount.pain).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.expenses_tasdiqlangan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_tasdiqlangan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.expenses_tasdiqlangan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('expenses_tasdiqlangan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.expense_requests_amount?.confirmed ? Number(item.report.expense_requests_amount.confirmed).toLocaleString("uz-UZ") : ""}
                   </td>
 
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.payroll_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.payroll_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.payroll_amount?.total ? Number(item.report.payroll_amount.total).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.payroll_kpi ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_kpi'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.payroll_kpi ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_kpi'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.payroll_amount?.kpi_bonuses ? Number(item.report.payroll_amount.kpi_bonuses).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin.payroll_jarima ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_jarima'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.payroll_jarima ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 120, left: getSubPinnedLeft('payroll_jarima'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.payroll_amount?.penalty_amount ? Number(item.report.payroll_amount.penalty_amount).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.date_joined ? 'sticky right-0' : ''}`}
+                  <td className={`p-3 text-xs text-end border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.date_joined ? 'sticky right-0' : ''}`}
                     style={{ boxShadow: tablePin.date_joined ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                     {item?.date_joined ? dayjs(item.date_joined).format('DD.MM.YYYY') : ""}
                   </td>

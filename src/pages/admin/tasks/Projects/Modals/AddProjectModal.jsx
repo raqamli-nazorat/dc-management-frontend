@@ -10,7 +10,7 @@ import { FiCalendar } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { UserPickerModal, SelectedUsersField } from "../Components/UserPickerModal"
 
-const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const { isDark } = useTheme()
@@ -162,7 +162,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
 
   const statusList = Array.isArray(STATUS_API) ? STATUS_API : Object.entries(STATUS_API || {}).map(([value, label]) => ({ value, label }))
   const currentStatusLabel = statusList.find(s => s.value === form.status)?.label || 'Holati tanlang'
@@ -175,14 +175,14 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
           {/* header */}
-          <div className="px-7 pt-7 pb-4 sticky top-0 bg-white dark:bg-[#111111] z-[100] rounded-t-xl">
+          <div className="px-7 pt-7 pb-4 sticky top-0 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                 <FaArrowLeft size={17} />
               </button>
-              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha qo'shish</h2>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha qo'shish</h2>
             </div>
             <p className="text-sm text-[var(--text-sub)]">Loyiha nomi va asosiy ma'lumotlarni to'ldiring</p>
           </div>
@@ -206,7 +206,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   <button
                     type="button"
                     onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
+                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
                     disabled
                   >
                     <span>{currentStatusLabel}</span>
@@ -214,10 +214,10 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {statusList.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < statusList.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < statusList.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -247,8 +247,8 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} dark:bg-[#191A1A]`}>
-                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} dark:bg-[var(--bg-base)]`}>
+                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -260,10 +260,10 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                             {u.username?.slice(0, 2).toUpperCase()}
                           </div>
@@ -349,9 +349,9 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                       time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
                     }))}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                     format="DD.MM.YYYY"
                     placeholder="Muddat"
                   />
@@ -363,9 +363,9 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                     value={form.time ? dayjs(form.time, 'HH:mm') : null}
                     onChange={(val) => set('time', val)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                     format="HH:mm"
                     placeholder="00:00"
                     maxLength={5}
@@ -380,7 +380,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <div className="px-7 py-5 flex items-center justify-end">
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}

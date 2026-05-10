@@ -31,12 +31,12 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
       <div className="fixed inset-0 bg-black/60" />
        <button onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
-            bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+            bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)] transition-colors">
           <FaXmark size={14} />
         </button>
 
 
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
 
         {/* X tugmasi */}
        
@@ -44,11 +44,11 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         <div className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
-              <FaArrowLeft className="dark:text-white text-[var(--text-strong)]" size={16} />
+              <FaArrowLeft className="dark:text-[var(--text-strong)] text-[var(--text-strong)]" size={16} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[#FFFFFF]">Filtrlash</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Filtrlash</h2>
           </div>
-          <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0] mb-5">
+          <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-5">
             Kerakli filtirlarni tanlang, natijalar shunga qarab saralanadi
           </p>
         </div>
@@ -99,8 +99,8 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
-                  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
+                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="dan: 0"
                 value={f.amount__gte}
                 onChange={e => set('amount__gte', e.target.value.replace(/[^\d]/g, ''))}
@@ -108,8 +108,8 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
-                  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#474848]"
+                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="gacha: 0"
                 value={f.amount__lte}
                 onChange={e => set('amount__lte', e.target.value.replace(/[^\d]/g, ''))}
@@ -150,7 +150,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}

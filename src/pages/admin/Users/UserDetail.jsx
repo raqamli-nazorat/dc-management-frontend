@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
@@ -291,9 +291,9 @@ const UserDetail = () => {
     if (loading) return <span>Loading...</span>
     if (!user) return <span>User not found</span>
 
-    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]`
 
-    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
+    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
     return (
         <>
@@ -302,26 +302,26 @@ const UserDetail = () => {
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                         <div className="fixed inset-0 bg-black/60" />
-                        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-                            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
+                        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+                            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
                                 <FaXmark size={14} />
                             </button>
                             <div className="flex items-center gap-3 mb-3">
                                 <button
                                     onClick={() => setConfirmDelete(false)}
-                                    className="text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
+                                    className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer"
                                 >
                                     <FaArrowLeft size={16} />
                                 </button>
-                                <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">Foydalanuvchini o'chirmoqchimisiz?</h2>
+                                <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Foydalanuvchini o'chirmoqchimisiz?</h2>
                             </div>
-                            <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mb-6">
+                            <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-6">
                                 Bu foydalanuvchi tizimdan o'chiriladi va unga tegishli ma'lumotlar o'chirish mumkin.
                             </p>
                             <div className="flex items-center justify-end gap-3">
                                 <button
                                     onClick={() => setConfirmDelete(false)}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
                                 >
                                     <FaXmark size={14} /> Bekor qilish
                                 </button>
@@ -338,7 +338,7 @@ const UserDetail = () => {
 
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">Foydalanuvchining ma'lumotlari</h1>
+                    <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Foydalanuvchining ma'lumotlari</h1>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setConfirmDelete(true)}
@@ -386,7 +386,7 @@ const UserDetail = () => {
                             </label>
                         </div>
 
-                        <h2 className="text-2xl font-extrabold text-[var(--text-strong)] dark:text-white">
+                        <h2 className="text-2xl font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                             {form.name}
                         </h2>
                     </div>
@@ -505,7 +505,7 @@ const UserDetail = () => {
                         <div>
                             <label className={labelCls}>Passport rasmi</label>
                             {form.passport_image ? (
-                                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-white border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#C2C8E0]">
+                                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]">
                                     <FaFileLines size={14} className="shrink-0" />
                                     <a href={typeof form.passport_image === 'string' ? form.passport_image : URL.createObjectURL(form.passport_image)} target="_blank" rel="noreferrer" className="flex-1 truncate hover:underline text-[var(--accent-strong)]">
                                         Passport rasmini ko'rish
@@ -519,7 +519,7 @@ const UserDetail = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex items-center justify-between gap-3 pl-3 pr-1.5 py-1.5 rounded-lg border text-sm bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] text-[var(--text-soft)] dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:text-[#8E95B5]">
+                                <div className="flex items-center justify-between gap-3 pl-3 pr-1.5 py-1.5 rounded-lg border text-sm bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] text-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-soft)]">
                                     <span className="truncate">Rasm yuklanmagan</span>
                                     <label className="cursor-pointer bg-[var(--accent-strong)] text-white px-3 py-1.5 rounded-md hover:bg-[#32458C]  text-xs font-medium shrink-0">
                                         Rasm yuklash
@@ -571,7 +571,7 @@ const UserDetail = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => set('links', [...form.links, ''])}
-                                                className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                                className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
                                             >
                                                 <FiPlus size={20} />
                                             </button>
@@ -583,7 +583,7 @@ const UserDetail = () => {
                                 <button
                                     type="button"
                                     onClick={() => set('links', [''])}
-                                    className="flex items-center gap-2 py-1 px-2 w-[180px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
+                                    className="flex items-center gap-2 py-1 px-2 w-[180px] cursor-pointer text-[#3F57B3] dark:text-[var(--text-soft)] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]"
                                 >
                                     <div className="w-9 h-9 flex items-center justify-center">
                                         <FiPlus size={18} />
@@ -596,10 +596,10 @@ const UserDetail = () => {
                         <div className="flex flex-col gap-5">
                             <div className="flex items-center mb-auto justify-between mt-5">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]">
                                         <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                                     </div>
-                                    <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
+                                    <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Lavozimi</span>
                                 </div>
 
                                 <Dropdown
@@ -617,10 +617,10 @@ const UserDetail = () => {
 
                             <div className="flex items-center mb-auto justify-between gap-3">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]">
                                         <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
                                     </div>
-                                    <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Roli</span>
+                                    <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Roli</span>
                                 </div>
 
                                 <Dropdown
@@ -641,10 +641,10 @@ const UserDetail = () => {
                 </div>
 
                 {/* Footer / Actions */}
-                <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[#292A2A]">
+                <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
                     <button
                         onClick={handleCancel}
-                        className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
+                        className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-3)]"
                     >
                         Tozalash
                     </button>

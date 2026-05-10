@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+﻿import { useState, useRef, useEffect, useCallback } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { usePageAction } from '../context/PageActionContext'
@@ -100,20 +100,20 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   return (
     <div
       className="fixed top-0 right-0 h-full z-50 flex flex-col shadow-2xl
-        bg-white dark:bg-[#1C1D1D] border-l border-[#EEF1F7] dark:border-[#292A2A]"
+        bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-l border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
       style={{ width: 480 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5  shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-white">Bildirshnomalar</h2>
+          <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
          {/* 
           <button
             onClick={markAllRead}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
-              text-[var(--accent-sub)] hover:bg-[#F1F3F9] dark:text-[#8EA1E8] dark:hover:bg-[#292A2A]"
+              text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             Barchasi o'qildi
           </button>
@@ -121,7 +121,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
-              text-[var(--text-soft)] hover:bg-[#F1F3F9] dark:text-[#8E95B5] dark:hover:bg-[#292A2A]"
+              text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             <FaXmark size={15} />
           </button>
@@ -132,7 +132,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5">
         {grouped.map(([date, items]) => (
           <div key={date}>
-            <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[#8E95B5] mb-3 px-2">{date}</p>
+            <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[var(--text-soft)] mb-3 px-2">{date}</p>
             <div className="flex flex-col gap-1">
               {[...items].sort((a, b) => b.time.localeCompare(a.time)).map(n => (
                 <button
@@ -143,13 +143,13 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
                     ${!n.read
-                      ? 'bg-[#F4F6FD] dark:bg-[#222323]'
-                      : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'
+                      ? 'bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)]'
+                      : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'
                     }`}
                 >
                   {/* Avatar */}
                   <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[#3A3B3B] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[#C2C8E0]">
+                    <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                       Y
                     </div>
                     {/* Badge */}
@@ -169,17 +169,17 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-white' : 'font-medium text-[var(--text-sub)] dark:text-[#C2C8E0]'}`}>
+                    <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
                       {n.title}
                     </p>
-                    <p className="text-xs text-[var(--text-soft)] dark:text-[#8E95B5] flex items-center gap-1 mt-0.5 truncate">
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-soft)] flex items-center gap-1 mt-0.5 truncate">
                       <FaFolder size={10} className="shrink-0" />
                       {n.sub}
                     </p>
                   </div>
 
                   {/* Time */}
-                  <span className="text-xs text-[var(--text-disabled)] dark:text-[#8E95B5] shrink-0">{n.time}</span>
+                  <span className="text-xs text-[var(--text-disabled)] dark:text-[var(--text-soft)] shrink-0">{n.time}</span>
                 </button>
               ))}
             </div>
@@ -223,7 +223,7 @@ function Breadcrumb() {
               <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
             )}
             <span
-              className={`text-[13px] font-medium ${part === "detail" ? "hidden" : ""} ${isLast ? 'text-[var(--text-sub)] dark:text-white' : 'text-[#c2c8e0]'} ${canClick ? 'cursor-pointer' : ''}`}
+              className={`text-[13px] font-medium ${part === "detail" ? "hidden" : ""} ${isLast ? 'text-[var(--text-sub)] dark:text-[var(--text-strong)]' : 'text-[#c2c8e0]'} ${canClick ? 'cursor-pointer' : ''}`}
               onClick={() => canClick && navigate(part)}
             >
               {label}
@@ -461,14 +461,14 @@ export default function Layout() {
   const isKanban = !!navbarExtra
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]">
+    <div className="flex min-h-screen bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
       <Sidebar forceCollapsed={isKanban} onForceClick={sidebarClickHandler} />
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* ── Navbar ── */}
         <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 border-b
-          bg-[var(--bg-elevation-1)] border-[#EEF1F7]
-          dark:bg-[#191A1A] dark:border-[#292A2A]">
+          bg-[var(--bg-elevation-1)] border-[var(--stroke-soft)]
+          dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]">
 
           {/* Left: Breadcrumb OR navbarExtra */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -480,7 +480,7 @@ export default function Layout() {
                 {breadcrumbExtra && (
                   <>
                     <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
-                    <span className="text-[13px] font-medium text-[var(--text-sub)] dark:text-white">
+                    <span className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[var(--text-strong)]">
                       {breadcrumbExtra}
                     </span>
                   </>
@@ -508,7 +508,7 @@ export default function Layout() {
             {print && (
               <button
                 onClick={print.onClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer  bg-[#e9eeff] dark:bg-[#303131] dark:text-white text-[var(--text-strong)] "
+                className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer  bg-[#e9eeff] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-strong)] text-[var(--text-strong)] "
                 style={{ fontSize: 13, fontWeight: 800 }}
               >
                 <MdOutlinePrint size={20} />
@@ -535,7 +535,7 @@ export default function Layout() {
                 </button>
 
                 {downloadOpen && (
-                  <div className="absolute top-full right-0 mt-3 w-[230px] bg-[#F1F3F9] dark:bg-[#292A2A] rounded-[24px] p-3 shadow-2xl z-50 flex flex-col gap-2 border border-white/50 dark:border-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute top-full right-0 mt-3 w-[230px] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] rounded-[24px] p-3 shadow-2xl z-50 flex flex-col gap-2 border border-white/50 dark:border-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
                     {[
                       { label: 'Excel', icon: <ExcelIcon size={24} />, key: 'excel' },
                       { label: 'PDF', icon: <PdfIcon size={24} />, key: 'pdf' },
@@ -544,15 +544,15 @@ export default function Layout() {
                       <div
                         key={item.key}
                         onClick={() => { download[item.key](); setDownloadOpen(false) }}
-                        className="flex items-center justify-between p-2 bg-white/40 dark:bg-white/5 rounded-[18px] cursor-pointer hover:bg-white dark:hover:bg-white/10 transition-all active:scale-[0.98] group"
+                        className="flex items-center justify-between p-2 bg-white/40 dark:bg-white/5 rounded-[18px] cursor-pointer hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-white/10 transition-all active:scale-[0.98] group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white dark:bg-[#1C1D1D] rounded-[14px] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                          <div className="w-10 h-10 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] rounded-[14px] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
                             {item.icon}
                           </div>
-                          <span className="text-[var(--text-strong)] dark:text-white font-bold text-base">{item.label}</span>
+                          <span className="text-[var(--text-strong)] dark:text-[var(--text-strong)] font-bold text-base">{item.label}</span>
                         </div>
-                        <div className="w-6 h-6 flex items-center justify-center text-[var(--text-sub)] dark:text-[#C2C8E0] group-hover:text-[var(--accent-strong)] ">
+                        <div className="w-6 h-6 flex items-center justify-center text-[var(--text-sub)] dark:text-[var(--text-sub)] group-hover:text-[var(--accent-strong)] ">
                           <MdOutlineFileDownload size={22} />
                         </div>
                       </div>
@@ -568,7 +568,7 @@ export default function Layout() {
                 onClick={() => setNotifOpen(o => !o)}
                 className="w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer 
                   bg-[#F1F3F9] hover:bg-[#E8EAF2]
-                  dark:bg-[#292A2A] dark:hover:bg-[#333435]"
+                  dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)]"
               >
                 <img
                   src="/imgs/notification.svg"
@@ -585,7 +585,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className={`flex-1 flex flex-col bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] ${isKanban ? 'p-0 overflow-hidden' : 'p-6'}`}>
+        <main className={`flex-1 flex flex-col bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] ${isKanban ? 'p-0 overflow-hidden' : 'p-6'}`}>
           <Outlet />
         </main>
       </div>

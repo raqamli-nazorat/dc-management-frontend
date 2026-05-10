@@ -215,9 +215,9 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
 
-    const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[var(--stroke-sub)] focus:border-[var(--accent-sub)] dark:border-[#292A2A]'}`
+    const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[var(--stroke-sub)] focus:border-[var(--accent-sub)] dark:border-[var(--stroke-soft)]'}`
     const inputCls = getInputCls(false)
-    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
+    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
     return (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto modal-scroll py-8 px-4">
@@ -225,24 +225,24 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
                 <FaXmark size={16} />
             </button>
-            <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+            <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
                 <div className="px-7 pt-7 pb-5">
                     <div className="flex flex-col items-start gap-3">
                         <div className='flex gap-3'>
                             <button
                                 onClick={onClose}
-                                className="mt-1 text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0"
+                                className="mt-1 text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer shrink-0"
                             >
                                 <FaArrowLeft size={18} />
                             </button>
                             <h2
-                                className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
+                                className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
                                 style={{ fontSize: 20, fontWeight: 800 }}
                             >
                                 Yangi xodim qo'shish
                             </h2>
                         </div>
-                        <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mt-1">
+                        <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] mt-1">
                             Yangi xodimni tizimga qo'shing va unga tegishli rol hamda maoshni belgilang
                         </p>
                     </div>
@@ -381,7 +381,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('pasport').click()}
-                                className={`w-full h-[42px] px-3 rounded-lg border flex items-center justify-center gap-2 cursor-pointer transition-all text-sm border-[var(--stroke-strong)] bg-white text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1)] dark:border-[#292A2A] dark:bg-[#191A1A] dark:text-[#8E95B5] dark:hover:bg-[#292A2A] ${form.passport_image ? 'border-solid text-gray-800 dark:text-gray-100 font-medium' : 'border-dashed'}`}
+                                className={`w-full h-[42px] px-3 rounded-lg border flex items-center justify-center gap-2 cursor-pointer transition-all text-sm border-[var(--stroke-strong)] bg-[var(--bg-elevation-1-alt)] text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-2)] ${form.passport_image ? 'border-solid text-gray-800 dark:text-gray-100 font-medium' : 'border-dashed'}`}
                             >
                                 <MdOutlineFileUpload size={18} />
                                 <span className="truncate text-sm">
@@ -398,12 +398,12 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                             <button
                                 type="button"
                                 onClick={() => fileRef.current?.click()}
-                                className="w-[100px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer  shrink-0 border-[var(--stroke-strong)] bg-[var(--bg-elevation-1)] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:bg-[#191A1A] dark:hover:bg-[#292A2A]">
+                                className="w-[100px] h-[80px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer  shrink-0 border-[var(--stroke-strong)] bg-[var(--bg-elevation-1)] hover:bg-[var(--bg-elevation-1-alt)] dark:border-[var(--stroke-soft)] dark:bg-[var(--bg-base)] dark:hover:bg-[var(--bg-elevation-2)]">
                                 {avatarPreview
                                     ? <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover rounded-xl" />
                                     : <>
-                                        <IoIosCamera size={18} className="text-[var(--text-disabled)] dark:text-[#8E95B5]" />
-                                        <span className="text-[10px] text-[var(--text-disabled)] dark:text-[#8E95B5] text-center leading-tight">
+                                        <IoIosCamera size={18} className="text-[var(--text-disabled)] dark:text-[var(--text-soft)]" />
+                                        <span className="text-[10px] text-[var(--text-disabled)] dark:text-[var(--text-soft)] text-center leading-tight">
                                             Rasm yuklash
                                         </span>
                                     </>
@@ -414,7 +414,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-                                        <span className="text-sm font-semibold text-[var(--text-strong)] dark:text-[#FFFFFF] shrink-0">Lavozimi</span>
+                                        <span className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] shrink-0">Lavozimi</span>
                                         <Dropdown
                                             label="Tanlash"
                                             options={positions.map(pos => pos.name)}
@@ -432,7 +432,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
                                             <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                                            <span className="text-sm font-semibold text-[var(--text-strong)] dark:text-[#FFFFFF] shrink-0">Roli</span>
+                                            <span className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] shrink-0">Roli</span>
                                         </div>
                                         <Dropdown
                                             label="Tanlash"
@@ -482,7 +482,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             set('links', form.links.filter((_, i) => i !== index))
                                         }
                                     }}
-                                    className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] flex items-center justify-center text-[var(--text-strong)] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                    className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
                                 >
                                     {index === form.links.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
                                 </button>
@@ -491,7 +491,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     </div>
                 </div>
                 <div className="px-7 py-5 flex items-center justify-end gap-3">
-                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
                         <FaXmark size={14} />
                         Yopish
                     </button>

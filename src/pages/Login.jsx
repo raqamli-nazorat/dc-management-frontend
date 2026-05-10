@@ -101,7 +101,7 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-[#F1F3F9] dark:bg-[#111111]"
+      className="min-h-screen flex items-center justify-center bg-[#F1F3F9] dark:bg-[var(--bg-base)]"
       style={{ fontFamily: '"Manrope", sans-serif' }}
     >
       <div className="flex w-[1200px] items-center justify-between gap-10">
@@ -117,13 +117,13 @@ export default function Login() {
         >
           <div className="absolute top-10 left-10 right-10 z-10">
             <h2
-              className="leading-tight text-[#1a1a2e] dark:text-white"
+              className="leading-tight text-[#1a1a2e] dark:text-[var(--text-strong)]"
               style={{ fontWeight: 800, fontSize: 36, fontFamily: '"Manrope", sans-serif' }}
             >
               Raqamli boshqaruv tizimiga<br />xush kelibsiz
             </h2>
             <p
-              className="mt-4 text-[rgba(30,30,60,0.72)] dark:text-white/80"
+              className="mt-4 text-[rgba(30,30,60,0.72)] dark:text-[var(--text-strong)]/80"
               style={{ fontWeight: 500, fontSize: 17, fontFamily: '"Manrope", sans-serif' }}
             >
               Loyihalar, vazifalar va moliyani bitta platformada boshqaring
@@ -138,7 +138,7 @@ export default function Login() {
 
         {/* O'ng panel */}
         <div
-          className="rounded-2xl bg-white dark:bg-[#191A1A] border border-[#EEF1F7] dark:border-[#474848] shadow-[0_4px_32px_rgba(0,0,0,0.06)] shrink-0"
+          className="rounded-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-[0_4px_32px_rgba(0,0,0,0.06)] shrink-0"
           style={{ width: 440, padding: 40, fontFamily: '"Manrope", sans-serif' }}
         >
           {/* Logo */}
@@ -146,14 +146,14 @@ export default function Login() {
             <div className="w-10 h-10 rounded-xl bg-[var(--accent-sub)] flex items-center justify-center shrink-0">
               <img src="/imgs/Logo.png" alt="logo" className="w-6 h-6 object-contain" />
             </div>
-            <span className="font-semibold text-base text-[#1a1a2e] dark:text-white" style={{ fontFamily: '"Manrope", sans-serif' }}>
+            <span className="font-semibold text-base text-[#1a1a2e] dark:text-[var(--text-strong)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
               Raqamli Nazorat
             </span>
           </div>
 
           {/* Sarlavha */}
           <h1
-            className="mb-7 text-[var(--text-strong)] dark:text-white"
+            className="mb-7 text-[var(--text-strong)] dark:text-[var(--text-strong)]"
             style={{ fontWeight: 800, fontSize: 28, fontFamily: '"Manrope", sans-serif' }}
           >
             Kirish
@@ -169,9 +169,9 @@ export default function Login() {
               onChange={e => { setLoginVal(e.target.value); if (!isThrottled) setError('') }}
               disabled={isThrottled}
               className="w-full px-4 py-3.5 rounded-xl text-sm outline-none
-                bg-[var(--bg-elevation-1)] border border-[#EEF1F7] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
-                focus:border-[#EEF1F7] dark:focus:border-[#474848]
-                dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]
+                bg-[var(--bg-elevation-1)] border border-[var(--stroke-soft)] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
+                focus:border-[var(--stroke-soft)] dark:focus:border-[#474848]
+                dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
                 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ fontFamily: '"Manrope", sans-serif' }}
             />
@@ -185,9 +185,9 @@ export default function Login() {
                 onChange={e => { setParolVal(e.target.value); if (!isThrottled) setError('') }}
                 disabled={isThrottled}
                 className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm outline-none
-                  bg-[var(--bg-elevation-1)] border border-[#EEF1F7] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
-                  focus:border-[#EEF1F7] dark:focus:border-[#474848]
-                  dark:bg-[#222323] dark:border-[#292A2A] dark:text-white dark:placeholder-[#757575]
+                  bg-[var(--bg-elevation-1)] border border-[var(--stroke-soft)] text-[var(--text-strong)] placeholder-[var(--text-disabled)]
+                  focus:border-[var(--stroke-soft)] dark:focus:border-[#474848]
+                  dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
                   disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ fontFamily: '"Manrope", sans-serif' }}
               />
@@ -209,8 +209,8 @@ export default function Login() {
                 <p className="text-sm font-semibold text-[var(--error-sub)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
                   Kirish vaqtincha bloklandi
                 </p>
-                <p className="text-sm text-[var(--text-sub)] dark:text-[#8E95B5]" style={{ fontFamily: '"Manrope", sans-serif' }}>
-                  Qayta urinish uchun: <span className="font-bold text-[var(--text-strong)] dark:text-white">{formatTime(throttleSecs)}</span>
+                <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
+                  Qayta urinish uchun: <span className="font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{formatTime(throttleSecs)}</span>
                 </p>
               </div>
             )}
