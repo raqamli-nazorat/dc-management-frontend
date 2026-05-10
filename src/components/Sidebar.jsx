@@ -225,16 +225,16 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
   const popupRef = useRef(null)
-  
+
   const [userSts, setUserSts] = useState({})
 
   const getUserSts = async () => {
     try {
       const { data } = await axiosAPI.get('users/me/efficiency/')
-      setUserSts(data)
+      setUserSts(data.data)
     } catch (error) {
       console.error(error)
-      toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
+      toast.error("Samaradorlik haqidagi malumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
     }
   }
 
@@ -527,12 +527,14 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           <div className="flex flex-col justify-start gap-3 ml-3.5 mt-3">
             <h6 className='flex items-center gap-2 text-[13px] font-medium text-[#1A1D2E]'>
               <span className='font-extrabold'>
-                57%
+                {userSts?.overall_efficiency || 0}%
               </span>
               Samaradorlik
             </h6>
             <div className='w-full h-[6px] bg-[#dbdbd9] rounded-full overflow-hidden'>
-              <div className='w-[57%] h-full bg-green-500 rounded-full'></div>
+              <div
+                style={{ width: `${userSts?.overall_efficiency || 0}%`, background: userSts?.overall_efficiency < 30 ? "#ff4053" : userSts?.overall_efficiency < 75 ? "#fca400" : userSts?.overall_efficiency > 75 ? "#00b253" : "#adaca8" }}
+                className={`h-full rounded-full transition-all duration-1000 ease-in-out`}></div>
             </div>
           </div>
         )}
