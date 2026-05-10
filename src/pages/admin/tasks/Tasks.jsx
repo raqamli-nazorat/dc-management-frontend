@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
-import { LuFilter, LuLayoutList, LuLayoutGrid } from 'react-icons/lu'
+import { LuFilter } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -955,12 +955,19 @@ export default function TasksPage() {
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
         <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)]">
-          <button className="p-1.5 rounded-lg bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm cursor-pointer">
-            <LuLayoutList size={16} />
+          <button className="p-1.5 rounded-lg bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm cursor-pointer">
+            <img
+              src="/imgs/taskIconRow.svg"
+              alt="row view"
+              className="w-3 h-3 text-[var(--accent-strong)] [filter:invert(27%)_sepia(89%)_saturate(500%)_hue-rotate(210deg)_brightness(90%)] dark:[filter:invert(60%)_sepia(30%)_saturate(400%)_hue-rotate(190deg)_brightness(110%)]"
+            />
           </button>
-          <button onClick={switchToKanban}
-            className="p-1.5 rounded-lg  cursor-pointer text-[var(--text-soft)] dark:text-[var(--text-sub)] hover:text-[var(--accent-strong)]">
-            <LuLayoutGrid size={16} />
+          <button onClick={switchToKanban} className="p-1.5 rounded-lg cursor-pointer">
+            <img
+              src="/imgs/taskIconCard.svg"
+              alt="card view"
+              className="w-4 h-4 [filter:invert(65%)_sepia(10%)_saturate(400%)_hue-rotate(190deg)_brightness(95%)] dark:[filter:invert(65%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)_brightness(90%)] hover:[filter:invert(27%)_sepia(89%)_saturate(500%)_hue-rotate(210deg)_brightness(90%)]"
+            />
           </button>
         </div>
       </div>
