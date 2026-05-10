@@ -351,7 +351,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         ].join(' ')}
       >
         {/* Analitika */}
-        {['employee', 'xodim', 'manager', 'menager'].includes(routeRole) && (
+        {['employee', 'xodim', 'manager', 'menager', 'admin', 'superadmin'].includes(routeRole) && (
           isCollapsed ? (
             <button
               onClick={() => navigate(`/${urlPrefix}/dashboard`)}

@@ -513,14 +513,29 @@ export default function TasksPage() {
     !!filters.deadFromD || !!filters.deadToD || !!filters.created_by?.length > 0 || !!filters.assignee?.length > 0
 
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
+    // Sana + vaqtni timezone bilan ISO formatga o'tkazish
+    const toIso = (date, time, isEnd = false) => {
+      if (!date) return null
+      const t = time || (isEnd ? '23:59' : '00:00')
+      const now = new Date()
+      const offsetMin = -now.getTimezoneOffset()
+      const sign = offsetMin >= 0 ? '+' : '-'
+      const absMin = Math.abs(offsetMin)
+      const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+      const mm = String(absMin % 60).padStart(2, '0')
+      return `${date}T${t}:00${sign}${hh}:${mm}`
+    }
+
     const p = { page: pg, page_size: 20 }
     if (q) p.search = q
     if (f.holat) p.status = f.holat
     if (f.daraja) p.priority = f.daraja
     if (f.turi) p.type = f.turi
     if (f.projects?.length) p.project = f.projects.map(pr => pr.id || pr).join(',')
-    if (f.deadFromD) p.deadline_from = f.deadFromD
-    if (f.deadToD) p.deadline_to = f.deadToD
+    const fromIso = toIso(f.deadFromD, f.deadFromT, false)
+    const toIsoVal = toIso(f.deadToD, f.deadToT, true)
+    if (fromIso) p.deadline_from = fromIso
+    if (toIsoVal) p.deadline_to = toIsoVal
     if (f.created_by?.length) p.created_by = f.created_by.map(pr => pr.id || pr).join(',')
     if (f.assignee?.length) p.assignee = f.assignee.map(pr => pr.id || pr).join(',')
     return p
@@ -565,7 +580,12 @@ export default function TasksPage() {
     if (viewMode === 'kanban') loadKanbanTasks(filters, q)
     else loadTasks(filters, q, 1)
   }
-  const handleApplyFilter = (f) => { setFilters(f); setShowFilter(false); loadTasks(f, search, 1) }
+  const handleApplyFilter = (f) => {
+    setFilters(f)
+    setShowFilter(false)
+    if (viewMode === 'kanban') loadKanbanTasks(f, search)
+    else loadTasks(f, search, 1)
+  }
 
   const handleAdd = async (body) => {
     try {
@@ -656,15 +676,30 @@ export default function TasksPage() {
   const loadKanbanTasks = useCallback(async (f = filters, q = search, silent = false) => {
     if (!silent) setKanbanLoading(true)
     try {
+      const toIso = (date, time, isEnd = false) => {
+        if (!date) return null
+        const t = time || (isEnd ? '23:59' : '00:00')
+        const now = new Date()
+        const offsetMin = -now.getTimezoneOffset()
+        const sign = offsetMin >= 0 ? '+' : '-'
+        const absMin = Math.abs(offsetMin)
+        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+        const mm = String(absMin % 60).padStart(2, '0')
+        return `${date}T${t}:00${sign}${hh}:${mm}`
+      }
+
       const params = { page_size: 200 }
       if (q) params.search = q
       if (f.holat) params.status = f.holat
       if (f.daraja) params.priority = f.daraja
       if (f.turi) params.type = f.turi
-      if (f.myTasks) params.my_tasks = true
       if (f.projects?.length) params.project = f.projects.map(pr => pr.id || pr).join(',')
-      if (f.deadFromD) params.deadline_from = f.deadFromD
-      if (f.deadToD) params.deadline_to = f.deadToD
+      const fromIso = toIso(f.deadFromD, f.deadFromT, false)
+      const toIsoVal = toIso(f.deadToD, f.deadToT, true)
+      if (fromIso) params.deadline_from = fromIso
+      if (toIsoVal) params.deadline_to = toIsoVal
+      if (f.created_by?.length) params.created_by = f.created_by.map(pr => pr.id || pr).join(',')
+      if (f.assignee?.length) params.assignee = f.assignee.map(pr => pr.id || pr).join(',')
       const res = await axiosAPI.get('/tasks/', { params })
       const payload = res.data?.data ?? res.data
       const results = Array.isArray(payload) ? payload : (payload.results ?? [])
@@ -676,7 +711,7 @@ export default function TasksPage() {
     }
   }, [filters, search])
   const switchToTable = () => setViewMode('table')
-  const switchToKanban = () => setViewMode('kanban')
+  const switchToKanban = () => { setViewMode('kanban'); loadKanbanTasks(filters, search) }
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
     setDraggingOver(null)

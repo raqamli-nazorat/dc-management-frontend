@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
   const prjDomain = [0, prjTop]
 
   // Vazifalar YAxis — real dataga moslashgan, step 5, minimum 15
-  const taskMaxVal = Math.max(15, ...taskData.map(d => Math.max(d.value || 0, d.prevValue || 0)))
+  const taskMaxVal = Math.max(20, ...taskData.map(d => Math.max(d.value || 0, d.prevValue || 0)))
   const taskStep = taskMaxVal <= 25 ? 5 : taskMaxVal <= 50 ? 10 : taskMaxVal <= 100 ? 25 : 50
   const taskTop = Math.ceil(taskMaxVal / taskStep) * taskStep
   const taskTicks = Array.from({ length: Math.floor(taskTop / taskStep) + 1 }, (_, i) => i * taskStep)
