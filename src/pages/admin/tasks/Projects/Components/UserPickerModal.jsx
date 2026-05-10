@@ -1,4 +1,4 @@
-﻿import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates"
 
@@ -20,6 +20,17 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
     const handleConfirm = () => {
         onConfirm(users.filter(u => temp.includes(u.id)))
     }
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                e.stopImmediatePropagation();
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown, true);
+        return () => window.removeEventListener("keydown", handleKeyDown, true);
+    }, [onClose]);
 
     return (
         <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
@@ -145,7 +156,7 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
             <label className={labelCls}>{label}</label>
             <div
                 onClick={onOpen}
-                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] hover:border-[var(--accent-sub)]"
+                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]"
             >
                 <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                     {selected.length === 0 ? (

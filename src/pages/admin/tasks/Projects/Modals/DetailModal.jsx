@@ -1,8 +1,10 @@
 ﻿import dayjs from "dayjs"
 import { useEffect, useState } from "react"
-import { FaArrowLeft, FaXmark } from "react-icons/fa6"
+import { FaArrowLeft, FaCheck, FaXmark } from "react-icons/fa6"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { axiosAPI } from "../../../../../service/axiosAPI"
+import { FiPlus } from "react-icons/fi"
+import { PiCopyBold } from "react-icons/pi"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
@@ -25,7 +27,7 @@ const DetailModal = ({ id, onClose }) => {
         setLoading(true)
         try {
             const { data } = await axiosAPI.get(`projects/${id}/`)
-            setProject(data.data)
+            setProject({ ...data.data, links: ["https://salom.com", "https://alik.com"] })
         } catch (error) {
             console.log(error)
             toast.error("Loyihani yuklashda xatolik.", error?.response?.data?.error?.errorMsg || "Loyihani yuklashda xatolik yuz berdi, iltimos qaytadan urinib ko'ring!")
@@ -49,6 +51,21 @@ const DetailModal = ({ id, onClose }) => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
+
+    const [copyLink, setCopyLink] = useState(null);
+
+    const handleCopyLink = (link, index) => {
+        if (!link) return;
+        
+        navigator.clipboard.writeText(link).then(() => {
+            setCopyLink(index);
+            setTimeout(() => {
+                setCopyLink(null);
+            }, 3000);
+        }).catch(err => {
+            console.log("Failed to copy:", err);
+        });
+    };
 
     const managerName = project.manager_info?.username || project.manager_info?.name || '—'
     const statusLabel = STATUS_LABEL[project.status] || project.status || '—'
@@ -193,6 +210,43 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
+                        <div className="flex flex-col gap-2">
+                            <label className={labelCls}>Hujjat ma'lumotlari</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                {project?.links?.map((link, index) => {
+                                    return (
+                                        <div key={index} className="flex items-center gap-2.5">
+                                            <div className="flex-1 relative w-full">
+                                                <input
+                                                    className={fCls + " pr-10"}
+                                                    placeholder="Hujjat nomini kiriting"
+                                                    disabled
+                                                    value={link || ''}
+                                                    onChange={e => {
+                                                        const newLinks = [...form.links];
+                                                        newLinks[index] = e.target.value;
+                                                        set('links', newLinks);
+                                                    }}
+                                                />
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCopyLink(link, index)}
+                                                    disabled={copyLink === index}
+                                                    className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] cursor-pointer transition-colors"
+                                                >
+                                                    {copyLink === index ?
+                                                        <FaCheck size={14} color="green" />
+                                                        : <PiCopyBold size={14} />
+                                                    }
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+
                     </div>
                 )}
 
@@ -202,8 +256,8 @@ const DetailModal = ({ id, onClose }) => {
                     {!loading &&
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-[#1A1D2E] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
-                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[var(--bg-elevation-2)]'}`}>
-                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow ${project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#141414]'}`}>
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                             </div>
                         </div>
                     }

@@ -1,10 +1,10 @@
-﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { axiosAPI } from "../../../service/axiosAPI"
-import { FaArrowsRotate, FaFileLines, FaXmark } from "react-icons/fa6"
+import { FaArrowsRotate, FaCheck, FaFileLines, FaXmark } from "react-icons/fa6"
 import { PiTelegramLogo } from "react-icons/pi"
 import { FiPlus } from "react-icons/fi"
 import { toast } from "../../../Toast/ToastProvider"
@@ -288,8 +288,34 @@ const UserDetail = () => {
         }
     }
 
-    if (loading) return <span>Loading...</span>
-    if (!user) return <span>User not found</span>
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center gap-3 min-h-[70vh]">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--accent-strong)]"></div>
+                <p className='text-[var(--text-sub)]'>Yuklanmoqda...</p>
+            </div>
+        )
+    }
+
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 text-[var(--text-sub)]">
+                <div className="w-20 h-20 rounded-full bg-[var(--bg-elevation-1)] flex items-center justify-center shadow-inner">
+                    <FaUser size={40} className="opacity-20" />
+                </div>
+                <div className="text-center">
+                    <p className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-1">Foydalanuvchi topilmadi</p>
+                    <p className="text-sm">Qidirilayotgan foydalanuvchi mavjud emas yoki o'chirilgan bo'lishi mumkin.</p>
+                </div>
+                <button 
+                    onClick={() => navigate('/admin/users')} 
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--accent-strong)] text-white font-medium hover:bg-[#32458C] transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                >
+                    <FaArrowLeft size={14} /> Foydalanuvchilar ro'yxatiga qaytish
+                </button>
+            </div>
+        )
+    }
 
     const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]`
 
@@ -297,7 +323,7 @@ const UserDetail = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-4 pr-4">
+            <div className="flex flex-col gap-2.5 pr-4">
                 {/* Confirm Delete Modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -395,7 +421,7 @@ const UserDetail = () => {
                 </div>
 
                 {/* Form */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
 
                     {/* row - 1*/}
                     <div className="grid grid-cols-3 gap-3">
@@ -470,7 +496,7 @@ const UserDetail = () => {
                                 }}
                                 placeholder='Viloyatni tanlang'
                                 padding="11px 11px"
-                                className="dark:bg-[#191a1a]!"
+                                className="dark:bg-[#0d1117]!"
                             />
                         </div>
                         <div>
@@ -482,7 +508,7 @@ const UserDetail = () => {
                                     const selectedDistrict = districts.find(d => d.name === v);
                                     set('district_info', selectedDistrict || null);
                                 }}
-                                className="dark:bg-[#191a1a]!"
+                                className="dark:bg-[#0d1117]!"
                                 padding="11px 11px"
                                 disabled={!form.region_info}
                             />
@@ -542,11 +568,11 @@ const UserDetail = () => {
 
                     {/* Social Links + Lavozim + Rol */}
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="col-span-1 flex flex-col gap-3">
+                        <div className="col-span-1 flex flex-col gap-2">
                             {form.links?.map((link, index) => {
                                 const isLast = index === form.links.length - 1;
                                 return (
-                                    <div key={index} className="flex items-end gap-2.5">
+                                    <div key={index} className="flex items-end gap-2">
                                         <div className="flex-1 relative">
                                             <label className={labelCls}>{index + 1}.Havola</label>
                                             <input
@@ -571,7 +597,7 @@ const UserDetail = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => set('links', [...form.links, ''])}
-                                                className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                                className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#0d1117]"
                                             >
                                                 <FiPlus size={20} />
                                             </button>
@@ -594,7 +620,7 @@ const UserDetail = () => {
                         </div>
 
                         <div className="flex flex-col gap-5">
-                            <div className="flex items-center mb-auto justify-between mt-5">
+                            <div className="flex items-center mb-auto justify-between mt-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]">
                                         <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
@@ -636,24 +662,47 @@ const UserDetail = () => {
                         </div>
 
                     </div>
-
-
                 </div>
 
                 {/* Footer / Actions */}
-                <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
-                    <button
-                        onClick={handleCancel}
-                        className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-3)]"
-                    >
-                        Tozalash
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C]"
-                    >
-                        Saqlash
-                    </button>
+                <div className="flex items-center justify-end gap-3 pt-[3px] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+                    {(() => {
+                        const hasChanged = () => {
+                            if (!user) return false;
+                            if (form.name !== initial.name) return true;
+                            if (form.password) return true;
+                            if (form.fixed_salary?.toString().replace(/\s/g, '') !== initial.fixed_salary?.toString().replace(/\s/g, '')) return true;
+                            if (form.phone_number !== initial.phone_number) return true;
+                            if (form.card_number !== initial.card_number) return true;
+                            if (form.passportSeria !== initial.passportSeria) return true;
+                            if (form.passportRaqam !== initial.passportRaqam) return true;
+                            if (form.region_info?.id !== initial.region_info?.id) return true;
+                            if (form.district_info?.id !== initial.district_info?.id) return true;
+                            if (form.position_info?.id !== initial.position_info?.id) return true;
+                            if (JSON.stringify(form.roles) !== JSON.stringify(initial.roles)) return true;
+                            if (JSON.stringify(form.links?.filter(l => l?.trim())) !== JSON.stringify(initial.links?.filter(l => l?.trim()))) return true;
+                            if (form.avatar instanceof File) return true;
+                            if (form.passport_image instanceof File) return true;
+                            return false;
+                        };
+
+                        const changed = hasChanged();
+
+                        return (
+                            <button
+                                onClick={handleSave}
+                                disabled={!changed}
+                                className={`px-6 py-2.5 mt-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${
+                                    changed 
+                                    ? 'cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C] active:scale-95 shadow-md' 
+                                    : 'cursor-default text-[var(--text-disabled)] bg-[var(--bg-elevation-1)] border border-[var(--stroke-soft)] opacity-80'
+                                }`}
+                            >
+                                <FaCheck size={14} />
+                                Saqlash
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
             <style>{

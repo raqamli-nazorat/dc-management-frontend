@@ -240,7 +240,7 @@ const ApplicationsPage = () => {
             onScroll={handleMoreApplications}
           >
             <table className="w-full" style={{ fontSize: 13 }}>
-              <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[#191a1a] shadow-xs">
+              <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[var(--bg-elevation-1)] shadow-xs">
                 <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                     №

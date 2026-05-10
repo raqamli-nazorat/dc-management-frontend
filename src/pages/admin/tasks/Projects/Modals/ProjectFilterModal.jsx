@@ -74,7 +74,29 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
 
 
     return (
-        <ConfigProvider theme={{ algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+        <ConfigProvider
+            theme={{
+                algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+                token: {
+                    borderRadius: 12,
+                    colorPrimary: '#7186ED',
+                    motion: false,
+                    colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+                    colorBgContainer: isDark ? '#161b22' : '#ffffff',
+                    colorBgElevated: isDark ? '#161b22' : '#ffffff',
+                },
+                components: {
+                    Select: {
+                        selectorBg: isDark ? '#161b22' : '#ffffff',
+                        optionSelectedBg: isDark ? '#21262d' : '#F1F3F9',
+                        optionActiveBg: isDark ? '#1c2128' : 'var(--bg-elevation-1)',
+                    },
+                    DatePicker: {
+                        controlItemBgActive: isDark ? '#21262d' : 'var(--bg-elevation-1)',
+                    }
+                }
+            }}
+        >
             <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                 <div className="fixed inset-0 bg-black/60" />
                 <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">

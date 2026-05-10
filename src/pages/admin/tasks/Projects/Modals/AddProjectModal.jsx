@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates/"
@@ -6,7 +6,7 @@ import { DatePicker, TimePicker, ConfigProvider, theme } from "antd"
 import { useTheme } from "../../../../../context/ThemeContext"
 import { toast } from "../../../../../Toast/ToastProvider"
 import dayjs from "dayjs"
-import { FiCalendar } from "react-icons/fi"
+import { FiCalendar, FiPlus } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { UserPickerModal, SelectedUsersField } from "../Components/UserPickerModal"
 
@@ -36,7 +36,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const [form, setForm] = useState({
     title: '', prefix: '', status: 'planning', description: '', manager: null,
     project_price: '', penalty_percentage: '', employees: [], testers: [],
-    deadline: '', time: '', is_active: true,
+    deadline: '', time: '', is_active: true, links: ["", ""]
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -73,7 +73,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
     const [intPartRaw = '', decRaw = ''] = normalized.split('.')
     const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-    
+
     if (firstDot === -1) {
       return Number(intPart) > 100 ? '100' : intPart
     } else {
@@ -120,6 +120,16 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       }
       const res = await axiosAPI.post('/projects/', body)
 
+      const id = res?.data?.data?.id
+      
+      if (id) {
+        await Promise.all(
+          form.links.filter(link => link.trim()).map(async (link) => {
+            await axiosAPI.post(`project-documents/`, { project: id, name: "saloom", url: link })
+          })
+        )
+      }
+      
       if (refreshData) refreshData()
 
       toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
@@ -162,7 +172,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-[#F6F6F8] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
 
   const statusList = Array.isArray(STATUS_API) ? STATUS_API : Object.entries(STATUS_API || {}).map(([value, label]) => ({ value, label }))
   const currentStatusLabel = statusList.find(s => s.value === form.status)?.label || 'Holati tanlang'
@@ -175,7 +185,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+        <div className="relative w-full max-w-[600px] h-[650px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
           {/* header */}
           <div className="px-7 pt-7 pb-4 sticky top-0 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
@@ -188,7 +198,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           </div>
 
           {/* body */}
-          <div className="px-7 pb-4 flex flex-col gap-4 overflow-y-auto max-h-[60vh]">
+          <div className="px-7 pb-4 flex flex-col gap-4 overflow-y-auto max-h-[65vh]">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Nomi</label>
@@ -206,7 +216,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   <button
                     type="button"
                     onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
+                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[#F6F6F8] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
                     disabled
                   >
                     <span>{currentStatusLabel}</span>
@@ -282,7 +292,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Boshqaruvchi bonusi (UZS)</label>
                 <input value={form.project_price} onChange={e => set('project_price', fmtBonus(e.target.value))}
                   placeholder="Boshqaruvchi bonusi 0,0"
-                  className={inputCls(errors.project_price) + "font-bold"} />
+                  className={inputCls(errors.project_price) + " font-bold"} />
                 {errors.project_price && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>
             </div>
@@ -334,7 +344,19 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   borderRadius: 12,
                   colorPrimary: '#7186ED',
                   motion: false,
-                  colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+                  colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+                  colorBgContainer: isDark ? '#161b22' : '#ffffff',
+                  colorBgElevated: isDark ? '#161b22' : '#ffffff',
+                },
+                components: {
+                  Select: {
+                    selectorBg: isDark ? '#161b22' : '#ffffff',
+                    optionSelectedBg: isDark ? '#21262d' : '#F1F3F9',
+                    optionActiveBg: isDark ? '#1c2128' : 'var(--bg-elevation-1)',
+                  },
+                  DatePicker: {
+                    controlItemBgActive: isDark ? '#21262d' : 'var(--bg-elevation-1)',
+                  }
                 }
               }}
             >
@@ -349,7 +371,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                       time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
                     }))}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#0d1117]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
                     allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                     format="DD.MM.YYYY"
@@ -363,7 +385,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                     value={form.time ? dayjs(form.time, 'HH:mm') : null}
                     onChange={(val) => set('time', val)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
+                    className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#0d1117]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
                     suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
                     allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                     format="HH:mm"
@@ -374,30 +396,71 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 </div>
               </div>
             </ConfigProvider>
+
+            <div className="flex flex-col gap-2">
+              <label className={labelCls}>Hujjat ma'lumotlari</label>
+              <div className="grid grid-cols-2 gap-3">
+                {form.links?.map((link, index) => {
+                  const isLast = index === form.links.length - 1;
+                  return (
+                    <div key={index} className="flex items-center gap-2.5">
+                      <div className="flex-1 relative w-full">
+                        <input
+                          className={inputCls() + " pr-10"}
+                          placeholder="Hujjat nomini kiriting"
+                          value={link || ''}
+                          onChange={e => {
+                            const newLinks = [...form.links];
+                            newLinks[index] = e.target.value;
+                            set('links', newLinks);
+                          }}
+                        />
+                        {form.links.length > 1 &&
+                          <button
+                            type="button"
+                            onClick={() => set('links', form.links.filter((_, i) => i !== index))}
+                            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                          >
+                            <FaXmark size={14} />
+                          </button>
+                        }
+                      </div>
+                      {isLast && (
+                        <button
+                          type="button"
+                          onClick={() => set('links', [...form.links, ''])}
+                          className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+                        >
+                          <FiPlus size={20} />
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
           {/* footer */}
-          <div className="px-7 py-5 flex items-center justify-end">
-            <div className="flex items-center gap-3">
-              <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
-                <FaXmark size={13} /> Yopish
-              </button>
-              <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
-                {loading ? (
-                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                ) : (
-                  <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-                Qo'shish
-              </button>
-            </div>
+          <div className="flex items-center justify-end mt-4 mr-5 gap-3">
+            <button onClick={onClose}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+              <FaXmark size={13} /> Yopish
+            </button>
+            <button onClick={handleSubmit} disabled={loading}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
+              {loading ? (
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+              ) : (
+                <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+              Qo'shish
+            </button>
           </div>
         </div>
       </div>

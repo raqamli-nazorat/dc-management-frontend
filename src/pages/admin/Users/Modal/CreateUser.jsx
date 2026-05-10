@@ -319,7 +319,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 options={regions.map(region => region.name)}
                                 placeholder="Viloyatni tanlang"
                                 value={regions.find(r => r.id === form.region)?.name || ''}
-                                className="dark:bg-[#191a1a]!"
+                                className="dark:bg-[#0d1117]!"
                                 padding="11px 11px"
                                 error={errors.region}
                                 onChange={v => {
@@ -340,7 +340,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 placeholder="Tuman tanlang"
                                 value={districts.find(d => d.id === form.district)?.name || ''}
                                 onChange={v => set('district', districts.find(d => d.name === v)?.id)}
-                                className="dark:bg-[#191a1a]!"
+                                className="dark:bg-[#0d1117]!"
                                 padding="11px 11px"
                                 disabled={!form.region}
                                 error={errors.district}
@@ -421,7 +421,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             value={positions.find(p => p.id === form.position)?.name || ''}
                                             onChange={v => { set('position', positions.find(p => p.name === v)?.id); setErrors(prev => ({ ...prev, position: false })) }}
                                             width={130}
-                                            className="dark:bg-[#191a1a]!"
+                                            className="dark:bg-[#0d1117]!"
                                             placeholder="Tanlash"
                                             error={errors.position}
                                         />
@@ -444,7 +444,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                                 set('roles', newRoles);
                                                 setErrors(prev => ({ ...prev, roles: false }));
                                             }}
-                                            className="dark:bg-[#191a1a]!"
+                                            className="dark:bg-[#0d1117]!"
                                             placeholder={form.roles?.length > 0 ? "Tanlangan" : "Tanlash"}
                                             width={130}
                                             error={errors.roles}
@@ -482,7 +482,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                             set('links', form.links.filter((_, i) => i !== index))
                                         }
                                     }}
-                                    className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                    className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[]"
                                 >
                                     {index === form.links.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
                                 </button>

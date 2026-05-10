@@ -137,6 +137,7 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                     placeholder="Tuman tanlang"
                                     disabled={!f.region}
                                     padding="11px 11px"
+                                    className="disabled:bg-[var(--bg-elevation-1)]!"
                                 />
                             </div>
 
@@ -182,10 +183,10 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                 <button
                                     type="button"
                                     onClick={() => set('is_student', !f.is_student)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[var(--bg-elevation-1)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                                 >
                                     <span
-                                        className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
+                                        className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] dark:bg-white shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
                                     />
                                 </button>
                             </div>

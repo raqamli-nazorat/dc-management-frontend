@@ -412,24 +412,6 @@ export default function ProfilePage() {
     }
   }
 
-  const getUserSts = async () => {
-    try {
-      const { data } = await axiosAPI.get('users/me/efficiency/')
-
-      console.log(data);
-    } catch (error) {
-      console.error(error)
-      toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
-    }
-  }
-
-  useEffect(() => {
-    if (authUser?.active_role === "employee" || authUser?.active_role === "manager") {
-      getUserSts()
-    }
-    getProfile()
-  }, [])
-
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') {

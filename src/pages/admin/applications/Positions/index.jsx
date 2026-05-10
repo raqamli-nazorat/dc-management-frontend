@@ -103,7 +103,7 @@ const ApplicationsPage = () => {
 
           <div className="max-h-[80vh] overflow-y-auto rounded-xl">
             <table className="w-full" style={{ fontSize: 13 }}>
-              <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[#191a1a] shadow-xs">
+              <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[var(--bg-elevation-1)] shadow-xs">
                 <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                     №
@@ -139,7 +139,7 @@ const ApplicationsPage = () => {
                         className={`relative w-10 h-5 rounded-full  cursor-pointer ${application?.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                       >
                         <span
-                          className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${application?.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
+                          className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${application?.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
                         />
                       </button>
                     </td>

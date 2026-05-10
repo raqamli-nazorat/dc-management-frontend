@@ -85,10 +85,10 @@ const CreatePosition = ({ onClose, refetch }) => {
                         <button
                             type="button"
                             onClick={() => setForm({ ...form, is_application: !form.is_application })}
-                            className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
+                            className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-2)]'}`}
                         >
                             <span
-                                className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
+                                className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_application ? ' translate-x-5' : 'translate-x-0.5 '}`}
                             />
                         </button>
                     </div>

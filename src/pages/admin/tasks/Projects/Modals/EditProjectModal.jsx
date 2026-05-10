@@ -3,7 +3,7 @@ import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import dayjs from 'dayjs'
 import { DatePicker, TimePicker, ConfigProvider, theme } from 'antd'
 import { useTheme } from "../../../../../context/ThemeContext"
-import { FiCalendar } from "react-icons/fi"
+import { FiCalendar, FiPlus } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
@@ -65,22 +65,22 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     }
 
     const normalizePercentInput = (raw) => {
-      const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
-      if (!cleaned) return ''
-      const firstDot = cleaned.indexOf('.')
-      const normalized = firstDot === -1
-        ? cleaned
-        : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
-      const [intPartRaw = '', decRaw = ''] = normalized.split('.')
-      const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
-      
-      if (firstDot === -1) {
-        return Number(intPart) > 100 ? '100' : intPart
-      } else {
-        const limitedDec = decRaw.slice(0, 2)
-        const resultStr = `${intPart}.${limitedDec}`
-        return Number(resultStr) > 100 ? '100' : resultStr
-      }
+        const cleaned = String(raw || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
+        if (!cleaned) return ''
+        const firstDot = cleaned.indexOf('.')
+        const normalized = firstDot === -1
+            ? cleaned
+            : `${cleaned.slice(0, firstDot)}.${cleaned.slice(firstDot + 1).replace(/\./g, '')}`
+        const [intPartRaw = '', decRaw = ''] = normalized.split('.')
+        const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0'
+
+        if (firstDot === -1) {
+            return Number(intPart) > 100 ? '100' : intPart
+        } else {
+            const limitedDec = decRaw.slice(0, 2)
+            const resultStr = `${intPart}.${limitedDec}`
+            return Number(resultStr) > 100 ? '100' : resultStr
+        }
     }
 
     const [form, setForm] = useState({
@@ -97,6 +97,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         deadline: '',
         time: '',
         is_hidden: true,
+        links: ["", ""],
     })
 
     useEffect(() => {
@@ -115,6 +116,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 deadline: project?.deadline ? project.deadline.slice(0, 10) : '',
                 time: project?.deadline ? project.deadline.slice(11, 16) : '',
                 is_hidden: project?.is_hidden !== null ? project?.is_hidden : true,
+                links: ["", ""],
             })
         }
     }, [project])
@@ -154,6 +156,16 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
             const res = await axiosAPI.patch(`projects/${project.id}/`, payload)
             if (res.status === 200) {
+
+                const id = res?.data?.data?.id
+                if (id) {
+                    await Promise.all(
+                        form.links.filter(link => link.trim()).map(async (link) => {
+                            await axiosAPI.post(`project-documents/`, { project: id, name: "saloom", url: link })
+                        })
+                    )
+                }
+
                 toast.success('Malumotlar saqlandi');
                 onClose();
                 refreshData();
@@ -201,8 +213,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
-
-
+    
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
@@ -399,7 +410,19 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         borderRadius: 12,
                                         colorPrimary: '#7186ED',
                                         motion: false,
-                                        colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e'
+                                        colorTextPlaceholder: isDark ? '#90a1b9' : '#62748e',
+                                        colorBgContainer: isDark ? '#161b22' : '#ffffff',
+                                        colorBgElevated: isDark ? '#161b22' : '#ffffff',
+                                    },
+                                    components: {
+                                        Select: {
+                                            selectorBg: isDark ? '#161b22' : '#ffffff',
+                                            optionSelectedBg: isDark ? '#21262d' : '#F1F3F9',
+                                            optionActiveBg: isDark ? '#1c2128' : 'var(--bg-elevation-1)',
+                                        },
+                                        DatePicker: {
+                                            controlItemBgActive: isDark ? '#21262d' : 'var(--bg-elevation-1)',
+                                        }
                                     }
                                 }}
                             >
@@ -414,7 +437,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                 time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
                                             }))}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#0d1117]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                                             suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
                                             allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                                             format="DD.MM.YYYY"
@@ -428,7 +451,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                             value={form.time ? dayjs(form.time, 'HH:mm') : null}
                                             onChange={(val) => set('time', val)}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                                            className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
+                                            className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#0d1117]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
                                             suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
                                             allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                                             format="HH:mm"
@@ -439,6 +462,49 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     </div>
                                 </div>
                             </ConfigProvider>
+
+                            <div className="flex flex-col gap-2">
+                                <label className={labelCls}>Hujjat ma'lumotlari</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {form.links?.map((link, index) => {
+                                        const isLast = index === form.links.length - 1;
+                                        return (
+                                            <div key={index} className="flex items-center gap-2.5">
+                                                <div className="flex-1 relative w-full">
+                                                    <input
+                                                        className={inputCls() + " pr-10"}
+                                                        placeholder="Hujjat nomini kiriting"
+                                                        value={link || ''}
+                                                        onChange={e => {
+                                                            const newLinks = [...form.links];
+                                                            newLinks[index] = e.target.value;
+                                                            set('links', newLinks);
+                                                        }}
+                                                    />
+                                                    {form.links.length > 1 &&
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => set('links', form.links.filter((_, i) => i !== index))}
+                                                            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                                                        >
+                                                            <FaXmark size={14} />
+                                                        </button>
+                                                    }
+                                                </div>
+                                                {isLast && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => set('links', [...form.links, ''])}
+                                                        className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+                                                    >
+                                                        <FiPlus size={20} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -448,8 +514,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
                                 <button type="button" onClick={() => set('is_hidden', !form.is_hidden)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#141414]'}`}>
+                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
                         }

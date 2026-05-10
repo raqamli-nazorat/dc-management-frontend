@@ -281,7 +281,7 @@ const ApplicationDetail = () => {
         <div className="flex flex-col gap-2 -mt-3!">
           <span className="text-[20px] font-bold dark:text-[var(--text-strong)]">Xodim hulosasi</span>
           <textarea
-            className={`${inputCls} h-25`}
+            className={`${inputCls} h-[95px]`}
             placeholder='Xodim hulosasini kiriting'
             value={conclusion}
             onChange={(e) => setConclusion(e.target.value)}

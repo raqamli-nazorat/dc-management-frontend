@@ -39,7 +39,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-elevation-1-alt)] border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9] dark:disabled:bg-[#292A2A]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-elevation-1-alt)] border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9] dark:disabled:bg-[var(--bg-elevation-2)]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
                 {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[var(--accent-sub)]!" size={16} /> : null}
@@ -94,9 +94,9 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                                     fontWeight: 500,
                                     color: isDark ? '#FFFFFF' : 'var(--text-strong)',
                                     background: isSelected
-                                        ? (isDark ? '#303131' : '#F1F3F9')
+                                        ? (isDark ? 'var(--bg-elevation-2)' : '#F1F3F9')
                                         : hovered === opt
-                                            ? (isDark ? '#222323' : 'var(--bg-elevation-1)')
+                                            ? (isDark ? 'var(--bg-elevation-2)' : 'var(--bg-elevation-1)')
                                             : 'transparent',
                                 }}
                             >
