@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
 import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
@@ -129,7 +129,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
         <div className="fixed inset-0 bg-black/60" />
         <button onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer z-10
-              bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
+              bg-[#F1F3F9] hover:bg-[#E2E6F2] text-[#5B6078] dark:bg-[#292A2A] dark:hover:bg-[#333435] dark:text-[#C2C8E0] transition-colors">
           <FaXmark size={14} />
         </button>
 
@@ -275,7 +275,6 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
             setShowCancelModal(false)
             onCancel(payment.id, reason)
             onClose()
-            showCheckModal()
           }}
         />
       )}
@@ -288,6 +287,8 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
             setShowPaidModal(false)
             onPaid(payment.id)
             onClose()
+            showCheckModal(payment.id, payment.project)
+            onPaid(payment.id)
           }}
         />
       )}

@@ -1,5 +1,5 @@
-﻿import { useState, useEffect, useRef } from 'react'
-import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown } from 'react-icons/fa6'
+import { useState, useEffect, useRef } from 'react'
+import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { getErrorMessage } from '../../../service/getErrorMessage'
@@ -471,10 +471,12 @@ export default function ProfilePage() {
     try { social = JSON.parse(data.social_links) } catch { social = {} }
   }
 
-  const handleSave = async () => {
-    const isCardChanged = data.card_number !== profile.card_number && data.card_number.trim() !== "";
-    const isSocialChanged = JSON.stringify(data.social_links || "") !== JSON.stringify(profile.social_links || "");
+  const isCardChanged = data.card_number !== profile.card_number && data.card_number.trim() !== "";
+  const isSocialChanged = JSON.stringify(data.social_links || "") !== JSON.stringify(profile.social_links || "");
 
+  const isChanged = isCardChanged || isSocialChanged
+
+  const handleSave = async () => {
     try {
       if (isCardChanged && isSocialChanged) {
         const resCard = await axiosAPI.put("users/me/card-number/", {
@@ -485,19 +487,18 @@ export default function ProfilePage() {
         })
 
         getProfile()
-        
+
         toast.success("Ma'lumotlar yangilandi!", `${resCard.data.data.message}, ${resLinks.data.data.message}`)
       } else if (isCardChanged) {
         const resCard = await axiosAPI.put("users/me/card-number/", {
           card_number: data.card_number.replace(/\s/g, '')
         })
-        console.log(resCard);
 
         getProfile()
         toast.success("Ma'lumotlar yangilandi!", resCard.data.data.message)
       } else if (isSocialChanged) {
         const resLinks = await axiosAPI.put("users/me/social-links/", {
-          social_links: data.social_links.map((item, index) => ({havola: item}))
+          social_links: data.social_links
         })
 
         getProfile()
@@ -533,8 +534,8 @@ export default function ProfilePage() {
 
   const rowCls = 'grid grid-cols-2 gap-4'
 
-  const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
+  const labelCls = 'block text-xs font-medium text-[#5B6078] dark:text-[#C2C8E0] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[#E2E6F2] text-[#1A1D2E] placeholder-[#B6BCCB] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
 
 
   return (
@@ -571,7 +572,7 @@ export default function ProfilePage() {
       </div>
 
       <div className={rowCls}>
-        <SocialField label="Telifon raqami" value={formatCard(data.phone_number)} />
+        <SocialField label="Telifon raqami" value={formatPhone(data.phone_number)} />
 
         <div>
           <label className={labelCls}>Karta raqami</label>
@@ -581,7 +582,7 @@ export default function ProfilePage() {
             type="text"
             inputMode="numeric"
             placeholder="0000 0000 0000 0000"
-            value={data.card_number || ''}
+            value={formatCard(data.card_number) || ''}
             onChange={e => set('card_number', formatCard(e.target.value))}
           />
         </div>
@@ -637,36 +638,53 @@ export default function ProfilePage() {
 
       {/* Social Links */}
       <div className="grid grid-cols-3 gap-3">
-        {data.social_links?.map((link, index) => (
-          <div key={index} className="flex items-end gap-3">
-            <div className="flex-1">
-              <label className={labelCls}>{index + 1}.Havola qo'shish</label>
-              <input
-                className={inputCls}
-                placeholder="Havola yuklang"
-                value={link}
-                onChange={e => {
-                  const newLinks = [...data.social_links];
-                  newLinks[index] = e.target.value;
-                  set('social_links', newLinks);
-                }}
-              />
+        {data.social_links?.map((link, index) => {
+          const apiLinksCount = profile?.social_links
+            ? (Array.isArray(profile.social_links) ? profile.social_links.length : Object.keys(profile.social_links).length)
+            : 0;
+          const isApiLink = index < apiLinksCount;
+          const isLast = index === data.social_links.length - 1;
+
+          return (
+            <div key={index} className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className={labelCls}>{index + 1}.Havola qo'shish</label>
+                <div className="relative">
+                  <input
+                    className={inputCls + (!isApiLink ? " pr-10" : "")}
+                    placeholder="Havola yuklang"
+                    value={link}
+                    onChange={e => {
+                      const newLinks = [...data.social_links];
+                      newLinks[index] = e.target.value;
+                      set('social_links', newLinks);
+                    }}
+                  />
+                  {!isApiLink && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        set('social_links', data.social_links.filter((_, i) => i !== index))
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                    >
+                      <FaXmark size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {isLast && index < 4 && (
+                <button
+                  type="button"
+                  onClick={() => set('social_links', [...data.social_links, ''])}
+                  className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                >
+                  <FiPlus size={20} />
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                if (index === data.social_links?.length - 1 && index < 4) {
-                  set('social_links', [...data.social_links, '']);
-                } else {
-                  set('social_links', data.social_links?.filter((_, i) => i !== index))
-                }
-              }}
-              className="h-[42px] w-[42px] rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] flex items-center justify-center text-[var(--text-strong)] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
-            >
-              {index === data.social_links?.length - 1 && index < 4 ? <FiPlus size={20} /> : <FaXmark size={20} />}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Lavozim + Rol */}
@@ -706,15 +724,11 @@ export default function ProfilePage() {
 
       <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--stroke-sub)] dark:border-[#292A2A]">
         <button
-          onClick={() => setData(profile)}
-          className="px-6 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:text-[#C2C8E0] dark:bg-[#292A2A] dark:hover:bg-[#363737]"
-        >
-          Tozalash
-        </button>
-        <button
           onClick={handleSave}
-          className="px-6 py-2.5 rounded-lg text-sm font-semibold  cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C]"
+          disabled={!isChanged}
+          className="px-6 py-2.5 rounded-xl text-sm font-semibold  cursor-pointer text-white bg-[#3F57B3] hover:bg-[#32458C] flex items-center gap-2 disabled:hover:bg-[#3F57B3] disabled:opacity-50 disabled:cursor-default"
         >
+          <FaCheck size={15} />
           Saqlash
         </button>
       </div>

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -10,6 +10,7 @@ import XarajatDetailModal from './payments/modals/XarajatDetailModal'
 import FilterModal from './payments/modals/FilterModal'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
+import AddCheck from './payments/modals/AddCheck'
 
 // ── Timezone offset helper ───────────────────────────────────
 // ── Datetime helper ──────────────────────────────────────────
@@ -85,7 +86,7 @@ async function apiMarkPaid(id) {
 }
 
 async function apiConfirm(id) {
-  const res = await axiosAPI.post(`/expense-request/${id}/confirm/`, {})
+  const res = await axiosAPI.post(`/expense-request/${id}/confirm/`)
   return res.data?.data ?? res.data
 }
 
@@ -96,6 +97,11 @@ async function apiCancel(id, cancelReason) {
 
 async function apiGetPaymentDetail(id) {
   const res = await axiosAPI.get(`/expense-request/${id}/`)
+  return res.data?.data ?? res.data
+}
+
+async function apiGetPaymentChecks(id) {
+  const res = await axiosAPI.get(`expense-receipt/${id}/`)
   return res.data?.data ?? res.data
 }
 
@@ -148,6 +154,10 @@ export default function PaymentsPage() {
   const [showFilter, setShowFilter] = useState(false)
   const [showSorov, setShowSorov] = useState(false)
   const [detailPayment, setDetailPayment] = useState(null)
+  const [showAddCheck, setShowAddCheck] = useState(false)
+  const [paymentId, setPaymentId] = useState(null)
+  const [projectId, setProjectId] = useState(null)
+
   const scrollRef = useRef(null)
 
   const hasFilter = Object.entries(filters).some(([, v]) => v && v !== false)
@@ -365,7 +375,8 @@ export default function PaymentsPage() {
           onClose={() => setShowFilter(false)} onApply={handleApplyFilter} />
       )}
       {canSendRequest && showSorov && (
-        <SorovModal categories={categories} projects={projects}
+        <SorovModal 
+        categories={categories} projects={projects}
           onClose={() => setShowSorov(false)} onSubmit={handleSubmitSorov} />
       )}
       {detailPayment && (
@@ -375,10 +386,25 @@ export default function PaymentsPage() {
           onPaid={isAccountant ? handlePaid : null}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
-          showCheckModal={() => setCheckModal(true)}
+          showCheckModal={(id, projId) => {
+            setShowAddCheck(true)
+            setPaymentId(id)
+            setProjectId(projId)
+          }}
         />
       )}
 
+      {showAddCheck && (
+        <AddCheck
+          onClose={() => setShowAddCheck(false)}
+          paymentId={paymentId}
+          projectId={projectId}
+          onConfirm={(id) => {
+            handlePaid(id)
+            setShowAddCheck(false)
+          }}
+        />
+      )}
       
     </div>
   )

@@ -95,7 +95,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
         >
             <div
                 className="w-full h-[600px] flex flex-col max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden"
