@@ -202,8 +202,8 @@ const DetailModal = ({ id, onClose }) => {
                     {!loading &&
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
-                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${!project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${!project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                             </div>
                         </div>
                     }
