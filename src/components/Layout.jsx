@@ -7,7 +7,7 @@ import { FaFolder } from 'react-icons/fa'
 import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
-import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal } from './MeetingModals'
+import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
 
 const labelMap = {
@@ -254,6 +254,7 @@ export default function Layout() {
   const [activeAbsence, setActiveAbsence] = useState(null)
   const [activeOpenMeeting, setActiveOpenMeeting] = useState(null)
   const [activeExcuseAttendanceId, setActiveExcuseAttendanceId] = useState(null)
+  const [activeSystemNotif, setActiveSystemNotif] = useState(null) // { title, message, date }
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -338,9 +339,12 @@ export default function Layout() {
         setNotifOpen(false)
       }
     } else if (type === 'system' || type === 'alert') {
-      // Tizim xabari yoki ogohlantirish — loyihalar sahifasiga
-      const prefix = location.pathname.split('/')[1] || 'admin'
-      navigate(`/${prefix}/projects`)
+      // Tizim xabari — modal ochish
+      setActiveSystemNotif({
+        title: n.title || n.raw?.title || 'Tizim xabari',
+        message: n.raw?.message || n.raw?.body || n.message || '',
+        date: n.date && n.time ? `${n.date} ${n.time}` : '',
+      })
       setNotifOpen(false)
     } else {
       // type yo'q yoki noma'lum — title ga qarab eski logika
@@ -634,6 +638,18 @@ export default function Layout() {
           <AttendanceExcuseModal
             attendanceId={activeExcuseAttendanceId}
             onClose={() => setActiveExcuseAttendanceId(null)}
+          />
+        </>
+      )}
+
+      {activeSystemNotif && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveSystemNotif(null)} />
+          <SystemNotifModal
+            title={activeSystemNotif.title}
+            message={activeSystemNotif.message}
+            date={activeSystemNotif.date}
+            onClose={() => setActiveSystemNotif(null)}
           />
         </>
       )}

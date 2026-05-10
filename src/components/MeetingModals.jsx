@@ -547,3 +547,50 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
     </div>
   )
 }
+
+// Tizim xabari modali — "Parolingizni yangilang" va shunga o'xshash system notificationlar
+export function SystemNotifModal({ title, message, date, onClose }) {
+  return (
+    <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[#1C1D1D] shadow-2xl border-l border-[var(--stroke-sub)] dark:border-[#292A2A] animate-in slide-in-from-right duration-300">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-6 shrink-0">
+        <button
+          onClick={onClose}
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-elevation-2)] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435]"
+        >
+          <FaArrowLeft size={14} />
+        </button>
+        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">
+          {title}
+        </h2>
+      </div>
+
+      {/* Body */}
+      <div className="flex-1 px-6 flex flex-col gap-4">
+        {date && (
+          <p className="text-[13px] font-medium text-[var(--text-soft)] dark:text-[#8E95B5]">
+            {date}
+          </p>
+        )}
+        {message && (
+          <p className="text-[15px] font-medium text-[var(--text-strong)] dark:text-white leading-relaxed">
+            {message}
+          </p>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-0 left-0 w-full px-6 py-4 flex justify-end">
+        <button
+          onClick={onClose}
+          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--bg-elevation-2)] dark:bg-[#292A2A] text-[var(--text-strong)] dark:text-white text-[14px] font-bold hover:bg-[var(--stroke-sub)] dark:hover:bg-[#333435] cursor-pointer transition-colors"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          Yopish
+        </button>
+      </div>
+    </div>
+  )
+}
