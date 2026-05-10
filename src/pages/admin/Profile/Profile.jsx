@@ -724,7 +724,7 @@ export default function ProfilePage() {
               </div>
               <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">Lavozimi</span>
             </div>
-            <div className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center justify-between bg-white dark:bg-[#191A1A]">
+            <div className="px-3 py-2.5 w-[200px] rounded-lg border border-[var(--stroke-sub)] dark:border-[#292A2A] flex items-center justify-between bg-white dark:bg-[#191A1A]">
               <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">{data.position || 'Admin'}</span>
               <FaChevronDown className="w-2.5 h-2.5 text-[var(--text-soft)]" />
             </div>
@@ -744,7 +744,7 @@ export default function ProfilePage() {
                 onChangeRole={(newRole) => setProfile(p => ({ ...p, active_role: newRole }))}
               />
             ) : (
-              <div className="px-3 py-1.5 rounded-lg border border-[var(--stroke-sub)] dark:border-[#474848] flex items-center gap-2 bg-white dark:bg-[#191A1A]">
+              <div className="px-3 py-2.5 rounded-lg border border-[var(--stroke-sub)] flex items-center gap-2 bg-white justify-between dark:border-[#292A2A] w-[200px] dark:bg-[#191A1A]">
                 <span className="text-xs font-semibold text-[var(--text-strong)] dark:text-white">
                   {ROLE_LABELS[data.active_role || data.roles?.[0]] || data.active_role || data.roles?.[0] || role || 'Tanlash'}
                 </span>
