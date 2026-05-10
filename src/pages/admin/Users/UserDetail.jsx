@@ -1,4 +1,4 @@
-﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
@@ -292,7 +292,7 @@ const UserDetail = () => {
     if (!user) return <span>User not found</span>
 
     const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]`
-    
+
     const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
 
     return (
@@ -543,23 +543,54 @@ const UserDetail = () => {
                     {/* Social Links + Lavozim + Rol */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-1 flex flex-col gap-3">
-                            {form.links?.map((link, index) => (
-                                <div key={index} className="flex items-end gap-3">
-                                    <div className="flex-1">
-                                        <label className={labelCls}>{index + 1}.Havola</label>
-                                        <input
-                                            className={inputCls}
-                                            placeholder="Havola yuklang"
-                                            value={link || ''}
-                                            onChange={e => {
-                                                const newLinks = [...form.links];
-                                                newLinks[index] = e.target.value;
-                                                set('links', newLinks);
-                                            }}
-                                        />
+                            {form.links?.map((link, index) => {
+                                const isLast = index === form.links.length - 1;
+                                return (
+                                    <div key={index} className="flex items-end gap-2.5">
+                                        <div className="flex-1 relative">
+                                            <label className={labelCls}>{index + 1}.Havola</label>
+                                            <input
+                                                className={inputCls + " pr-10"}
+                                                placeholder="Havola yuklang"
+                                                value={link || ''}
+                                                onChange={e => {
+                                                    const newLinks = [...form.links];
+                                                    newLinks[index] = e.target.value;
+                                                    set('links', newLinks);
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => set('links', form.links.filter((_, i) => i !== index))}
+                                                className="absolute right-3 top-[34px] text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                                            >
+                                                <FaXmark size={14} />
+                                            </button>
+                                        </div>
+                                        {isLast && index < 4 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => set('links', [...form.links, ''])}
+                                                className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[#292A2A] flex items-center justify-center text-[#1A1D2E] dark:text-white hover:bg-gray-50 dark:hover:bg-[#292A2A] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
+                                            >
+                                                <FiPlus size={20} />
+                                            </button>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
+                            {(!form.links || form.links.length === 0) && (
+                                <button
+                                    type="button"
+                                    onClick={() => set('links', [''])}
+                                    className="flex items-center gap-2 py-1 px-2 w-[180px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
+                                >
+                                    <div className="w-9 h-9 flex items-center justify-center">
+                                        <FiPlus size={18} />
+                                    </div>
+                                    Havola qo'shish
+                                </button>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-5">

@@ -572,7 +572,17 @@ export default function ProfilePage() {
       </div>
 
       <div className={rowCls}>
-        <SocialField label="Telifon raqami" value={formatPhone(data.phone_number)} />
+        <div>
+          <label className={labelCls}>Telefon raqami</label>
+          <input
+            className={inputCls}
+            type="text"
+            inputMode="numeric"
+            placeholder="+998 90 123 45 67"
+            data value={data.phone_number}
+            onChange={e => set('phone_number', formatPhone(e.target.value))}
+          />
+        </div>
 
         <div>
           <label className={labelCls}>Karta raqami</label>
@@ -644,7 +654,7 @@ export default function ProfilePage() {
           return (
             <div key={index} className="flex items-end gap-3">
               <div className="flex-1">
-                <label className={labelCls}>{index + 1}.Havola qo'shish</label>
+                <label className={labelCls}>{index + 1}.Havola</label>
                 <div className="relative">
                   <input
                     className={inputCls + " pr-10"}
@@ -683,10 +693,12 @@ export default function ProfilePage() {
           <button
             type="button"
             onClick={() => set('social_links', [''])}
-            className="col-span-3 flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-[#E2E6F2] dark:border-[#292A2A] text-[#8F95A8] hover:text-[#526ED3] hover:border-[#526ED3] hover:bg-[#F8F9FC] dark:hover:bg-[#1C1D1D] transition-all cursor-pointer group"
+            className="flex items-center gap-2 py-2 px-3 w-[165px] cursor-pointer text-[#3F57B3] dark:text-[#8E95B5] text-sm font-semibold hover:opacity-80 transition-opacity rounded-xl bg-[#F1F3F9] dark:bg-[#292A2A]"
           >
-            <FiPlus size={20} className="group-hover:scale-110 transition-transform" />
-            <span className="font-semibold text-sm">Ijtimoiy tarmoq havolasini qo'shish</span>
+            <div className="flex items-center justify-center">
+              <FiPlus size={18} />
+            </div>
+            Havola qo'shish
           </button>
         )}
       </div>
