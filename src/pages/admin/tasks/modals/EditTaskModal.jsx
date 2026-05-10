@@ -47,9 +47,9 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
       <div className="relative">
         <button type="button" onClick={() => !disabled && setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A]'}
-            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
-            ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
+            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
+            ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{selected?.label || placeholder}</span>
           {!disabled && (
             <div className="flex items-center gap-1.5 shrink-0 ml-1">
@@ -61,12 +61,12 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer
-                  ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                  ${value === o.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                  ${i < options.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
+                  ${value === o.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                 {o.label}
               </button>
             ))}
@@ -100,9 +100,9 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
           type="button"
           onClick={() => !disabled && setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B]' : 'cursor-pointer bg-white dark:bg-[#191A1A]'}
-            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
-            ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-sub)]'}`}
+            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+            ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
+            ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-sub)]'}`}
         >
           <span className="flex-1 text-left truncate">
             {selected ? selected.title : 'Loyiha tanlang'}
@@ -127,7 +127,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
         {/* Dropdown */}
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
-            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             <div className="overflow-y-auto max-h-64">
               {projects.length === 0 && (
                 <p className="text-sm text-[var(--text-soft)] text-center py-6">Loyihalar topilmadi</p>
@@ -140,12 +140,12 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
                     type="button"
                     onClick={() => { onChange(String(p.id)); setOpen(false) }}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer transition-colors
-                      border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0
-                      ${isActive ? 'bg-[#F1F3F9] dark:bg-[#252626]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#222323]'}`}
+                      border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0
+                      ${isActive ? 'bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'}`}
                   >
                     {/* Left: title + description */}
                     <div className="flex flex-col min-w-0 flex-1 pr-3">
-                      <span className="text-sm font-semibold truncate leading-snug text-[var(--text-strong)] dark:text-white">
+                      <span className="text-sm font-semibold truncate leading-snug text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                         {p.title}
                       </span>
                       {p.description && (
@@ -190,18 +190,18 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
-            <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-white">{title}</h2>
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
+            <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{title}</h2>
           </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white focus:border-[var(--accent-sub)]" />
+              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] focus:border-[var(--accent-sub)]" />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2">
@@ -211,27 +211,27 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
             return (
               <button key={u.id} onClick={() => setTemp(isSel ? null : u)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left
-                  ${isSel ? 'bg-[#EEF1FB] border-[var(--accent-sub)] dark:bg-[#292A2A] dark:border-[var(--accent-strong)]' : 'bg-white border-[#EEF1F7] hover:bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'}`}>
+                  ${isSel ? 'bg-[#EEF1FB] border-[var(--accent-sub)] dark:bg-[var(--bg-elevation-2)] dark:border-[var(--accent-strong)]' : 'bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-soft)] hover:bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:hover:bg-[var(--bg-elevation-1)]'}`}>
                 {/* Radio circle */}
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
-                  ${isSel ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[#474848]'}`}>
-                  {isSel && <div className="w-2 h-2 rounded-full bg-white" />}
+                  ${isSel ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[var(--stroke-sub)]'}`}>
+                  {isSel && <div className="w-2 h-2 rounded-full bg-[var(--bg-elevation-1-alt)]" />}
                 </div>
                 <div className="w-9 h-9 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{u.username}</p>
+                  <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{u.username}</p>
                   <p className="text-xs text-[var(--text-soft)] truncate">{u.position || '—'}</p>
                 </div>
               </button>
             )
           })}
         </div>
-        <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-          <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
+        <div className="px-6 py-4 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex items-center justify-between shrink-0">
+          <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
@@ -458,9 +458,9 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const inputCls = (err, ro) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:text-white dark:placeholder-[var(--text-sub)]
-    ${ro ? 'bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B] cursor-default' : 'bg-white dark:bg-[#191A1A]'}
-    ${err ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
+    ${ro ? 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default' : 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+    ${err ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
     ${!ro ? 'focus:border-[var(--accent-sub)]' : ''}`
 
   // Delete an existing attachment
@@ -578,13 +578,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* ── Header ── */}
-          <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[#F1F3F9] dark:border-[#292A2A] rounded-t-3xl">
+          <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
               </h2>
             </div>
@@ -645,10 +645,10 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                 onClick={() => !ro && form.project && form.status !== 'in_progress' ? setPickerOpen(true) : null}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
                   ${ro || !form.project || form.status === 'in_progress'
-                    ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[#1A1B1B]'
-                    : 'cursor-pointer bg-white dark:bg-[#191A1A] hover:border-[var(--accent-sub)]'}
-                  border-[var(--stroke-sub)] dark:border-[#292A2A]`}>
-                <span className={assigneeLabel ? 'text-[var(--text-strong)] dark:text-white flex-1 text-left truncate' : 'text-[var(--text-sub)] flex-1 text-left'}>
+                    ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]'
+                    : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] hover:border-[var(--accent-sub)]'}
+                  border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]`}>
+                <span className={assigneeLabel ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)] flex-1 text-left truncate' : 'text-[var(--text-sub)] flex-1 text-left'}>
                   {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
                 </span>
                 {!ro && form.project && form.status !== 'in_progress' && (
@@ -741,13 +741,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                 <div className="flex flex-wrap gap-2">
                   {/* Existing attachments */}
                   {existingAttachments.map(att => (
-                    <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] flex items-center justify-center group">
+                    <div key={att.id} className="relative w-20 h-20 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] flex items-center justify-center group">
                       {isImage(att.file) ? (
                         <img src={att.file} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="flex flex-col items-center gap-1 px-1">
                           <FaPaperclip size={16} className="text-[var(--accent-sub)]" />
-                          <span className="text-[9px] text-[var(--text-sub)] dark:text-[#C2C8E0] text-center whitespace-normal break-words w-[75%] px-1">{getFilename(att.file.split('/').pop().split('?')[0])}</span>
+                          <span className="text-[9px] text-[var(--text-sub)] dark:text-[var(--text-sub)] text-center whitespace-normal break-words w-[75%] px-1">{getFilename(att.file.split('/').pop().split('?')[0])}</span>
                         </div>
                       )}
                       {/* View link */}
@@ -773,13 +773,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
                   {/* New (pending) attachments */}
                   {newAttachments.map((att, i) => (
-                    <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl border border-[var(--accent-sub)]/40 dark:border-[var(--accent-sub)]/40 overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] flex items-center justify-center group">
+                    <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl border border-[var(--accent-sub)]/40 dark:border-[var(--accent-sub)]/40 overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] flex items-center justify-center group">
                       {att.preview ? (
                         <img src={att.preview} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="flex flex-col items-center gap-1 px-1">
                           <FaPaperclip size={16} className="text-[var(--accent-sub)]" />
-                          <span className="text-[9px] text-[var(--text-sub)] dark:text-[#C2C8E0] text-center whitespace-normal break-words w-full px-1">{att.file.name}</span>
+                          <span className="text-[9px] text-[var(--text-sub)] dark:text-[var(--text-sub)] text-center whitespace-normal break-words w-full px-1">{att.file.name}</span>
                         </div>
                       )}
                       <button
@@ -798,7 +798,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[#474848] flex flex-col items-center justify-center gap-1 text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)] cursor-pointer transition-colors"
+                        className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex flex-col items-center justify-center gap-1 text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)] cursor-pointer transition-colors"
                       >
                         <FaPaperclip size={16} />
                         <span className="text-[10px] font-medium">Fayl</span>
@@ -829,7 +829,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             {/* Rad etish sababi */}
             {(task.status === 'rejected' || task.reopened_count > 0) && (task.rejection_reason || rejectionFiles.length > 0) && (
               <div>
-                <label className="text-[11px]  text-[var(--text-sub)] dark:text-[#8B949E] mb-2 flex items-center gap-1.5">
+                <label className="text-[11px]  text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-2 flex items-center gap-1.5">
                   
                   Rad etish sabablari
                 </label>
@@ -846,7 +846,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                             href={rf.file}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[#262C36] overflow-hidden bg-white dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
+                            className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[#262C36] overflow-hidden bg-[var(--bg-elevation-1-alt)] dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
                           >
                             {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
                               <img src={rf.file} alt="" className="w-full h-full object-cover" />
@@ -868,13 +868,13 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                   {task.rejection_reason && (
                     <div className="flex flex-col gap-1">
                       {parseRejectionReason(task.rejection_reason).map((entry, idx) => (
-                        <div key={idx} className="rounded-xl bg-white dark:bg-[#1A0808] px-3 py-2.5">
+                        <div key={idx} className="rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[#1A0808] px-3 py-2.5">
                           {entry.date && (
-                            <p className="text-[11px] font-semibold text-[var(--text-sub)]/70 dark:text-[#E6EDF3] mb-1">
+                            <p className="text-[11px] font-semibold text-[var(--text-sub)]/70 dark:text-[var(--text-strong)] mb-1">
                               {entry.date}
                             </p>
                           )}
-                          <p className="text-sm text-[var(--text-strong)] dark:text-[#E6EDF3] leading-relaxed whitespace-pre-wrap">
+                          <p className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-relaxed whitespace-pre-wrap">
                             {entry.text}
                           </p>
                         </div>
@@ -889,7 +889,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-white dark:bg-[#111111]">
+          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
             {/* O'chirish tugmasi — faqat onDelete prop berilganda */}
             {onDelete ? (
               <button
@@ -906,7 +906,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               {canEdit && (

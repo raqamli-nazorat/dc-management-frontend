@@ -9,7 +9,7 @@ import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
 
-const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL }) => {
     const { isDark } = useTheme()
@@ -205,9 +205,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)]
-    dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)]
-    ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
+    bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+    dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
+    ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
 
     return (
         <>
@@ -216,23 +216,23 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
                     <FaXmark size={16} />
                 </button>
-                <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#111111]">
+                <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
 
                     {/* Header */}
-                    <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-white dark:bg-[#111111]">
+                    <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
                         <div className="flex items-center gap-3 mb-1">
-                            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                 <FaArrowLeft size={17} />
                             </button>
-                            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha tahrirlash</h2>
+                            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha tahrirlash</h2>
                         </div>
-                        <p className="text-sm text-[var(--text-strong)] dark:text-white">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
+                        <p className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
                     </div>
 
                     {loading ? (
                         <div className="flex flex-col items-center justify-center gap-5 h-[500px]">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]"> Ma'lumotlar yuklanmoqda...</p>
+                            <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]"> Ma'lumotlar yuklanmoqda...</p>
                         </div>
                     ) : (
                         <div className="px-7 pb-4 flex flex-col gap-4 h-[500px] max-h-[70vh] overflow-y-auto">
@@ -249,19 +249,19 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <div className="relative">
                                         <button type="button" onClick={() => setStatusOpen(o => !o)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-                    bg-white dark:bg-[#191A1A]
-                    ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}
-                    ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+                    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+                    ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
+                    ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
                                             <span>{STATUS_LABEL[form.status] || 'Holati tanlang'}</span>
                                             <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {statusOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                                                 {Object.values(STATUS_LABEL).map((s, i) => (
                                                     <button key={s} type="button" onClick={() => { set('status', Object.keys(STATUS_LABEL).find(key => STATUS_LABEL[key] === s)); setStatusOpen(false) }}
                                                         className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
-                          ${i < Object.values(STATUS_LABEL).length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                          ${form.status === s ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          ${i < Object.values(STATUS_LABEL).length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
+                          ${form.status === s ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                                                         {s}
                                                     </button>
                                                 ))}
@@ -295,8 +295,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <div className="relative">
                                         <div onClick={() => setMgrOpen(!mgrOpen)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-                    bg-white dark:bg-[#191A1A]
-                    ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#2A2B2B]'} ${mgrOpen ? 'border-[var(--accent-sub)]' : ''}`}>
+                    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+                    ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${mgrOpen ? 'border-[var(--accent-sub)]' : ''}`}>
                                             {mgrOpen ? (
                                                 <input
                                                     autoFocus
@@ -306,10 +306,10 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                         setMgrQuery(e.target.value)
                                                         getEmployee({ search: e.target.value })
                                                     }}
-                                                    className="flex-1 outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]"
+                                                    className="flex-1 outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]"
                                                 />
                                             ) : (
-                                                <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
+                                                <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                                                     {form.manager || 'Menejer tanlang'}
                                                 </span>
                                             )}
@@ -322,10 +322,10 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                             </div>
                                         </div>
                                         {mgrOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                                                 {employees.filter(e => e.roles?.includes('manager')).map((u, i) => (
                                                     <button key={u.id} type="button" onClick={() => { setForm(p => ({ ...p, manager: u.username, manager_id: u.id })); setMgrOpen(false); setMgrQuery('') }}
-                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                                                         <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                                                             {u.username?.slice(0, 2).toUpperCase()}
                                                         </div>
@@ -414,9 +414,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                 time: (val && !p.time) ? dayjs('23:59', 'HH:mm') : p.time
                                             }))}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
-                                            suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                                            allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                                            suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                                            allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                                             format="DD.MM.YYYY"
                                             placeholder="Muddati tanlang"
                                         />
@@ -428,9 +428,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                             value={form.time ? dayjs(form.time, 'HH:mm') : null}
                                             onChange={(val) => set('time', val)}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                                            className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
-                                            suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                                            allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                                            className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#191a1a]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
+                                            suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                                            allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                                             format="HH:mm"
                                             placeholder="00:00"
                                             maxLength={5}
@@ -443,20 +443,20 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     )}
 
                     {/* Footer */}
-                    <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-white dark:bg-[#111111]">
+                    <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
                         {!loading &&
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Muzlatilganmi ?</span>
+                                <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
                                 <button type="button" onClick={() => set('is_hidden', !form.is_hidden)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
-                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
+                                    <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
                         }
                         <div className="flex items-center gap-3">
                             <button onClick={onClose}
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                                 <FaXmark size={13} /> Yopish
                             </button>
                             <button onClick={saveChanges}

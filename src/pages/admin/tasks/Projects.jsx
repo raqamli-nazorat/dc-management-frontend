@@ -10,7 +10,7 @@ import { toast } from '../../../Toast/ToastProvider'
 
 const STATUSES = ['Faol', 'Rejalashtirilmoqda', 'Yakunlangan']
 const EMPTY_FILTER = { manager: '', status: '', employee: '', startFromD: '', startFromT: '', startToD: '', startToT: '', deadFromD: '', deadFromT: '', deadToD: '', deadToT: '' }
-const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 const STATUS_LABEL = {
   planning:  'Rejalashtirilmoqda',
@@ -46,7 +46,7 @@ const EMPLOYEES = [
 
 const statusStyle = {
   'Faol': { dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
-  'Rejalashtirilmoqda': { dot: 'bg-[var(--text-soft)]', text: 'text-[var(--text-sub)] dark:text-[#C2C8E0]' },
+  'Rejalashtirilmoqda': { dot: 'bg-[var(--text-soft)]', text: 'text-[var(--text-sub)] dark:text-[var(--text-sub)]' },
   'Yakunlangan': { dot: 'bg-[var(--accent-sub)]', text: 'text-[var(--accent-sub)] dark:text-[var(--accent-soft)]' },
 }
 
@@ -68,8 +68,8 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-          bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
-          ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+          ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
         <span className="flex-1 text-left truncate">{value || placeholder}</span>
         <div className="flex items-center gap-1.5 shrink-0 ml-1">
           {value && <span onMouseDown={e => { e.stopPropagation(); onChange('') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>}
@@ -78,12 +78,12 @@ function SimpleSelect({ value, onChange, options, placeholder }) {
       </button>
       {open && (
         <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {options.map((o, i) => (
             <button key={o} type="button" onClick={() => { onChange(o); setOpen(false) }}
               className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
-                ${i < options.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                ${value === o ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                ${i < options.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
+                ${value === o ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
               {o}
             </button>
           ))}
@@ -109,8 +109,8 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
     { label: 'Bekor qilingan',     value: 'cancelled' },
   ]
 
-  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[#191A1A] border-[var(--stroke-sub)] dark:border-[#292A2A] ${val ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
-  const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]'
+  const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${val ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
+  const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]'
 
   const selectedMgr = users.find(u => u.id === f.manager)
   const selectedEmp = users.find(u => u.id === f.employee)
@@ -121,15 +121,15 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
       <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
 
         {/* Header */}
         <div className="px-7 pt-7 pb-3">
           <div className="flex items-center gap-3 mb-1.5">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Filtrlash</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Filtrlash</h2>
           </div>
           <p className="text-sm text-[var(--text-sub)]">Kerakli filtrlarni tanlang, natijalar shunga qarab saralanadi</p>
         </div>
@@ -155,11 +155,11 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {users.map((u, i) => (
                       <button key={u.id} type="button" onClick={() => { set('manager', u.id); mgrDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${f.manager === u.id ? 'bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                         <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                           {(u.username ?? '?').slice(0, 2).toUpperCase()}
                         </div>
-                        <p className={`text-sm truncate ${f.manager === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
+                        <p className={`text-sm truncate ${f.manager === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)]'}`}>{u.username}</p>
                       </button>
                     ))}
                   </div>
@@ -183,7 +183,7 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {STATUS_API.map((s, i) => (
                       <button key={s.value} type="button" onClick={() => { set('status', s.value); stsDd.setOpen(false) }}
-                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full px-4 py-2.5 text-left text-sm  cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${f.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                         {s.label}
                       </button>
                     ))}
@@ -208,11 +208,11 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
                   <div className={ddList}>
                     {users.map((u, i) => (
                       <button key={u.id} type="button" onClick={() => { set('employee', u.id); empDd.setOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left  cursor-pointer ${i < users.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${f.employee === u.id ? 'bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                         <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                           {(u.username ?? '?').slice(0, 2).toUpperCase()}
                         </div>
-                        <p className={`text-sm truncate ${f.employee === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-white'}`}>{u.username}</p>
+                        <p className={`text-sm truncate ${f.employee === u.id ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)] font-semibold' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)]'}`}>{u.username}</p>
                       </button>
                     ))}
                   </div>
@@ -245,10 +245,10 @@ function ProjectFilterModal({ onClose, onApply, initial, users = [] }) {
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+        <div className="px-7 py-5 flex items-center justify-end gap-3 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
@@ -290,20 +290,20 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
         {/* Header */}
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer">
               <FaArrowLeft size={16} />
             </button>
-            <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-white">{title}</h2>
+            <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{title}</h2>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={toggleAll}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer
-                border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
@@ -320,8 +320,8 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border 
-                  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-                  dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)]
+                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
                   focus:border-[var(--accent-sub)]"
               />
             </div>
@@ -341,13 +341,13 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 onClick={() => toggle(u.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${isSelected
-                    ? 'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[var(--accent-strong)]'
-                    : 'bg-white border-[#EEF1F7] hover:bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'
+                    ? 'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[var(--bg-elevation-2)] dark:border-[var(--accent-strong)]'
+                    : 'bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-soft)] hover:bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:hover:bg-[var(--bg-elevation-1)]'
                   }`}
               >
                 {/* Checkbox */}
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 
-                  ${isSelected ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[#474848]'}`}>
+                  ${isSelected ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[var(--stroke-sub)]'}`}>
                   {isSelected && <FaCheck size={9} className="text-white" />}
                 </div>
                 {/* Avatar */}
@@ -356,7 +356,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
                 </div>
                 {/* Info */}
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{u.username}</p>
+                  <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{u.username}</p>
                   <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate">{u.position || u.roles?.[0] || '�'}</p>
                 </div>
               </button>
@@ -365,12 +365,12 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users = [] }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-          <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
+        <div className="px-6 py-4 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex items-center justify-between shrink-0">
+          <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]">{temp.length} ta tanlangan</span>
           <div className="flex items-center gap-3">
             <button onClick={() => setTemp([])}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium  cursor-pointer
-                text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={handleConfirm}
@@ -393,7 +393,7 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
       <div
         onClick={onOpen}
         className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left
-          bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[var(--accent-sub)]"
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] hover:border-[var(--accent-sub)]"
       >
         <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
           {selected.length === 0 ? (
@@ -402,7 +402,7 @@ function SelectedUsersField({ label, selected, onOpen, onRemove }) {
             selected.map(u => (
               <span key={u.id}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
-                  bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]">
+                  bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]">
                 {u.username}
                 <span
                   onMouseDown={e => { e.stopPropagation(); onRemove(u.id) }}
@@ -439,19 +439,19 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
   const remove = (name) => onChange(selected.filter(s => s.name !== name))
   const add = (item) => { onChange([...selected, item]); setQuery(''); }
 
-  const iCls = 'w-full px-3 py-2 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)] dark:placeholder-[var(--text-sub)]'
+  const iCls = 'w-full px-3 py-2 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:placeholder-[var(--text-sub)]'
 
   return (
     <div ref={ref} className="relative">
       <div
         onClick={() => setOpen(true)}
         className={`min-h-[42px] w-full flex flex-wrap gap-1.5 px-3 py-2 rounded-xl border  cursor-text
-          bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
           ${open ? 'border-[var(--accent-sub)] dark:border-[var(--accent-sub)]' : ''}`}>
         {selected.map(s => (
           <span key={s.name}
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium
-              bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]">
+              bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]">
             {s.name} | {s.role}
             <button type="button" onMouseDown={e => { e.stopPropagation(); remove(s.name) }}
               className="hover:opacity-70 cursor-pointer ml-0.5">
@@ -462,22 +462,22 @@ function MultiSelect({ placeholder, options, selected, onChange }) {
         {open ? (
           <input autoFocus value={query} onChange={e => setQuery(e.target.value)}
             placeholder={selected.length === 0 ? placeholder : ''}
-            className="flex-1 min-w-[80px] text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-white placeholder-[var(--text-soft)]" />
+            className="flex-1 min-w-[80px] text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
         ) : selected.length === 0 && (
           <span className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] select-none">{placeholder}</span>
         )}
       </div>
       {open && filtered.length > 0 && (
         <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {filtered.map(o => (
             <button key={o.name} type="button" onMouseDown={() => add(o)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]  cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B] last:border-0">
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]  cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0">
               <div className="w-7 h-7 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                 {o.name.slice(0, 2).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-medium text-[var(--text-strong)] dark:text-white leading-tight">{o.name}</p>
+                <p className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-tight">{o.name}</p>
                 <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)]">{o.role}</p>
               </div>
             </button>
@@ -603,9 +603,9 @@ function AddProjectModal({ onClose, onAdd }) {
 
   const inputCls = (err) =>
     `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)]
-    dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)]
-    ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
+    bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+    dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
+    ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
 
   const STATUS_API = [
     { label: 'Rejalashtirilmoqda', value: 'planning' },
@@ -621,13 +621,13 @@ function AddProjectModal({ onClose, onAdd }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-4">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                 <FaArrowLeft size={17} />
               </button>
-              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha qo'shish</h2>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha qo'shish</h2>
             </div>
             <p className="text-sm text-[var(--text-sub)]">Loyiha nomi va asosiy ma'lumotlarni to'ldiring</p>
           </div>
@@ -646,7 +646,7 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Holati</label>
                 <div className="relative">
                   <button type="button" onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
                     <span>{STATUS_API.find(s => s.value === form.status)?.label || 'Holati tanlang'}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {form.status && (
@@ -657,10 +657,10 @@ function AddProjectModal({ onClose, onAdd }) {
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {STATUS_API.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -693,8 +693,8 @@ function AddProjectModal({ onClose, onAdd }) {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]">
-                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]">
+                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -706,10 +706,10 @@ function AddProjectModal({ onClose, onAdd }) {
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                             {u.username?.slice(0, 2).toUpperCase()}
                           </div>
@@ -806,15 +806,15 @@ function AddProjectModal({ onClose, onAdd }) {
 
           <div className="px-7 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">Faolmi?</span>
+              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Faolmi?</span>
               <button type="button" onClick={() => set('is_active', !form.is_active)}
-                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_active ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
-                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_active ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
+                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
@@ -859,17 +859,17 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
           <FaXmark size={14} />
         </button>
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
       
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-2">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyihani o'chirish</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyihani o'chirish</h2>
           </div>
           <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] ">
             Haqiqatan ham ushbu loyihani o'chirmoqchimisiz? Bu amalni bekor qilib bo'lmaydi
@@ -878,7 +878,7 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
         <div className="px-7 py-5 flex items-center justify-end gap-3">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={() => { onConfirm(project.id); onClose() }}
@@ -893,7 +893,7 @@ function DeleteConfirmModal({ project, onClose, onConfirm }) {
 
 /* -- DetailModal -- */
 function DetailModal({ project, onClose }) {
-  const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
+  const tagCls = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
 
   const fmtNum = (val) => {
     if (!val) return '�'
@@ -912,7 +912,7 @@ function DetailModal({ project, onClose }) {
 
   const statusColors = {
     active:    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    planning:  'bg-[#F1F3F9] text-[var(--text-sub)] dark:bg-[#292A2A] dark:text-[#C2C8E0]',
+    planning:  'bg-[#F1F3F9] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)]',
     completed: 'bg-[#EEF1FB] text-[var(--accent-sub)] dark:bg-[#1e2340] dark:text-[var(--accent-soft)]',
     overdue:   'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     cancelled: 'bg-[#FEF2F2] text-[#DC2626] dark:bg-[#2A1A1A] dark:text-[#F87171]',
@@ -922,7 +922,7 @@ function DetailModal({ project, onClose }) {
     return (
       <div>
         <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-[var(--text-strong)] dark:text-white">{value || '�'}</p>
+        <p className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{value || '�'}</p>
       </div>
     )
   }
@@ -937,7 +937,7 @@ function DetailModal({ project, onClose }) {
             {info.username?.slice(0, 2).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{info.username}</p>
+            <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{info.username}</p>
             <p className="text-xs text-[var(--text-soft)] truncate">{info.position || info.roles?.[0] || ''}</p>
           </div>
         </div>
@@ -952,17 +952,17 @@ function DetailModal({ project, onClose }) {
         <FaXmark size={14} />
       </button>
 
-      <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+      <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
         {/* Header */}
-        <div className="px-7 pt-7 pb-5 border-b border-[#F1F3F9] dark:border-[#292A2A]">
+        <div className="px-7 pt-7 pb-5 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
           <div className="flex items-center gap-3 mb-3">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
             </button>
             <div className="flex items-center gap-2 flex-wrap">
               {project.uid && (
-                <span className="text-xs font-mono text-[var(--text-soft)] bg-[#F1F3F9] dark:bg-[#292A2A] px-2 py-0.5 rounded-lg">{project.uid}</span>
+                <span className="text-xs font-mono text-[var(--text-soft)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] px-2 py-0.5 rounded-lg">{project.uid}</span>
               )}
               {project.prefix && (
                 <span className="text-xs font-mono font-bold text-[var(--accent-sub)] bg-[#EEF1FB] dark:bg-[#1e2340] px-2 py-0.5 rounded-lg">{project.prefix}</span>
@@ -975,7 +975,7 @@ function DetailModal({ project, onClose }) {
               )}
             </div>
           </div>
-          <h2 className="text-xl font-extrabold text-[var(--text-strong)] dark:text-white ml-8">
+          <h2 className="text-xl font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] ml-8">
             {project.title || project.name}
           </h2>
         </div>
@@ -987,7 +987,7 @@ function DetailModal({ project, onClose }) {
           {project.description && (
             <div>
               <p className="text-xs text-[var(--text-soft)] mb-1">Tavsif</p>
-              <p className="text-sm text-[var(--text-strong)] dark:text-[#C2C8E0] leading-relaxed whitespace-pre-wrap bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] rounded-xl px-4 py-3">
+              <p className="text-sm text-[var(--text-strong)] dark:text-[var(--text-sub)] leading-relaxed whitespace-pre-wrap bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] rounded-xl px-4 py-3">
                 {project.description}
               </p>
             </div>
@@ -1000,7 +1000,7 @@ function DetailModal({ project, onClose }) {
           </div>
 
           {/* Moliya bloki */}
-          <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]">
+          <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
             <InfoRow label="Loyiha narxi" value={fmtNum(project.project_price)} />
             <InfoRow label="Menejer bonusi" value={fmtNum(project.manager_bonus)} />
             <InfoRow label="Jarima foizi" value={project.penalty_percentage ? `${Math.abs(parseFloat(project.penalty_percentage))} %` : '�'} />
@@ -1032,7 +1032,7 @@ function DetailModal({ project, onClose }) {
           </div>
 
           {/* Vaqtlar */}
-          <div className="grid grid-cols-3 gap-4 pt-2 border-t border-[#F1F3F9] dark:border-[#292A2A]">
+          <div className="grid grid-cols-3 gap-4 pt-2 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
             <InfoRow label="Muddati" value={fmtDtFull(project.deadline)} />
             <InfoRow label="Yaratilgan" value={fmtDtFull(project.created_at)} />
             <InfoRow label="Yangilangan" value={fmtDtFull(project.updated_at)} />
@@ -1041,10 +1041,10 @@ function DetailModal({ project, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-4 border-t border-[#F1F3F9] dark:border-[#292A2A] flex justify-end">
+        <div className="px-7 py-4 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex justify-end">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Yopish
           </button>
         </div>
@@ -1164,7 +1164,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
   }
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#191A1A] dark:text-white dark:placeholder-[var(--text-sub)] ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A] focus:border-[var(--accent-sub)]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
 
   const STATUS_API = [
     { label: 'Rejalashtirilmoqda', value: 'planning' },
@@ -1180,11 +1180,11 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
         <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-white dark:bg-[#111111] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
           <div className="px-7 pt-7 pb-4">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
-              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyiha tahrirlash</h2>
+              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha tahrirlash</h2>
             </div>
             <p className="text-sm text-[var(--text-sub)]">Loyiha ma'lumotlarini yangilash uchun o'zgartirishlar kiriting</p>
           </div>
@@ -1199,7 +1199,7 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
                 <label className={labelCls}>Holati</label>
                 <div className="relative">
                   <button type="button" onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[#191A1A] ${errors.status ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'} ${form.status ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
                     <span>{STATUS_API.find(s => s.value === form.status)?.label || 'Holati tanlang'}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {form.status && <span onMouseDown={e => { e.stopPropagation(); set('status', '') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>}
@@ -1208,10 +1208,10 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {STATUS_API.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
-                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer ${i < STATUS_API.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           {s.label}
                         </button>
                       ))}
@@ -1233,18 +1233,18 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]">
-                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>{form.manager?.username || 'Menejer tanlang'}</span>
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]">
+                    <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>{form.manager?.username || 'Menejer tanlang'}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {form.manager && <span onMouseDown={e => { e.stopPropagation(); set('manager', null) }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>}
                       <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${mgrOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+                    <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {allUsers.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', { id: u.id, username: u.username }); setMgrOpen(false) }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[#292A2A] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                           <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">{u.username?.slice(0, 2).toUpperCase()}</div>
                           <p className="truncate">{u.username}</p>
                         </button>
@@ -1300,14 +1300,14 @@ function EditProjectModal({ project, onClose, onSave, users: allUsers = [] }) {
           </div>
           <div className="px-7 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
+              <span className="text-sm font-medium text-[#1A1D2E] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
               <button type="button" onClick={() => set('is_active', !form.is_active)}
-                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_active ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}>
-                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_active ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
+                <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_active ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               <button onClick={handleSubmit} disabled={loading}
@@ -1344,15 +1344,15 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
         className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer
-          text-[var(--text-soft)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+          text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-2xl shadow-2xl border overflow-hidden
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           <button onClick={() => { onDetail?.(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
-              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+            className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
             </svg>
@@ -1361,8 +1361,8 @@ function RowMenu({ onEdit, onDetail, onDelete, canEdit = false }) {
           {canEdit && (
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
-                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
-                  hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A] cursor-pointer border-b border-[#F1F3F9] dark:border-[#2A2B2B]">
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+                  hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -1546,11 +1546,11 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white">Loyihalar</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyihalar</h1>
 
       <div className="flex items-center gap-2">
         <div className="relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#C2C8E0]"
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-sub)]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
@@ -1558,22 +1558,22 @@ export default function ProjectsPage() {
             onChange={e => handleSearch(e.target.value)}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none w-[200px]
               bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[var(--text-sub)]" />
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]" />
         </div>
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border cursor-pointer
-            bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+            bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
           <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
         {/* View toggle */}
-        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[#222323] dark:border-[#474848]">
+        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)]">
           <button onClick={() => setViewMode('table')}
-            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#2A2B2B] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm' : 'text-[var(--text-soft)] dark:text-[#C2C8E0] hover:text-[var(--accent-strong)]'}`}>
+            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'table' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)] hover:text-[var(--accent-strong)]'}`}>
             <LuLayoutList size={16} />
           </button>
           <button onClick={() => setViewMode('card')}
-            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'card' ? 'bg-white dark:bg-[#2A2B2B] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm' : 'text-[var(--text-soft)] dark:text-[#C2C8E0] hover:text-[var(--accent-strong)]'}`}>
+            className={`p-1.5 rounded-lg cursor-pointer ${viewMode === 'card' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)] hover:text-[var(--accent-strong)]'}`}>
             <LuLayoutGrid size={16} />
           </button>
         </div>
@@ -1585,10 +1585,10 @@ export default function ProjectsPage() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="rounded-2xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#1C1D1D] p-4 flex flex-col gap-3">
-                  <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-3/4" />
-                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-1/2" />
-                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse w-2/3" />
+                <div key={i} className="rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-4 flex flex-col gap-3">
+                  <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse w-3/4" />
+                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse w-1/2" />
+                  <div className="h-3 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse w-2/3" />
                 </div>
               ))}
             </div>
@@ -1599,7 +1599,7 @@ export default function ProjectsPage() {
               {data.map(p => {
                 const statusColors = {
                   active:    { bg: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-                  planning:  { bg: 'bg-[#F1F3F9] text-[var(--text-sub)] dark:bg-[#292A2A] dark:text-[#C2C8E0]' },
+                  planning:  { bg: 'bg-[#F1F3F9] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)]' },
                   completed: { bg: 'bg-[#EEF1FB] text-[var(--accent-sub)] dark:bg-[#1e2340] dark:text-[var(--accent-soft)]' },
                   overdue:   { bg: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
                   cancelled: { bg: 'bg-[#FEF2F2] text-[#DC2626] dark:bg-[#2A1A1A] dark:text-[#F87171]' },
@@ -1608,11 +1608,11 @@ export default function ProjectsPage() {
                 return (
                   <div key={p.id}
                     onClick={() => loadProjectDetail(p.id, 'detail')}
-                    className="rounded-2xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#1C1D1D]
+                    className="rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]
                       p-4 flex flex-col gap-3 cursor-pointer hover:border-[var(--accent-sub)]/50 hover:shadow-md transition-all">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-bold text-[var(--text-strong)] dark:text-white leading-snug truncate flex-1">
+                      <p className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-snug truncate flex-1">
                         {p.title || p.name}
                       </p>
                       <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${sc.bg}`}>
@@ -1642,7 +1642,7 @@ export default function ProjectsPage() {
                           {(p.manager_info?.username || '?').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-[var(--text-strong)] dark:text-white truncate">{p.manager_info?.username || '�'}</p>
+                          <p className="text-xs font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{p.manager_info?.username || '�'}</p>
                           <p className="text-[10px] text-[var(--text-soft)]">Menejer</p>
                         </div>
                       </div>
@@ -1661,7 +1661,7 @@ export default function ProjectsPage() {
             </div>
           )}
           {loadingMore && (
-            <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+            <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
               <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
@@ -1674,25 +1674,25 @@ export default function ProjectsPage() {
         <div ref={scrollRef} className="flex-1 overflow-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">?</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">?</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Menejer</span>
               </th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratilgan</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Yaratilgan</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Muddati</th>
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
           <tbody>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                <tr key={i} className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   {[1,2,3,4,5,6,7].map(j => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
+                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
                     </td>
                   ))}
                 </tr>
@@ -1701,17 +1701,17 @@ export default function ProjectsPage() {
               data.map((p, idx) => (
                 <tr key={p.id}
                   onClick={() => loadProjectDetail(p.id, 'detail')}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
-                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{p.uid || idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{p.title || p.name}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{p.manager_info?.username || '�'}</td>
+                  className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/2 dark:hover:bg-white/2 cursor-pointer">
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">{p.uid || idx + 1}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.title || p.name}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.manager_info?.username || '�'}</td>
                   <td className="px-4 py-3 text-right">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[#292A2A] dark:text-[#C2C8E0]`}>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-[var(--stroke-sub)] text-[var(--text-sub)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]`}>
                       {STATUS_LABEL[p.status] || p.status || '�'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDt(p.created_at)}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDt(p.deadline)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.created_at)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.deadline)}</td>
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                     <RowMenu
                       onDetail={() => loadProjectDetail(p.id, 'detail')}
@@ -1733,7 +1733,7 @@ export default function ProjectsPage() {
           />
         )}
         {loadingMore && (
-          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>

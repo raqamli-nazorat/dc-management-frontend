@@ -2,7 +2,7 @@
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates"
 
-const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [], onSearch }) => {
     const [search, setSearch] = useState('')
@@ -27,19 +27,19 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
             <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
                 <FaXmark size={16} />
             </button>
-            <div className="relative w-full min-h-[90vh]! max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] flex flex-col max-h-[90vh]">
+            <div className="relative w-full min-h-[90vh]! max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4 shrink-0">
                     <div className="flex items-center gap-3 mb-4">
-                        <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer">
+                        <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer">
                             <FaArrowLeft size={16} />
                         </button>
-                        <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-white">{title}</h2>
+                        <h2 className="text-lg font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{title}</h2>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={toggleAll}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:border-[#292A2A] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border  cursor-pointer border-[var(--stroke-sub)] text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                 <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
                             </svg>
@@ -66,7 +66,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                         onSearch(search);
                                     }
                                 }}
-                                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white dark:placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]"
+                                className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]"
                             />
                         </div>
                     </div>
@@ -84,8 +84,8 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                 onClick={() => toggle(u.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left 
                                     ${isSelected ?
-                                        'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[#292A2A] dark:border-[var(--accent-strong)]' :
-                                        'bg-white border-[#EEF1F7] hover:bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:hover:bg-[#222323]'
+                                        'bg-[#EEF1FB] border-[#C7D0F5] dark:bg-[var(--bg-elevation-2)] dark:border-[var(--accent-strong)]' :
+                                        'bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-soft)] hover:bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:hover:bg-[var(--bg-elevation-1)]'
                                     }
                                 `}
                             >
@@ -93,7 +93,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
                                     ${isSelected ?
                                         'bg-[var(--accent-strong)] border-[var(--accent-strong)]' :
-                                        'border-[var(--stroke-strong)] dark:border-[#474848]'
+                                        'border-[var(--stroke-strong)] dark:border-[var(--stroke-sub)]'
                                     }
                                 `}>
                                     {isSelected && <FaCheck size={9} className="text-white" />}
@@ -105,7 +105,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                 </div>
                                 {/* Info */}
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-white truncate">{u.username}</p>
+                                    <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{u.username}</p>
                                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate">
                                         {
                                             console.log(u)
@@ -120,11 +120,11 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-[#EEF1F7] dark:border-[#292A2A] flex items-center justify-between shrink-0">
-                    <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]">{temp.length} ta tanlangan</span>
+                <div className="px-6 py-4 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex items-center justify-between shrink-0">
+                    <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]">{temp.length} ta tanlangan</span>
                     <div className="flex items-center gap-3">
                         <button onClick={() => setTemp([])}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                             <FaXmark size={12} /> Tozalash
                         </button>
                         <button onClick={handleConfirm}
@@ -145,7 +145,7 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
             <label className={labelCls}>{label}</label>
             <div
                 onClick={onOpen}
-                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] hover:border-[var(--accent-sub)]"
+                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] hover:border-[var(--accent-sub)]"
             >
                 <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                     {selected.length === 0 ? (
@@ -154,7 +154,7 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
                         selected.map(u => (
                             <span
                                 key={u.id}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]"
                             >
 
                                 {u?.username} | {u?.position_info?.name || u?.position}

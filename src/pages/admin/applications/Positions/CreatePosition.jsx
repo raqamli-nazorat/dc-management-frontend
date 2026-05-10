@@ -36,8 +36,8 @@ const CreatePosition = ({ onClose, refetch }) => {
         }
     }
 
-    const inputCls = 'w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] border-[var(--stroke-sub)] focus:border-[var(--accent-sub)] dark:border-[#292A2A]'
-    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
+    const inputCls = 'w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] border-[var(--stroke-sub)] focus:border-[var(--accent-sub)] dark:border-[var(--stroke-soft)]'
+    const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto modal-scroll py-8 px-4">
@@ -45,24 +45,24 @@ const CreatePosition = ({ onClose, refetch }) => {
             <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
                 <FaXmark size={16} />
             </button>
-            <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323]">
+            <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
                 <div className="px-7 pt-7 pb-5">
                     <div className="flex flex-col items-start gap-3">
                         <div className='flex gap-3'>
                             <button
                                 onClick={onClose}
-                                className="mt-1 text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer shrink-0"
+                                className="mt-1 text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer shrink-0"
                             >
                                 <FaArrowLeft size={18} />
                             </button>
                             <h2
-                                className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
+                                className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
                                 style={{ fontSize: 20, fontWeight: 800 }}
                             >
                                 Lavozim qo'shish
                             </h2>
                         </div>
-                        <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mt-1">
+                        <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] mt-1">
                             Yangi lavozim qo'shish
                         </p>
                     </div>
@@ -79,22 +79,22 @@ const CreatePosition = ({ onClose, refetch }) => {
                         />
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-sm text-[var(--text-strong)] dark:text-[#FFFFFF]">
+                        <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                             Ariza uchun ham ishlatilsinmi?
                         </span>
                         <button
                             type="button"
                             onClick={() => setForm({ ...form, is_application: !form.is_application })}
-                            className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[#292A2A]'}`}
+                            className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                         >
                             <span
-                                className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
+                                className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${form.is_application ? 'translate-x-5' : 'translate-x-0.5'}`}
                             />
                         </button>
                     </div>
                 </div>
                 <div className="px-7 py-5 flex items-center justify-end gap-3">
-                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
                         <FaXmark size={14} />
                         Yopish
                     </button>

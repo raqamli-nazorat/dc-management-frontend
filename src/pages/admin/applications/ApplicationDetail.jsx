@@ -124,21 +124,21 @@ const ApplicationDetail = () => {
 
   if (!application) {
     return (
-      <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+      <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
         Ariza topilmadi
       </div>
     )
   }
 
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5] disabled:cursor-default`
-  const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1'
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] disabled:cursor-default`
+  const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
 
   return (
     <>
       <div className="flex flex-col gap-2.5">
         <h1
-          className="text-[var(--text-strong)] dark:text-white"
+          className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
           style={{ fontSize: 24, fontWeight: 800 }}
         >
           Ma'lumotlar
@@ -156,7 +156,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.full_name); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -183,7 +183,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.phone); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -200,7 +200,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.telegram); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -230,7 +230,7 @@ const ApplicationDetail = () => {
           <div>
             <label className={labelCls}>Rezyume (CV)</label>
             <div
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-white border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-[#C2C8E0]"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]"
             >
               <FaFileLines size={14} className="shrink-0" />
               <a
@@ -249,7 +249,7 @@ const ApplicationDetail = () => {
               />
               <button
                 onClick={() => { navigator.clipboard.writeText(application.portfolio); setCopyText(true) }}
-                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]'
+                className='absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]'
                 title="Nusxa olish"
               >
                 <CopyIcon />
@@ -279,7 +279,7 @@ const ApplicationDetail = () => {
         </div>
 
         <div className="flex flex-col gap-2 -mt-3!">
-          <span className="text-[20px] font-bold dark:text-white">Xodim hulosasi</span>
+          <span className="text-[20px] font-bold dark:text-[var(--text-strong)]">Xodim hulosasi</span>
           <textarea
             className={`${inputCls} h-25`}
             placeholder='Xodim hulosasini kiriting'
@@ -328,15 +328,15 @@ const ApplicationDetail = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => setIsModalOpen(false)} />
-          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-white dark:bg-[#141414] p-6 border border-white/5">
+          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[#141414] p-6 border border-white/5">
             <div className="flex items-center gap-3 mb-5">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="dark:text-white text-black hover:opacity-70 cursor-pointer"
+                className="dark:text-[var(--text-strong)] text-black hover:opacity-70 cursor-pointer"
               >
                 <FaArrowLeft size={18} />
               </button>
-              <h2 className="text-xl font-bold dark:text-white text-black">
+              <h2 className="text-xl font-bold dark:text-[var(--text-strong)] text-black">
                 Xulosa kiriting
               </h2>
             </div>
@@ -348,7 +348,7 @@ const ApplicationDetail = () => {
                   setModalConclusion(e.target.value)
                   if (e.target.value.trim()) setError('')
                 }}
-                className={`w-full h-[150px] p-4 rounded-xl dark:bg-[#141414] border ${error ? 'border-[#fa5252]' : 'border-slate-300'} dark:text-white text-black text-sm placeholder:text-gray-500 outline-none resize-none dark:placeholder-white/20 dark:focus:border-white/20 dark:border-[#292A2A] focus:border-slate-400 transition-colors`}
+                className={`w-full h-[150px] p-4 rounded-xl dark:bg-[#141414] border ${error ? 'border-[#fa5252]' : 'border-slate-300'} dark:text-[var(--text-strong)] text-black text-sm placeholder:text-gray-500 outline-none resize-none dark:placeholder-white/20 dark:focus:border-white/20 dark:border-[var(--stroke-soft)] focus:border-slate-400 transition-colors`}
                 placeholder="Xulosangizni shu yerga yozing..."
               />
               {error && (

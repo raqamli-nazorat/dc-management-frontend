@@ -151,7 +151,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               ? '0 8px 24px rgba(0,0,0,0.35)'
               : '0 1px 4px rgba(0,0,0,0.12)',
           }}
-          className={`w-full shrink-0 rounded-xl bg-white dark:bg-[#252626] select-none cursor-grab active:cursor-grabbing overflow-hidden border
+          className={`w-full shrink-0 rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] select-none cursor-grab active:cursor-grabbing overflow-hidden border
             ${snapshot.isDragging
               ? 'border-[var(--accent-sub)] dark:border-[var(--accent-sub)]'
               : 'border-[#E8EBF4] dark:border-[#333535]'}`}
@@ -160,7 +160,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
             <div className="flex-1 px-2 py-1.5 flex    h-40 flex-col gap-1.5">
 
               {/* Title — har doim 2 qator balandlik, matn oshsa kesiladi */}
-              <p className="w-full text-[13px] font-bold text-[var(--text-strong)] dark:text-white leading-snug line-clamp-2"
+              <p className="w-full text-[13px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-snug line-clamp-2"
                 style={{ minHeight: 'calc(1.25em * 2)' }}
                 title={card.title || ''}>
                 {card.title}
@@ -174,7 +174,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                   </svg>
 
                   <span
-                    className="text-[11px] cursor-pointer text-[var(--text-strong)] dark:text-[#8B949E] font-medium hover:text-[var(--accent-sub)] transition-colors"
+                    className="text-[11px] cursor-pointer text-[var(--text-strong)] dark:text-[var(--text-sub)] font-medium hover:text-[var(--accent-sub)] transition-colors"
                     onClick={e => {
                       e.stopPropagation()
                       navigator.clipboard.writeText(card.uid || `T${card.id}`).then(() => {
@@ -187,7 +187,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                 {card.reopened_count > 0 && (
                   <div className="flex items-center top-0 right-3 absolute gap-0.5 shrink-0">
                     <img src="/imgs/tuiIconRedo.svg" alt="redo" className="w-3 h-3" style={{ filter: 'invert(65%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)' }} />
-                    <span className="text-[11px]  dark:text-[#8B949E]  font-bold text-[var(--text-sub)]">{card.reopened_count}</span>
+                    <span className="text-[11px]  dark:text-[var(--text-sub)]  font-bold text-[var(--text-sub)]">{card.reopened_count}</span>
                   </div>
                 )}
               </div>
@@ -199,7 +199,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M4.375 0C4.85825 0 5.25 0.391751 5.25 0.875V1.75L8.75 1.75V0.875C8.75 0.391751 9.14175 0 9.625 0C10.1082 0 10.5 0.391751 10.5 0.875V1.75H11.0836C12.2109 1.75 13.125 2.66413 13.125 3.79138L13.125 11.9586C13.125 13.0859 12.2109 14 11.0836 14L2.91637 14C1.78913 14 0.875 13.0859 0.875 11.9586L0.875 3.79138C0.875 2.66413 1.78913 1.75 2.91637 1.75L3.5 1.75L3.5 0.875C3.5 0.391751 3.89175 0 4.375 0ZM3.54969 3.5H2.91637C2.75562 3.5 2.625 3.63062 2.625 3.79138L2.625 5.25L11.375 5.25V3.79138C11.375 3.63062 11.2444 3.5 11.0836 3.5L10.4503 3.5C10.3303 3.84 10.0061 4.08362 9.625 4.08362C9.24391 4.08362 8.91972 3.84 8.79969 3.5L5.20031 3.5C5.08028 3.84 4.75609 4.08362 4.375 4.08362C3.99391 4.08362 3.66972 3.84 3.54969 3.5ZM11.375 7L2.625 7L2.625 11.9586C2.625 12.1194 2.75562 12.25 2.91637 12.25L11.0836 12.25C11.2444 12.25 11.375 12.1194 11.375 11.9586L11.375 7Z" fill="#9AA1B5" />
                   </svg>
 
-                  <span className={`text-[11px] dark:text-[#8B949E]  font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[var(--text-strong)]'}`}>
+                  <span className={`text-[11px] dark:text-[var(--text-sub)]  font-medium ${isOverdue ? 'text-[#EF4444]' : 'text-[var(--text-strong)]'}`}>
                     {fmtDate(card.deadline)}
                   </span>
                 </div>
@@ -221,7 +221,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                         </defs>
                       </svg>
 
-                      <span className="text-[11px] dark:text-[#8B949E]  text-[var(--text-strong)] font-medium">{durationStr}</span>
+                      <span className="text-[11px] dark:text-[var(--text-sub)]  text-[var(--text-strong)] font-medium">{durationStr}</span>
                     </div>
                   )}
                   {countdown && (
@@ -254,10 +254,10 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-[var(--text-strong)] dark:text-white truncate leading-tight">
+                    <p className="text-[11px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate leading-tight">
                       {assignee}
                     </p>
-                    <p className="text-[11px] dark:text-[#E6EDF3]  text-[var(--text-strong)] truncate leading-tight">
+                    <p className="text-[11px] dark:text-[var(--text-strong)]  text-[var(--text-strong)] truncate leading-tight">
                       {position || 'Dasturchi'}
                     </p>
                   </div>
@@ -337,13 +337,13 @@ function RejectionModal({ task, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-[9999]  flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111] p-7 flex flex-col gap-5">
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] dark:bg-[#292A2A] text-[var(--text-sub)] dark:text-[#C2C8E0] hover:bg-[var(--stroke-sub)] cursor-pointer">
+      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] p-7 flex flex-col gap-5">
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:bg-[var(--stroke-sub)] cursor-pointer">
           <FaXmark size={13} />
         </button>
 
         <div>
-          <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-white">Vazifani rad etish</h2>
+          <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Vazifani rad etish</h2>
           <p className="text-sm text-[var(--text-soft)] mt-0.5">Rad etish sababini kiriting</p>
         </div>
 
@@ -351,7 +351,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
         <div>
           <div className="flex flex-wrap gap-2 mb-1">
             {files.map((f, i) => (
-              <div key={i} className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[#191A1A] flex items-center justify-center group">
+              <div key={i} className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] flex items-center justify-center group">
                 {f.preview
                   ? <img src={f.preview} alt="" className="w-full h-full object-cover" />
                   : <div className="flex flex-col items-center gap-0.5 px-1">
@@ -367,7 +367,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
             ))}
             <button type="button" onClick={() => fileRef.current?.click()}
               className="w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors
-                border-[#C2C8E0] dark:border-[#474848] text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)]">
+                border-[#C2C8E0] dark:border-[var(--stroke-sub)] text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)]">
               <FaPaperclip size={14} />
               <span className="text-[9px]">Rasm</span>
             </button>
@@ -392,16 +392,16 @@ function RejectionModal({ task, onClose, onConfirm }) {
             placeholder="Sababini yozing..."
             rows={4}
             className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
-              bg-white dark:bg-[#191A1A] text-[var(--text-strong)] dark:text-white placeholder-[var(--text-disabled)] dark:placeholder-[#474848]
+              bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:placeholder-[var(--text-sub)]
               focus:border-[var(--accent-sub)] transition-colors
-              ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[#292A2A]'}`}
+              ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`}
           />
           {reasonError && <p className="text-xs text-red-500 mt-0.5">*Sabab kiritish majburiy</p>}
         </div>
 
         <div className="flex items-center justify-end gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={12} /> Bekor qilish
           </button>
           <button onClick={handleSubmit} disabled={loading}
@@ -433,7 +433,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
     >
       {/* Header */}
       <div className="flex  mb-2 justify-center items-center gap-2 px-1">
-        <span className="text-[12px] font-bold text-[var(--text-strong)] dark:text-white whitespace-nowrap truncate">{col.label}</span>
+        <span className="text-[12px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] whitespace-nowrap truncate">{col.label}</span>
         <span
           className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
           style={{ backgroundColor: col.color }}
@@ -783,12 +783,12 @@ export default function TasksPage() {
       registerNavbarExtra(
         <div className="flex items-center gap-3 flex-1">
           <span
-            className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer"
+            className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
             onClick={() => setViewMode('table')}
           >
             Vazifa boshqaruvi
           </span>
-          <span className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[#C2C8E0]">
+          <span className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
             › Vazifalar
           </span>
           <div className="flex-1" />
@@ -806,12 +806,12 @@ export default function TasksPage() {
               onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
               className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
                 bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-soft)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
-                dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[#C2C8E0]" />
+                dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[#C2C8E0]" />
           </div>
           {/* Filter */}
           <button onClick={() => setShowFilter(true)}
             className="relative flex items-center gap-1.5 px-3 py-[5px] rounded-xl text-[13px] font-semibold border  cursor-pointer
-              bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+              bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
             <LuFilter size={13} />
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
           </button>
@@ -831,7 +831,7 @@ export default function TasksPage() {
     return (
       <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate} onDragStart={onDragStart}>
         <div
-          className="flex flex-col bg-[var(--bg-elevation-1)] dark:bg-[#191A1A]"
+          className="flex flex-col bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]"
           style={{ height: 'calc(99vh - 57px)' }}
         >
           {kanbanLoading ? (
@@ -843,7 +843,7 @@ export default function TasksPage() {
             </div>
           ) : (
             <div
-              className="flex gap-2 px-3 pt-3  dark:bg-[#191A1A] pb-3 h-full"
+              className="flex gap-2 px-3 pt-3  dark:bg-[var(--bg-base)] pb-3 h-full"
               style={{ overflow: 'hidden' }}
             >
               {COLUMNS.map(col => {
@@ -930,11 +930,11 @@ export default function TasksPage() {
   return (
     <div className="flex flex-col h-full gap-4" >
 
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white">Vazifalar</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Vazifalar</h1>
 
       <div className="flex items-center gap-2">
         <div className="relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#C2C8E0]"
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-sub)]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
@@ -946,20 +946,20 @@ export default function TasksPage() {
             onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[200px]
               bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[var(--text-sub)]" />
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]" />
         </div>
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
-            bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+            bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
           <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
-        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[#222323] dark:border-[#474848]">
-          <button className="p-1.5 rounded-lg bg-white dark:bg-[#2A2B2B] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm cursor-pointer">
+        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)]">
+          <button className="p-1.5 rounded-lg bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] shadow-sm cursor-pointer">
             <LuLayoutList size={16} />
           </button>
           <button onClick={switchToKanban}
-            className="p-1.5 rounded-lg  cursor-pointer text-[var(--text-soft)] dark:text-[#C2C8E0] hover:text-[var(--accent-strong)]">
+            className="p-1.5 rounded-lg  cursor-pointer text-[var(--text-soft)] dark:text-[var(--text-sub)] hover:text-[var(--accent-strong)]">
             <LuLayoutGrid size={16} />
           </button>
         </div>
@@ -967,33 +967,33 @@ export default function TasksPage() {
 
       <div ref={scrollRef} className="overflow-auto h-[70vh]">
         <table className="w-full  text-sm whitespace-nowrap">
-          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#222323]">
-            <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">№</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">UID</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Loyiha</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Yaratuvchi</th>
-              <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">
+          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
+            <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">№</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">UID</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Loyiha</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Yaratuvchi</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                   Topshiruvchi
                 </span>
               </th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Turi</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Darajasi</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-              <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Turi</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Darajasi</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
+              <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Muddati</th>
               <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
           <tbody className=''>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                <tr key={i} className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(j => (
                     <td key={j} className="px-4 py-3">
-                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
+                      <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" style={{ width: j === 1 ? 32 : '80%' }} />
                     </td>
                   ))}
                 </tr>
@@ -1002,18 +1002,18 @@ export default function TasksPage() {
               data.map((t, idx) => (
                 <tr key={t.id}
                   onClick={() => loadTaskDetail(t.id)}
-                  className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
-                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[#C2C8E0] text-xs font-medium">{idx + 1}</td>
+                  className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/2 dark:hover:bg-white/2  cursor-pointer">
+                  <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">{idx + 1}</td>
                   <td className="px-4 py-3 text-xs font-medium" onClick={e => e.stopPropagation()}>
                     <div className="flex items-center gap-1.5 group">
-                      <span className="text-[var(--text-soft)] dark:text-[#C2C8E0]">{t.uid || idx + 1}</span>
+                      <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)]">{t.uid || idx + 1}</span>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(t.uid || String(idx + 1)).then(() => {
                             toast.success('Nusxa olindi', t.uid || String(idx + 1))
                           }).catch(() => {})
                         }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[#EEF1FB] dark:hover:bg-[#292A2A] text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer"
                         title="Nusxa olish"
                       >
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1022,18 +1022,18 @@ export default function TasksPage() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white max-w-[220px]">
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] max-w-[220px]">
                     <span className="block truncate" title={t.title || t.name || ''}>
                       {t.title || t.name}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || t.project || '—')}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.created_by_info?.username || t.creator || '—'}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{t.assignee_info?.username || t.assignee || '—'}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{TYPE_LABEL[t.type] || t.type || '—'}</td>
-                  <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-white">{PRIORITY_LABEL[t.priority] || t.level || '—'}</td>
-                  <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-white">{TASK_STATUS_LABEL[t.status] || t.status || '—'}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtTaskDt(t.deadline)}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{typeof t.project_info === 'object' ? t.project_info?.title : (t.project_info || t.project || '—')}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.created_by_info?.username || t.creator || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.assignee_info?.username || t.assignee || '—'}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{TYPE_LABEL[t.type] || t.type || '—'}</td>
+                  <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{PRIORITY_LABEL[t.priority] || t.level || '—'}</td>
+                  <td className="px-4 py-3 text-right font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{TASK_STATUS_LABEL[t.status] || t.status || '—'}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtTaskDt(t.deadline)}</td>
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                     {!isAuditor && canEdit && (
                       <TaskRowMenu
@@ -1060,7 +1060,7 @@ export default function TasksPage() {
           />
         )}
         {loadingMore && (
-          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+          <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />

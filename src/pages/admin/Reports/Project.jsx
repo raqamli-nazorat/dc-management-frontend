@@ -733,7 +733,7 @@ const Employee = () => {
       <div className='flex items-center justify-between'>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -741,7 +741,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && search.trim()) {
@@ -757,7 +757,7 @@ const Employee = () => {
               e.preventDefault()
               setFilterModal(prev => !prev)
             }}
-            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-white! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
+            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)]! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${showClearButton ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
             Filtrlash
@@ -767,7 +767,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[#1E2021] text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[var(--bg-elevation-1)] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -817,10 +817,10 @@ const Employee = () => {
                     value={filters.deadline_min}
                     onChange={(value) => handleFilterChange('deadline_min', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Boshlanish sanasi'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
                 <div className="relative flex-1">
@@ -830,10 +830,10 @@ const Employee = () => {
                     format="DD.MM.YYYY HH:mm"
                     onChange={(value) => handleFilterChange('deadline_max', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Tugash sana'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
               </div>
@@ -846,7 +846,7 @@ const Employee = () => {
                 <div className="relative">
                   <FilterInput
                     label="dan"
-                    className='bg-white'
+                    className='bg-[var(--bg-elevation-1-alt)]'
                     value={filters.price_min}
                     onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
                   />
@@ -855,7 +855,7 @@ const Employee = () => {
                 <div className="relative">
                   <FilterInput
                     label="gacha"
-                    className='bg-white'
+                    className='bg-[var(--bg-elevation-1-alt)]'
                     value={filters.price_max}
                     onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
                   />
@@ -871,7 +871,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectAuthor(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
@@ -894,7 +894,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectManager(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.manager?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.manager ? `${filters.manager.split(',').filter(Boolean).length} ta boshqaruvchi` : 'Boshqaruvchi tanlang'}
@@ -917,7 +917,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectUser(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.employees?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.employees ? `${filters.employees.split(',').filter(Boolean).length} ta xodim` : 'Xodimlar tanlang'}
@@ -940,7 +940,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectTester(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.testers?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.testers ? `${filters.testers.split(',').filter(Boolean).length} ta sinovchi` : 'Sinovchilar tanlang'}
@@ -965,35 +965,35 @@ const Employee = () => {
       {/* Table Section */}
       {
         isLoading ? (
-          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (
-          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
           </div>
         ) : (
           <div
-            className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
+            className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
             onScroll={handleMoreReportsScroll}
           >
             <table className="text-left border-collapse w-full min-w-[2800px]">
-              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
+              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
                 <tr>
-                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-center" >№</th>
+                  <th rowSpan={2} className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center" >№</th>
                   {MAIN_COLUMNS.map((col) => (
                     <th
                       key={col.key}
                       rowSpan={2}
-                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                       style={{
                         width: col.width,
                         minWidth: col.width,
@@ -1013,7 +1013,7 @@ const Employee = () => {
                       </div>
                     </th>
                   ))}
-                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#1E2021] dark:border-[#292A2A] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center justify-center gap-2">
                       <Checkbox
                         checked={tablePin.tasks}
@@ -1024,11 +1024,11 @@ const Employee = () => {
                     </div>
                   </th>
                 </tr>
-                <tr className="bg-[#7186ED] dark:bg-[#1E2021] text-[10px] text-center">
+                <tr className="bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] text-[10px] text-center">
                   {GROUP_SUBS.tasks.map((sub) => (
                     <th
                       key={sub.key}
-                      className={`p-2 bg-[#7186ED] dark:bg-[#1E2021] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
+                      className={`p-2 bg-[#7186ED] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
                       style={{
                         width: 140,
                         minWidth: 140,
@@ -1049,61 +1049,61 @@ const Employee = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
+              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[#292A2A] hover:bg-slate-50 dark:hover:bg-[#252626] transition-colors" key={item.id || index}>
-                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 border-r`}>
+                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)] hover:bg-slate-50 dark:hover:bg-[var(--bg-elevation-1-alt)] transition-colors" key={item.id || index}>
+                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 border-r`}>
                       {index + 1}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-start z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.prefix ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.prefix ? 'sticky' : ''}`}
                       style={{ width: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.prefix}
                     </td>
-                    <td className={`p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.title ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs font-semibold text-end text-slate-700 dark:text-slate-200 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.title ? 'sticky' : ''}`}
                       style={{ width: 200, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.title}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.description ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.description ? 'sticky' : ''}`}
                       style={{ width: 250, left: getPinnedLeft('description'), boxShadow: tablePin.description ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.description}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.deadline ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.deadline ? 'sticky' : ''}`}
                       style={{ width: 180, left: getPinnedLeft('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.status ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.status ? 'sticky' : ''}`}
                       style={{ width: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {tableStatuses[item?.status]}
                     </td>
-                    <td className={`p-3 text-xs font-bold text-slate-900 dark:text-white border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.project_price ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs font-bold text-slate-900 dark:text-[var(--text-strong)] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.project_price ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('project_price'), boxShadow: tablePin.project_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.project_price ? formatNum(item.project_price) : ''}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.created_by_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.created_by_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('created_by_name'), boxShadow: tablePin.created_by_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.created_by_name}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.manager_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.manager_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('manager_name'), boxShadow: tablePin.manager_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.manager_name}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-end z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.employees_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.employees_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('employees_names'), boxShadow: tablePin.employees_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.employees_names}
                     </td>
-                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 ${tablePin.testers_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-xs text-slate-600 dark:text-slate-400 border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${tablePin.testers_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('testers_names'), boxShadow: tablePin.testers_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.testers_names}
                     </td>
 
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
-                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-white dark:bg-[#1E2021]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
+                    <td className={`p-3 text-xs font-bold text-slate-700 dark:text-slate-300 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center transition-all duration-300 ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
                   </tr>
                 ))}
               </tbody>

@@ -725,7 +725,7 @@ const Employee = () => {
       <div className='flex items-center justify-between'>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -733,7 +733,7 @@ const Employee = () => {
               placeholder="Izlash..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              className="pl-8 pr-3 outline-none  bg-slate-100 border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -749,7 +749,7 @@ const Employee = () => {
               e.preventDefault()
               setFilterModal(prev => !prev)
             }}
-            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[#1E2021] dark:text-white rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[#292A2A] ${showClearButton ? 'filter-notif' : ''}`}
+            className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${showClearButton ? 'filter-notif' : ''}`}
           >
             <LuFilter size={16} />
             Filtrlash
@@ -759,7 +759,7 @@ const Employee = () => {
           {showClearButton && (
             <button
               onClick={handleClear}
-              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[#222323] text-sm font-semibold cursor-pointer`}
+              className={`flex items-center justify-between gap-2 h-8 px-4 bg-[#f1f5f9] rounded-xl text-red-600 dark:bg-[var(--bg-elevation-1)] text-sm font-semibold cursor-pointer`}
             >
               <FaXmark size={16} />
               Tozalash
@@ -808,10 +808,10 @@ const Employee = () => {
                     value={filters.created_at_min}
                     onChange={(value) => handleFilterChange('created_at_min', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Boshlanish sanasi'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
                 <div className="relative flex-1">
@@ -821,10 +821,10 @@ const Employee = () => {
                     format="DD.MM.YYYY HH:mm"
                     onChange={(value) => handleFilterChange('created_at_max', value)}
                     getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[#292A2A]! rounded-xl! text-sm dark:text-white! dark:bg-[#222323]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
+                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[var(--bg-elevation-1)]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]!"
                     placeholder='Tugash sana'
-                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[#8E95B5]" />}
-                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[#8E95B5]" /> }}
+                    suffixIcon={<FiCalendar size={16} className="text-slate-400 dark:text-[var(--text-soft)]" />}
+                    allowClear={{ clearIcon: <IoCloseCircle size={15} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
                   />
                 </div>
               </div>
@@ -835,7 +835,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectProject(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d]  cursor-pointer ${filters?.project?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.project ? `${filters.project.split(',').filter(Boolean).length} ta loyiha` : 'Loyiha tanlang'}
@@ -859,7 +859,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectSubmitter(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.assignee?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.assignee ? `${filters.assignee.split(',').filter(Boolean).length} ta topshiruvchi` : 'Topshiruvchi tanlang'}
@@ -883,7 +883,7 @@ const Employee = () => {
               <button
                 type="button"
                 onClick={() => setSelectAuthor(true)}
-                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
+                className={`relative w-full h-11 flex items-center justify-between gap-2 px-4 bg-slate-100 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#2c2d2d] cursor-pointer ${filters?.created_by?.length > 0 ? 'filter-notif' : ''}`}
               >
                 <span className="truncate text-sm font-medium">
                   {filters.created_by ? `${filters.created_by.split(',').filter(Boolean).length} ta muallif` : 'Muallif tanlang'}
@@ -922,10 +922,10 @@ const Employee = () => {
                 value={filters.status || undefined}
                 onChange={(value) => handleFilterChange('status', value)}
                 getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                className="w-full py-[10px]! border-slate-200! dark:border-[#292A2A]!"
+                className="w-full py-[10px]! border-slate-200! dark:border-[var(--stroke-soft)]!"
                 size="middle"
-                allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[#8E95B5]" /> }}
-                suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[#8E95B5]" />}
+                allowClear={{ clearIcon: <IoCloseCircle size={16} className="text-slate-400 dark:text-[var(--text-soft)]" /> }}
+                suffixIcon={<MdExpandMore size={16} className="text-gray-400 dark:text-[var(--text-soft)]" />}
                 placeholder="Holatini tanlang"
                 optionLabelProp="label"
                 options={[
@@ -1012,13 +1012,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.price_min}
                   onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.price_max}
                   onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
                 />
@@ -1029,13 +1029,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.penalty_min}
                   onChange={(e) => handleFilterChange('penalty_min', formatPercent(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.penalty_max}
                   onChange={(e) => handleFilterChange('penalty_max', formatPercent(e.target.value))}
                 />
@@ -1046,13 +1046,13 @@ const Employee = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.reopened_min}
                   onChange={(e) => handleFilterChange('reopened_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-white'
+                  className='bg-[var(--bg-elevation-1-alt)]'
                   value={filters.reopened_max}
                   onChange={(e) => handleFilterChange('reopened_max', formatNum(e.target.value))}
                 />
@@ -1066,36 +1066,36 @@ const Employee = () => {
       {/* Table Section */}
       {
         isLoading ? (
-          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (
-          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[#292A2A] bg-white dark:bg-[#1E2021] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
           </div>
         ) : (
           <div
-            className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[#292A2A]"
+            className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
             onScroll={handleMoreReportsScroll}
           >
             <table className="text-left border-collapse min-w-[2800px]">
-              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#1E2021]">
+              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[var(--bg-elevation-1)]">
                 <tr>
-                  <th className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] w-[40px] dark:border-[#292A2A] text-center" >№</th>
+                  <th className="py-2 px-3 text-xs border-r bg-[#7186ED] dark:bg-[#1e2021]! font-bold border-[var(--stroke-sub)] w-[40px] dark:border-[var(--stroke-soft)] text-center" >№</th>
                   {MAIN_COLUMNS.map((col) => {
                     const isRight = RIGHT_PINNED_KEYS.includes(col.key);
                     return (
                       <th
                         key={col.key}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#1e2021] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] transition-all duration-300 ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                         style={{
                           width: col.width,
                           minWidth: col.width,
@@ -1119,11 +1119,11 @@ const Employee = () => {
                   })}
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-[#1E2021] dark:text-slate-300">
+              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:text-slate-300">
                 {UserReports.map((item, index) => (
-                  <tr className="border-b border-slate-100 dark:border-[#292A2A]" key={item.id || index}>
+                  <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)]" key={item.id || index}>
 
-                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[#292A2A] text-center z-10! bg-white dark:bg-[#1E2021] transition-all duration-300 border-r`}>
+                    <td className={`p-3 text-xs text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 border-r`}>
                       {index + 1}
                     </td>
 
@@ -1156,7 +1156,7 @@ const Employee = () => {
                       return (
                         <td
                           key={col.key}
-                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#1E2021] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'project' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'task_price' ? 'font-bold text-slate-900 dark:text-white text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'type' || col.key === 'deadline' || col.key === 'created_at' || col.key === 'sprint' || col.key === 'reopened_count') ? 'text-center' : ''}`}
+                          className={`p-3 text-xs border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] transition-all duration-300 ${isPinned ? 'sticky z-10!' : ''} ${col.key === 'number' ? 'text-slate-500 text-center' : (col.key === 'project' || col.key === 'title' || col.key === 'assignee' || col.key === 'created_by') ? 'font-semibold text-slate-700 dark:text-slate-200 text-start' : (col.key === 'task_price' ? 'font-bold text-slate-900 dark:text-[var(--text-strong)] text-end' : 'text-slate-600 dark:text-slate-400 text-end')} ${(col.key === 'status' || col.key === 'type' || col.key === 'deadline' || col.key === 'created_at' || col.key === 'sprint' || col.key === 'reopened_count') ? 'text-center' : ''}`}
                           style={{
                             width: col.width,
                             minWidth: col.width,

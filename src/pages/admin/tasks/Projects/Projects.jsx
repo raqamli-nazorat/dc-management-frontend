@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaEllipsisVertical } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../../context/PageActionContext'
@@ -59,17 +59,17 @@ const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
   return (
     <div className="fixed  inset-0 z-50 flex items-center justickyfy-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="absolute  top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
+      <button onClick={onClose} className="absolute  top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
         <FaXmark size={14} />
       </button>
-      <div className="relative left-[30%]  w-full max-w-[600px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+      <div className="relative left-[30%]  w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
 
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-2">
-            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
               <FaArrowLeft size={17} />
             </button>
-            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Loyihani o'chirish</h2>
+            <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyihani o'chirish</h2>
           </div>
           <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] ">
             Haqiqatan ham ushbu loyihani o'chirmoqchimisiz? Bu amalni bekor qilib bo'lmaydi
@@ -78,7 +78,7 @@ const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
         <div className="px-7 py-5 flex items-center justify-end gap-3">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={() => { onConfirm(project.id); onClose() }}
@@ -99,17 +99,17 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
         className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
-          text-[var(--text-soft)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]">
+          text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-2xl shadow-2xl border overflow-hidden
-          bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {/* Batafsil — hammaga */}
           <button onClick={() => { onDetail?.(); setOpen(false) }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
-              hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[#C2C8E0]">
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+              hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
               <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             Batafsil
@@ -119,9 +119,9 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
           {canEdit && (
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-white
-                  hover:bg-[#F1F3F9] dark:hover:bg-[#292A2A] border-b border-[#F1F3F9] dark:border-[#2A2B2B] cursor-pointer transition-colors">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[#C2C8E0]">
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+                  hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                 </svg>
                 Tahrirlash
@@ -262,12 +262,12 @@ const ProjectsPage = () => {
   return (
     <div className="flex flex-col h-[85vh] gap-4">
 
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-white shrink-0">Loyihalar</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] shrink-0">Loyihalar</h1>
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 shrink-0">
         <div className="relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#C2C8E0]"
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-sub)]"
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
@@ -285,30 +285,30 @@ const ProjectsPage = () => {
             }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
               bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
-              dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0] dark:placeholder-[var(--text-sub)]" />
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]" />
         </div>
 
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
             bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)]
-            dark:bg-[#222323] dark:border-[#474848] dark:text-[#C2C8E0]">
+            dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
           <LuFilter size={13} />
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
 
         {/* View toggle */}
-        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl bg-[#F1F3F9] dark:bg-[#222323] border border-[var(--stroke-sub)] dark:border-[#474848]">
+        <div className="ml-auto flex items-center gap-1 p-1 rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)]">
           <button onClick={() => setViewMode('table')}
             className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'table' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+              ${viewMode === 'table' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18" />
             </svg>
           </button>
           <button onClick={() => setViewMode('grid')}
             className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'grid' ? 'bg-white dark:bg-[#3A3B3B] shadow-sm text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+              ${viewMode === 'grid' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="8" height="8" rx="1" /><rect x="13" y="3" width="8" height="8" rx="1" />
               <rect x="3" y="13" width="8" height="8" rx="1" /><rect x="13" y="13" width="8" height="8" rx="1" />
@@ -321,24 +321,24 @@ const ProjectsPage = () => {
       {viewMode === 'table' && (
         <div ref={scrollRef} className="flex-1 overflow-auto">
           <table className="w-full text-sm whitespace-nowrap">
-            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#222323]">
-              <tr className="border-b border-[var(--stroke-sub)] dark:border-[#292A2A]">
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0] w-10">№</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Nomi</th>
-                <th className="px-4 py-3 text-left font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Menejer</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Holati</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Boshlanish sanasi</th>
-                <th className="px-4 py-3 text-right font-medium text-[#1B1F3B]/65 dark:text-[#C2C8E0]">Muddati</th>
+            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
+              <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] w-10">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Menejer</th>
+                <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
+                <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Boshlanish sanasi</th>
+                <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Muddati</th>
                 <th className="px-4 py-3 w-10" />
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+                  <tr key={i} className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                     {[1, 2, 3, 4, 5, 6, 7].map(j => (
                       <td key={j} className="px-4 py-3">
-                        <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[#292A2A] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
+                        <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
                       </td>
                     ))}
                   </tr>
@@ -353,15 +353,15 @@ const ProjectsPage = () => {
                       }
                       setEditProject(p.id)
                     }}
-                    className="border-b border-[#EEF1F7] dark:border-[#292A2A] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
-                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{p.title || p.name}</td>
-                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white">{p.manager_info?.username || p.manager || '—'}</td>
+                    className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
+                    <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.title || p.name}</td>
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.manager_info?.username || p.manager || '—'}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className="text-sm font-medium text-[var(--text-strong)] dark:text-white">{STATUS_LABEL[p.status] || p.status}</span>
+                      <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{STATUS_LABEL[p.status] || p.status}</span>
                     </td>
-                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDt(p.created_at)}</td>
-                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white">{fmtDt(p.deadline)}</td>
+                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.created_at)}</td>
+                    <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin} />
                     </td>
@@ -378,7 +378,7 @@ const ProjectsPage = () => {
             />
           )}
           {loadingMore && (
-            <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">
+            <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
               <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
@@ -425,12 +425,12 @@ const ProjectsPage = () => {
                     setEditProject(p.id)
                   }}
                   className="rounded-2xl border p-4 cursor-pointer transition-all
-                  bg-white border-[var(--stroke-sub)] hover:border-[#C2C8E0] hover:shadow-sm
-                  dark:bg-[#1C1D1D] dark:border-[#292A2A] dark:hover:border-[#474848]">
+                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] hover:border-[#C2C8E0] hover:shadow-sm
+                  dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:hover:border-[#474848]">
 
                   {/* Title + Status */}
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="text-[14px] font-bold text-[var(--text-strong)] dark:text-white leading-snug truncate flex-1">{p.title || p.name}</h3>
+                    <h3 className="text-[14px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-snug truncate flex-1">{p.title || p.name}</h3>
                     <span className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold ${st.bg} ${st.text}`}>
                       {st.label}
                     </span>
@@ -459,7 +459,7 @@ const ProjectsPage = () => {
                         {managerInitials}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-[var(--text-strong)] dark:text-white truncate">{managerName}</p>
+                        <p className="text-[12px] font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{managerName}</p>
                         <p className="text-[10px] text-[var(--text-soft)] dark:text-[var(--text-sub)]">{managerRole}</p>
                       </div>
                     </div>

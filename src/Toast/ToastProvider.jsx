@@ -30,7 +30,7 @@ const getToastConfig = (type) => {
         case 'success': return { icon: <FaCheckCircle size={18} />, bg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' };
         case 'error': return { icon: <FaExclamationCircle size={18} />, bg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' };
         case 'delete': return { icon: <FaTrash size={16} />, bg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' };
-        case 'info': return { icon: <FaInfoCircle size={18} />, bg: 'bg-[#EEF1F7] dark:bg-[#303131] text-[var(--accent-strong)] dark:text-[var(--accent-sub)]' };
+        case 'info': return { icon: <FaInfoCircle size={18} />, bg: 'bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] text-[var(--accent-strong)] dark:text-[var(--accent-sub)]' };
         default: return { icon: <FaInfoCircle size={18} />, bg: 'bg-gray-100 dark:bg-gray-800 text-gray-500' };
     }
 };
@@ -61,20 +61,20 @@ export const ToastProvider = ({ children }) => {
                     <div
                         key={t.id}
                         style={{ pointerEvents: 'auto' }}
-                        className="flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg w-[320px] bg-white border border-[var(--stroke-sub)] dark:bg-[#222323] dark:border-[#292A2A] animate-in fade-in slide-in-from-right-5 duration-300"
+                        className="flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg w-[320px] bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] animate-in fade-in slide-in-from-right-5 duration-300"
                     >
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${config.bg}`}>
                             {config.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">{t.title}</p>
+                            <p className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{t.title}</p>
                             {t.msg && (
-                                <p className="text-[13px] text-[var(--text-soft)] dark:text-[#8E95B5] mt-0.5 leading-snug">{t.msg}</p>
+                                <p className="text-[13px] text-[var(--text-soft)] dark:text-[var(--text-soft)] mt-0.5 leading-snug">{t.msg}</p>
                             )}
                         </div>
                         <button
                             onClick={() => removeToast(t.id)}
-                            className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[#8E95B5] dark:hover:text-[#C2C8E0] shrink-0 cursor-pointer mt-0.5"
+                            className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[var(--text-soft)] dark:hover:text-[#C2C8E0] shrink-0 cursor-pointer mt-0.5"
                         >
                             <FaTimes size={14} />
                         </button>

@@ -4,7 +4,7 @@ import { FaArrowLeft, FaXmark } from "react-icons/fa6"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 
-const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[#C2C8E0] mb-1.5'
+const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 const STATUS_LABEL = {
     planning: 'Rejalashtirilmoqda',
@@ -18,8 +18,8 @@ const DetailModal = ({ id, onClose }) => {
     const [project, setProject] = useState({});
     const [loading, setLoading] = useState(false)
 
-    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[#191A1A] dark:border-[#292A2A] dark:text-white'
-    const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[#292A2A] dark:text-[var(--accent-soft)]'
+    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
+    const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
 
     const getProject = async () => {
         setLoading(true)
@@ -57,21 +57,21 @@ const DetailModal = ({ id, onClose }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="fixed inset-0 bg-black/60" onClick={onClose} />
             {/* X tugmasi */}
-            <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer z-10">
+            <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer z-10">
                 <FaXmark size={14} />
             </button>
-            <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-white dark:bg-[#111111]">
+            <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
 
 
                 {/* Header */}
-                <div className="px-7 pt-7 pb-4 sticky top-0 z-10 bg-white rounded-t-2xl dark:bg-[#111111]">
+                <div className="px-7 pt-7 pb-4 sticky top-0 z-10 bg-[var(--bg-elevation-1-alt)] rounded-t-2xl dark:bg-[var(--bg-base)]">
                     <div className="flex items-center gap-3 mb-1">
-                        <button onClick={onClose} className="text-[var(--text-strong)] dark:text-white hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                        <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                             <FaArrowLeft size={17} />
                         </button>
-                        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-white">Batafsil ma'lumot</h2>
+                        <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Batafsil ma'lumot</h2>
                     </div>
-                    <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]">Loyiha haqida batafsil ma'lumotlar</p>
+                    <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]">Loyiha haqida batafsil ma'lumotlar</p>
                 </div>
 
                 {/* Body */}
@@ -79,7 +79,7 @@ const DetailModal = ({ id, onClose }) => {
                     <div className="flex flex-col items-center justify-center gap-5 h-[500px]">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
 
-                        <p className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0]"> Ma'lumotlar yuklanmoqda...</p>
+                        <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]"> Ma'lumotlar yuklanmoqda...</p>
                     </div>
                 ) : (
                     <div className="px-7 pb-4 flex flex-col gap-4 h-[500px] overflow-y-auto">
@@ -171,8 +171,8 @@ const DetailModal = ({ id, onClose }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className={labelCls}>Muddat sanasi</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                                    <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-white">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                    <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('DD.MM.YYYY') : '—'}
                                     </span>
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-soft)] shrink-0">
@@ -182,8 +182,8 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                             <div>
                                 <label className={labelCls}>Soati</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[#292A2A] bg-white dark:bg-[#191A1A]">
-                                    <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-white">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                    <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('HH:mm') : '—'}
                                     </span>
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-soft)] shrink-0">
@@ -198,18 +198,18 @@ const DetailModal = ({ id, onClose }) => {
 
 
                 {/* Footer */}
-                <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-white dark:bg-[#111111]">
+                <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
                     {!loading &&
                         <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
-                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
-                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                            <span className="text-sm font-medium text-[#1A1D2E] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
+                            <div className={`relative w-10 h-5 rounded-full pointer-events-none ${project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[var(--bg-elevation-2)]'}`}>
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow ${project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                             </div>
                         </div>
                     }
                     <button
                         onClick={onClose}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[var(--text-soft)] dark:hover:bg-[#1C1D1D] ml-auto"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)] ml-auto"
                     >
                         <FaXmark size={13} /> Yopish
                     </button>

@@ -10,8 +10,8 @@ export default function AssigneeDropdown({ value, onChange }) {
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-            bg-white border-[var(--stroke-sub)] dark:bg-[#191A1A] dark:border-[#292A2A]
-            ${value ? 'text-[var(--text-strong)] dark:text-white' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+            ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{value || 'Topshiruvchi'}</span>
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
             {value
@@ -22,17 +22,17 @@ export default function AssigneeDropdown({ value, onChange }) {
         </button>
         {open && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-white border-[var(--stroke-sub)] dark:bg-[#1C1D1D] dark:border-[#2A2B2B]">
+            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {EMPLOYEES_LIST.map((e, i) => (
               <button key={e.name} type="button" onClick={() => { onChange(e.name); setOpen(false) }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-left  cursor-pointer
-                  ${i < EMPLOYEES_LIST.length - 1 ? 'border-b border-[#F1F3F9] dark:border-[#2A2B2B]' : ''}
-                  ${value === e.name ? 'bg-[#EEF1FB] dark:bg-[#292A2A]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[#292A2A]'}`}>
+                  ${i < EMPLOYEES_LIST.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
+                  ${value === e.name ? 'bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                 <div className="w-7 h-7 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                   {e.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-sm font-medium truncate ${value === e.name ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-white'}`}>{e.name}</p>
+                  <p className={`text-sm font-medium truncate ${value === e.name ? 'text-[var(--accent-strong)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)]'}`}>{e.name}</p>
                   <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)]">{e.role}</p>
                 </div>
               </button>

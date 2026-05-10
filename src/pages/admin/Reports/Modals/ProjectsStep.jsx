@@ -74,7 +74,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           >
                <div
-                    className="w-full max-w-[600px] max-h-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[#292A2A]"
+                    className="w-full max-w-[600px] max-h-[600px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[var(--stroke-soft)]"
                     onClick={(e) => e.stopPropagation()}
                >
                     <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
@@ -82,11 +82,11 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                     </button>
 
                     {/* Modal Header */}
-                    <div className="flex items-center px-6 py-5 border-b border-b-gray-100 dark:border-[#292A2A]">
-                         <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-white">
+                    <div className="flex items-center px-6 py-5 border-b border-b-gray-100 dark:border-[var(--stroke-soft)]">
+                         <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                               <FaArrowLeft size={18} />
                          </button>
-                         <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-white">Loyiha tanlang</h2>
+                         <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha tanlang</h2>
                     </div>
 
                     <div className="p-6">
@@ -94,17 +94,17 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                          <div className="flex items-center gap-3 mb-6">
                               <button
                                    onClick={toggleAll}
-                                   className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1E2021] border border-gray-100 dark:border-[#292A2A] rounded-xl text-gray-600 dark:text-[#8E95B5] hover:bg-gray-50 dark:hover:bg-[#2c2d2d] whitespace-nowrap text-sm font-medium h-10 shadow-sm"
+                                   className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[#2c2d2d] whitespace-nowrap text-sm font-medium h-10 shadow-sm"
                               >
                                    <LuCheckCheck size={18} />
                                    Barchasini tanlash
                               </button>
                               <div className="relative flex-1">
-                                   <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#8E95B5]" size={18} />
+                                   <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--text-soft)]" size={18} />
                                    <input
                                         type="text"
                                         placeholder="Izlash..."
-                                        className="w-full h-10 pl-10 pr-4 py-2 bg-[#F8F9FD] dark:bg-[#1A1B1B] border border-gray-100 dark:border-[#292A2A] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#8E95B5] text-sm"
+                                        className="w-full h-10 pl-10 pr-4 py-2 bg-[#F8F9FD] dark:bg-[var(--bg-base)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-[var(--text-strong)] placeholder:text-gray-400 dark:placeholder:text-[#8E95B5] text-sm"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                    />
@@ -124,7 +124,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                                              onClick={() => toggleSelect(project.id)}
                                              className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer ${isSelected
                                                        ? "border-[#4F5ECE] bg-[#F5F7FF] dark:bg-[#252836] dark:border-[#4F5ECE]"
-                                                       : "border-[#F1F5F9] bg-white dark:bg-[#1E2021] dark:border-[#292A2A] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
+                                                       : "border-[#F1F5F9] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
                                                   }`}
                                         >
                                              <div className="flex items-center flex-1 min-w-0">
@@ -145,15 +145,15 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
 
                                                   {/* Text Info */}
                                                   <div className="flex-1 min-w-0">
-                                                       <h4 className="text-[15px] font-bold text-[#1F2937] dark:text-white leading-tight truncate">
+                                                       <h4 className="text-[15px] font-bold text-[#1F2937] dark:text-[var(--text-strong)] leading-tight truncate">
                                                             {project.title || project.uid}
                                                        </h4>
-                                                       <p className="text-[13px] text-[#9CA3AF] dark:text-[#8E95B5] mt-0.5 truncate">
+                                                       <p className="text-[13px] text-[#9CA3AF] dark:text-[var(--text-soft)] mt-0.5 truncate">
                                                             {project.description || project.manager_info?.username || "Loyiha haqida ma'lumot yo'q"}
                                                        </p>
                                                   </div>
                                              </div>
-                                             <span className="text-[13px] whitespace-nowrap text-[#9CA3AF] dark:text-[#8E95B5] ml-2">
+                                             <span className="text-[13px] whitespace-nowrap text-[#9CA3AF] dark:text-[var(--text-soft)] ml-2">
                                                   {projectDate}
                                              </span>
                                         </div>
@@ -162,18 +162,18 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
 
                               {Projects?.length === 0 && (
                                    <div className="flex justify-center items-center h-[300px]">
-                                        <p className="text-gray-400 dark:text-[#8E95B5]">{loading ? "Yuklanmoqda..." : "Hech qanday loyiha topilmadi."}</p>
+                                        <p className="text-gray-400 dark:text-[var(--text-soft)]">{loading ? "Yuklanmoqda..." : "Hech qanday loyiha topilmadi."}</p>
                                    </div>
                               )}
                          </div>
 
                          {/* Footer */}
                          <div className="flex items-center justify-between pt-2">
-                              <span className="text-gray-500 dark:text-[#8E95B5] font-medium text-sm">{selectedIds.length} ta tanlangan</span>
+                              <span className="text-gray-500 dark:text-[var(--text-soft)] font-medium text-sm">{selectedIds.length} ta tanlangan</span>
                               <div className="flex gap-3">
                                    <button
                                         onClick={() => setSelectedIds([])}
-                                        className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-white font-semibold hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-xl text-sm"
+                                        className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-[var(--text-strong)] font-semibold hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-xl text-sm"
                                    >
                                         <IoClose size={20} />
                                         Tozalash

@@ -98,14 +98,14 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
         >
             <div
-                className="w-full h-[600px] flex flex-col max-w-[600px] bg-white dark:bg-[#1A1B1B] rounded-[24px] shadow-2xl overflow-hidden"
+                className="w-full h-[600px] flex flex-col max-w-[600px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden"
             >
                 {/* Modal Header */}
                 <div className="flex items-center px-6 py-5 ">
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-white">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                         <FaArrowLeft size={18} />
                     </button>
-                    <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-white">{title}</h2>
+                    <h2 className="ml-2 text-[17px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{title}</h2>
                 </div>
 
                 <div className="p-6 pt-0 flex flex-col flex-1">
@@ -113,17 +113,17 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     <div className="flex items-center gap-3 mb-6">
                         <button
                             onClick={toggleAll}
-                            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1E2021] border border-gray-100 dark:border-[#292A2A] rounded-xl text-gray-600 dark:text-[#8E95B5] hover:bg-gray-50 dark:hover:bg-[#2c2d2d] whitespace-nowrap text-sm font-medium h-10 shadow-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[#2c2d2d] whitespace-nowrap text-sm font-medium h-10 shadow-sm"
                         >
                             <LuCheckCheck size={18} />
                             Barchasini tanlash
                         </button>
                         <div className="relative flex-1">
-                            <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#8E95B5]" size={18} />
+                            <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--text-soft)]" size={18} />
                             <input
                                 type="text"
                                 placeholder="Ism Sharifi bo'yicha izlash..."
-                                className="w-full h-10 pl-10 pr-4 py-2 bg-[#F8F9FD] dark:bg-[#1A1B1B] border border-gray-100 dark:border-[#292A2A] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#8E95B5] text-sm"
+                                className="w-full h-10 pl-10 pr-4 py-2 bg-[#F8F9FD] dark:bg-[var(--bg-base)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-[var(--text-strong)] placeholder:text-gray-400 dark:placeholder:text-[#8E95B5] text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -140,7 +140,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                                     onClick={() => toggleSelect(emp.id)}
                                     className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer ${isSelected
                                         ? "border-[#4F5ECE] bg-[#F5F7FF] dark:bg-[#252836] dark:border-[#4F5ECE]"
-                                        : "border-[#F1F5F9] bg-white dark:bg-[#1E2021] dark:border-[#292A2A] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
+                                        : "border-[#F1F5F9] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
                                         }`}
                                 >
                                     {/* Selection Indicator */}
@@ -160,10 +160,10 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
                                     {/* Text Info */}
                                     <div className="flex-1 overflow-hidden">
-                                        <h4 className="text-[15px] font-bold text-[#1F2937] dark:text-white leading-tight truncate">
+                                        <h4 className="text-[15px] font-bold text-[#1F2937] dark:text-[var(--text-strong)] leading-tight truncate">
                                             {emp.username}
                                         </h4>
-                                        <p className="text-[13px] text-[#9CA3AF] dark:text-[#8E95B5] mt-0.5 truncate">
+                                        <p className="text-[13px] text-[#9CA3AF] dark:text-[var(--text-soft)] mt-0.5 truncate">
                                             {emp.position_info?.name || emp.position || "Lavozim ko'rsatilmadi"}
                                         </p>
                                     </div>
@@ -173,21 +173,21 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
                         {employees?.length === 0 && (
                             <div className="flex justify-center items-center h-[300px]">
-                                <p className="text-gray-400 dark:text-[#8E95B5]">{loading ? "Yuklanmoqda..." : `Hech qanday ${title.toLowerCase()?.split(" ")[0] || "ma'lumot"} topilmadi.`}</p>
+                                <p className="text-gray-400 dark:text-[var(--text-soft)]">{loading ? "Yuklanmoqda..." : `Hech qanday ${title.toLowerCase()?.split(" ")[0] || "ma'lumot"} topilmadi.`}</p>
                             </div>
                         )}
                     </div>
 
                     {/* Footer Actions */}
                     <div className="flex  items-center justify-between mt-8 pt-6">
-                        <span className="text-gray-500 dark:text-[#8E95B5] font-medium text-sm">
+                        <span className="text-gray-500 dark:text-[var(--text-soft)] font-medium text-sm">
                             {selectedIds.length} ta tanlangan
                         </span>
 
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setSelectedIds([])}
-                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-white font-semibold hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-xl text-sm"
+                                className="flex items-center gap-2 px-6 py-2.5 text-gray-700 dark:text-[var(--text-strong)] font-semibold hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-xl text-sm"
                             >
                                 <IoClose size={20} />
                                 Tozalash

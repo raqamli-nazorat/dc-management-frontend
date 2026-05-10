@@ -1,4 +1,4 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 
 export const FilterInput = ({ label, value, onChange, isFine, className = '' }) => {
   const [focused, setFocused] = useState(false)
@@ -20,7 +20,7 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
 
   return (
     <div
-      className={`flex-1 dark:bg-[#222323] border border-slate-200 dark:border-[#292A2A] rounded-xl flex flex-col justify-center px-4 h-11 relative cursor-text group ${className}`}
+      className={`flex-1 dark:bg-[var(--bg-elevation-1)] border border-slate-200 dark:border-[var(--stroke-soft)] rounded-xl flex flex-col justify-center px-4 h-11 relative cursor-text group ${className}`}
       onClick={() => setFocused(true)}
     >
       <span
@@ -46,14 +46,14 @@ export const FilterInput = ({ label, value, onChange, isFine, className = '' }) 
         )}
 
         {!isActive && !focused ? (
-          <span className="text-slate-900 dark:text-white text-sm font-medium">0</span>
+          <span className="text-slate-900 dark:text-[var(--text-strong)] text-sm font-medium">0</span>
         ) : (
           <input
             value={value === 0 ? '' : value}
             onChange={onChange}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className={`w-full bg-transparent outline-none font-bold ${isFine ? 'text-red-500!' : 'text-slate-900! dark:text-white!'}`}
+            className={`w-full bg-transparent outline-none font-bold ${isFine ? 'text-red-500!' : 'text-slate-900! dark:text-[var(--text-strong)]!'}`}
             style={{ fontSize: `${fontSize}px` }}
             autoFocus={focused}
             placeholder={focused ? "0" : ""}

@@ -141,26 +141,26 @@ export default function UsersPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
-          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[#222323] p-7">
-            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[#292A2A] dark:hover:bg-[#333435] text-[var(--text-sub)] dark:text-[#C2C8E0] cursor-pointer  z-10">
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+            <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="text-[var(--text-strong)] dark:text-[#FFFFFF] hover:opacity-70 cursor-pointer"
+                className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer"
               >
                 <FaArrowLeft size={16} />
               </button>
-              <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[#FFFFFF]">Foydalanuvchini o'chirmoqchimisiz?</h2>
+              <h2 className="text-lg font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Foydalanuvchini o'chirmoqchimisiz?</h2>
             </div>
-            <p className="text-sm text-[var(--text-soft)] dark:text-[#C2C8E0] mb-6">
+            <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-6">
               Bu foydalanuvchi tizimdan o'chiriladi va unga tegishli ma'lumotlar o'chirish mumkin.
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[#F1F3F9] dark:text-[#C2C8E0] dark:hover:bg-[#292A2A]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
@@ -179,7 +179,7 @@ export default function UsersPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1
-            className="text-[var(--text-strong)] dark:text-[#FFFFFF]"
+            className="text-[var(--text-strong)] dark:text-[var(--text-strong)]"
             style={{ fontSize: 24, fontWeight: 800 }}
           >
             Foydalanuvchilar
@@ -189,7 +189,7 @@ export default function UsersPage() {
               onClick={cancelSelecting}
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
               bg-[#DADFF0] text-[var(--text-strong)] hover:bg-[#c8ceea]
-              dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
+              dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-strong)] dark:hover:bg-[var(--bg-elevation-2)]"
             >
               <FaXmark size={14} />
               Bekor qilish
@@ -199,7 +199,7 @@ export default function UsersPage() {
               onClick={startSelecting}
               className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium  cursor-pointer
               bg-[#DADFF0] text-[var(--text-strong)] hover:bg-[#c8ceea]
-              dark:bg-[#292A2A] dark:text-[#FFFFFF] dark:hover:bg-[#303131]"
+              dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-strong)] dark:hover:bg-[var(--bg-elevation-2)]"
             >
               <img src="/imgs/checkIcon.svg" alt="" className="w-4 h-4 dark:invert" />
               Tanlash
@@ -211,7 +211,7 @@ export default function UsersPage() {
         <div className="flex flex-wrap gap-2">
           {/* Search */}
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[#8E95B5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input
@@ -220,8 +220,8 @@ export default function UsersPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 outline-none 
-              bg-white border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-              dark:bg-[#222323] dark:border-[#292A2A] dark:text-[#FFFFFF] dark:placeholder-[#8E95B5]"
+              bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
             />
           </div>
@@ -249,7 +249,7 @@ export default function UsersPage() {
         <div className="max-h-[70vh] overflow-y-auto">
           <table className="w-full rounded-2xl" style={{ fontSize: 13 }}>
             <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[#191a1a] shadow-xs">
-              <tr className="border-b border-[#EEF1F7] dark:border-[#292A2A]">
+              <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                 <th className="px-4 py-3 text-left w-14" style={{ fontWeight: 500, color: 'var(--text-sub)' }}>
                   {selecting ? (
                     <span className="flex items-center gap-2">
@@ -286,7 +286,7 @@ export default function UsersPage() {
                       navigate(`/${user.active_role}/users/detail/${u.id}`)
                     }
                   }}
-                  className=" cursor-pointer border-b border-[#EEF1F7] dark:border-[#292A2A]"
+                  className=" cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
                 >
                   <td className="px-4 py-3 w-14" >
                     {selecting ? (
@@ -307,33 +307,33 @@ export default function UsersPage() {
                       <span className="text-[var(--text-soft)]" style={{ fontWeight: 500 }}>{idx + 1}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-white">{u.name || u.username || '—'}</td>
-                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}>{positions?.find(p => p.id === u.position_info?.id)?.name || '—'}</td>
+                  <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{u.name || u.username || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]" style={{ fontWeight: 500 }}>{positions?.find(p => p.id === u.position_info?.id)?.name || '—'}</td>
                   <td
-                    className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}
+                    className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]" style={{ fontWeight: 500 }}
                     title={u?.roles?.map(r => Roles[r])?.join(', ')}
                   >
                     {statuses(u.roles)}
                   </td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>
-                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-white" style={{ fontWeight: 500 }}>{fmt(u.balance)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]" style={{ fontWeight: 800 }}>{fmt(u.fixed_salary)}</td>
+                  <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]" style={{ fontWeight: 500 }}>{fmt(u.balance)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           {loading && (
-            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Yuklanmoqda...</div>
+            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Yuklanmoqda...</div>
           )}
           {users?.length === 0 && !loading && (
-            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[#8E95B5]">Foydalanuvchilar topilmadi</div>
+            <div className="py-16 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">Foydalanuvchilar topilmadi</div>
           )}
         </div>
 
         {/* Selection bar */}
         {selecting && selected.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
-          bg-white border border-[var(--stroke-sub)] dark:bg-[#222323] dark:border-[#292A2A]">
-            <span className="text-sm text-[var(--text-sub)] dark:text-[#C2C8E0] mr-1">{selected.size} ta tanlandi</span>
+          bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)] mr-1">{selected.size} ta tanlandi</span>
             <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer bg-[#FFF2F2] text-[var(--error-strong)] hover:bg-[#F8D7DA] dark:bg-[var(--error-strong)]/10 dark:text-[var(--error-sub)] dark:hover:bg-[var(--error-strong)]/20">
               <MdDelete size={16} />
               O'chirish
