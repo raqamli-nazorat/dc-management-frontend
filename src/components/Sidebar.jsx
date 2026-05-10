@@ -524,8 +524,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         ))}
 
         {(user?.active_role === "employee" || user?.active_role === "manager") && !isCollapsed && (
-          <div className="flex flex-col justify-start gap-3 ml-3.5 mt-3">
-            <h6 className='flex items-center gap-2 text-[13px] font-medium text-[#1A1D2E]'>
+          <div className="flex flex-col justify-start gap-3 ml-3.5 mt-3 mb-2">
+            <h6 className='flex items-center gap-2 text-[13px] font-medium text-[#1A1D2E] dark:text-[#E6EDF3]'>
               <span className='font-extrabold'>
                 {userSts?.overall_efficiency || 0}%
               </span>
