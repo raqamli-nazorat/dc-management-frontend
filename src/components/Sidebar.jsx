@@ -323,8 +323,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
       {/* ── Logo ── */}
       <div
         className={[
-          'flex items-center shrink-0 mb-4',
-          isCollapsed ? 'justify-center h-20 px-3' : 'h-20 px-3',
+          'flex items-center shrink-0 ',
+          isCollapsed ? 'justify-center h-16 px-3' : 'h-16 px-3',
         ].join(' ')}
       >
         {isCollapsed ? (
