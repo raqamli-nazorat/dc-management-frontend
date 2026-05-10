@@ -7,10 +7,12 @@ import dayjs from 'dayjs'
 import { FaFileLines, FaXmark, FaArrowLeft, FaCheck } from 'react-icons/fa6'
 import { CopyIcon } from '../../../components/icons'
 import { Alert } from '../Components/Alert'
+import { useAuth } from '../../../context/AuthContext'
 
 const ApplicationDetail = () => {
   const { id } = useParams()
   const { registerBreadcrumb, clearBreadcrumb } = usePageAction()
+  const { user } = useAuth()
   const [application, setApplication] = useState(null)
   const [copyText, setCopyText] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -21,6 +23,8 @@ const ApplicationDetail = () => {
   const [modalConclusion, setModalConclusion] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const isAuditor = user?.active_role === 'auditor'
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -281,39 +285,42 @@ const ApplicationDetail = () => {
             placeholder='Xodim hulosasini kiriting'
             value={conclusion}
             onChange={(e) => setConclusion(e.target.value)}
+            disabled={isAuditor}
           />
-          <div className="flex items-center justify-end mt-1 gap-4">
-            {application?.status !== 'accepted' && application?.status !== 'rejected' ? (
-              <>
+          {!isAuditor && (
+            <div className="flex items-center justify-end mt-1 gap-4">
+              {application?.status !== 'accepted' && application?.status !== 'rejected' ? (
+                <>
+                  <button
+                    onClick={() => openModal('rejected')}
+                    style={{ fontSize: 14, color: '#FFFFFF' }}
+                    className="px-4 py-2.5 rounded-xl bg-[#fa5252] font-semibold  hover:opacity-80 flex items-center gap-2"
+                  >
+                    <FaXmark size={15} />
+                    Rad etildi
+                  </button>
+                  <button
+                    onClick={() => openModal('accepted')}
+                    style={{ fontSize: 14, color: '#FFFFFF' }}
+                    className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2"
+                  >
+                    <FaCheck size={15} />
+                    Qabul qilindi
+                  </button>
+                </>
+              ) : (
                 <button
-                  onClick={() => openModal('rejected')}
+                  onClick={handleSave}
                   style={{ fontSize: 14, color: '#FFFFFF' }}
-                  className="px-4 py-2.5 rounded-xl bg-[#fa5252] font-semibold  hover:opacity-80 flex items-center gap-2"
-                >
-                  <FaXmark size={15} />
-                  Rad etildi
-                </button>
-                <button
-                  onClick={() => openModal('accepted')}
-                  style={{ fontSize: 14, color: '#FFFFFF' }}
-                  className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! dark:disabled:bg-[#222323]! disabled:text-gray-500!"
+                  disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
                 >
                   <FaCheck size={15} />
-                  Qabul qilindi
+                  Saqlash
                 </button>
-              </>
-            ) : (
-              <button
-                onClick={handleSave}
-                style={{ fontSize: 14, color: '#FFFFFF' }}
-                className="px-4 py-2.5 rounded-xl bg-[#526ED3] font-semibold  hover:opacity-80 flex items-center gap-2 disabled:bg-gray-200! dark:disabled:bg-[#222323]! disabled:text-gray-500!"
-                disabled={(conclusion === (application.conclusion || '')) || !conclusion.trim()}
-              >
-                <FaCheck size={15} />
-                Saqlash
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

@@ -200,7 +200,7 @@ const DetailModal = ({ id, onClose }) => {
                 <div className="px-7 py-5 flex items-center rounded-b-2xl border-t border-[#F1F3F9] dark:border-[#292A2A] sticky bottom-0 z-10 bg-white dark:bg-[#111111]">
                     {!loading &&
                         <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Faolmi?</span>
+                            <span className="text-sm font-medium text-[#1A1D2E] dark:text-white">Muzlatilganmi ?</span>
                             <div className={`relative w-10 h-5 rounded-full pointer-events-none ${!project.is_hidden ? 'bg-[#000000]' : 'bg-[#E2E6F2] dark:bg-[#292A2A]'}`}>
                                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow ${!project.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                             </div>

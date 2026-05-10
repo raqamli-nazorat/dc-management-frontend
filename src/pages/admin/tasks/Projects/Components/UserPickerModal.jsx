@@ -135,6 +135,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
 }
 
 export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
+    console.log(selected);
     return (
         <div>
             <label className={labelCls}>{label}</label>
@@ -151,7 +152,7 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
                                 key={u.id}
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[#3F57B3] dark:bg-[#292A2A] dark:text-[#7F95E6]"
                             >
-                                {u.username}|{u?.position_info.name}
+                                {u.username} | {u?.position_info?.name || u?.position}
                                 <span
                                     onMouseDown={e => { e.stopPropagation(); onRemove(u.id) }}
                                     className="hover:opacity-70 cursor-pointer ml-0.5 flex items-center">

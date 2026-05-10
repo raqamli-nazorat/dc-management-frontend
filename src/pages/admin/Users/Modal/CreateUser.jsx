@@ -128,7 +128,6 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
             if (!form.position) newErrs.position = "*Bu maydon majburiy"
             if (!form.roles || form.roles.length === 0) newErrs.roles = "*Bu maydon majburiy"
             if (!form.phone_number) newErrs.phone_number = "*Bu maydon majburiy"
-            if (!form.card_number) newErrs.card_number = "*Bu maydon majburiy"
             if (form.card_number && form.card_number.replace(/\s/g, '').length !== 16) newErrs.card_number = "*Karta raqami 16 ta raqamdan iborat bo'lishi shart!"
             if (form.passportSeria && !form.passport_number) newErrs.passport_number = "*Passport raqami majburiy"
             if (!form.passportSeria && form.passport_number) newErrs.passportSeria = "*Passport seriyasi majburiy"
@@ -311,7 +310,6 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={form.card_number}
                                 onChange={e => set('card_number', formatCard(e.target.value))}
                             />
-                            {errors.card_number && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.card_number}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
