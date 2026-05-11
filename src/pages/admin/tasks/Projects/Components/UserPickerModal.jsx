@@ -38,7 +38,7 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
             <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
                 <FaXmark size={16} />
             </button>
-            <div className="relative w-full min-h-[90vh]! max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
+            <div className="relative w-full min-h-[92vh]! max-w-[600px] rounded-2xl shadow-2xl bg-white dark:bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4 shrink-0">
                     <div className="flex items-center gap-3 mb-4">
@@ -156,7 +156,7 @@ export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
             <label className={labelCls}>{label}</label>
             <div
                 onClick={onOpen}
-                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]"
+                className="w-full min-h-[42px] flex items-center justify-between px-3 py-2 rounded-xl border cursor-pointer text-left bg-white border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]"
             >
                 <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                     {selected.length === 0 ? (

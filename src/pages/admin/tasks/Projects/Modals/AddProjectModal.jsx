@@ -36,7 +36,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const [form, setForm] = useState({
     title: '', prefix: '', status: 'planning', description: '', manager: null,
     project_price: '', penalty_percentage: '', employees: [], testers: [],
-    deadline: '', time: '', is_active: true, links: ["", ""]
+    deadline: '', time: '', is_active: true, links: [{ name: '', link: '' }]
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -93,6 +93,23 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
     if (!form.penalty_percentage) e.penalty_percentage = true
     if (!form.deadline) e.deadline = true
     if (!form.time) e.time = true
+
+    const linkErrors = form.links.map(item => {
+      const hasName = !!item.name?.trim();
+      const hasLink = !!item.link?.trim();
+      const isValidFormat = hasLink && item.link.startsWith('https://');
+
+      if ((hasName && !hasLink) || (!hasName && hasLink) || (hasLink && !isValidFormat)) {
+        return {
+          name: !hasName,
+          link: !hasLink || !isValidFormat,
+          isInvalidFormat: hasLink && !isValidFormat
+        };
+      }
+      return null;
+    });
+    if (linkErrors.some(el => el)) e.links = linkErrors;
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -124,8 +141,8 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       
       if (id) {
         await Promise.all(
-          form.links.filter(link => link.trim()).map(async (link) => {
-            await axiosAPI.post(`project-documents/`, { project: id, name: "saloom", url: link })
+          form.links.filter(item => item.name.trim() || item.link.trim()).map(async (item, index) => {
+            await axiosAPI.post(`project-documents/`, { project: id, name: item.name || `Hujjat ${index + 1}`, url: item.link })
           })
         )
       }
@@ -172,7 +189,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-[#F6F6F8] text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
 
   const statusList = Array.isArray(STATUS_API) ? STATUS_API : Object.entries(STATUS_API || {}).map(([value, label]) => ({ value, label }))
   const currentStatusLabel = statusList.find(s => s.value === form.status)?.label || 'Holati tanlang'
@@ -216,7 +233,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   <button
                     type="button"
                     onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[#F6F6F8] dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
+                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
                     disabled
                   >
                     <span>{currentStatusLabel}</span>
@@ -257,7 +274,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} dark:bg-[var(--bg-base)]`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} dark:bg-[var(--bg-base)]`}>
                     <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
@@ -270,7 +287,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-white border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
                           className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
@@ -292,7 +309,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Boshqaruvchi bonusi (UZS)</label>
                 <input value={form.project_price} onChange={e => set('project_price', fmtBonus(e.target.value))}
                   placeholder="Boshqaruvchi bonusi 0,0"
-                  className={inputCls(errors.project_price) + " font-bold"} />
+                  className={inputCls(errors.project_price) + " font-bold placeholder:font-normal"} />
                 {errors.project_price && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
               </div>
             </div>
@@ -397,47 +414,69 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
               </div>
             </ConfigProvider>
 
-            <div className="flex flex-col gap-2">
-              <label className={labelCls}>Hujjat ma'lumotlari</label>
-              <div className="grid grid-cols-2 gap-3">
-                {form.links?.map((link, index) => {
-                  const isLast = index === form.links.length - 1;
-                  return (
-                    <div key={index} className="flex items-center gap-2.5">
-                      <div className="flex-1 relative w-full">
+            <div className="flex flex-col gap-3">
+              {form.links?.map((item, index) => {
+                const isLast = index === form.links.length - 1;
+                return (
+                  <div key={index} className="flex flex-col gap-1.5">
+                    <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1">
                         <input
-                          className={inputCls() + " pr-10"}
+                          className={inputCls(errors.links?.[index]?.name)}
                           placeholder="Hujjat nomini kiriting"
-                          value={link || ''}
+                          value={item.name || ''}
                           onChange={e => {
                             const newLinks = [...form.links];
-                            newLinks[index] = e.target.value;
+                            newLinks[index] = { ...newLinks[index], name: e.target.value };
                             set('links', newLinks);
                           }}
                         />
-                        {form.links.length > 1 &&
-                          <button
-                            type="button"
-                            onClick={() => set('links', form.links.filter((_, i) => i !== index))}
-                            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
-                          >
-                            <FaXmark size={14} />
-                          </button>
-                        }
+                        {errors.links?.[index]?.name && <p className="text-red-500 text-[10px] mt-1">* Majburiy</p>}
+                      </div>
+                      <div className="flex-1">
+                        <div className="relative">
+                          <input
+                            className={inputCls(errors.links?.[index]?.link) + (form.links.length > 1 ? " pr-10" : "")}
+                            placeholder="Hujjat havolasi"
+                            value={item.link || ''}
+                            onChange={e => {
+                              const newLinks = [...form.links];
+                              newLinks[index] = { ...newLinks[index], link: e.target.value };
+                              set('links', newLinks);
+                            }}
+                          />
+                          {form.links.length > 1 &&
+                            <button
+                              type="button"
+                              onClick={() => set('links', form.links.filter((_, i) => i !== index))}
+                              className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                            >
+                              <FaXmark size={14} />
+                            </button>
+                          }
+                        </div>
+                        {errors.links?.[index]?.link && (
+                          <p className="text-red-500 text-[10px] mt-1">
+                            {errors.links[index].isInvalidFormat ? "* Havola https:// bilan boshlanishi kerak" : "* Majburiy"}
+                          </p>
+                        )}
                       </div>
                       {isLast && (
-                        <button
-                          type="button"
-                          onClick={() => set('links', [...form.links, ''])}
-                          className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
-                        >
-                          <FiPlus size={20} />
-                        </button>
+                        <div className="w-[42px] shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => set('links', [...form.links, { name: '', link: '' }])}
+                            className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+                          >
+                            <FiPlus size={20} />
+                          </button>
+                        </div>
                       )}
                     </div>
-                  )
-                })}
-              </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 

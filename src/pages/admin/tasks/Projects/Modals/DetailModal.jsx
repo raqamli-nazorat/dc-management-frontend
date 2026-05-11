@@ -1,4 +1,4 @@
-﻿import dayjs from "dayjs"
+import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { FaArrowLeft, FaCheck, FaXmark } from "react-icons/fa6"
 import { toast } from "../../../../../Toast/ToastProvider"
@@ -20,14 +20,20 @@ const DetailModal = ({ id, onClose }) => {
     const [project, setProject] = useState({});
     const [loading, setLoading] = useState(false)
 
-    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
+    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-white border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
     const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
 
     const getProject = async () => {
         setLoading(true)
         try {
             const { data } = await axiosAPI.get(`projects/${id}/`)
-            setProject({ ...data.data, links: ["https://salom.com", "https://alik.com"] })
+
+            if (data.success && data?.data?.id) {
+                const { data: links } = await axiosAPI.get(`project-documents/?project=${id}`)
+                setProject({ ...data.data, project_documents: links.data.results || [] })
+            } else {
+                setProject(data.data)
+            }
         } catch (error) {
             console.log(error)
             toast.error("Loyihani yuklashda xatolik.", error?.response?.data?.error?.errorMsg || "Loyihani yuklashda xatolik yuz berdi, iltimos qaytadan urinib ko'ring!")
@@ -56,7 +62,7 @@ const DetailModal = ({ id, onClose }) => {
 
     const handleCopyLink = (link, index) => {
         if (!link) return;
-        
+
         navigator.clipboard.writeText(link).then(() => {
             setCopyLink(index);
             setTimeout(() => {
@@ -74,9 +80,10 @@ const DetailModal = ({ id, onClose }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="fixed inset-0 bg-black/60" onClick={onClose} />
             {/* X tugmasi */}
-            <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer z-10">
-                <FaXmark size={14} />
+            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                <FaXmark size={16} />
             </button>
+
             <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
 
 
@@ -188,7 +195,7 @@ const DetailModal = ({ id, onClose }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className={labelCls}>Muddat sanasi</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-white dark:bg-[var(--bg-base)]">
                                     <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('DD.MM.YYYY') : '—'}
                                     </span>
@@ -199,7 +206,7 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                             <div>
                                 <label className={labelCls}>Soati</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-white dark:bg-[var(--bg-base)]">
                                     <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('HH:mm') : '—'}
                                     </span>
@@ -210,28 +217,31 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                            <label className={labelCls}>Hujjat ma'lumotlari</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {project?.links?.map((link, index) => {
-                                    return (
-                                        <div key={index} className="flex items-center gap-2.5">
-                                            <div className="flex-1 relative w-full">
+                        <div className="flex flex-col gap-5">
+                            {project?.project_documents?.map((item, index) => {
+                                return (
+                                    <div key={index} className="flex flex-col gap-2.5">
+                                        <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex-1">
+                                                <input
+                                                    className={fCls}
+                                                    placeholder="Hujjat nomi"
+                                                    disabled
+                                                    value={item.name || ''}
+                                                />
+                                            </div>
+                                            <div className="flex-1 relative">
                                                 <input
                                                     className={fCls + " pr-10"}
-                                                    placeholder="Hujjat nomini kiriting"
+                                                    placeholder="Hujjat havolasi"
                                                     disabled
-                                                    value={link || ''}
-                                                    onChange={e => {
-                                                        const newLinks = [...form.links];
-                                                        newLinks[index] = e.target.value;
-                                                        set('links', newLinks);
-                                                    }}
+                                                    value={item.url || ''}
                                                 />
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleCopyLink(link, index)}
+                                                    onClick={() => handleCopyLink(item.url, index)}
                                                     disabled={copyLink === index}
                                                     className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] cursor-pointer transition-colors"
                                                 >
@@ -242,9 +252,9 @@ const DetailModal = ({ id, onClose }) => {
                                                 </button>
                                             </div>
                                         </div>
-                                    )
-                                })}
-                            </div>
+                                    </div>
+                                )
+                            })}
                         </div>
 
                     </div>
