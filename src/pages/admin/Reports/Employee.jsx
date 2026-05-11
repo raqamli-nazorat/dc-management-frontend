@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
-import { LuFilter, LuRefreshCw, LuUserPlus } from 'react-icons/lu'
+import { LuRefreshCw, LuUserPlus } from 'react-icons/lu'
 import { FaAngleDown, FaChevronDown } from 'react-icons/fa'
 import { FaRegFile, FaXmark, FaCalendarDays, FaSpinner } from 'react-icons/fa6'
 import { DatePicker, Select, ConfigProvider, theme, Checkbox } from 'antd'
@@ -892,7 +892,7 @@ const Employee = () => {
             }}
             className={`flex items-center justify-between gap-2 h-8 px-5 pr-3! bg-slate-100 dark:bg-[var(--bg-elevation-1)] rounded-xl text-slate-600 text-sm font-semibold dark:text-[var(--text-strong)]! cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${showClearButton ? 'filter-notif' : ''}`}
           >
-            <LuFilter size={16} />
+            <img src="/imgs/filterIcon.svg" alt="" className="w-4 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" />
             Filtrlash
 
             <FaAngleDown size={16} className={`transition-transform duration-300 ${!filterModal ? '-rotate-90' : ''}`} />

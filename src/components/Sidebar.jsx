@@ -380,13 +380,19 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         {/* Analitika */}
         {['employee', 'xodim', 'manager', 'menager', 'admin', 'superadmin'].includes(routeRole) && (
           isCollapsed ? (
-            <button
-              onClick={() => navigate(`/${urlPrefix}/dashboard`)}
-              title="Analitika"
-              className={iconBtn(location.pathname.includes('dashboard') || location.pathname.includes('analytics'))}
-            >
-              <img src="/imgs/dashboard-square-03.svg" alt="analytics" className="w-4 h-4 dark:invert dark:brightness-0" />
-            </button>
+            (() => {
+              const isAnalyticActive = location.pathname.includes('dashboard') || location.pathname.includes('analytics')
+              return (
+                <button
+                  onClick={() => navigate(`/${urlPrefix}/dashboard`)}
+                  title="Analitika"
+                  className={iconBtn(isAnalyticActive)}
+                >
+                  <img src="/imgs/dashboard-square-03.svg" alt="analytics"
+                    className={`w-4 h-4 brightness-0 ${isAnalyticActive ? 'dark:invert dark:opacity-100' : 'dark:invert dark:opacity-40'}`} />
+                </button>
+              )
+            })()
           ) : (
             <NavLink
               to={`/${urlPrefix}/dashboard`}
@@ -397,8 +403,13 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
               ].join(' ')}
             >
-              <img src="/imgs/dashboard-square-03.svg" alt="" className="w-4 h-4 shrink-0 opacity-70 dark:invert dark:brightness-0 dark:opacity-100" />
-              <span>Analitika</span>
+              {({ isActive }) => (
+                <>
+                  <img src="/imgs/dashboard-square-03.svg" alt=""
+                    className={`w-4 h-4 shrink-0 brightness-0 ${isActive || location.pathname.includes('analytics') ? 'dark:invert dark:opacity-100' : 'dark:invert dark:opacity-40'}`} />
+                  <span>Analitika</span>
+                </>
+              )}
             </NavLink>
           )
         )}

@@ -1,6 +1,5 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaEllipsisVertical } from 'react-icons/fa6'
-import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../../context/PageActionContext'
 import { useAuth } from '../../../../context/AuthContext'
 import EmptyState from '../../../../components/EmptyState'
@@ -163,6 +162,7 @@ const ProjectsPage = () => {
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
   const [users, setUsers] = useState([])
+  const [copiedUid, setCopiedUid] = useState(null)
   const scrollRef = useRef(null)
 
   // ── API funksiyalari ──
@@ -298,7 +298,7 @@ const ProjectsPage = () => {
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
             bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)]
             dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
-          <LuFilter size={13} />
+          <img src="/imgs/filterIcon.svg" alt="" className="w-3.5 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" />
           Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
@@ -330,6 +330,7 @@ const ProjectsPage = () => {
             <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
               <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
                 <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] w-10">№</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Titul</th>
                 <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Nomi</th>
                 <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Menejer</th>
                 <th className="px-4 py-3 text-right font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">Holati</th>
@@ -342,7 +343,7 @@ const ProjectsPage = () => {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
-                    {[1, 2, 3, 4, 5, 6, 7].map(j => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(j => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 rounded-lg bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse" style={{ width: j === 1 ? 24 : '80%' }} />
                       </td>
@@ -361,6 +362,26 @@ const ProjectsPage = () => {
                     }}
                     className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/3 dark:hover:bg-white/3  cursor-pointer">
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
+                    <td className="px-4 py-3 text-sm font-medium" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 group">
+                        <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)]">{p.uid || p.title || p.name}</span>
+                        <button
+                          onClick={() => {
+                            const val = p.uid || p.title || p.name || ''
+                            navigator.clipboard.writeText(val).then(() => {
+                              setCopiedUid(p.id)
+                              setTimeout(() => setCopiedUid(null), 2000)
+                            }).catch(() => {})
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-soft)] dark:text-[var(--text-sub)] cursor-pointer"
+                        >
+                          {copiedUid === p.id
+                            ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z"/></svg>
+                          }
+                        </button>
+                      </div>
+                    </td>
                     <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.title || p.name}</td>
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.manager_info?.username || p.manager || '—'}</td>
                     <td className="px-4 py-3 text-right">
