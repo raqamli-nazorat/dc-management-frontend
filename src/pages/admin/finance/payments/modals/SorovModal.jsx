@@ -121,7 +121,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
   }
 
   const iCls = (k) => `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
+    bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
     dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
     ${errors[k] ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`
 

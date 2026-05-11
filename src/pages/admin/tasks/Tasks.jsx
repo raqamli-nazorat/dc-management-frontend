@@ -488,7 +488,7 @@ export default function TasksPage() {
   const isEmployee = activeRole === 'employee'
   const canEdit = activeRole === 'admin' || activeRole === 'superadmin' || activeRole === 'manager'
 
-  const [viewMode, setViewMode] = useState('table')
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('tasks_view_mode') || 'table')
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [showFilter, setShowFilter] = useState(false)
@@ -710,8 +710,8 @@ export default function TasksPage() {
       if (!silent) setKanbanLoading(false)
     }
   }, [filters, search])
-  const switchToTable = () => setViewMode('table')
-  const switchToKanban = () => { setViewMode('kanban'); loadKanbanTasks(filters, search) }
+  const switchToTable = () => { setViewMode('table'); localStorage.setItem('tasks_view_mode', 'table') }
+  const switchToKanban = () => { setViewMode('kanban'); localStorage.setItem('tasks_view_mode', 'kanban'); loadKanbanTasks(filters, search) }
 
   const onDragEnd = async ({ destination, source, draggableId }) => {
     setDraggingOver(null)
@@ -784,7 +784,7 @@ export default function TasksPage() {
         <div className="flex items-center gap-3 flex-1">
           <span
             className="text-[13px] font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
-            onClick={() => setViewMode('table')}
+            onClick={() => switchToTable()}
           >
             Vazifa boshqaruvi
           </span>
@@ -1055,12 +1055,14 @@ export default function TasksPage() {
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                     {!isAuditor && canEdit && (
                       <TaskRowMenu
+                        onDetail={() => loadTaskDetail(t.id)}
                         onEdit={() => loadTaskDetail(t.id)}
                         onDelete={() => handleDelete(t.id)}
                       />
                     )}
                     {!isAuditor && !canEdit && (
                       <TaskRowMenu
+                        onDetail={() => loadTaskDetail(t.id)}
                         onDelete={() => handleDelete(t.id)}
                       />
                     )}

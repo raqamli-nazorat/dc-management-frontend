@@ -189,7 +189,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
 
   const inputCls = (err) =>
-    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-soft)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
+    `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
 
   const statusList = Array.isArray(STATUS_API) ? STATUS_API : Object.entries(STATUS_API || {}).map(([value, label]) => ({ value, label }))
   const currentStatusLabel = statusList.find(s => s.value === form.status)?.label || 'Holati tanlang'

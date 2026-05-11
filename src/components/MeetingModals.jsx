@@ -284,7 +284,7 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
           value={reason} 
           onChange={e => setReason(e.target.value)} 
           placeholder="Sababni yozing..." 
-          className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
+          className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] resize-none outline-none focus:border-[var(--accent-strong)]"
         />
       </div>
 
@@ -400,7 +400,7 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder="Sababni yozing..."
-            className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
+            className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] resize-none outline-none focus:border-[var(--accent-strong)]"
           />
         )}
       </div>

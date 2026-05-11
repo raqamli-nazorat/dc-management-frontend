@@ -36,8 +36,8 @@ function CancelReasonModal({ onCancel, onConfirm }) {
             onChange={e => { setReason(e.target.value); setError(false) }}
             placeholder="Iltimos, sababni yozing. Bu majburiy"
             className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none 
-              bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-              dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
+              bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-sub)]
+              dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
               ${error ? 'border-[var(--error-strong)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`}
           />
           {error && <p className="text-xs text-[var(--error-strong)] mt-1">*Sabab kiritish majburiy</p>}

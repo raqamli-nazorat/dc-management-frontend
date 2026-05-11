@@ -651,14 +651,14 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
           {/* -- Header (qotgan) -- */}
-          <div className="px-7 pt-7 pb-3 shrink-0 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+          <div className="px-7 pt-7 pb-3 shrink-0 ">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {canEdit ? "Yig'ilishni tahrirlash" : "Yig'ilish ma'lumotlari"}
               </h2>
             </div>
-            <p className="text-sm text-[var(--text-soft)] ml-8">
+            <p className="text-sm text-[var(--text-soft)] ">
               {canEdit ? "Yig'ilish ma'lumotlarini yangilang" : "Yig'ilish haqida to'liq ma'lumot"}
             </p>
           </div>
@@ -897,14 +897,14 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
       <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
 
         {/* Header */}
-        <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+        <div className="px-7 pt-7 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-1">
             <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0">
               <FaArrowLeft size={17} />
             </button>
             <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Yig'ilish ma'lumotlari</h2>
           </div>
-          <p className="text-sm text-[var(--text-soft)] ml-8">Yig'ilish haqida to'liq ma'lumot</p>
+          <p className="text-sm text-[var(--text-soft)] ">Yig'ilish haqida to'liq ma'lumot</p>
         </div>
 
         {/* Scrollable content */}
@@ -994,17 +994,6 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
           </div>
 
-          {/* Tugatildimi */}
-          <div className="flex items-center gap-3">
-            <label className={labelCls + " mb-0"}>Tugatildimi?</label>
-            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-[var(--bg-base)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
-            </div>
-            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-              {meeting.is_completed ? 'Ha' : "Yo'q"}
-            </span>
-          </div>
-
           {/* Qatnashchilar */}
           <div>
             <label className={labelCls}>Qatnashchilar</label>
@@ -1022,8 +1011,17 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
 
         </div>
 
-        {/* Footer — faqat Yopish */}
-        <div className="px-7 py-4 flex items-center justify-end border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] shrink-0 bg-[var(--bg-base)]">
+        {/* Footer — Tugatildimi + Yopish */}
+        <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">Tugatildimi?</label>
+            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-[var(--bg-base)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
+            </div>
+            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+              {meeting.is_completed ? 'Ha' : "Yo'q"}
+            </span>
+          </div>
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Yopish
