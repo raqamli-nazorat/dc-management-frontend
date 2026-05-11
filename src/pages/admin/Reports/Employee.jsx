@@ -1558,7 +1558,7 @@ const Employee = () => {
                   <td className={`p-3 text-[13px] text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] dark:text-[#E6EDF3] bg-white dark:bg-[#161b22] ${tablePin.payroll_kpi ? 'sticky z-10!' : ''}`} style={{ width: 120, right: getSubPinnedRight('payroll_kpi'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.payroll_amount?.kpi_bonuses ? Number(item.report.payroll_amount.kpi_bonuses).toLocaleString("uz-UZ") : ""}
                   </td>
-                  <td className={`p-3 text-[13px] text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] dark:text-[#E6EDF3] bg-white dark:bg-[#161b22] ${tablePin.payroll_jarima ? 'sticky z-10!' : ''}`} style={{ width: 120, right: getSubPinnedRight('payroll_jarima'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                  <td className={`p-3 text-[13px] text-end border-r border-t border-[var(--stroke-sub)] dark:border-[#292A2A] dark:text-[#E6EDF3] bg-white dark:bg-[#161b22] ${tablePin.payroll_jarima ? 'sticky z-10!' : ''}`} style={{ width: 120, right: getSubPinnedRight('payroll_jarima'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                     {item?.report?.payroll_amount?.penalty_amount ? Number(item.report.payroll_amount.penalty_amount).toLocaleString("uz-UZ") : ""}
                   </td>
                   <td className={`p-3 text-[13px] text-end border-t border-[var(--stroke-sub)] dark:border-[#292A2A] dark:text-[#E6EDF3] bg-white dark:bg-[#161b22] ${tablePin.date_joined ? 'sticky right-0 z-10!' : ''}`}
