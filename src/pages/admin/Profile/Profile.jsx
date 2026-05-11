@@ -413,6 +413,10 @@ export default function ProfilePage() {
   }
 
   useEffect(() => {
+    getProfile()
+  }, [])
+
+  useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') {
         setOpenImg(false)

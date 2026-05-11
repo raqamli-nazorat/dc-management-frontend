@@ -1,8 +1,9 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { MdCheck } from 'react-icons/md'
 import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
 import { useAuth } from '../../../../../context/AuthContext'
+import { axiosAPI } from '../../../../../service/axiosAPI'
 
 const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
   bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
@@ -102,6 +103,18 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
   const [showPaidModal, setShowPaidModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [receipts, setReceipts] = useState([])
+  const [previewImg, setPreviewImg] = useState(null)
+
+  useEffect(() => {
+    if (!payment?.id) return
+    axiosAPI.get('/expense-receipt/', { params: { expense: payment.id } })
+      .then(res => {
+        const payload = res.data?.data ?? res.data
+        setReceipts(Array.isArray(payload) ? payload : (payload.results ?? []))
+      })
+      .catch(() => {})
+  }, [payment?.id])
 
   const handleCopyCard = () => {
     const raw = payment.card_number?.replace(/\s/g, '') ?? ''
@@ -113,6 +126,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
 
   const c = payment.expense_category_info ?? {}
   const isCard = payment.payment_method === 'card'
+  const isCompany = payment.type === 'company'
 
   const activeRole = user?.active_role
   const isAccountant = activeRole === 'accountant'
@@ -137,12 +151,10 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
-
-          {/* X tugmasi */}
+        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] max-h-[90vh] flex flex-col">
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-3">
+          <div className="px-6 pt-6 pb-3 shrink-0">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer shrink-0">
                 <FaArrowLeft size={16} />
@@ -155,17 +167,21 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           </div>
 
           {/* Body */}
-          <div className="px-6 pb-4 flex flex-col gap-4">
+          <div className="px-6 pb-4 flex flex-col gap-4 overflow-y-auto flex-1">
 
-            {/* Xarajat turi + Toifa */}
+            {/* Xarajat turi + Toifa/Loyiha */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Xarajat turi</label>
                 <div className={fieldCls}>{typeLabel(payment.type)}</div>
               </div>
               <div>
-                <label className={labelCls}>Toifa</label>
-                <div className={fieldCls}>{c.title || ''}</div>
+                <label className={labelCls}>{isCompany ? 'Loyiha' : 'Toifa'}</label>
+                <div className={fieldCls}>
+                  {isCompany
+                    ? (payment.project_info?.title || payment.project_info?.name || '')
+                    : (c.title || '')}
+                </div>
               </div>
             </div>
 
@@ -215,9 +231,28 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
             {payment.status === 'cancelled' && payment.cancel_reason && (
               <div>
                 <label className={labelCls}>Rad etish sababi</label>
-                <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed
-                   `}>
+                <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
                   {payment.cancel_reason}
+                </div>
+              </div>
+            )}
+
+            {/* To'lov cheklari */}
+            {receipts.length > 0 && (
+              <div>
+                <label className={labelCls}>To'lov cheki</label>
+                <div className="flex items-center gap-3 overflow-x-auto pb-1">
+                  {receipts.map(receipt => (
+                    <div
+                      key={receipt.id}
+                      onClick={() => setPreviewImg(receipt.file)}
+                      className="w-[120px] h-[150px] flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden
+                        border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
+                        hover:opacity-90 transition-opacity"
+                    >
+                      <img src={receipt.file} alt="chek" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -225,7 +260,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 flex items-center justify-end gap-3">
+          <div className="px-6 py-4 flex items-center justify-end gap-3 shrink-0 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
                 text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
@@ -270,6 +305,27 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           </div>
         </div>
       </div>
+
+      {/* Rasm preview */}
+      {previewImg && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85"
+          onClick={() => setPreviewImg(null)}
+        >
+          <button
+            onClick={() => setPreviewImg(null)}
+            className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+          >
+            <FaXmark size={15} />
+          </button>
+          <img
+            src={previewImg}
+            alt="chek"
+            className="max-w-[90vw] max-h-[90vh] rounded-2xl object-contain shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       {/* Rad etish sababi modali */}
       {showCancelModal && (
