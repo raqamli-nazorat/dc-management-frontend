@@ -101,7 +101,7 @@ const ApplicationsPage = () => {
             </div>
           </div>
 
-          <div className="max-h-[80vh] overflow-y-auto rounded-xl">
+          <div className="overflow-y-auto h-[70vh] rounded-xl">
             <table className="w-full" style={{ fontSize: 13 }}>
               <thead className="sticky top-0 z-10 bg-[#F6F9FC] dark:bg-[var(--bg-elevation-1)] shadow-xs">
                 <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">

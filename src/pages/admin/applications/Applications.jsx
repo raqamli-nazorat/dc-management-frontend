@@ -1,5 +1,4 @@
 ﻿import { useState, useEffect } from 'react'
-import { LuFilter } from "react-icons/lu"
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import dayjs from 'dayjs'
@@ -220,7 +219,7 @@ const ApplicationsPage = () => {
                 onClick={() => setFilterModal(true)}
                 className={`flex items-center justify-between gap-2 h-8 px-5 bg-slate-100 dark:bg-[var(--bg-elevation-1)] dark:text-slate-400! rounded-xl text-slate-600 text-sm font-semibold cursor-pointer relative border border-slate-200 dark:border-[var(--stroke-soft)] ${Object.keys(activeFilters).length > 0 ? 'filter-notif' : ''}`}
               >
-                <LuFilter size={16} />
+                <img src="/imgs/filterIcon.svg" alt="" className="w-4 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" />
                 Filtrlash
               </button>
             </div>
@@ -236,7 +235,7 @@ const ApplicationsPage = () => {
           </div>
 
           <div
-            className="max-h-[80vh] overflow-y-auto rounded-xl"
+            className="overflow-y-auto h-[70vh] rounded-xl"
             onScroll={handleMoreApplications}
           >
             <table className="w-full" style={{ fontSize: 13 }}>

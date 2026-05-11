@@ -1,5 +1,4 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -304,7 +303,7 @@ export default function PaymentsPage() {
             className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
               bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)]
               dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
-            <LuFilter size={13} />
+            <img src="/imgs/filterIcon.svg" alt="" className="w-3.5 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" />
             Filtrlash
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
           </button>

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy } from 'react-icons/fa6'
-import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
 import EmptyState from '../../../components/EmptyState'
@@ -12,7 +11,7 @@ import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 import { PiCopyBold } from 'react-icons/pi'
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
-const DURATION_UNITS = ['daqiqa', 'soat']
+const DURATION_UNITS = ['daqiqa']
 
 /* -- helpers -- */
 const fmtDt = (iso) => {
@@ -53,15 +52,14 @@ const fromIso = (iso) => {
   } catch { return { date: '', time: '' } }
 }
 
-const durationToMinutes = (val, unit) => {
+const durationToMinutes = (val) => {
   const n = parseInt(val, 10)
   if (!n || isNaN(n)) return null
-  return unit === 'soat' ? n * 60 : n
+  return n
 }
 
 const minutesToDisplay = (mins) => {
   if (!mins) return { val: '', unit: 'daqiqa' }
-  if (mins >= 60 && mins % 60 === 0) return { val: String(mins / 60), unit: 'soat' }
   return { val: String(mins), unit: 'daqiqa' }
 }
 
@@ -331,6 +329,7 @@ function AddMeetingModal({ onClose, projects, loadMeetings }) {
 
       const res = await axiosAPI.post('/meetings/', body)
       toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
+      loadMeetings?.()
       onClose()
     } catch (err) {
       const errData = err?.response?.data
@@ -546,7 +545,7 @@ function AddMeetingModal({ onClose, projects, loadMeetings }) {
 }
 
 /* -- EditMeetingModal -- */
-function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, onFinish }) {
+function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, onFinish, onSaved }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copyLink, setCopyLink] = useState(null)
@@ -563,7 +562,6 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
     date: initDate,
     time: initTime,
     durationVal: initDurVal,
-    durationUnit: initDurUnit,
     participants: meeting.participants_info ?? [],
     is_completed: meeting.is_completed ?? false,
   })
@@ -602,13 +600,13 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
       if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
       if (startIso) body.start_time = startIso
-      const mins = durationToMinutes(form.durationVal, form.durationUnit)
+      const mins = durationToMinutes(form.durationVal)
       if (mins) body.duration_minutes = mins
 
       const res = await axiosAPI.put(`/meetings/${meeting?.id}/`, body)
 
       toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
-
+      onSaved?.()
       onClose()
     } catch (error) {
       console.error(error)
@@ -777,7 +775,7 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
                     readOnly={!canEdit} placeholder="40"
                     className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
                   <span className="flex items-center px-2 text-xs text-[var(--text-sub)] dark:text-[var(--text-sub)] border-l border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] whitespace-nowrap">
-                    {form.durationUnit === 'soat' ? 'soat' : 'daqiqa'}
+                    daqiqa
                   </span>
                 </div>
               </div>
@@ -1015,8 +1013,8 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
         <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] ">
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">Tugatildimi?</label>
-            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-[var(--bg-base)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
+            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
             </div>
             <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">
               {meeting.is_completed ? 'Ha' : "Yo'q"}
@@ -1353,6 +1351,7 @@ export default function MeetingsPage() {
   const [meetingLoading, setMeetingLoading] = useState(false)
   const [projects, setProjects] = useState([])
   const [users, setUsers] = useState([])
+  const [copiedUid, setCopiedUid] = useState(null)
   const [attendanceMeetingId, setAttendanceMeetingId] = useState(null)
   const scrollRef = useRef(null)
 
@@ -1493,14 +1492,14 @@ export default function MeetingsPage() {
         <button onClick={() => setShowFilter(true)}
           className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-bold border  cursor-pointer
             bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
-          <LuFilter size={13} /> Filtrlash
+          <img src="/imgs/filterIcon.svg" alt="" className="w-3.5 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-auto">
+      <div ref={scrollRef} className="overflow-auto h-[70vh]">
         <table className="w-full text-sm whitespace-nowrap">
-          <thead>
+          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
             <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
               <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] w-10">№</th>
               <th className="px-4 py-3 text-left font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]">UID</th>
@@ -1535,7 +1534,27 @@ export default function MeetingsPage() {
                     className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
                     onClick={() => loadMeetingDetail(m.id, isAuditor && m?.is_completed ? 'detail' : 'edit')}>
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{idx + 1}</td>
-                    <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{m.uid || ''}</td>
+                    <td className="px-4 py-3 font-medium" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 group">
+                        <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)]">{m.uid || ''}</span>
+                        {m.uid && (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(m.uid).then(() => {
+                                setCopiedUid(m.id)
+                                setTimeout(() => setCopiedUid(null), 2000)
+                              }).catch(() => {})
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer text-[var(--text-soft)] dark:text-[var(--text-sub)]"
+                          >
+                            {copiedUid === m.id
+                              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z"/></svg>
+                            }
+                          </button>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{m.title}</td>
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{organizer?.username || ''}</td>
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{project?.title || ''}</td>
@@ -1609,6 +1628,7 @@ export default function MeetingsPage() {
           onClose={() => setEditItem(null)}
           projects={projects}
           users={users}
+          onSaved={() => loadMeetings(filters, search, 1)}
           onFinish={(id) => { setEditItem(null); setAttendanceMeetingId(id) }}
           canEdit={(() => {
             const isAdminOrManager = user?.active_role === 'admin' || user?.active_role === 'manager'
