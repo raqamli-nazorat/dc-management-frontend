@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -284,6 +284,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
   const [loading, setLoading] = useState(false)
   const [projectMembers, setProjectMembers] = useState([])
   const [membersLoading, setMembersLoading] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
   const [form, setForm] = useState({
     project: null, title: '', fine: '', link: '', description: '',
     date: '', time: '', durationVal: '',
@@ -410,8 +411,17 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 
             <div>
               <label className={labelCls}>Havolasi</label>
-              <input value={form.link} onChange={e => set('link', e.target.value)}
-                placeholder="URL manzil kiriting" className={inputCls(errors.link)} />
+              <div className="relative">
+                <input value={form.link} onChange={e => set('link', e.target.value)}
+                  placeholder="URL manzil kiriting" className={inputCls(errors.link) + (form.link ? ' pr-9' : '')} />
+                {form.link && (
+                  <button type="button" title="Nusxa olish"
+                    onClick={() => { navigator.clipboard.writeText(form.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
+                    {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <FaCopy size={12} />}
+                  </button>
+                )}
+              </div>
               {errors.link && <p className="text-xs text-red-500 mt-1">*To'g'ri URL manzil kiriting</p>}
             </div>
 
@@ -560,6 +570,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit = true, onFinish }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   const { date: initDate, time: initTime } = fromIso(meeting.start_time)
   const { val: initDurVal, unit: initDurUnit } = minutesToDisplay(meeting.duration_minutes)
@@ -678,14 +689,30 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
             <div>
               <label className={labelCls}>Havolasi</label>
               {canEdit ? (
-                <input value={form.link} onChange={e => set('link', e.target.value)}
-                  placeholder="URL manzil kiriting" className={inputCls(false)} />
+                <div className="relative">
+                  <input value={form.link} onChange={e => set('link', e.target.value)}
+                    placeholder="URL manzil kiriting" className={inputCls(false) + (form.link ? ' pr-9' : '')} />
+                  {form.link && (
+                    <button type="button" title="Nusxa olish"
+                      onClick={() => { navigator.clipboard.writeText(form.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
+                      {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <FaCopy size={12} />}
+                    </button>
+                  )}
+                </div>
               ) : (
-                <div className={inputCls(false)}>
+                <div className={inputCls(false) + ' flex items-center justify-between gap-2'}>
                   {form.link
                     ? <a href={form.link} target="_blank" rel="noreferrer"
-                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{form.link}</a>
+                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all flex-1 min-w-0 truncate">{form.link}</a>
                     : <span className="text-[var(--text-soft)]">—</span>}
+                  {form.link && (
+                    <button type="button" title="Nusxa olish"
+                      onClick={() => { navigator.clipboard.writeText(form.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
+                      className="shrink-0 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
+                      {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <FaCopy size={12} />}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -837,6 +864,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
   const project = projects?.find(p => p.id === meeting.project)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -897,11 +925,18 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           {/* Havola */}
           <div>
             <label className={labelCls}>Havolasi</label>
-            <div className={fieldCls}>
+            <div className={fieldCls + ' flex items-center justify-between gap-2'}>
               {meeting.link
                 ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{meeting.link}</a>
+                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all flex-1 min-w-0 truncate">{meeting.link}</a>
                 : <span className="text-[var(--text-soft)]">—</span>}
+              {meeting.link && (
+                <button type="button" title="Nusxa olish"
+                  onClick={() => { navigator.clipboard.writeText(meeting.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
+                  className="shrink-0 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
+                  {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <FaCopy size={12} />}
+                </button>
+              )}
             </div>
           </div>
 
@@ -1516,7 +1551,7 @@ export default function MeetingsPage() {
                 return (
                   <tr key={m.id}
                     className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
-                    onClick={() => loadMeetingDetail(m.id, 'edit')}>
+                    onClick={() => loadMeetingDetail(m.id, 'detail')}>
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{idx + 1}</td>
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{m.uid || ''}</td>
                     <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{m.title}</td>
@@ -1537,7 +1572,7 @@ export default function MeetingsPage() {
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       {!isAuditor && (
                         <RowMenu
-                          onDetail={() => loadMeetingDetail(m.id, 'edit')}
+                          onDetail={() => loadMeetingDetail(m.id, 'detail')}
                           onEdit={() => loadMeetingDetail(m.id, 'edit')}
                           onFinish={() => setAttendanceMeetingId(m.id)}
                           isCompleted={!!m.is_completed}

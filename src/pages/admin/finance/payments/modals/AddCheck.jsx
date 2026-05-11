@@ -19,7 +19,8 @@ const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
         axiosAPI.get('/expense-receipt/', { params: { expense: paymentId } })
             .then(res => {
                 const payload = res.data?.data ?? res.data
-                setExistingReceipts(Array.isArray(payload) ? payload : (payload.results ?? []))
+                const all = Array.isArray(payload) ? payload : (payload.results ?? [])
+                setExistingReceipts(all.filter(r => Number(r.expense) === Number(paymentId)))
             })
             .catch(() => {})
     }, [paymentId])

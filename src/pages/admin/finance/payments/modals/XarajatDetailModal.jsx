@@ -111,7 +111,8 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
     axiosAPI.get('/expense-receipt/', { params: { expense: payment.id } })
       .then(res => {
         const payload = res.data?.data ?? res.data
-        setReceipts(Array.isArray(payload) ? payload : (payload.results ?? []))
+        const all = Array.isArray(payload) ? payload : (payload.results ?? [])
+        setReceipts(all.filter(r => Number(r.expense) === Number(payment.id)))
       })
       .catch(() => {})
   }, [payment?.id])
