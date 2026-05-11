@@ -99,7 +99,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
                   dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="dan: 0"
                 value={f.amount__gte}
@@ -108,7 +108,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
                   dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="gacha: 0"
                 value={f.amount__lte}

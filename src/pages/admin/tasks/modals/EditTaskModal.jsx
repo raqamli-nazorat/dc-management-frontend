@@ -581,14 +581,14 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* ── Header ── */}
-          <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] rounded-t-3xl">
+          <div className="px-7 pt-7 pb-4 shrink-0  rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
               </h2>
             </div>
-            <p className="text-sm text-[var(--text-sub)] ml-8">
+            <p className="text-sm text-[var(--text-sub)] ">
               {canEdit ? "Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting" : "Vazifa haqida batafsil ma'lumot"}
             </p>
           </div>

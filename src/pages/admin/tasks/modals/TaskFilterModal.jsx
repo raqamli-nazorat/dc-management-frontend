@@ -230,7 +230,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Loyiha nomi bo'yicha izlash"
-                className="flex-1 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]"
+                className="flex-1 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)]"
               />
             </div>
           </div>
