@@ -800,13 +800,19 @@ export default function TasksPage() {
             </svg>
             <input
               type="text"
-              placeholder="Izlash"
+              placeholder="Izlash..."
               value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
+              onChange={e => {
+                setSearchInput(e.target.value)
+                if (e.target.value.length === 0) {
+                  runSearch("")
+                }
+              }}
               onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
               className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
                 bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-soft)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
-                dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[#C2C8E0]" />
+                dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[#C2C8E0]"
+            />
           </div>
           {/* Filter */}
           <button onClick={() => setShowFilter(true)}

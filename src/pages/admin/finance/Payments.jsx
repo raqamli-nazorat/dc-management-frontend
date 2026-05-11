@@ -207,7 +207,16 @@ export default function PaymentsPage() {
     return () => clearAction()
   }, [registerAction, clearAction])
 
-
+  const handleRowClick = async (id) => {
+    try {
+      const detail = await apiGetPaymentDetail(id)
+      // if/
+      setDetailPayment(detail)
+    } catch (err) {
+      console.error(err)
+      toast.error(getErrorMessage(err?.results?.data?.error?.errorMsg, "Ma'lumotlarni yuklashda xatolik yuz berdi."))
+    }
+  }
 
   const runSearch = (val) => {
     const q = val.trim()
@@ -331,11 +340,7 @@ export default function PaymentsPage() {
             <tbody>
               {payments.map((p, idx) => (
                 <tr key={p.id}
-                  onClick={() => {
-                    apiGetPaymentDetail(p.id)
-                      .then(detail => setDetailPayment(detail))
-                      .catch(() => setDetailPayment(p))
-                  }}
+                  onClick={() => handleRowClick(p.id)}
                   className="group border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]  last:border-0 cursor-pointer hover:bg-black/3 dark:hover:bg-white/3">
                   <td className="px-4 py-3 w-10 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.user_info?.username ?? ''}</td>

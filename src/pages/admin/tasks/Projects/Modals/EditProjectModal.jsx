@@ -310,7 +310,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         </button>
                                         {statusOpen && (
                                             <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
-                                                {Object.values(STATUS_LABEL).map((s, i) => (
+                                                {Object.values(STATUS_LABEL).filter(s => s !== "Muddati o'tgan").map((s, i) => (
                                                     <button key={s} type="button" onClick={() => { set('status', Object.keys(STATUS_LABEL).find(key => STATUS_LABEL[key] === s)); setStatusOpen(false) }}
                                                         className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
                           ${i < Object.values(STATUS_LABEL).length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}

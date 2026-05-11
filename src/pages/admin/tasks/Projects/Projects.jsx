@@ -275,7 +275,12 @@ const ProjectsPage = () => {
             type="text"
             placeholder="Izlash..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => {
+              setSearch(e.target.value)
+              if (e.target.value.length === 0) {
+                loadProjects(filters, "", 1)
+              }
+            }}
             onKeyDown={e => {
               if (e.key === "Enter") {
                 const q = search.trim()
@@ -285,7 +290,8 @@ const ProjectsPage = () => {
             }}
             className="pl-9 pr-4 py-[4px] rounded-xl text-[13px] font-medium outline-none  w-[240px]
               bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] focus:border-[var(--accent-sub)]
-              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]" />
+              dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]"
+          />
         </div>
 
         <button onClick={() => setShowFilter(true)}
