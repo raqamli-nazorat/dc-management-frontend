@@ -92,91 +92,58 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 
       {/* Karta tanasi */}
       <div className="bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)] rounded-[24px] px-6 pt-5 pb-7 -mt-3 relative z-10">
-        <h3 className="text-[15px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-5">
+        <h3 className="text-[15px] font-bold text-[#1A1D2E] dark:text-[#E6EDF3] mb-5">
           {task.title}
         </h3>
 
-        <div className="flex flex-col gap-3">
-          {(task.items || []).map(item => (
-            <div
-              key={item.id}
-              className="flex items-center gap-3 group"
-            >
+        <div className="flex flex-col gap-0">
+          {/* Scroll qilinadigan subtask ro'yxati — max 4 ta ko'rinadi, har doim 144px */}
+          <div className="flex flex-col gap-3 overflow-y-auto min-h-36 max-h-36 custom-scrollbar pr-1">
+            {(task.items || []).map(item => (
               <div
-                onClick={() => onToggleItem(task.id, item)}
-                className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer
-                  ${item.is_done
-                    ? 'bg-[#4A65D8] text-white'
-                    : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] text-transparent group-hover:bg-[var(--stroke-strong)] dark:group-hover:bg-[#4A4B4B]'
-                  }`}
+                key={item.id}
+                className="flex items-center gap-3 group"
               >
-                {item.is_done && <MdCheck size={14} />}
+                <div
+                  onClick={() => onToggleItem(task.id, item)}
+                  className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer
+                    ${item.is_done
+                      ? 'bg-[#4A65D8] text-white'
+                      : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] text-transparent group-hover:bg-[var(--stroke-strong)] dark:group-hover:bg-[#4A4B4B]'
+                    }`}
+                >
+                  {item.is_done && <MdCheck size={14} />}
+                </div>
+                <span
+                  className={`flex-1 text-[13px] font-medium transition-colors
+                    ${item.is_done
+                      ? 'text-[#1A1D2E]/50 dark:text-[#E6EDF3]/50 line-through'
+                      : 'text-[#1A1D2E] dark:text-[#E6EDF3]'
+                    }`}
+                >
+                  {item.title}
+                </span>
+                {/* O'chirish tugmasi */}
+                <button
+                  onClick={() => onDeleteItem(task.id, item.id)}
+                  className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-md hover:bg-red-500/10 transition-all cursor-pointer"
+                  title="O'chirish"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
+                    <path d="M10 11v6M14 11v6" />
+                  </svg>
+                </button>
               </div>
-              <span
-                className={`flex-1 text-[13px] font-medium transition-colors
-                  ${item.is_done
-                    ? 'text-[var(--text-sub)] dark:text-[var(--text-sub)] line-through'
-                    : 'text-[var(--text-soft)] dark:text-[var(--text-soft)]'
-                  }`}
-              >
-                {item.title}
-              </span>
-              {/* O'chirish tugmasi */}
-              <button
-                onClick={() => onDeleteItem(task.id, item.id)}
-                className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-md hover:bg-red-500/10 transition-all cursor-pointer"
-                title="O'chirish"
-              >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
-                  <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
-                  <path d="M10 11v6M14 11v6" />
-                </svg>
-              </button>
-            </div>
-          ))}
+            ))}
 
-          {/* Yangi subtask qo'shish */}
-          <div className="flex items-center gap-3 mt-2">
-            <div className="w-[22px] h-[22px] rounded-full bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] shrink-0" />
-            <input
-              type="text"
-              value={newItemTitle}
-              onChange={e => setNewItemTitle(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleAddItem()
-              }}
-              placeholder="Subtask qo'shish..."
-              disabled={addingItem}
-              className="flex-1 bg-transparent outline-none text-[13px]
-                text-[var(--text-sub)] dark:text-[var(--text-sub)]
-                placeholder:text-[var(--stroke-strong)] dark:placeholder:text-[#4A4B4B]
-                disabled:opacity-50"
-            />
-            {newItemTitle.trim() && (
-              <button
-                onClick={handleAddItem}
-                disabled={addingItem}
-                className="w-6 h-6 flex items-center justify-center rounded-lg bg-[var(--accent-strong)] hover:bg-[#4A65D8] transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {addingItem ? (
-                  <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" />
-                    <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                )}
-              </button>
+            {(!task.items || task.items.length === 0) && !newItemTitle && (
+              <p className="text-[12px] text-[var(--text-disabled)] dark:text-[#474848] italic">
+                Subtasklar yo'q
+              </p>
             )}
           </div>
 
-          {(!task.items || task.items.length === 0) && !newItemTitle && (
-            <p className="text-[12px] text-[var(--text-disabled)] dark:text-[#474848] italic">
-              Subtasklar yo'q
-            </p>
-          )}
         </div>
       </div>
     </div>

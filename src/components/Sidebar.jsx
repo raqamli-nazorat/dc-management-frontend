@@ -96,6 +96,14 @@ const menuByRole = {
         { label: "Vazifalar bo'yicha", path: '/manager/reports/by_tasks' },
       ],
     },
+    {
+      label: 'Arizalar', icon: IconApplications,
+      children: [
+        { label: 'Arizalar', path: '/manager/applications' },
+        { label: 'Lavozimlar', path: '/manager/applications/positions' },
+        { label: 'Viloyatlar', path: '/manager/applications/regions' },
+      ],
+    },
   ],
 
   // ── EMPLOYEE ─────────────────────────────────────────────────

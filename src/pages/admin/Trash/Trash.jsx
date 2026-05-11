@@ -149,9 +149,9 @@ function ProjectsTab() {
           placeholder="Loyihani izlash"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border 
-              border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-            dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
+          className="w-full pl-9 pr-3 py-2 rounded-xl text-sm outline-none border
+              bg-[#FFFFFF] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+            dark:bg-[#0D1117] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
             focus:border-[var(--accent-sub)]"
         />
       </div>
