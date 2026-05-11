@@ -100,6 +100,11 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
             <div
                 className="w-full h-[600px] flex flex-col max-w-[600px] bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden"
             >
+
+                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                    <FaXmark size={16} />
+                </button>
+
                 {/* Modal Header */}
                 <div className="flex items-center px-6 py-5 ">
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[var(--text-strong)] dark:text-[var(--text-strong)]">

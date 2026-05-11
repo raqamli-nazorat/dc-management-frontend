@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import dayjs from 'dayjs'
 import { DatePicker, TimePicker, ConfigProvider, theme } from 'antd'
@@ -32,7 +32,12 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         try {
             const { data } = await axiosAPI.get(`projects/${id}/`)
 
-            setProject(data.data)
+            if (data.success && data?.data?.id) {
+                const { data: links } = await axiosAPI.get(`project-documents/?project=${id}`)
+                setProject({ ...data.data, links: links.data.results || [] })
+            } else {
+                setProject(data.data)
+            }
         } catch (error) {
             console.log(error)
             toast.error(error?.response?.data?.error?.errorMsg || "Xodimlar olinmadi")
@@ -97,8 +102,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         deadline: '',
         time: '',
         is_hidden: true,
-        links: ["", ""],
+        links: [{ name: '', link: '' }],
     })
+    const [deletedIds, setDeletedIds] = useState([]);
 
     useEffect(() => {
         if (project && Object.keys(project).length > 0) {
@@ -116,7 +122,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 deadline: project?.deadline ? project.deadline.slice(0, 10) : '',
                 time: project?.deadline ? project.deadline.slice(11, 16) : '',
                 is_hidden: project?.is_hidden !== null ? project?.is_hidden : true,
-                links: ["", ""],
+                links: project?.links?.length > 0 
+                    ? project.links.map(d => ({ name: d.name, link: d.url, id: d.id }))
+                    : [{ name: '', link: '' }],
             })
         }
     }, [project])
@@ -133,6 +141,23 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         if (!form.penalty_percentage) e.penalty_percentage = true
         if (!form.deadline) e.deadline = true
         if (!form.time) e.time = true
+
+        const linkErrors = form.links.map(item => {
+            const hasName = !!item.name?.trim();
+            const hasLink = !!item.link?.trim();
+            const isValidFormat = hasLink && item.link.startsWith('https://');
+
+            if ((hasName && !hasLink) || (!hasName && hasLink) || (hasLink && !isValidFormat)) {
+                return {
+                    name: !hasName,
+                    link: !hasLink || !isValidFormat,
+                    isInvalidFormat: hasLink && !isValidFormat
+                };
+            }
+            return null;
+        });
+        if (linkErrors.some(el => el)) e.links = linkErrors;
+
         setErrors(e)
         return Object.keys(e).length === 0
     }
@@ -157,14 +182,31 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
             const res = await axiosAPI.patch(`projects/${project.id}/`, payload)
             if (res.status === 200) {
 
-                const id = res?.data?.data?.id
-                if (id) {
-                    await Promise.all(
-                        form.links.filter(link => link.trim()).map(async (link) => {
-                            await axiosAPI.post(`project-documents/`, { project: id, name: "saloom", url: link })
-                        })
-                    )
+                const projectId = res?.data?.data?.id || project.id;
+                
+                if (deletedIds.length > 0) {
+                    const deletePromises = deletedIds.map(docId => axiosAPI.delete(`project-documents/${docId}/`));
+                    await Promise.all(deletePromises);
                 }
+
+                const linkPromises = form.links
+                    .filter(item => item.name.trim() || item.link.trim())
+                    .map((item, index) => {
+                        const docId = item.id;
+                        const docData = {
+                            project: projectId,
+                            name: item.name || `Hujjat ${index + 1}`,
+                            url: item.link
+                        };
+
+                        if (docId) {
+                            return axiosAPI.patch(`project-documents/${docId}/`, docData);
+                        } else {
+                            return axiosAPI.post(`project-documents/`, docData);
+                        }
+                    });
+
+                await Promise.all(linkPromises);
 
                 toast.success('Malumotlar saqlandi');
                 onClose();
@@ -463,47 +505,75 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 </div>
                             </ConfigProvider>
 
-                            <div className="flex flex-col gap-2">
-                                <label className={labelCls}>Hujjat ma'lumotlari</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {form.links?.map((link, index) => {
-                                        const isLast = index === form.links.length - 1;
-                                        return (
-                                            <div key={index} className="flex items-center gap-2.5">
-                                                <div className="flex-1 relative w-full">
+                            <div className="flex flex-col gap-3">
+                                {form.links?.map((item, index) => {
+                                    const isLast = index === form.links.length - 1;
+                                    return (
+                                        <div key={index} className="flex flex-col gap-1.5">
+                                            <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
+                                            <div className="flex items-start gap-3">
+                                                <div className="flex-1">
                                                     <input
-                                                        className={inputCls() + " pr-10"}
+                                                        className={inputCls(errors.links?.[index]?.name)}
                                                         placeholder="Hujjat nomini kiriting"
-                                                        value={link || ''}
+                                                        value={item.name || ''}
                                                         onChange={e => {
                                                             const newLinks = [...form.links];
-                                                            newLinks[index] = e.target.value;
+                                                            newLinks[index] = { ...newLinks[index], name: e.target.value };
                                                             set('links', newLinks);
                                                         }}
                                                     />
-                                                    {form.links.length > 1 &&
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => set('links', form.links.filter((_, i) => i !== index))}
-                                                            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
-                                                        >
-                                                            <FaXmark size={14} />
-                                                        </button>
-                                                    }
+                                                    {errors.links?.[index]?.name && <p className="text-red-500 text-[10px] mt-1">* Majburiy</p>}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="relative">
+                                                        <input
+                                                            className={inputCls(errors.links?.[index]?.link) + (form.links.length > 1 ? " pr-10" : "")}
+                                                            placeholder="Hujjat havolasi"
+                                                            value={item.link || ''}
+                                                            onChange={e => {
+                                                                const newLinks = [...form.links];
+                                                                newLinks[index] = { ...newLinks[index], link: e.target.value };
+                                                                set('links', newLinks);
+                                                            }}
+                                                        />
+                                                        {form.links.length > 1 &&
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const itemToRemove = form.links[index];
+                                                                    if (itemToRemove.id) {
+                                                                        setDeletedIds(prev => [...prev, itemToRemove.id]);
+                                                                    }
+                                                                    set('links', form.links.filter((_, i) => i !== index));
+                                                                }}
+                                                                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                                                            >
+                                                                <FaXmark size={14} />
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                    {errors.links?.[index]?.link && (
+                                                        <p className="text-red-500 text-[10px] mt-1">
+                                                            {errors.links[index].isInvalidFormat ? "* Havola https:// bilan boshlanishi kerak" : "* Majburiy"}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 {isLast && (
+                                                <div className="w-[42px] shrink-0">
                                                     <button
                                                         type="button"
-                                                        onClick={() => set('links', [...form.links, ''])}
-                                                        className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+                                                        onClick={() => set('links', [...form.links, { name: '', link: '' }])}
+                                                        className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] bg-white flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
                                                     >
                                                         <FiPlus size={20} />
                                                     </button>
-                                                )}
+                                                </div>
+                                            )}
                                             </div>
-                                        )
-                                    })}
-                                </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}
