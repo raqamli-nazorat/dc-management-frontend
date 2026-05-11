@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -770,7 +770,7 @@ export default function TasksPage() {
   }
 
   useEffect(() => {
-    if (!isAuditor && !isEmployee) {
+    if (!isAuditor) {
       registerAction({
         label: "Vazifa qo'shish",
         icon: <img src="/imgs/tasks.svg" alt="" className="w-4 h-4 brightness-0 invert" />,
@@ -872,11 +872,15 @@ export default function TasksPage() {
             onApply={(f) => { setFilters(f); setShowFilter(false); loadKanbanTasks(f, search) }} />
         )}
         {showAdd && (
-          <AddTaskModal onClose={() => setShowAdd(false)} onAdd={async (body) => {
-            const created = await handleAdd(body)
-            loadKanbanTasks(filters, search)
-            return created
-          }} />
+          <AddTaskModal
+            onClose={() => setShowAdd(false)}
+            onAdd={async (body) => {
+              const created = await handleAdd(body)
+              loadKanbanTasks(filters, search)
+              return created
+            }}
+            isEmployee={isEmployee}
+          />
         )}
         {editTask && (
           <EditTaskModal
@@ -892,6 +896,7 @@ export default function TasksPage() {
               await handleDelete(editTask.id)
               setEditTask(null)
             } : undefined}
+            isEmployee={isEmployee}
           />
         )}
         {rejectionPending && (
@@ -1018,13 +1023,13 @@ export default function TasksPage() {
                         onClick={() => {
                           navigator.clipboard.writeText(t.uid || String(idx + 1)).then(() => {
                             toast.success('Nusxa olindi', t.uid || String(idx + 1))
-                          }).catch(() => {})
+                          }).catch(() => { })
                         }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer"
                         title="Nusxa olish"
                       >
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                          <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                         </svg>
                       </button>
                     </div>
@@ -1082,11 +1087,15 @@ export default function TasksPage() {
           onApply={handleApplyFilter} />
       )}
       {showAdd && (
-        <AddTaskModal onClose={() => setShowAdd(false)} onAdd={async (body) => {
-          const created = await handleAdd(body)
-          loadTasks(filters, search, 1)
-          return created
-        }} />
+        <AddTaskModal
+          onClose={() => setShowAdd(false)}
+          onAdd={async (body) => {
+            const created = await handleAdd(body)
+            loadTasks(filters, search, 1)
+            return created
+          }}
+          isEmployee={isEmployee}
+        />
       )}
       {editTask && (
         <EditTaskModal
@@ -1102,6 +1111,7 @@ export default function TasksPage() {
             await handleDelete(editTask.id)
             setEditTask(null)
           } : undefined}
+          isEmployee={isEmployee}
         />
       )}
 

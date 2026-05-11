@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react-icons/fa6'
 import { labelCls } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
@@ -258,7 +258,7 @@ function parseRejectionReason(reason) {
   })
 }
 
-export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete }) {
+export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete, isEmployee }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -681,14 +681,14 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
               <div>
                 <label className={labelCls}>Vazifa narxi (UZS)</label>
                 <input type="text" inputMode="numeric" value={form.task_price}
-                  onChange={e => !ro && set('task_price', formatPrice(e.target.value))}
-                  readOnly={ro} placeholder="0" className={inputCls(false, ro) + ' text-right'} />
+                  onChange={e => !ro && !isEmployee && set('task_price', formatPrice(e.target.value))}
+                  readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee) + ' text-right'} />
               </div>
               <div>
                 <label className={labelCls}>Jarima foizi (%) <span className="text-[var(--text-soft)] font-normal">(0–100)</span></label>
                 <input type="text" inputMode="decimal" value={form.penalty_percentage}
-                  onChange={e => !ro && handlePenalty(e.target.value)}
-                  readOnly={ro} placeholder="0" className={inputCls(false, ro)} />
+                  onChange={e => !ro && !isEmployee && handlePenalty(e.target.value)}
+                  readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee)} />
               </div>
             </div>
 

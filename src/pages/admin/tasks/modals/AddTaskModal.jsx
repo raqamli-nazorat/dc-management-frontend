@@ -235,7 +235,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   )
 }
 
-export default function AddTaskModal({ onClose, onAdd }) {
+export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -426,11 +426,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, pickerOpen]);
-
-  console.log(form.assignees);
-  console.log(form.position);
-
+  }, [onClose, pickerOpen]);  
 
   return (
     <>
@@ -546,6 +542,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                   onChange={e => set('task_price', formatPrice(e.target.value))}
                   placeholder="0"
                   className={inputCls(false) + " text-right"}
+                  disabled={isEmployee}
                 />
               </div>
               <div>
@@ -557,6 +554,7 @@ export default function AddTaskModal({ onClose, onAdd }) {
                   onChange={e => handlePenalty(e.target.value)}
                   placeholder="0"
                   className={inputCls(false)}
+                  disabled={isEmployee}
                 />
               </div>
             </div>
