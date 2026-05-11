@@ -264,7 +264,7 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
 
   return (
     <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border-l border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] animate-in slide-in-from-right duration-300">
-      <div className="flex items-center gap-3 px-6 py-6 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] shrink-0 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="flex items-center gap-3 px-6 py-6 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] shrink-0 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
         <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--text-strong)] dark:text-[var(--text-strong)] cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
           <FaArrowLeft size={14} />
         </button>
@@ -284,11 +284,11 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
           value={reason} 
           onChange={e => setReason(e.target.value)} 
           placeholder="Sababni yozing..." 
-          className="w-full h-36 px-4 py-3 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
+          className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
         />
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full px-6 py-4 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex justify-end">
+      <div className="absolute bottom-0 left-0 w-full px-6 py-4 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex justify-end">
          <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--accent-strong)] text-white text-[14px] font-bold hover:bg-[var(--accent-sub)] disabled:opacity-50 cursor-pointer transition-colors shadow-sm shadow-[var(--accent-strong)]/30">
            {saving ? 'Yuborilmoqda...' : <><FaCheck size={14} /> Yuborish</>}
          </button>
@@ -400,7 +400,7 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder="Sababni yozing..."
-            className="w-full h-36 px-4 py-3 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
+            className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] resize-none outline-none focus:border-[var(--accent-strong)]"
           />
         )}
       </div>
@@ -517,7 +517,7 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
             <textarea
               readOnly
               value={absenceReason || "Sabab ko'rsatilmagan"}
-              className="w-full h-36 px-4 py-3 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] resize-none outline-none cursor-default"
+              className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] resize-none outline-none cursor-default"
             />
           </div>
 

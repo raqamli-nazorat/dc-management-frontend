@@ -44,7 +44,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
   }
 
   return (
-    <div className="relative w-[320px] rounded-[24px] overflow-hidden shadow-sm bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+    <div className="relative w-[320px] rounded-[24px] overflow-hidden shadow-sm bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
       {/* Rangli header */}
       <div
         className="px-5 py-4 flex items-center justify-between"
@@ -186,7 +186,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 /* ── Skeleton loader ── */
 function SkeletonCard() {
   return (
-    <div className="w-[320px] rounded-[24px] overflow-hidden shadow-sm bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] animate-pulse">
+    <div className="w-[320px] rounded-[24px] overflow-hidden shadow-sm bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] animate-pulse">
       <div className="h-[56px] bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]" />
       <div className="bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)] rounded-[24px] px-6 pt-5 pb-7 -mt-3">
         <div className="h-4 w-2/3 bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] rounded-lg mb-5" />

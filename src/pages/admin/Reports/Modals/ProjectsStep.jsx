@@ -74,7 +74,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           >
                <div
-                    className="w-full max-w-[600px] max-h-[600px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[var(--stroke-soft)]"
+                    className="w-full max-w-[600px] max-h-[600px] bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden border dark:border-[var(--stroke-soft)]"
                     onClick={(e) => e.stopPropagation()}
                >
                     <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
@@ -94,7 +94,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                          <div className="flex items-center gap-3 mb-6">
                               <button
                                    onClick={toggleAll}
-                                   className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer whitespace-nowrap text-sm font-medium h-10 shadow-sm"
+                                   className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer whitespace-nowrap text-sm font-medium h-10 shadow-sm"
                               >
                                    <LuCheckCheck size={18} />
                                    Barchasini tanlash
@@ -124,7 +124,7 @@ const ProjectsStep = ({ selectedList = [], onConfirm, onClose }) => {
                                              onClick={() => toggleSelect(project.id)}
                                              className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer ${isSelected
                                                        ? "border-[#4F5ECE] bg-[#F5F7FF] dark:bg-[#252836] dark:border-[#4F5ECE]"
-                                                       : "border-[#F1F5F9] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
+                                                       : "border-[#F1F5F9] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
                                                   }`}
                                         >
                                              <div className="flex items-center flex-1 min-w-0">

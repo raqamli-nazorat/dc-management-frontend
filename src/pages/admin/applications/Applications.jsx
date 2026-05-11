@@ -156,7 +156,7 @@ const ApplicationsPage = () => {
       {confirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
-          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-7">
             <button onClick={() => setConfirmModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
@@ -177,7 +177,7 @@ const ApplicationsPage = () => {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmModal(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
@@ -225,10 +225,10 @@ const ApplicationsPage = () => {
               </button>
             </div>
             <div className="relative group flex items-center gap-2">
-              <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[var(--text-strong)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+              <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[var(--text-strong)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
                 Arizalar tashqi platforma orqali yuboriladi va ushbu tizimda yaratilmaydi.
               </div>
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-base)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
               <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
                 <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
               </button>

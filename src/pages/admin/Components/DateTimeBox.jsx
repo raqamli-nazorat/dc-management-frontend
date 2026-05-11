@@ -79,7 +79,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
       style={{ minWidth: 260, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
       {/* Header */}
@@ -87,7 +87,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={prevMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
@@ -95,7 +95,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={() => setShowYearMonth(s => !s)}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer"
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer"
         >
           <span className="text-sm font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
             {MONTH_NAMES[viewMonth]} {viewYear}
@@ -106,7 +106,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={nextMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
         </button>
@@ -170,7 +170,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
                     ? 'bg-[var(--accent-strong)] text-white'
                     : isToday(d)
                     ? 'border-2 border-[var(--accent-strong)] text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:bg-[var(--accent-disabled)] dark:hover:bg-[var(--bg-elevation-2)]'
-                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {d}
               </button>
@@ -184,7 +184,7 @@ function CalendarPopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={() => { onChange(''); onClose() }}
-          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]"
+          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]"
         >
           Tozalash
         </button>
@@ -253,7 +253,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
   return (
     <div
       ref={popRef}
-      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
+      className="absolute z-[9999] rounded-2xl shadow-2xl border bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 select-none"
       style={{ minWidth: 160, ...(dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) }}
     >
       <p className="text-xs font-semibold text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-2 text-center">Vaqt tanlang</p>
@@ -271,7 +271,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 className={`w-full text-center py-1.5 text-sm cursor-pointer transition-colors
                   ${i === hour
                     ? 'bg-[var(--accent-strong)] text-white font-bold'
-                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {String(i).padStart(2, '0')}
               </button>
@@ -291,7 +291,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
                 className={`w-full text-center py-1.5 text-sm cursor-pointer transition-colors
                   ${i === min
                     ? 'bg-[var(--accent-strong)] text-white font-bold'
-                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
+                    : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}
               >
                 {String(i).padStart(2, '0')}
               </button>
@@ -304,7 +304,7 @@ function TimePopover({ value, onChange, onClose, anchorRef, dropUp }) {
         <button
           type="button"
           onClick={() => { setHour(0); setMin(0); onChange('00:00'); onClose() }}
-          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)]"
+          className="text-xs text-[var(--text-soft)] hover:text-[var(--accent-sub)] cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]"
         >
           Tozalash
         </button>
@@ -422,7 +422,7 @@ export const DateTimeBox = ({ type, placeholder, value, onChange, disabled, erro
   // ── STYLES ────────────────────────────────────────────────
   const wrapCls = `
     relative flex items-center gap-1.5 px-3 py-2.5 rounded-xl border
-    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+    bg-[var(--bg-base)]
     ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
     ${!error && !disabled ? 'focus-within:border-[var(--accent-sub)] dark:focus-within:border-[var(--accent-sub)]' : ''}
     transition-colors

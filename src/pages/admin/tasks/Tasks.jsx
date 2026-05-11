@@ -151,7 +151,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
               ? '0 8px 24px rgba(0,0,0,0.35)'
               : '0 1px 4px rgba(0,0,0,0.12)',
           }}
-          className={`w-full shrink-0 rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] select-none cursor-grab active:cursor-grabbing overflow-hidden border
+          className={`w-full shrink-0 rounded-xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] select-none cursor-grab active:cursor-grabbing overflow-hidden border
             ${snapshot.isDragging
               ? 'border-[var(--accent-sub)] dark:border-[var(--accent-sub)]'
               : 'border-[#E8EBF4] dark:border-[#333535]'}`}
@@ -337,7 +337,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-[9999]  flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] p-7 flex flex-col gap-5">
+      <div className="relative w-full max-w-[520px] rounded-3xl shadow-2xl bg-[var(--bg-base)] p-7 flex flex-col gap-5">
         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:bg-[var(--stroke-sub)] cursor-pointer">
           <FaXmark size={13} />
         </button>
@@ -392,7 +392,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
             placeholder="Sababini yozing..."
             rows={4}
             className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
-              bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:placeholder-[var(--text-sub)]
+              bg-[var(--bg-base)] text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:placeholder-[var(--text-sub)]
               focus:border-[var(--accent-sub)] transition-colors
               ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`}
           />
@@ -401,7 +401,7 @@ function RejectionModal({ task, onClose, onConfirm }) {
 
         <div className="flex items-center justify-end gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={12} /> Bekor qilish
           </button>
           <button onClick={handleSubmit} disabled={loading}
@@ -955,7 +955,7 @@ export default function TasksPage() {
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
         <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)]">
-          <button className="p-1.5 rounded-lg bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm cursor-pointer">
+          <button className="p-1.5 rounded-lg bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] shadow-sm cursor-pointer">
             <img
               src="/imgs/taskIconRow.svg"
               alt="row view"

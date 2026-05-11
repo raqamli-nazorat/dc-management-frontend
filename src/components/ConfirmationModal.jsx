@@ -7,7 +7,7 @@ export const ConfirmationModal = ({title, description, onClose, onAction, button
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                     <div className="fixed inset-0 bg-black/60" />
-                    <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+                    <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] p-7">
                         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
                             <FaXmark size={14} />
                         </button>
@@ -28,7 +28,7 @@ export const ConfirmationModal = ({title, description, onClose, onAction, button
                         <div className="flex items-center justify-end gap-3">
                             <button
                                 onClick={onClose}
-                                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#4356a0] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[#4356a0] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
                             >
                                 <FaXmark size={14} /> Yopish
                             </button>

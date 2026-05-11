@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates/"
@@ -185,9 +185,9 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] h-[650px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+        <div className="relative w-full max-w-[600px] h-[650px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
           {/* header */}
-          <div className="px-7 pt-7 pb-4 sticky top-0 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] z-[100] rounded-t-xl">
+          <div className="px-7 pt-7 pb-4 sticky top-0 bg-[var(--bg-base)] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                 <FaArrowLeft size={17} />
@@ -224,7 +224,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                   </button>
                   {errors.status && <p className="text-xs text-red-500 mt-1">* Bu maydon majburiy</p>}
                   {statusOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {statusList.map((s, i) => (
                         <button key={s.value} type="button" onClick={() => { set('status', s.value); setStatusOpen(false) }}
                           className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer ${i < statusList.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.status === s.value ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
@@ -257,7 +257,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                 <label className={labelCls}>Menejer</label>
                 <div className="relative">
                   <button type="button" onClick={() => setMgrOpen(o => !o)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} dark:bg-[var(--bg-base)]`}>
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-base)] ${errors.manager ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} dark:bg-[var(--bg-base)]`}>
                     <span className={form.manager ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}>
                       {form.manager?.username || 'Menejer tanlang'}
                     </span>
@@ -270,7 +270,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                     </div>
                   </button>
                   {mgrOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                    <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       {users.filter(u => u.roles?.includes('manager')).map((u, i, arr) => (
                         <button key={u.id} type="button" onClick={() => { set('manager', u); setMgrOpen(false) }}
                           className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < arr.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager?.id === u.id ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
@@ -444,7 +444,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           {/* footer */}
           <div className="flex items-center justify-end mt-4 mr-5 gap-3">
             <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={13} /> Yopish
             </button>
             <button onClick={handleSubmit} disabled={loading}

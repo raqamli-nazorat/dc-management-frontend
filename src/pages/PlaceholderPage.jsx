@@ -3,7 +3,7 @@
 export default function PlaceholderPage({ title }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] rounded-2xl
-      bg-[var(--bg-elevation-1-alt)] border border-gray-100 shadow-sm
+      bg-[var(--bg-base)] border border-gray-100 shadow-sm
       dark:bg-gray-900 dark:border-gray-800">
       <MdConstruction size={48} className="text-gray-300 dark:text-gray-600" />
       <h2 className="mt-4 text-xl font-semibold text-gray-800 dark:text-[var(--text-strong)]">{title}</h2>

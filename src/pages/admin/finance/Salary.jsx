@@ -34,7 +34,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
-const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]'
 
 // -- API ------------------------------------------------------
 async function apiGetPayrolls(params = {}) {
@@ -71,7 +71,7 @@ function Toggle({ checked, onChange }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
       className={`relative w-10 h-5 rounded-full cursor-pointer ${checked ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-      <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+      <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   )
 }
@@ -83,7 +83,7 @@ function MonthDropdownFull({ value, onChange }) {
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+          bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
           ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
         <span className="flex-1 text-left truncate">{value || 'Oy tanlang'}</span>
         <div className="flex items-center gap-1 shrink-0 ml-1">
@@ -93,7 +93,7 @@ function MonthDropdownFull({ value, onChange }) {
       </button>
       {open && (
         <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+          bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {MONTHS.map((m, i) => (
             <button key={m} type="button" onClick={() => { onChange(m); setOpen(false) }}
               className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer
@@ -120,7 +120,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
               bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
 
         {/* Header */}
         <div className="px-6 pt-6 pb-3">
@@ -205,7 +205,7 @@ function SalaryFilterModal({ onClose, onApply, initial }) {
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
@@ -228,7 +228,7 @@ function Field({ label, value, right, red }) {
     <div>
       <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">{label}</label>
       <div className={`w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
-        bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)]
+        bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
         dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]
         ${right ? 'justify-end' : ''}
         ${red ? 'text-[var(--error-strong)]! dark:text-[var(--error-sub)]!' : ''}`}>
@@ -243,7 +243,7 @@ function ConfirmModal({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
         <div className="px-6 pt-6 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={onCancel} className="text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:opacity-70 cursor-pointer shrink-0">
@@ -261,7 +261,7 @@ function ConfirmModal({ onCancel, onConfirm }) {
         </div>
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
           <button onClick={onCancel} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
-            text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+            text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={onConfirm} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
@@ -288,7 +288,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
               bg-[#FFFFFF29] absolute top-7 right-7 hover:bg-[#FFFFFF40] text-white">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] max-h-[90vh] overflow-y-auto">
+        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
           <div className="px-6 pt-6 pb-4 flex items-center justify-between">
@@ -328,10 +328,10 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <div>
               <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">Passport ma'lumotlari</label>
               <div className="flex gap-2">
-                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
+                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
                   {u.passport_series?.slice(0, 2) ?? ''}
                 </div>
-                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
+                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
                   {u.passport_series?.slice(2)?.trim() ?? ''}
                 </div>
               </div>
@@ -348,7 +348,7 @@ function UserDetailModal({ user, onClose, onApprove }) {
           <div className="px-6 py-4 flex items-center justify-end gap-3 ">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
               <FaXmark size={13} /> {user.is_confirmed ? 'Yopish' : 'Bekor qilish'}
             </button>
             {!user.is_confirmed && onApprove && (
@@ -542,11 +542,11 @@ export default function SalaryPage() {
           {/* Info tooltip */}
           <div className="relative group flex items-center gap-2">
             <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[var(--text-strong)]
-            bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
             opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
               Tasdiqlash orqali ish haqi yakuniy hisob bo‘yicha hisoblanadi.
              </div>
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-base)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
               <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
             </button>
@@ -631,7 +631,7 @@ export default function SalaryPage() {
       {/* Selection bar */}
       {isAccountant && selecting && selected.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
-          bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+          bg-[var(--bg-base)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)] mr-1">{selected.size} ta tanlandi</span>
           <button onClick={() => setShowConfirm(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer bg-green-500 text-white hover:bg-green-600">

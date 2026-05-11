@@ -100,7 +100,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   return (
     <div
       className="fixed top-0 right-0 h-full z-50 flex flex-col shadow-2xl
-        bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border-l border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
+        bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border-l border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]"
       style={{ width: 480 }}
     >
       {/* Header */}
@@ -113,7 +113,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <button
             onClick={markAllRead}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
-              text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
+              text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             Barchasi o'qildi
           </button>
@@ -121,7 +121,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
-              text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-2)]"
+              text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             <FaXmark size={15} />
           </button>
@@ -544,10 +544,10 @@ export default function Layout() {
                       <div
                         key={item.key}
                         onClick={() => { download[item.key](); setDownloadOpen(false) }}
-                        className="flex items-center justify-between p-2 bg-white/40 dark:bg-white/5 rounded-[18px] cursor-pointer hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-white/10 transition-all active:scale-[0.98] group"
+                        className="flex items-center justify-between p-2 bg-white/40 dark:bg-white/5 rounded-[18px] cursor-pointer hover:bg-[var(--bg-elevation-1)] dark:hover:bg-white/10 transition-all active:scale-[0.98] group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] rounded-[14px] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                          <div className="w-10 h-10 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] rounded-[14px] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
                             {item.icon}
                           </div>
                           <span className="text-[var(--text-strong)] dark:text-[var(--text-strong)] font-bold text-base">{item.label}</span>

@@ -98,7 +98,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
         >
             <div
-                className="w-full h-[600px] flex flex-col max-w-[600px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden"
+                className="w-full h-[600px] flex flex-col max-w-[600px] bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden"
             >
                 {/* Modal Header */}
                 <div className="flex items-center px-6 py-5 ">
@@ -113,7 +113,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     <div className="flex items-center gap-3 mb-6">
                         <button
                             onClick={toggleAll}
-                            className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer whitespace-nowrap text-sm font-medium h-10 shadow-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-gray-100 dark:border-[var(--stroke-soft)] rounded-xl text-gray-600 dark:text-[var(--text-soft)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer whitespace-nowrap text-sm font-medium h-10 shadow-sm"
                         >
                             <LuCheckCheck size={18} />
                             Barchasini tanlash
@@ -140,7 +140,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                                     onClick={() => toggleSelect(emp.id)}
                                     className={`flex items-center px-4 py-3.5 rounded-[16px] border cursor-pointer ${isSelected
                                         ? "border-[#4F5ECE] bg-[#F5F7FF] dark:bg-[#252836] dark:border-[#4F5ECE]"
-                                        : "border-[#F1F5F9] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
+                                        : "border-[#F1F5F9] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] hover:border-gray-200 dark:hover:border-[#3a3b3b]"
                                         }`}
                                 >
                                     {/* Selection Indicator */}

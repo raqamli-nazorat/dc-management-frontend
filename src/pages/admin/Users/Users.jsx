@@ -141,7 +141,7 @@ export default function UsersPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/60" />
-          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+          <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-7">
             <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
               <FaXmark size={14} />
             </button>
@@ -160,7 +160,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
               >
                 <FaXmark size={14} /> Bekor qilish
               </button>
@@ -220,7 +220,7 @@ export default function UsersPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 outline-none 
-              bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+              bg-[var(--bg-base)] border border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
               dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
               style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px 6px 32px', borderRadius: 12 }}
             />
@@ -332,7 +332,7 @@ export default function UsersPage() {
         {/* Selection bar */}
         {selecting && selected.size > 0 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl
-          bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+          bg-[var(--bg-base)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)] mr-1">{selected.size} ta tanlandi</span>
             <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer bg-[#FFF2F2] text-[var(--error-strong)] hover:bg-[#F8D7DA] dark:bg-[var(--error-strong)]/10 dark:text-[var(--error-sub)] dark:hover:bg-[var(--error-strong)]/20">
               <MdDelete size={16} />

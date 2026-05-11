@@ -48,7 +48,7 @@ const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
 
-            <div className="w-[620px] h-[500px] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[32px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden py-6 px-4 flex flex-col gap-8">
+            <div className="w-[620px] h-[500px] bg-[var(--bg-base)] rounded-[32px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden py-6 px-4 flex flex-col gap-8">
 
                 {/* Header Section */}
                 <div className="flex items-start justify-between">
@@ -65,10 +65,10 @@ const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
                     </div>
 
                     <div className="relative group flex items-center gap-2">
-                        <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[var(--text-strong)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[#E2E6F2] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                        <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[#1A1D2E] dark:text-[var(--text-strong)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-[#E2E6F2] dark:border-[var(--stroke-soft)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
                             Chek faylini hozir yuklamasangiz ham bo‘ladi. Uni keyinroq qo‘shishingiz mumkin.
                         </div>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A1D2E] dark:bg-[var(--bg-base)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
                             <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
                         </button>

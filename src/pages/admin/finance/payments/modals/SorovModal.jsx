@@ -121,8 +121,8 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
   }
 
   const iCls = (k) => `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
-    dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
+    bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
+    dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
     ${errors[k] ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`
 
   const categoryOptions = categories.map(c => ({ label: c.title, value: String(c.id) }))
@@ -139,7 +139,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
         bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
 
         {/* Header */}
         <div className="px-6 pt-7">
@@ -266,7 +266,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
                   {/* Karta taklifi */}
                   {showCardSuggest && userCard && (
                     <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-xl shadow-xl border overflow-hidden
-                      bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                      bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                       <button
                         type="button"
                         onMouseDown={() => {
@@ -302,7 +302,7 @@ export default function SorovModal({ onClose, onSubmit, categories = [], project
         <div className="px-6 py-4 flex items-center justify-end gap-3">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={14} /> Yopish
           </button>
           <button onClick={handleSubmit}

@@ -83,7 +83,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
           type="button"
           onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
         >
           <span className="flex-1 text-left truncate">
@@ -102,7 +102,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder, renderOp
 
         {open && (
           <div className="absolute top-full left-0 mt-1 z-[70] w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {options.map((o, i) => (
               <button
                 key={getVal(o)}
@@ -133,7 +133,7 @@ function MultiChipField({ label, selected, onRemove, onClick, placeholder, rende
         type="button"
         onClick={onClick}
         className="w-full min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-xl border  cursor-pointer text-left
-          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]"
+          bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]"
       >
         {selected?.length === 0 ? (
           <span className="flex-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-sub)]">{placeholder}</span>
@@ -182,7 +182,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 " />
-      <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
 
         {/* Header */}
         <div className="px-7 pt-7 pb-4 shrink-0">
@@ -201,11 +201,11 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                   : setLocal(projectsList.map(p => ({ id: p.id, name: p.title })))
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
-                text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-1)] cursor-pointer  shrink-0"
+                text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)] cursor-pointer  shrink-0"
             >
               <LuSlidersHorizontal size={12} /> Barchasi tanlash
             </button>
-            <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+            <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)]">
               <LuSearch size={13} className="text-[var(--text-soft)] shrink-0" />
               <input
                 autoFocus
@@ -231,7 +231,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border  cursor-pointer text-left
                   ${checked
                     ? 'border-[var(--accent-sub)] bg-[#EEF1FB] dark:bg-[#1C2340] dark:border-[var(--accent-sub)]'
-                    : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'}`}
+                    : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'}`}
               >
                 <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center 
                   ${checked ? 'border-[var(--accent-sub)] bg-[var(--accent-sub)]' : 'border-[#C2C8E0] dark:border-[var(--stroke-sub)]'}`}>
@@ -254,7 +254,7 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
             <button
               onClick={() => setLocal([])}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
             >
               <FaXmark size={13} /> Tozalash
             </button>
@@ -356,7 +356,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col">
+        <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)] flex flex-col">
 
           {/* Header */}
           <div className="px-7 pt-7 pb-3">
@@ -462,7 +462,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
               <button
                 onClick={() => setF(getDefaultFilter())}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                  text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
+                  text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
               >
                 <FaXmark size={13} /> Tozalash
               </button>

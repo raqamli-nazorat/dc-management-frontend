@@ -36,7 +36,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         </button>
 
 
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
 
         {/* X tugmasi */}
        
@@ -99,8 +99,8 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
-                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="dan: 0"
                 value={f.amount__gte}
                 onChange={e => set('amount__gte', e.target.value.replace(/[^\d]/g, ''))}
@@ -108,8 +108,8 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
               <input
                 inputMode="decimal"
                 className="w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border
-                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
-                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-sub)]
+                  dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]"
                 placeholder="gacha: 0"
                 value={f.amount__lte}
                 onChange={e => set('amount__lte', e.target.value.replace(/[^\d]/g, ''))}
@@ -150,7 +150,7 @@ export default function FilterModal({ onClose, onApply, initial, categories = []
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}

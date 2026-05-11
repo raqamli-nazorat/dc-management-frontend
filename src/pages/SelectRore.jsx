@@ -69,7 +69,7 @@ const SelectRore = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F1F3F9] dark:bg-[var(--bg-base)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
-            <div className="bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] rounded-[32px] p-10 shadow-[0_4px_32px_rgba(0,0,0,0.04)] w-full max-w-[480px] border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+            <div className="bg-[var(--bg-base)] rounded-[32px] p-10 shadow-[0_4px_32px_rgba(0,0,0,0.04)] w-full max-w-[480px] border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                 <h1 className="text-[28px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-3 leading-[1.2]">
                     Siz dasturni bir nechta rol bilan foydalanishingiz mumkin
                 </h1>

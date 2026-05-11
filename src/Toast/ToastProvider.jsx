@@ -61,7 +61,7 @@ export const ToastProvider = ({ children }) => {
                     <div
                         key={t.id}
                         style={{ pointerEvents: 'auto' }}
-                        className="flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg w-[320px] bg-[var(--bg-elevation-1-alt)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] animate-in fade-in slide-in-from-right-5 duration-300"
+                        className="flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg w-[320px] bg-[var(--bg-base)] border border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] animate-in fade-in slide-in-from-right-5 duration-300"
                     >
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${config.bg}`}>
                             {config.icon}

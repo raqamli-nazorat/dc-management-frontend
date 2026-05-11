@@ -512,13 +512,13 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           <NavLink
             to={`/${urlPrefix}/trash`}
             className={({ isActive }) => [
-              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium  cursor-pointer border',
+              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium  cursor-pointer border mb-3',
               isActive
                 ? 'bg-[var(--stroke-sub)] text-[var(--text-strong)] border-[var(--stroke-soft)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-strong)] dark:border-[var(--stroke-sub)]'
                 : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
             ].join(' ')}
           >
-            <FaTrashCan size={16} className="shrink-0" />
+            <FaTrashCan size={16} className="shrink-0 " />
             <span>Chiqindi qutisi</span>
           </NavLink>
         ))}
@@ -575,7 +575,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             <div
               ref={popupRef}
               className="fixed z-[99999] w-[240px] rounded-2xl shadow-2xl border overflow-hidden
-                bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]"
+                bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]"
               style={{ bottom: 16, left: isCollapsed ? 72 : 288 }}
             >
               {/* Rollar ro'yxati */}
@@ -638,7 +638,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                     className={`relative w-10 h-5 rounded-full  cursor-pointer shrink-0
                       ${isDark ? 'bg-[var(--accent-sub)]' : 'bg-[var(--stroke-strong)]'}`}
                   >
-                    <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] shadow transition-transform duration-200
+                    <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200
                       ${isDark ? 'translate-x-5' : 'translate-x-0.5'}`} />
                   </button>
                 </div>

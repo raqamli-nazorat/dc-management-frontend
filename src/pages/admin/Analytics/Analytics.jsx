@@ -36,7 +36,7 @@ function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
   return (
     <div className={`px-3 py-2 rounded-xl shadow-xl border text-xs z-50
-      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-[var(--bg-elevation-1-alt)] border-[#E8EAF0] text-[#1A1D2E]'}`}>
+      ${isDark ? 'bg-[#1C1D1D] border-[#292A2A] text-white' : 'bg-[var(--bg-base)] border-[#E8EAF0] text-[#1A1D2E]'}`}>
       {label && <p className="font-semibold mb-1 text-[#8F95A8]">{label}</p>}
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2">
@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
   /* ── Navbar period selector ── */
   useEffect(() => {
     const selector = (
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] shadow-sm border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] shadow-sm border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
         {PERIODS.map(p => (
           <button key={p.value} onClick={() => setPeriod(p.value)}
             className={`px-4 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors

@@ -20,7 +20,7 @@ const DetailModal = ({ id, onClose }) => {
     const [project, setProject] = useState({});
     const [loading, setLoading] = useState(false)
 
-    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
+    const fCls = 'w-full px-3 py-2.5 rounded-xl text-sm border bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
     const tagCls = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]'
 
     const getProject = async () => {
@@ -77,11 +77,11 @@ const DetailModal = ({ id, onClose }) => {
             <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer z-10">
                 <FaXmark size={14} />
             </button>
-            <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+            <div className="relative w-full max-w-[600px] h-[680px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
 
 
                 {/* Header */}
-                <div className="px-7 pt-7 pb-4 sticky top-0 z-10 bg-[var(--bg-elevation-1-alt)] rounded-t-2xl dark:bg-[var(--bg-base)]">
+                <div className="px-7 pt-7 pb-4 sticky top-0 z-10 bg-[var(--bg-base)] rounded-t-2xl dark:bg-[var(--bg-base)]">
                     <div className="flex items-center gap-3 mb-1">
                         <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                             <FaArrowLeft size={17} />
@@ -188,7 +188,7 @@ const DetailModal = ({ id, onClose }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className={labelCls}>Muddat sanasi</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)]">
                                     <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('DD.MM.YYYY') : '—'}
                                     </span>
@@ -199,7 +199,7 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                             <div>
                                 <label className={labelCls}>Soati</label>
-                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)]">
                                     <span className="flex-1 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                                         {project.deadline ? dayjs(project.deadline).format('HH:mm') : '—'}
                                     </span>
@@ -252,7 +252,7 @@ const DetailModal = ({ id, onClose }) => {
 
 
                 {/* Footer */}
-                <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                <div className="px-7 py-5 flex items-center rounded-b-2xl sticky bottom-0 z-10 bg-[var(--bg-base)]">
                     {!loading &&
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-[#1A1D2E] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
@@ -263,7 +263,7 @@ const DetailModal = ({ id, onClose }) => {
                     }
                     <button
                         onClick={onClose}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)] ml-auto"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)] ml-auto"
                     >
                         <FaXmark size={13} /> Yopish
                     </button>
