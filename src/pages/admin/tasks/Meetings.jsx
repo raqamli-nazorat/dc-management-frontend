@@ -60,9 +60,9 @@ const durationToMinutes = (val, unit) => {
 }
 
 const minutesToDisplay = (mins) => {
-  if (!mins) return { val: '', unit: 'Daqiqa' }
+  if (!mins) return { val: '', unit: 'daqiqa' }
   if (mins >= 60 && mins % 60 === 0) return { val: String(mins / 60), unit: 'soat' }
-  return { val: String(mins), unit: 'Daqiqa' }
+  return { val: String(mins), unit: 'daqiqa' }
 }
 
 const normalizePercentInput = (val) => {
@@ -828,13 +828,13 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
           </div>
 
           {/* -- Footer (qotgan) -- */}
-          <div className="px-7 py-5 flex items-center justify-between gap-3 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] shrink-0 bg-[var(--bg-base)]">
+          <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
             <div className="flex items-center gap-2.5">
               {!meeting.is_completed && onFinish && (
                 <button
                   type="button"
                   onClick={() => { onClose(); onFinish(meeting.id) }}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer text-[#22c55e] border border-[#22c55e]/30 hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer text-[#22c55e]  hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                   Yakunlash
@@ -1012,7 +1012,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
         </div>
 
         {/* Footer — Tugatildimi + Yopish */}
-        <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+        <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] ">
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">Tugatildimi?</label>
             <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-black dark:bg-[var(--bg-base)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
