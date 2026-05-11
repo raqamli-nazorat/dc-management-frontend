@@ -261,7 +261,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 flex items-center justify-end gap-3 shrink-0 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
+          <div className="px-6 py-4 flex items-center justify-end gap-3 shrink-0 ">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
                 text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
