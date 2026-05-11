@@ -1,5 +1,5 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus } from 'react-icons/fa6'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy } from 'react-icons/fa6'
 import { LuFilter } from 'react-icons/lu'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -9,6 +9,7 @@ import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
 import { MeetingAttendanceModal } from '../../../components/MeetingModals'
+import { PiCopyBold } from 'react-icons/pi'
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 const DURATION_UNITS = ['daqiqa', 'soat']
@@ -133,43 +134,6 @@ function ProjectDropdown({ value, onChange, error, projects = [] }) {
             ))}
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-/* -- DurationSelect -- */
-function DurationSelect({ value, unit, onValueChange, onUnitChange }) {
-  const { open, setOpen, ref } = useDropdown()
-  return (
-    <div ref={ref}>
-      <label className={labelCls}>Davomiyligi</label>
-      <div className="flex gap-2">
-        <input type="number" min="1" value={value} onChange={e => onValueChange(e.target.value)}
-          placeholder="40"
-          className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
-            bg-[var(--bg-base)] text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] " />
-        <div className="relative w-28">
-          <button type="button" onClick={() => setOpen(o => !o)}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-              bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-            <span>{unit}</span>
-            <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${open ? 'rotate-180' : ''}`} />
-          </button>
-          {open && (
-            <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-xl shadow-xl border overflow-hidden
-              bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
-              {DURATION_UNITS.map((u, i) => (
-                <button key={u} type="button" onClick={() => { onUnitChange(u); setOpen(false) }}
-                  className={`w-full text-left px-3 py-2.5 text-sm  cursor-pointer
-                    ${i < DURATION_UNITS.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''}
-                    ${unit === u ? 'bg-[#EEF1FB] text-[var(--accent-strong)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
-                  {u}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   )
@@ -460,7 +424,7 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
               <div>
                 <label className={labelCls}>Davomiyligi</label>
                 <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-[var(--bg-base)] focus-within:border-[var(--accent-sub)] ${errors.durationVal ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`}>
-                  <input type="number" min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value)}
+                  <input min="1" value={form.durationVal} onChange={e => set('durationVal', e.target.value.replace(/\D/g, ''))}
                     placeholder="0"
                     className="flex-1 min-w-0 w-8 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
                   <span className="shrink-0 text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] whitespace-nowrap">daqiqa</span>
@@ -553,9 +517,10 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
 }
 
 /* -- EditMeetingModal -- */
-function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit = true, onFinish }) {
+function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, onFinish }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [copyLink, setCopyLink] = useState(null)
 
   const { date: initDate, time: initTime } = fromIso(meeting.start_time)
   const { val: initDurVal, unit: initDurUnit } = minutesToDisplay(meeting.duration_minutes)
@@ -611,10 +576,27 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
       const mins = durationToMinutes(form.durationVal, form.durationUnit)
       if (mins) body.duration_minutes = mins
 
-      await onSave(meeting.id, body)
+      const res = await axiosAPI.put(`/meetings/${meeting?.id}/`, body)
+      
+      toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
+
       onClose()
-    } catch (err) {
-      toast.error('Xatolik', parseApiError(err, "Yig'ilish yangilashda xatolik"))
+    } catch (error) {
+      console.error(error)
+      const errData = error?.response?.data?.error;
+
+      // Field-level detail xatolarini chiqarish (masalan: password, name ...)
+      let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+      if (errData?.details && typeof errData.details === 'object') {
+        const detailMsgs = Object.values(errData.details).flat().join(' ');
+        if (detailMsgs) errMsg = detailMsgs;
+      } else if (errData?.errorMsg) {
+        errMsg = errData.errorMsg;
+      } else if (typeof error?.response?.data === 'string') {
+        errMsg = error.response.data;
+      }
+
+      toast.error(errMsg);
     } finally {
       setLoading(false)
     }
@@ -674,14 +656,44 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
             <div>
               <label className={labelCls}>Havolasi</label>
               {canEdit ? (
-                <input value={form.link} onChange={e => set('link', e.target.value)}
-                  placeholder="URL manzil kiriting" className={inputCls(false)} />
+                <div className='flex items-end relative'>
+                  <input value={form.link} onChange={e => set('link', e.target.value)}
+                    placeholder="URL manzil kiriting" className={inputCls(false) + ' pr-9'} />
+                  {form?.link?.trim() && (
+                    <button
+                      type="button"
+                      className="absolute top-2 right-1 p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
+                      onClick={() => { navigator.clipboard.writeText(form.link); setCopyLink(form.link); setTimeout(() => setCopyLink(null), 2000) }}
+                      title="Havolani nusxalash"
+                    >
+                      {copyLink ?
+                        <FaCheck size={14} className='text-green-500' />
+                        : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
+                      }
+                    </button>
+                  )}
+                </div>
               ) : (
-                <div className={inputCls(false)}>
-                  {form.link
-                    ? <a href={form.link} target="_blank" rel="noreferrer"
-                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{form.link}</a>
-                    : <span className="text-[var(--text-soft)]">—</span>}
+                <div className={`${inputCls(false)} flex items-center justify-between gap-2 overflow-hidden`}>
+                  <div className="flex-1 min-w-0">
+                    {form.link
+                      ? <a href={form.link} target="_blank" rel="noreferrer"
+                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all block">{form.link}</a>
+                      : <span className="text-[var(--text-soft)]">—</span>}
+                  </div>
+                  {form.link && (
+                    <button
+                      type="button"
+                      className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
+                      onClick={() => { navigator.clipboard.writeText(form.link); setCopyLink(form.link); setTimeout(() => setCopyLink(null), 2000) }}
+                      title="Havolani nusxalash"
+                    >
+                      {copyLink ?
+                        <FaCheck size={14} className='text-green-500' />
+                        : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
+                      }
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -731,8 +743,8 @@ function EditMeetingModal({ meeting, onClose, onSave, projects, users, canEdit =
               <div>
                 <label className={labelCls}>Davomiyligi</label>
                 <div className={`flex rounded-xl border overflow-hidden ${!canEdit ? 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]' : 'bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus-within:border-[var(--accent-sub)]'}`}>
-                  <input type="number" min="1" value={form.durationVal}
-                    onChange={e => canEdit && set('durationVal', e.target.value)}
+                  <input min="1" value={form.durationVal}
+                    onChange={e => canEdit && set('durationVal', e.target.value.replace(/\D/g, ''))}
                     readOnly={!canEdit} placeholder="40"
                     className="w-12 px-2 py-2.5 text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
                   <span className="flex items-center px-2 text-xs text-[var(--text-sub)] dark:text-[var(--text-sub)] border-l border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] whitespace-nowrap">
@@ -833,6 +845,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
   const project = projects?.find(p => p.id === meeting.project)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
+  const [copyLink, setCopyLink] = useState(null)
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -893,11 +906,25 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
           {/* Havola */}
           <div>
             <label className={labelCls}>Havolasi</label>
-            <div className={fieldCls}>
-              {meeting.link
-                ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all">{meeting.link}</a>
-                : <span className="text-[var(--text-soft)]">—</span>}
+            <div className={`${fieldCls} flex items-center justify-between gap-2 overflow-hidden`}>
+              <div className="flex-1 min-w-0">
+                {meeting.link
+                  ? <a href={meeting.link} target="_blank" rel="noreferrer"
+                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all block">{meeting.link}</a>
+                  : <span className="text-[var(--text-soft)]">—</span>}
+              </div>
+              {meeting.link && (
+                <button
+                  className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
+                  onClick={() => { navigator.clipboard.writeText(meeting.link); setCopyLink(meeting.link); setTimeout(() => setCopyLink(null), 2000) }}
+                  title="Havolani nusxalash"
+                >
+                  {copyLink ?
+                    <FaCheck size={14} className='text-green-500' />
+                    : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
+                  }
+                </button>
+              )}
             </div>
           </div>
 
@@ -1021,7 +1048,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
     if (!iso) return ''
     try {
       const d = new Date(iso)
-      return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+      return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
     } catch { return '' }
   }
 
@@ -1076,7 +1103,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                 <button type="button" onClick={() => { orgDd.setOpen(o => !o); setOrgSearch('') }} className={triggerCls(organizer)}>
                   {selectedOrg ? (
                     <>
-                      
+
                       <span className="flex-1 text-left truncate text-[var(--text-strong)] dark:text-[var(--text-strong)]">{selectedOrg.username}</span>
                       <span onMouseDown={e => { e.stopPropagation(); setOrganizer('') }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer ml-auto shrink-0"><FaXmark size={11} /></span>
                     </>
@@ -1088,7 +1115,7 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   )}
                 </button>
                 {orgDd.open && (
-                  <div className={ddBase} style={{ maxHeight: 260, width:250,  }}>
+                  <div className={ddBase} style={{ maxHeight: 260, width: 250, }}>
                     {/* <div className="px-3 py-2 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
                       <input autoFocus value={orgSearch} onChange={e => setOrgSearch(e.target.value)}
                         placeholder="Qidirish..." className="w-full text-sm outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-soft)]" />
@@ -1137,8 +1164,8 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
                   </div>
                 </button>
                 {prjDd.open && (
-                  <div className={ddBase} style={{ maxHeight: 260,  width:250}}>
-                 
+                  <div className={ddBase} style={{ maxHeight: 260, width: 250 }}>
+
                     <div className="overflow-y-auto" style={{ maxHeight: 200 }}>
                       {filteredProjects.length === 0
                         ? <p className="px-4 py-3 text-sm text-[var(--text-soft)] text-center">Topilmadi</p>
@@ -1226,8 +1253,12 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
 
 
 /* -- RowMenu -- */
-function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted }) {
+function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted, project }) {
   const [open, setOpen] = useState(false)
+  const { user } = useAuth()
+
+  const edit = project.organizer === user?.id
+
   const ref = useRef(null)
   useEffect(() => {
     const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
@@ -1250,11 +1281,13 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
             Ko'rish
           </button>
-          <button onClick={() => { onEdit(); setOpen(false) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-            Tahrirlash
-          </button>
+          {edit &&
+            <button onClick={() => { onEdit(); setOpen(false) }}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+              Tahrirlash
+            </button>
+          }
           {!isCompleted && (
             <button onClick={() => { onFinish(); setOpen(false) }}
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
@@ -1277,7 +1310,7 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted }) {
 export default function MeetingsPage() {
   const { registerAction, clearAction } = usePageAction()
   const { user } = useAuth()
-  const isAuditor = user?.active_role === 'auditor' || (user?.roles?.includes('auditor') && !user?.active_role)
+  const isAuditor = user?.active_role === 'auditor'
 
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -1389,19 +1422,6 @@ export default function MeetingsPage() {
     }
   }
 
-  const handleEdit = async (id, body) => {
-    try {
-      const res = await axiosAPI.put(`/meetings/${id}/`, body)
-      const updated = res.data?.data ?? res.data
-      setData(prev => prev.map(m => m.id === id ? updated : m))
-      toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
-      loadMeetings(filters, search, 1)
-    } catch (err) {
-      toast.error('Xatolik', parseApiError(err, "Yangilashda xatolik"))
-      throw err
-    }
-  }
-
   const handleClose = async (id) => {
     try {
       const res = await axiosAPI.post(`/meetings/${id}/close/`)
@@ -1431,7 +1451,7 @@ export default function MeetingsPage() {
     try {
       const res = await axiosAPI.get(`/meetings/${id}/`)
       const meeting = res.data?.data ?? res.data
-      if (mode === 'edit') setEditItem(meeting)
+      if (mode === 'edit' && meeting.organizer === user.id && !meeting?.is_completed) setEditItem(meeting)
       else setDetail(meeting)
     } catch (err) {
       toast.error('Xatolik', "Yig'ilish ma'lumotlarini yuklashda xatolik")
@@ -1470,7 +1490,7 @@ export default function MeetingsPage() {
               dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[var(--text-sub)]" />
         </div>
         <button onClick={() => setShowFilter(true)}
-          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border  cursor-pointer
+          className="relative flex items-center gap-2 px-3 py-[4px] rounded-xl text-[13px] font-bold border  cursor-pointer
             bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
           <LuFilter size={13} /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
@@ -1512,7 +1532,7 @@ export default function MeetingsPage() {
                 return (
                   <tr key={m.id}
                     className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]  cursor-pointer"
-                    onClick={() => loadMeetingDetail(m.id, 'edit')}>
+                    onClick={() => loadMeetingDetail(m.id, isAuditor && m?.is_completed ? 'detail' : 'edit')}>
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{idx + 1}</td>
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)]  font-medium">{m.uid || ''}</td>
                     <td className="px-4 py-3 font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">{m.title}</td>
@@ -1533,11 +1553,12 @@ export default function MeetingsPage() {
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       {!isAuditor && (
                         <RowMenu
-                          onDetail={() => loadMeetingDetail(m.id, 'edit')}
+                          onDetail={() => loadMeetingDetail(m.id, 'detail')}
                           onEdit={() => loadMeetingDetail(m.id, 'edit')}
                           onFinish={() => setAttendanceMeetingId(m.id)}
                           isCompleted={!!m.is_completed}
                           onDelete={() => handleDelete(m.id)}
+                          project={m}
                         />
                       )}
                     </td>
@@ -1578,8 +1599,11 @@ export default function MeetingsPage() {
           projects={projects} users={users} />
       )}
       {editItem && (
-        <EditMeetingModal meeting={editItem} onClose={() => setEditItem(null)}
-          onSave={handleEdit} projects={projects} users={users}
+        <EditMeetingModal
+          meeting={editItem}
+          onClose={() => setEditItem(null)}
+          projects={projects}
+          users={users}
           onFinish={(id) => { setEditItem(null); setAttendanceMeetingId(id) }}
           canEdit={(() => {
             const isAdminOrManager = user?.active_role === 'admin' || user?.active_role === 'manager'
