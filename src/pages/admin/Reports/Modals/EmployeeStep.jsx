@@ -11,7 +11,7 @@ import { FaXmark } from "react-icons/fa6";
 import { LuCheckCheck } from "react-icons/lu";
 import { useAuth } from "../../../../context/AuthContext";
 
-const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "all", title = "Boshqaruvchi tanlang", param = {} }) => {
+const EmployeeStep = ({ selectedList = [], onConfirm, bgColor = true, onClose, employee_role = "all", title = "Boshqaruvchi tanlang", param = {} }) => {
     const { user } = useAuth();
 
     const [employees, setEmployees] = useState([]);
@@ -77,6 +77,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "Escape") {
+                e.stopPropagation();
                 onClose();
             }
         };
@@ -95,7 +96,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+            className={`fixed inset-0 z-50 flex items-center justify-center ${bgColor ? "bg-black/70" : "bg-black/10"}`}
         >
             <div
                 className="w-full h-[600px] flex flex-col max-w-[600px] bg-[var(--bg-base)] rounded-[24px] shadow-2xl overflow-hidden"
@@ -136,7 +137,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     </div>
 
                     {/* Employee List */}
-                    <div className="space-y-3 flex-1 h-[340px] max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-3 flex-1 h-[400px] max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {employees?.map((emp) => {
                             const isSelected = selectedIds.includes(emp.id);
                             return (
@@ -184,7 +185,7 @@ const EmployeeStep = ({ selectedList = [], onConfirm, onClose, employee_role = "
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex  items-center justify-between mt-8 pt-6">
+                    <div className="flex  items-center justify-between">
                         <span className="text-gray-500 dark:text-[var(--text-soft)] font-medium text-sm">
                             {selectedIds.length} ta tanlangan
                         </span>

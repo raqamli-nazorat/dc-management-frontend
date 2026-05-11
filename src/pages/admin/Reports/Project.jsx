@@ -131,19 +131,35 @@ const Employee = () => {
     return undefined
   }
 
+  const getPinnedRight = (key) => {
+    if (!tablePin[key]) return undefined
+    let offset = 0
+
+    const rightGroups = [...GROUPS].reverse()
+    for (const group of rightGroups) {
+      if (group.key === key) return offset
+      if (tablePin[group.key]) {
+        offset += (group.colSpan * group.subWidth)
+      }
+    }
+    return undefined
+  }
+
   const getSubPinnedRight = (subKey) => {
     if (!tablePin[subKey]) return undefined
     let offset = 0
-    // Only 'tasks' group is at the end (right side)
-    const subs = GROUP_SUBS.tasks
-    const idx = subs.findIndex(s => s.key === subKey)
-    if (idx === -1) return undefined
 
-    for (let i = subs.length - 1; i > idx; i--) {
-      if (tablePin[subs[i].key]) offset += 140
+    const rightGroups = [...GROUPS].reverse()
+    for (const group of rightGroups) {
+      const subs = [...GROUP_SUBS[group.key]].reverse()
+      for (const sub of subs) {
+        if (sub.key === subKey) return offset
+        if (tablePin[sub.key]) offset += group.subWidth
+      }
     }
-    return offset
+    return undefined
   }
+
 
   useEffect(() => {
     if (!filterModal) return
@@ -1020,7 +1036,7 @@ const Employee = () => {
                       </div>
                     </th>
                   ))}
-                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[var(--stroke-soft)]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[var(--stroke-soft)]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ right: getPinnedRight('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center justify-center gap-2">
                       <Checkbox
                         checked={tablePin.tasks}
@@ -1040,7 +1056,7 @@ const Employee = () => {
                         width: 140,
                         minWidth: 140,
                         maxWidth: 140,
-                        left: getSubPinnedLeft(sub.key),
+                        right: getSubPinnedRight(sub.key),
                         boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)'
                       }}
                     >
@@ -1103,14 +1119,14 @@ const Employee = () => {
                       {item?.testers_names}
                     </td>
 
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedRight('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
                   </tr>
                 ))}
               </tbody>
