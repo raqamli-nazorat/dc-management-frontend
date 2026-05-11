@@ -1271,7 +1271,7 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted, project })
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
 
-  const edit = project.organizer === user?.id
+  const edit = project.organizer === user?.id && !project.is_completed
 
   const ref = useRef(null)
   useEffect(() => {
