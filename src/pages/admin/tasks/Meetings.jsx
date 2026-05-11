@@ -168,7 +168,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-      <div className="fixed inset-0 bg-black/60" />
+      <div className="fixed inset-0 bg-black/10" />
       <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
         <FaXmark size={14} />
       </button>
@@ -239,7 +239,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* -- AddMeetingModal -- */
-function AddMeetingModal({ onClose, onAdd, projects }) {
+function AddMeetingModal({ onClose, projects, loadMeetings }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [projectMembers, setProjectMembers] = useState([])
@@ -323,10 +323,25 @@ function AddMeetingModal({ onClose, onAdd, projects }) {
       if (startIso) body.start_time = startIso
       const mins = parseInt(form.durationVal, 10)
       if (mins && !isNaN(mins)) body.duration_minutes = mins
-      await onAdd(body)
+
+      const res = await axiosAPI.post('/meetings/', body)
+      toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
       onClose()
     } catch (err) {
-      toast.error('Xatolik', parseApiError(err, "Yig'ilish yaratishda xatolik"))
+      const errData = err?.response?.data
+      const details = errData?.error?.details
+      if (details && typeof details === 'object') {
+        const msgs = Object.entries(details)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join('\n')
+        toast.error('Xatolik', msgs)
+      } else {
+        const msg = errData?.error?.errorMsg
+          || errData?.detail
+          || "Yig'ilish yaratishda xatolik"
+        toast.error('Xatolik', msg)
+      }
+      throw err
     } finally {
       setLoading(false)
     }
@@ -577,7 +592,7 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
       if (mins) body.duration_minutes = mins
 
       const res = await axiosAPI.put(`/meetings/${meeting?.id}/`, body)
-      
+
       toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
 
       onClose()
@@ -1251,7 +1266,6 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   )
 }
 
-
 /* -- RowMenu -- */
 function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted, project }) {
   const [open, setOpen] = useState(false)
@@ -1396,31 +1410,6 @@ export default function MeetingsPage() {
     loadMeetings(filters, q, 1)
   }
   const handleApplyFilter = f => { setFilters(f); setShowFilter(false); loadMeetings(f, search, 1) }
-
-  const handleAdd = async (body) => {
-    try {
-      const res = await axiosAPI.post('/meetings/', body)
-      const created = res.data?.data ?? res.data
-      toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
-      loadMeetings(filters, search, 1)
-      return created
-    } catch (err) {
-      const errData = err?.response?.data
-      const details = errData?.error?.details
-      if (details && typeof details === 'object') {
-        const msgs = Object.entries(details)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
-          .join('\n')
-        toast.error('Xatolik', msgs)
-      } else {
-        const msg = errData?.error?.errorMsg
-          || errData?.detail
-          || "Yig'ilish yaratishda xatolik"
-        toast.error('Xatolik', msg)
-      }
-      throw err
-    }
-  }
 
   const handleClose = async (id) => {
     try {
@@ -1595,8 +1584,12 @@ export default function MeetingsPage() {
           onApply={handleApplyFilter} users={users} projects={projects} />
       )}
       {showAdd && (
-        <AddMeetingModal onClose={() => setShowAdd(false)} onAdd={handleAdd}
-          projects={projects} users={users} />
+        <AddMeetingModal
+          onClose={() => setShowAdd(false)}
+          projects={projects}
+          users={users}
+          loadMeetings={() => loadMeetings(filters, search, 1)}
+        />
       )}
       {editItem && (
         <EditMeetingModal

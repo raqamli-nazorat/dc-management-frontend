@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import { LuSearch, LuSlidersHorizontal } from 'react-icons/lu'
 import { DateTimeBox } from '../../Components/DateTimeBox'
@@ -179,9 +179,27 @@ function ProjectSelectModal({ selected, onClose, onApply, projectsList = [] }) {
       : [...prev, { id: p.id, name: p.title }]
   )
 
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKey)
+    return () => {
+      window.removeEventListener("keydown", handleKey)
+    }
+  }, [onClose])
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 " />
+
+      <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+        <FaXmark size={16} />
+      </button>
+
       <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)] flex flex-col max-h-[90vh]">
 
         {/* Header */}
@@ -333,7 +351,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
 
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !subModal) {
         onClose();
       }
     }
@@ -342,18 +360,15 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
     return () => {
       window.removeEventListener("keydown", handleKey)
     }
-  }, [onClose])
-
+  }, [onClose, subModal])
 
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button
-          onClick={onClose}
-          className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]"
-        >
-          <FaXmark size={14} />
+
+        <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+          <FaXmark size={16} />
         </button>
 
         <div className="relative w-full max-w-[600px] h-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)] flex flex-col">
@@ -497,6 +512,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           title='Muallif tanlash'
           selectedList={f.created_by ? f.created_by.map(u => u.id || u) : []}
           onConfirm={handleSelectEmployees}
+          bgColor={false}
         />
       )}
 
@@ -507,6 +523,7 @@ export default function TaskFilterModal({ onClose, onApply, initial }) {
           title='Xodim tanlang'
           selectedList={f.assignee ? f.assignee.map(u => u.id || u) : []}
           onConfirm={handleSelectAssignee}
+          bgColor={false}
         />
       )}
     </>
