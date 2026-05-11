@@ -93,7 +93,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
       </button>
 
       {/* Modal */}
-      <div className="relative w-full max-w-[640px] h-[80vh]! bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-[640px] h-[80vh]! bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] rounded-[32px] shadow-2xl flex flex-col p-8 animate-in zoom-in-95 duration-200">
 
         {/* ── Header ── */}
         <div className="flex items-start justify-between mb-6">
@@ -101,7 +101,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
             <div className="flex items-center gap-3">
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
               >
                 <FaArrowLeft className="text-[var(--text-strong)] dark:text-[var(--text-strong)]" size={18} />
               </button>
@@ -188,7 +188,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
 
           {/* Rang tanlash */}
           {showColors && (
-            <div className="absolute -top-8 right-0 px-3 py-4 rounded-full bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex flex-col gap-4 items-center justify-center shrink-0">
+            <div className="absolute -top-8 right-0 px-3 py-4 rounded-full bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex flex-col gap-4 items-center justify-center shrink-0">
               {COLORS.map(c => (
                 <button
                   key={c.id}
@@ -213,7 +213,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
             onClick={onClose}
             className="flex items-center gap-2 px-6 py-3.5 rounded-[16px] font-bold cursor-pointer
               text-[var(--text-strong)] dark:text-[var(--text-strong)]
-              hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors"
+              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors"
           >
             <FaXmark size={14} />
             Bekor qilish

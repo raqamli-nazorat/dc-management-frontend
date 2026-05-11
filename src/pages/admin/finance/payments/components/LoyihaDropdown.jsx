@@ -55,7 +55,7 @@ export function LoyihaDropdown({ value, onChange, projects = [], disabled = fals
         <button type="button" onClick={() => !disabled && setOpen(o => !o)}
           disabled={disabled}
           className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-sub)] dark:text-[var(--text-sub)]'}
             ${disabled ? 'opacity-50 cursor-not-allowed bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] pointer-events-none' : 'cursor-pointer'}`}>
           <span className="truncate flex-1 text-left">{selected?.title || 'Loyiha tanlang'}</span>
@@ -71,7 +71,7 @@ export function LoyihaDropdown({ value, onChange, projects = [], disabled = fals
         </button>
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />
           </div>
         )}
@@ -91,7 +91,7 @@ export function LoyihaDropdownForm({ value, onChange, error, projects = [], disa
         onClick={() => !disabled && setOpen(o => !o)}
         disabled={disabled}
         className={`w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border 
-          bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+          bg-[var(--bg-base)]
           ${error ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
           ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}
           ${disabled ? 'opacity-60 cursor-not-allowed bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer'}`}>
@@ -109,7 +109,7 @@ export function LoyihaDropdownForm({ value, onChange, error, projects = [], disa
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
       {open && !disabled && (
         <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden max-h-60 overflow-y-auto
-          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+          bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           <ProjectList projects={projects} value={value} onChange={onChange} setOpen={setOpen} />
         </div>
       )}

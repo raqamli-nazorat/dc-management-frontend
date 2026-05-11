@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
@@ -875,13 +875,13 @@ const Salary = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.total_amount_min}
                   onChange={(e) => handleFilterChange('total_amount_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.total_amount_max}
                   onChange={(e) => handleFilterChange('total_amount_max', formatNum(e.target.value))}
                 />
@@ -892,13 +892,13 @@ const Salary = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.salary_min}
                   onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.salary_max}
                   onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
                 />
@@ -909,13 +909,13 @@ const Salary = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.kpi_min}
                   onChange={(e) => handleFilterChange('kpi_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.kpi_max}
                   onChange={(e) => handleFilterChange('kpi_max', formatNum(e.target.value))}
                 />
@@ -926,13 +926,13 @@ const Salary = () => {
               <div className='grid grid-cols-2 gap-3'>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.penalty_min}
                   onChange={(e) => handleFilterChange('penalty_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.penalty_max}
                   onChange={(e) => handleFilterChange('penalty_max', formatNum(e.target.value))}
                 />
@@ -946,18 +946,18 @@ const Salary = () => {
       {/* Table Section */}
       {
         isLoading ? (
-          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (
-          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
           </div>

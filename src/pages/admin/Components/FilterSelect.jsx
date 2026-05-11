@@ -91,7 +91,7 @@ const FilterSelect = ({
                 onMouseEnter={() => setIsBtnHovered(true)}
                 onMouseLeave={() => setIsBtnHovered(false)}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-elevation-1-alt)] border ${error ? 'border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
+                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-base)] border ${error ? 'border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default dark:disabled:bg-[#222223] focus:outline-3 focus:outline-[#e9effc] dark:focus:outline-3 dark:focus:outline-[#323853] ${className}`}
                 style={{ fontSize: 13, fontWeight: 500, padding: padding, borderRadius: radius, width: '100%' }}
                 title={title}
             >
@@ -133,7 +133,7 @@ const FilterSelect = ({
             {open && (
                 <div
                     ref={dropdownRef}
-                    className="rounded-2xl shadow-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]"
+                    className="rounded-2xl shadow-xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]"
                     style={{
                         position: 'fixed',
                         top: dropPos.dropUp ? 'auto' : dropPos.top,

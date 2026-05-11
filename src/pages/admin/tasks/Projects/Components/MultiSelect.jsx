@@ -52,7 +52,7 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
             <div
                 onClick={() => setOpen(!open)}
                 className={`min-h-[42px] w-full relative flex flex-wrap gap-1.5 px-3 py-2 rounded-xl border  cursor-text
-              bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+              bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
               ${open ? 'border-[var(--accent-sub)] dark:border-[var(--accent-sub)]' : ''}`}>
                 {selected.map(s => (
                     <span key={s.username || Math.random()}
@@ -84,7 +84,7 @@ export const MultiSelect = ({ placeholder, options, selected, onChange, onSearch
                             width: coords.width,
                             zIndex: 9999
                         }}
-                        className="rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]"
+                        className="rounded-2xl shadow-xl border overflow-y-auto max-h-48 bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]"
                     >
                         {options.map(o => {
                             const isSelected = selected.some(s => s.username === o?.username)

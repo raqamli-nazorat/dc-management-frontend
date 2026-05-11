@@ -62,7 +62,7 @@ const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
       <button onClick={onClose} className="absolute  top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
         <FaXmark size={14} />
       </button>
-      <div className="relative left-[30%]  w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+      <div className="relative left-[30%]  w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
 
         <div className="px-7 pt-7 pb-4">
           <div className="flex items-center gap-3 mb-2">
@@ -78,7 +78,7 @@ const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
         <div className="px-7 py-5 flex items-center justify-end gap-3">
           <button onClick={onClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={() => { onConfirm(project.id); onClose() }}
@@ -99,16 +99,16 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
       <button onClick={() => setOpen(o => !o)}
         className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors
-          text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+          text-[var(--text-soft)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
         <FaEllipsisVertical size={14} />
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-2xl shadow-2xl border overflow-hidden
-          bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+          bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
           {/* Batafsil — hammaga */}
           <button onClick={() => { onDetail?.(); setOpen(false) }}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
-              hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
+              hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
               <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
@@ -120,7 +120,7 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
-                  hover:bg-[var(--bg-elevation-1-alt)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
+                  hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                 </svg>
@@ -301,14 +301,14 @@ const ProjectsPage = () => {
         <div className="ml-auto flex items-center gap-1 p-1 rounded-xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)]">
           <button onClick={() => setViewMode('table')}
             className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'table' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+              ${viewMode === 'table' ? 'bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18" />
             </svg>
           </button>
           <button onClick={() => setViewMode('grid')}
             className={`w-7 h-7 flex items-center justify-center rounded-lg  cursor-pointer
-              ${viewMode === 'grid' ? 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
+              ${viewMode === 'grid' ? 'bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] shadow-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="8" height="8" rx="1" /><rect x="13" y="3" width="8" height="8" rx="1" />
               <rect x="3" y="13" width="8" height="8" rx="1" /><rect x="13" y="13" width="8" height="8" rx="1" />
@@ -425,7 +425,7 @@ const ProjectsPage = () => {
                     setEditProject(p.id)
                   }}
                   className="rounded-2xl border p-4 cursor-pointer transition-all
-                  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] hover:border-[#C2C8E0] hover:shadow-sm
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] hover:border-[#C2C8E0] hover:shadow-sm
                   dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:hover:border-[#474848]">
 
                   {/* Title + Status */}

@@ -216,7 +216,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
-    bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+    bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
     dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
     ${err ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`
 
@@ -227,10 +227,10 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
                     <FaXmark size={16} />
                 </button>
-                <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
 
                     {/* Header */}
-                    <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                    <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-[var(--bg-base)]">
                         <div className="flex items-center gap-3 mb-1">
                             <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                 <FaArrowLeft size={17} />
@@ -260,14 +260,14 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <div className="relative">
                                         <button type="button" onClick={() => setStatusOpen(o => !o)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-                    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+                    bg-[var(--bg-base)]
                     ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
                     ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
                                             <span>{STATUS_LABEL[form.status] || 'Holati tanlang'}</span>
                                             <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {statusOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                                                 {Object.values(STATUS_LABEL).map((s, i) => (
                                                     <button key={s} type="button" onClick={() => { set('status', Object.keys(STATUS_LABEL).find(key => STATUS_LABEL[key] === s)); setStatusOpen(false) }}
                                                         className={`w-full text-left px-4 py-2.5 text-sm  cursor-pointer
@@ -306,7 +306,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <div className="relative">
                                         <div onClick={() => setMgrOpen(!mgrOpen)}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
-                    bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+                    bg-[var(--bg-base)]
                     ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${mgrOpen ? 'border-[var(--accent-sub)]' : ''}`}>
                                             {mgrOpen ? (
                                                 <input
@@ -333,7 +333,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                             </div>
                                         </div>
                                         {mgrOpen && (
-                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+                                            <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
                                                 {employees.filter(e => e.roles?.includes('manager')).map((u, i) => (
                                                     <button key={u.id} type="button" onClick={() => { setForm(p => ({ ...p, manager: u.username, manager_id: u.id })); setMgrOpen(false); setMgrQuery('') }}
                                                         className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
@@ -509,7 +509,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     )}
 
                     {/* Footer */}
-                    <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                    <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-[var(--bg-base)]">
                         {!loading &&
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
@@ -522,7 +522,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                         <div className="flex items-center gap-3">
                             <button onClick={onClose}
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                                 <FaXmark size={13} /> Yopish
                             </button>
                             <button onClick={saveChanges}

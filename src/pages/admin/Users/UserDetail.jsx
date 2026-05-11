@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
@@ -317,7 +317,7 @@ const UserDetail = () => {
         )
     }
 
-    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]`
+    const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]`
 
     const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
@@ -328,7 +328,7 @@ const UserDetail = () => {
                 {confirmDelete && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                         <div className="fixed inset-0 bg-black/60" />
-                        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-7">
+                        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-7">
                             <button onClick={() => setConfirmDelete(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
                                 <FaXmark size={14} />
                             </button>
@@ -347,7 +347,7 @@ const UserDetail = () => {
                             <div className="flex items-center justify-end gap-3">
                                 <button
                                     onClick={() => setConfirmDelete(false)}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
                                 >
                                     <FaXmark size={14} /> Bekor qilish
                                 </button>
@@ -531,7 +531,7 @@ const UserDetail = () => {
                         <div>
                             <label className={labelCls}>Passport rasmi</label>
                             {form.passport_image ? (
-                                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]">
+                                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]">
                                     <FaFileLines size={14} className="shrink-0" />
                                     <a href={typeof form.passport_image === 'string' ? form.passport_image : URL.createObjectURL(form.passport_image)} target="_blank" rel="noreferrer" className="flex-1 truncate hover:underline text-[var(--accent-strong)]">
                                         Passport rasmini ko'rish

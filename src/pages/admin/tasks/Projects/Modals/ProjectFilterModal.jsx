@@ -55,9 +55,9 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
         { label: 'Bekor qilingan', value: 'cancelled' },
     ]
 
-    const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${val ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
-    const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]'
-    const inputBox = 'flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] focus-within:border-[var(--accent-sub)] '
+    const ddBtn = (val) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${val ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
+    const ddList = 'absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52 bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]'
+    const inputBox = 'flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] focus-within:border-[var(--accent-sub)] '
 
     const selectedMgr = users.find(u => u.id === f.manager)
     const selectedEmp = users.find(u => u.id === f.employee)
@@ -102,7 +102,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                 <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
                     <FaXmark size={14} />
                 </button>
-                <div className="relative w-full max-w-[660px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                <div className="relative w-full max-w-[660px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
 
                     {/* Header */}
                     <div className="px-7 pt-7 pb-3">
@@ -324,7 +324,7 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
                     {/* Footer */}
                     <div className="px-7 py-5 flex items-center justify-end gap-3 ">
                         <button onClick={() => setF(empty_filter)}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                             <FaXmark size={13} /> Tozalash
                         </button>
                         <button onClick={() => onApply(f)}

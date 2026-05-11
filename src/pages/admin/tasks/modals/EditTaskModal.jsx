@@ -47,7 +47,7 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
       <div className="relative">
         <button type="button" onClick={() => !disabled && setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-base)]'}
             ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{selected?.label || placeholder}</span>
@@ -61,7 +61,7 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer
@@ -100,7 +100,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
           type="button"
           onClick={() => !disabled && setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+            ${disabled ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]' : 'cursor-pointer bg-[var(--bg-base)]'}
             ${error ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-sub)]'}`}
         >
@@ -127,7 +127,7 @@ function ProjectDropdownLocal({ value, onChange, error, projects, disabled }) {
         {/* Dropdown */}
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-hidden
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             <div className="overflow-y-auto max-h-64">
               {projects.length === 0 && (
                 <p className="text-sm text-[var(--text-soft)] text-center py-6">Loyihalar topilmadi</p>
@@ -190,7 +190,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
+      <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)] flex flex-col overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
         <div className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer"><FaArrowLeft size={16} /></button>
@@ -201,7 +201,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Ism bo'yicha izlash" value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] focus:border-[var(--accent-sub)]" />
+              className="w-full pl-8 pr-3 py-2 rounded-xl text-sm outline-none border bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] focus:border-[var(--accent-sub)]" />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 pb-2 flex flex-col gap-2">
@@ -211,11 +211,11 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
             return (
               <button key={u.id} onClick={() => setTemp(isSel ? null : u)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer text-left
-                  ${isSel ? 'bg-[#EEF1FB] border-[var(--accent-sub)] dark:bg-[var(--bg-elevation-2)] dark:border-[var(--accent-strong)]' : 'bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-soft)] hover:bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:hover:bg-[var(--bg-elevation-1)]'}`}>
+                  ${isSel ? 'bg-[#EEF1FB] border-[var(--accent-sub)] dark:bg-[var(--bg-elevation-2)] dark:border-[var(--accent-strong)]' : 'bg-[var(--bg-base)] border-[var(--stroke-sub)] hover:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:hover:bg-[var(--bg-elevation-1)]'}`}>
                 {/* Radio circle */}
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
                   ${isSel ? 'bg-[var(--accent-strong)] border-[var(--accent-strong)]' : 'border-[var(--stroke-strong)] dark:border-[var(--stroke-sub)]'}`}>
-                  {isSel && <div className="w-2 h-2 rounded-full bg-[var(--bg-elevation-1-alt)]" />}
+                  {isSel && <div className="w-2 h-2 rounded-full bg-[var(--bg-base)]" />}
                 </div>
                 <div className="w-9 h-9 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent-sub)] shrink-0">
                   {u.username?.slice(0, 2).toUpperCase()}
@@ -231,7 +231,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
         <div className="px-6 py-4 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] flex items-center justify-between shrink-0">
           <span className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]">{temp ? '1 ta tanlangan' : 'Tanlanmagan'}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+            <button onClick={() => setTemp(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={12} /> Tozalash
             </button>
             <button onClick={() => onConfirm(temp ? [temp] : [])} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
@@ -459,7 +459,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   const inputCls = (err, ro) =>
     `w-full px-3 py-2.5 rounded-xl text-sm outline-none border text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
-    ${ro ? 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default' : 'bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]'}
+    ${ro ? 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default' : 'bg-[var(--bg-base)]'}
     ${err ? 'border-red-400' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
     ${!ro ? 'focus:border-[var(--accent-sub)]' : ''}`
 
@@ -578,7 +578,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
-        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
+        <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
 
           {/* ── Header ── */}
           <div className="px-7 pt-7 pb-4 shrink-0 border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] rounded-t-3xl">
@@ -646,7 +646,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
                   ${ro || !form.project || form.status === 'in_progress'
                     ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]'
-                    : 'cursor-pointer bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] hover:border-[var(--accent-sub)]'}
+                    : 'cursor-pointer bg-[var(--bg-base)] hover:border-[var(--accent-sub)]'}
                   border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]`}>
                 <span className={assigneeLabel ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)] flex-1 text-left truncate' : 'text-[var(--text-sub)] flex-1 text-left'}>
                   {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
@@ -846,7 +846,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                             href={rf.file}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[#262C36] overflow-hidden bg-[var(--bg-elevation-1-alt)] dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
+                            className="relative w-16 h-16 rounded-xl border border-[var(--stroke-sub)] dark:border-[#262C36] overflow-hidden bg-[var(--bg-base)] dark:bg-[#1E0A0A] flex items-center justify-center group hover:opacity-80 transition-opacity"
                           >
                             {/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(rf.file) ? (
                               <img src={rf.file} alt="" className="w-full h-full object-cover" />
@@ -868,7 +868,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                   {task.rejection_reason && (
                     <div className="flex flex-col gap-1">
                       {parseRejectionReason(task.rejection_reason).map((entry, idx) => (
-                        <div key={idx} className="rounded-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[#1A0808] px-3 py-2.5">
+                        <div key={idx} className="rounded-xl bg-[var(--bg-elevation-1)] dark:bg-[#1A0808] px-3 py-2.5">
                           {entry.date && (
                             <p className="text-[11px] font-semibold text-[var(--text-sub)]/70 dark:text-[var(--text-strong)] mb-1">
                               {entry.date}
@@ -889,7 +889,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-[var(--bg-base)]">
             {/* O'chirish tugmasi — faqat onDelete prop berilganda */}
             {onDelete ? (
               <button
@@ -906,7 +906,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
             <div className="flex items-center gap-3">
               <button onClick={onClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               {canEdit && (

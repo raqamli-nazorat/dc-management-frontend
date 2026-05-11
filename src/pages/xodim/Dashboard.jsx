@@ -9,7 +9,7 @@ export default function XodimDashboard() {
         Xush kelibsiz, {user?.name} 👋
       </h1>
       <div className="rounded-xl border flex items-center justify-center min-h-[60vh] text-sm
-        bg-[var(--bg-elevation-1-alt)] border-gray-100 text-gray-400
+        bg-[var(--bg-base)] border-gray-100 text-gray-400
         dark:bg-[#0f1117] dark:border-white/6 dark:text-gray-500">
         Dashboard tez orada tayyor bo'ladi
       </div>

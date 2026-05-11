@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter, LuRefreshCw } from 'react-icons/lu'
 import { FaAngleDown } from 'react-icons/fa'
@@ -852,7 +852,7 @@ const Employee = () => {
                 <div className="relative">
                   <FilterInput
                     label="dan"
-                    className='bg-[var(--bg-elevation-1-alt)]'
+                    className='bg-[var(--bg-base)]'
                     value={filters.price_min}
                     onChange={(e) => handleFilterChange('price_min', formatNum(e.target.value))}
                   />
@@ -861,7 +861,7 @@ const Employee = () => {
                 <div className="relative">
                   <FilterInput
                     label="gacha"
-                    className='bg-[var(--bg-elevation-1-alt)]'
+                    className='bg-[var(--bg-base)]'
                     value={filters.price_max}
                     onChange={(e) => handleFilterChange('price_max', formatNum(e.target.value))}
                   />
@@ -971,18 +971,18 @@ const Employee = () => {
       {/* Table Section */}
       {
         isLoading ? (
-          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 rounded-2xl border flex flex-col justify-center items-center h-[74vh] border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
           </div>
         ) : !hasFetched ? (
-          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 h-[74vh] flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (
-          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+          <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
           </div>
@@ -1056,61 +1056,61 @@ const Employee = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22] dark:text-[#e6edf3]!">
+              <tbody className="bg-[var(--bg-base)] dark:bg-[#161b22] dark:text-[#e6edf3]!">
                 {UserReports.map((item, index) => (
                   <tr className="border-b border-slate-100 dark:border-[var(--stroke-soft)]" key={item.id || index}>
-                    <td className={`p-3 text-[13px] text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22] dark:text-[#e6edf3] sticky left-0 border-r`} style={{ width: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                    <td className={`p-3 text-[13px] text-slate-500 border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-base)] dark:bg-[#161b22] dark:text-[#e6edf3] sticky left-0 border-r`} style={{ width: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                       {index + 1}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.prefix ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-start z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.prefix ? 'sticky' : ''}`}
                       style={{ width: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.prefix}
                     </td>
-                    <td className={`p-3 text-[13px] font-semibold text-end border-r text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.title ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] font-semibold text-end border-r text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.title ? 'sticky' : ''}`}
                       style={{ width: 200, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.title}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.description ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 border-r dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.description ? 'sticky' : ''}`}
                       style={{ width: 250, left: getPinnedLeft('description'), boxShadow: tablePin.description ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.description}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.deadline ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.deadline ? 'sticky' : ''}`}
                       style={{ width: 180, left: getPinnedLeft('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.deadline ? dayjs(item.deadline).format('DD.MM.YYYY HH:mm') : ''}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.status ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.status ? 'sticky' : ''}`}
                       style={{ width: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {tableStatuses[item?.status]}
                     </td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.project_price ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] font-bold text-slate-900 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.project_price ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('project_price'), boxShadow: tablePin.project_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.project_price ? formatNum(item.project_price) : ''}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.created_by_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.created_by_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('created_by_name'), boxShadow: tablePin.created_by_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.created_by_name}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.manager_name ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.manager_name ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('manager_name'), boxShadow: tablePin.manager_name ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.manager_name}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.employees_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-end z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.employees_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('employees_names'), boxShadow: tablePin.employees_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.employees_names}
                     </td>
-                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]  ${tablePin.testers_names ? 'sticky' : ''}`}
+                    <td className={`p-3 text-[13px] text-slate-600 dark:text-[#e6edf3] border-r border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center z-10! bg-[var(--bg-base)] dark:bg-[#161b22]  ${tablePin.testers_names ? 'sticky' : ''}`}
                       style={{ width: 220, left: getPinnedLeft('testers_names'), boxShadow: tablePin.testers_names ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none' }}>
                       {item?.testers_names}
                     </td>
 
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
-                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-elevation-1-alt)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jami ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jami'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.total || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_qilish ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_qilish'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.todo || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_jarayonda ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_jarayonda'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.in_progress || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_muddati ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_muddati'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.overdue || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_bajarilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_bajarilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.done || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_ishga ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_ishga'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.production || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_tekshirilgan ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, left: getSubPinnedLeft('tasks_tekshirilgan'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.checked || ''}</td>
+                    <td className={`p-3 text-[13px] font-bold text-slate-700 dark:text-[#e6edf3] border-t border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] text-center  ${tablePin.tasks_rad ? 'sticky z-10! bg-[var(--bg-base)] dark:bg-[#161b22]' : ''}`} style={{ width: 140, right: getSubPinnedLeft('tasks_rad'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>{item?.task_stats?.rejected || ''}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { usePageAction } from '../../../context/PageActionContext'
 import { LuFilter, LuRefreshCw, LuUserPlus } from 'react-icons/lu'
 import { FaAngleDown, FaChevronDown } from 'react-icons/fa'
@@ -989,12 +989,12 @@ const Employee = () => {
               <div className="flex items-center gap-3">
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.salary_min}
                   onChange={(e) => handleFilterChange('salary_min', formatNum(e.target.value))}
                 />
                 <FilterInput
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   label="gacha"
                   value={filters.salary_max}
                   onChange={(e) => handleFilterChange('salary_max', formatNum(e.target.value))}
@@ -1007,13 +1007,13 @@ const Employee = () => {
               <div className="flex items-center gap-3">
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.balance_min}
                   onChange={(e) => handleFilterChange('balance_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.balance_max}
                   onChange={(e) => handleFilterChange('balance_max', formatNum(e.target.value))}
                 />
@@ -1061,13 +1061,13 @@ const Employee = () => {
                 </div>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.projects_min}
                   onChange={(e) => handleFilterChange('projects_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.projects_max}
                   onChange={(e) => handleFilterChange('projects_max', formatNum(e.target.value))}
                 />
@@ -1127,13 +1127,13 @@ const Employee = () => {
                 </div>
                 <FilterInput
                   label="dan"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.tasks_min}
                   onChange={(e) => handleFilterChange('tasks_min', formatNum(e.target.value))}
                 />
                 <FilterInput
                   label="gacha"
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                   value={filters.tasks_max}
                   onChange={(e) => handleFilterChange('tasks_max', formatNum(e.target.value))}
                 />
@@ -1157,7 +1157,7 @@ const Employee = () => {
                     label="dan"
                     value={filters.meetings_min}
                     onChange={(e) => handleFilterChange('meetings_min', formatNum(e.target.value))}
-                    className='bg-[var(--bg-elevation-1-alt)]'
+                    className='bg-[var(--bg-base)]'
                   />
                 </div>
                 <div className="col-span-1 relative">
@@ -1165,7 +1165,7 @@ const Employee = () => {
                     label="gacha"
                     value={filters.meetings_max}
                     onChange={(e) => handleFilterChange('meetings_max', formatNum(e.target.value))}
-                    className='bg-[var(--bg-elevation-1-alt)]'
+                    className='bg-[var(--bg-base)]'
                   />
                 </div>
 
@@ -1191,13 +1191,13 @@ const Employee = () => {
                   label="dan"
                   value={filters.expenses_amount_min}
                   onChange={(e) => handleFilterChange('expenses_amount_min', formatNum(e.target.value))}
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.expenses_amount_max}
                   onChange={(e) => handleFilterChange('expenses_amount_max', formatNum(e.target.value))}
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                 />
               </div>
             </div>
@@ -1219,14 +1219,14 @@ const Employee = () => {
                   value={filters.payrolls_amount_min}
                   onChange={(e) => handleFilterChange('payrolls_amount_min', formatNum(e.target.value))}
                   isFine={filters.salary_type === SalaryType[1].value}
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                 />
                 <FilterInput
                   label="gacha"
                   value={filters.payrolls_amount_max}
                   onChange={(e) => handleFilterChange('payrolls_amount_max', formatNum(e.target.value))}
                   isFine={filters.salary_type === SalaryType[1].value}
-                  className='bg-[var(--bg-elevation-1-alt)]'
+                  className='bg-[var(--bg-base)]'
                 />
               </div>
             </div>
@@ -1237,18 +1237,18 @@ const Employee = () => {
 
       {/* Table Section */}
       {isLoading ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col items-center justify-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col items-center justify-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
         </div>
       ) : !hasFetched ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col justify-center items-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col justify-center items-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
         </div>
       ) : UserReports.length === 0 ? (
-        <div className="mt-6 rounded-2xl border h-[74vh] flex flex-col items-center justify-center border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl border h-[74vh] flex flex-col items-center justify-center border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
         </div>

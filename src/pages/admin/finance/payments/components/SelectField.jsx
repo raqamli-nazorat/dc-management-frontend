@@ -4,7 +4,7 @@ import { labelCls } from '../constants'
 
 const triggerCls = (hasVal, error) =>
   `w-full h-[42px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-   bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]
+   bg-[var(--bg-base)]
    ${error ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
    ${hasVal ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`
 
@@ -48,7 +48,7 @@ export function SelectField({ label, value, onChange, options = [], placeholder,
         {error && <p className="text-xs text-red-500 mt-1">*{error}</p>}
         {open && !disabled && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {normalized.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-3 text-sm  cursor-pointer

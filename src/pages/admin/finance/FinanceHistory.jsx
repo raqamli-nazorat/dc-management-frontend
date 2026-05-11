@@ -38,7 +38,7 @@ function fmtDate(iso) {
 }
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
-const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]'
+const iCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm outline-none border  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]'
 
 // ── Timezone offset helper ───────────────────────────────────
 function toIsoWithOffset(date, time, isEnd = false) {
@@ -99,7 +99,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{display || placeholder}</span>
           <div className="flex items-center gap-1 shrink-0 ml-1">
@@ -109,7 +109,7 @@ function SimpleDropdown({ label, value, onChange, options, placeholder }) {
         </button>
         {open && (
           <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-hidden
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
                 className={`w-full text-left px-4 py-3 text-sm  cursor-pointer
@@ -138,7 +138,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
             bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)] transition-colors">
         <FaXmark size={14} />
       </button>
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
 
 
 
@@ -195,7 +195,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
         <div className="px-6 py-4 flex items-center justify-end gap-3 ">
           <button onClick={() => setF(EMPTY_FILTER)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Tozalash
           </button>
           <button onClick={() => onApply(f)}
@@ -216,7 +216,7 @@ function HistoryFilterModal({ onClose, onApply, initial }) {
 function HistoryDetailModal({ item, userInfo, onClose }) {
   const u = userInfo ?? {}
   const typeLabel = item.transaction_type === 'debit' ? 'Chiqim' : item.transaction_type === 'credit' ? 'Kirim' : item.transaction_type ?? ''
-  const fieldCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
+  const fieldCls = 'w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -227,7 +227,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
         <FaXmark size={14} />
       </button>
 
-      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] max-h-[90vh] overflow-y-auto">
 
         {/* X tugmasi */}
 
@@ -274,10 +274,10 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
             <div>
               <label className={labelCls}>Passport ma'lumotlari</label>
               <div className="flex gap-2">
-                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
+                <div className="w-16 shrink-0 h-[42px] px-3 py-2.5 rounded-xl text-sm text-center border flex items-center justify-center bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
                   {u.passport_series?.slice(0, 2) ?? ''}
                 </div>
-                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
+                <div className="flex-1 h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
                   {u.passport_series?.slice(2)?.trim() ?? ''}
                 </div>
               </div>
@@ -288,7 +288,7 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Xarajat</label>
-              <div className="w-full min-h-[42px] max-h-[100px] overflow-y-auto px-3 py-2.5 rounded-xl text-sm border flex items-start bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] whitespace-pre-wrap break-words leading-relaxed">
+              <div className="w-full min-h-[42px] max-h-[100px] overflow-y-auto px-3 py-2.5 rounded-xl text-sm border flex items-start bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] whitespace-pre-wrap break-words leading-relaxed">
                 {item.description || ''}
               </div>
             </div>
@@ -433,10 +433,10 @@ export default function FinanceHistoryPage() {
           {/* Info tooltip */}
           <div className="relative group flex items-center gap-2">
             <div className="absolute right-13 top-1/2 -translate-y-1/2 z-20 w-[220px] px-4 py-3 rounded-2xl shadow-xl text-[12px] text-[var(--text-strong)] dark:text-[var(--text-strong)]
-            bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]
             opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
               Tasdiqlash orqali ish haqi yakuniy hisob bo‘yicha hisoblanadi.    </div>
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-elevation-1-alt)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-strong)] dark:bg-[var(--bg-base)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             <button className="w-7 h-7 flex items-center justify-center cursor-pointer shrink-0">
               <img src="/imgs/LeftIcon.svg" alt="info" className="w-5 h-5 dark:brightness-0 dark:invert" />
             </button>

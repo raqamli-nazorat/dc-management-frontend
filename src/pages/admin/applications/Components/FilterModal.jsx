@@ -80,7 +80,7 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                         <FaXmark size={16} />
                     </button>
 
-                    <div className="relative w-full max-w-[620px] rounded-3xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)]">
+                    <div className="relative w-full max-w-[620px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
 
                         {/* Header */}
                         <div className="px-7 pt-7 pb-3">
@@ -186,14 +186,14 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
                                     className={`relative w-10 h-5 rounded-full  cursor-pointer ${f.is_student ? 'bg-[var(--bg-elevation-1)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                                 >
                                     <span
-                                        className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-elevation-1-alt)] dark:bg-white shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
+                                        className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] dark:bg-white shadow transition-transform duration-200 ${f.is_student ? 'translate-x-5' : 'translate-x-0.5'}`}
                                     />
                                 </button>
                             </div>
                             <div className="px-7 py-5 flex items-center justify-end gap-3">
                                 <button
                                     onClick={handleClear}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]"
                                 >
                                     <FaXmark size={13} /> Tozalash
                                 </button>

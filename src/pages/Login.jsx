@@ -138,7 +138,7 @@ export default function Login() {
 
         {/* O'ng panel */}
         <div
-          className="rounded-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-base)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-[0_4px_32px_rgba(0,0,0,0.06)] shrink-0"
+          className="rounded-2xl bg-[var(--bg-base)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-[0_4px_32px_rgba(0,0,0,0.06)] shrink-0"
           style={{ width: 440, padding: 40, fontFamily: '"Manrope", sans-serif' }}
         >
           {/* Logo */}

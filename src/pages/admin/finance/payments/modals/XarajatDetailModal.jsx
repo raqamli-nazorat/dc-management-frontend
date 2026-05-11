@@ -5,8 +5,8 @@ import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
 import { useAuth } from '../../../../../context/AuthContext'
 
 const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
-  bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] text-[var(--text-strong)]
-  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]`
+  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
+  dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]`
 
 // ── Rad etish sababi modali ──────────────────────────────────
 function CancelReasonModal({ onCancel, onConfirm }) {
@@ -21,7 +21,7 @@ function CancelReasonModal({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
         <div className="px-6 pt-6 pb-3 flex items-center gap-3">
           <button onClick={onCancel} className="text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:opacity-70 cursor-pointer shrink-0">
             <FaArrowLeft size={16} />
@@ -35,8 +35,8 @@ function CancelReasonModal({ onCancel, onConfirm }) {
             onChange={e => { setReason(e.target.value); setError(false) }}
             placeholder="Iltimos, sababni yozing. Bu majburiy"
             className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none 
-              bg-[var(--bg-elevation-1-alt)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
-              dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
+              bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
+              dark:text-[var(--text-strong)] dark:placeholder-[#C2C8E0]
               ${error ? 'border-[var(--error-strong)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`}
           />
           {error && <p className="text-xs text-[var(--error-strong)] mt-1">*Sabab kiritish majburiy</p>}
@@ -44,7 +44,7 @@ function CancelReasonModal({ onCancel, onConfirm }) {
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
           <button onClick={onCancel}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={handleSubmit}
@@ -67,7 +67,7 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+      <div className="relative w-full max-w-[500px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
         <div className="px-6 pt-6 pb-3 flex items-center gap-3">
           <button onClick={onCancel} className="text-[var(--text-sub)] dark:text-[var(--text-sub)] hover:opacity-70 cursor-pointer shrink-0">
             <FaArrowLeft size={16} />
@@ -80,7 +80,7 @@ function PaidConfirmModal({ onCancel, onConfirm }) {
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
           <button onClick={onCancel}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
-              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={13} /> Bekor qilish
           </button>
           <button onClick={onConfirm}
@@ -137,7 +137,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]">
+        <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
 
           {/* X tugmasi */}
 
@@ -228,7 +228,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           <div className="px-6 py-4 flex items-center justify-end gap-3">
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
-                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1-alt)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+                text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
               <FaXmark size={13} /> Yopish
             </button>
 

@@ -39,7 +39,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
                 type="button"
                 onClick={handleToggle}
                 disabled={disabled}
-                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-elevation-1-alt)] border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9] dark:disabled:bg-[var(--bg-elevation-2)]`}
+                className={`flex items-center gap-2 cursor-pointer  bg-[var(--bg-base)] border ${display === 'Rad etildi' ? 'border-red-500' : display === 'Qabul qilindi' ? 'border-[var(--accent-sub)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} text-[var(--text-strong)] dark:bg-[var(--bg-elevation-1)] dark:text-[var(--text-strong)] disabled:opacity-50 disabled:cursor-default disabled:bg-[#F1F3F9] dark:disabled:bg-[var(--bg-elevation-2)]`}
                 style={{ fontSize: 13, fontWeight: 500, padding: '6px 12px', borderRadius: 12, width: '100%' }}
             >
                 {display === "Rad etildi" ? <MdOutlineClear className="text-red-500" size={16} /> : display === "Qabul qilindi" ? <MdCheck className="text-[var(--accent-sub)]!" size={16} /> : null}
@@ -53,7 +53,7 @@ const FilterSelect = ({ options = [], value, onChange, label, multiple = false, 
 
             {open && (
                 <div
-                    className="rounded-2xl shadow-xl bg-[var(--bg-elevation-1-alt)] dark:bg-[var(--bg-elevation-1)]"
+                    className="rounded-2xl shadow-xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]"
                     style={{
                         position: 'fixed',
                         top: dropPos.dropUp ? 'auto' : dropPos.top,

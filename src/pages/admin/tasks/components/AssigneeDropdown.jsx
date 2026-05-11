@@ -10,7 +10,7 @@ export default function AssigneeDropdown({ value, onChange }) {
       <div className="relative">
         <button type="button" onClick={() => setOpen(o => !o)}
           className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)]
             ${value ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
           <span className="flex-1 text-left truncate">{value || 'Topshiruvchi'}</span>
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
@@ -22,7 +22,7 @@ export default function AssigneeDropdown({ value, onChange }) {
         </button>
         {open && (
           <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
-            bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
+            bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {EMPLOYEES_LIST.map((e, i) => (
               <button key={e.name} type="button" onClick={() => { onChange(e.name); setOpen(false) }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-left  cursor-pointer

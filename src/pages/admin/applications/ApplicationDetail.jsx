@@ -130,7 +130,7 @@ const ApplicationDetail = () => {
     )
   }
 
-  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] disabled:cursor-default`
+  const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] disabled:cursor-default`
   const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
 
@@ -230,7 +230,7 @@ const ApplicationDetail = () => {
           <div>
             <label className={labelCls}>Rezyume (CV)</label>
             <div
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-elevation-1-alt)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-sub)]"
             >
               <FaFileLines size={14} className="shrink-0" />
               <a
@@ -328,7 +328,7 @@ const ApplicationDetail = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => setIsModalOpen(false)} />
-          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-[var(--bg-elevation-1-alt)] dark:bg-[#141414] p-6 border border-white/5">
+          <div className="relative w-full max-w-[600px] rounded-[24px] shadow-2xl bg-[var(--bg-base)] dark:bg-[#141414] p-6 border border-white/5">
             <div className="flex items-center gap-3 mb-5">
               <button
                 onClick={() => setIsModalOpen(false)}
