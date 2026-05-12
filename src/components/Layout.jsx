@@ -496,7 +496,7 @@ export default function Layout() {
   const handleIncomingNotification = (payload) => {
     // Tizim bildirishnomasini ko'rsatish
     if (Notification.permission === "granted") {
-      new Notification(payload.title || "Yangi xabar", {
+      const notification = new Notification(payload.title || "Yangi xabar", {
         body: payload.body || payload.message,
         icon: "/imgs/Logo.png",
         data: { url: window.location.origin }
