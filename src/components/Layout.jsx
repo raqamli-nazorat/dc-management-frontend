@@ -48,10 +48,10 @@ function formatNotifTime(dateStr) {
 
 function mapApiNotification(item) {
   return {
-    id: item.id,
+    id: item?.user_id,
     date: formatNotifDate(item.created_at),
     title: item.title || 'Bildirishnoma',
-    sub: item.message || '',
+    sub: item.message || item.sub || '',
     time: formatNotifTime(item.created_at),
     read: !!item.is_read,
     urgent: item.type === 'alert',
@@ -72,6 +72,17 @@ function groupByDate(notifs) {
     return toSortable(b[0]).localeCompare(toSortable(a[0]))
   })
 }
+
+const showSystemNotification = (notif) => {
+  if (!("Notification" in window)) return;
+
+  if (Notification.permission === "granted") {
+    new Notification(notif.title || "Yangi xabar", {
+      body: notif.sub || notif.message || "Sizga yangi bildirishnoma keldi",
+      icon: "/imgs/Logo.png", // Loyihangiz logotipi
+    });
+  }
+};
 
 function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   const grouped = groupByDate(notifs)
@@ -109,7 +120,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
-         {/* 
+          {/* 
           <button
             onClick={markAllRead}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
@@ -249,6 +260,7 @@ export default function Layout() {
   const downloadRef = useRef(null)
   const wsRef = useRef(null)
   const reconnectTimerRef = useRef(null)
+  const shownNotifIdsRef = useRef(new Set())
   const unreadCount = notifs.filter(n => !n.read).length
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
@@ -401,29 +413,39 @@ export default function Layout() {
       const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
       const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
 
+      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
+        wsRef.current.close()
+      }
+
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
 
       ws.onmessage = (event) => {
         try {
-          const raw = JSON.parse(event.data)
+          const raw = JSON.parse(event.data);
           const payload =
             typeof raw?.data?.payload === 'string'
               ? JSON.parse(raw.data.payload)
-              : raw?.data?.payload || raw
-          const mapped = mapApiNotification(payload)
-          if (!mapped.id) return
+              : raw?.data?.payload || raw;
+
+          console.log(payload + "salom", raw);
+
+          const mapped = mapApiNotification(raw);
+          if (!mapped.id) return;
+
+          // --- Tizimli bildirishnomani chiqarish ---
+          showSystemNotification(mapped);
 
           setNotifs(prev => {
             if (prev.some(n => n.id === mapped.id)) {
-              return prev.map(n => (n.id === mapped.id ? mapped : n))
+              return prev.map(n => (n.id === mapped.id ? mapped : n));
             }
-            return [mapped, ...prev]
-          })
-        } catch {
-          // noto'g'ri payloadlarni e'tiborsiz qoldiramiz
+            return [mapped, ...prev];
+          });
+        } catch (err) {
+          console.error("Xabar qayta ishlashda xato:", err);
         }
-      }
+      };
 
       ws.onclose = () => {
         reconnectTimerRef.current = setTimeout(() => {
@@ -437,6 +459,22 @@ export default function Layout() {
     }
   }, [])
 
+
+  useEffect(() => {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
+
+    fetchNotifications();
+    connectNotificationsWs();
+
+    return () => {
+      if (wsRef.current) wsRef.current.close();
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+    };
+  }, [fetchNotifications, connectNotificationsWs]);
+
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (downloadRef.current && !downloadRef.current.contains(event.target)) {
@@ -446,16 +484,6 @@ export default function Layout() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  useEffect(() => {
-    fetchNotifications()
-    connectNotificationsWs()
-
-    return () => {
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
-      if (wsRef.current) wsRef.current.close()
-    }
-  }, [fetchNotifications, connectNotificationsWs])
 
   // navbarExtra mavjud bo'lsa sidebar collapsed holda ko'rsatiladi (kanban mode)
   const isKanban = !!navbarExtra
@@ -601,10 +629,10 @@ export default function Layout() {
       {activeAttendanceMeetingId && (
         <>
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAttendanceMeetingId(null)} />
-          <MeetingAttendanceModal 
+          <MeetingAttendanceModal
             meetingId={activeAttendanceMeetingId}
             closeMeetingOnSave
-            onClose={() => setActiveAttendanceMeetingId(null)} 
+            onClose={() => setActiveAttendanceMeetingId(null)}
           />
         </>
       )}
@@ -612,11 +640,11 @@ export default function Layout() {
       {activeAbsence && (
         <>
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAbsence(null)} />
-          <MeetingAbsenceModal 
+          <MeetingAbsenceModal
             attendanceId={activeAbsence.attendanceId}
             meetingTitle={activeAbsence.meetingTitle}
             meetingDate={activeAbsence.meetingDate}
-            onClose={() => setActiveAbsence(null)} 
+            onClose={() => setActiveAbsence(null)}
           />
         </>
       )}

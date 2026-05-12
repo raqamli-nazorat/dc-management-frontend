@@ -258,7 +258,7 @@ function parseRejectionReason(reason) {
   })
 }
 
-export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete, isEmployee }) {
+export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete, isEmployee, deadlineOnly = false }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -449,6 +449,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const validate = () => {
+    if (deadlineOnly) return true
     const e = {}
     if (!form.project) e.project = true
     if (!form.title.trim()) e.title = true
@@ -475,39 +476,45 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   }
 
   const handleSubmit = async () => {
-    if (!canEdit) return  // ruxsat yo'q
+    if (!canEdit) return
     if (!validate()) return
     setLoading(true)
     try {
-      // API sxemasiga mos body: status ALOHIDA change-status orqali yuboriladi
-      const body = {
-        project: Number(form.project),
-        title: form.title.trim(),
-        priority: form.priority,
-        type: form.type,
-      }
-      if (form.description.trim()) body.description = form.description.trim()
-      if (form.assignees.length) body.assignee = form.assignees[0].id
-      if (form.position) body.position = Number(form.position)
-      if (form.sprint) body.sprint = Number(form.sprint)
-      if (form.task_price) body.task_price = form.task_price.replace(/\s/g, '')
-      if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
-      if (form.deadline) {
-        const t = form.deadline_time || '00:00'
-        body.deadline = `${form.deadline}T${t}:00`
-      }
-      const hrs = parseInt(form.estimated_hours, 10) || 0
-      const mins = parseInt(form.estimated_minutes, 10) || 0
-      if (hrs || mins) {
-        body.estimated_input_hours = hrs
-        body.estimated_input_minutes = mins
+      let body
+      if (deadlineOnly) {
+        body = {}
+        if (form.deadline) {
+          const t = form.deadline_time || '00:00'
+          body.deadline = `${form.deadline}T${t}:00`
+        }
+      } else {
+        body = {
+          project: Number(form.project),
+          title: form.title.trim(),
+          priority: form.priority,
+          type: form.type,
+        }
+        if (form.description.trim()) body.description = form.description.trim()
+        if (form.assignees.length) body.assignee = form.assignees[0].id
+        if (form.position) body.position = Number(form.position)
+        if (form.sprint) body.sprint = Number(form.sprint)
+        if (form.task_price) body.task_price = form.task_price.replace(/\s/g, '')
+        if (form.penalty_percentage) body.penalty_percentage = form.penalty_percentage
+        if (form.deadline) {
+          const t = form.deadline_time || '00:00'
+          body.deadline = `${form.deadline}T${t}:00`
+        }
+        const hrs = parseInt(form.estimated_hours, 10) || 0
+        const mins = parseInt(form.estimated_minutes, 10) || 0
+        if (hrs || mins) {
+          body.estimated_input_hours = hrs
+          body.estimated_input_minutes = mins
+        }
       }
 
-      // 1. Asosiy ma'lumotlarni saqlash
       await onSave(task.id, body)
 
-      // 3. Yangi fayllarni yuklash
-      if (newAttachments.length > 0) {
+      if (!deadlineOnly && newAttachments.length > 0) {
         const uploadResults = await Promise.allSettled(
           newAttachments.map(att => {
             const fd = new FormData()
@@ -518,7 +525,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             })
           })
         )
-        // Har bir fayl uchun xatolikni ko'rsatish
         uploadResults.forEach((result, i) => {
           if (result.status === 'rejected') {
             const fname = newAttachments[i]?.file?.name || 'fayl'
@@ -527,8 +533,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         })
       }
 
-      // 2. Agar status o'zgargan bo'lsa — change-status endpoint
-      if (form.status && form.status !== task.status) {
+      if (!deadlineOnly && form.status && form.status !== task.status) {
         try {
           await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: form.status })
         } catch (statusErr) {
@@ -546,7 +551,8 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   const positionOptions = positions.map(p => ({ label: p.name, value: String(p.id) }))
   const assigneeLabel = form.assignees.map(u => u.username).join(', ')
-  const ro = !canEdit
+  const ro = !canEdit || deadlineOnly   // barcha maydonlar uchun (deadline bundan mustasno)
+  const roDeadline = !canEdit           // faqat deadline uchun
 
   // Helper: extract filename from URL
   const getFilename = (url) => {
@@ -586,11 +592,11 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             <div className="flex items-center gap-3 mb-1">
               <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-                {canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
+                {deadlineOnly ? 'Muddatni yangilash' : canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
               </h2>
             </div>
             <p className="text-sm text-[var(--text-sub)] ">
-              {canEdit ? "Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting" : "Vazifa haqida batafsil ma'lumot"}
+              {deadlineOnly ? "Vazifa muddati o'tgan. Yangi muddatni belgilang." : canEdit ? "Vazifa ma'lumotlarini yangilash uchun o'zgartirishlar kiriting" : "Vazifa haqida batafsil ma'lumot"}
             </p>
           </div>
 
@@ -722,21 +728,21 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                     placeholder="kk.oo.yyyy"
                     value={form.deadline}
                     onChange={v => {
-                      if (!ro) {
+                      if (!roDeadline) {
                         set('deadline', v);
                         if (v && (!form.deadline_time || form.deadline_time === "00:00")) {
                           set('deadline_time', "23:59");
                         }
                       }
                     }}
-                    disabled={ro}
+                    disabled={roDeadline}
                     dropUp
                   />
                   <DateTimeBox
                     type="time"
                     value={form.deadline_time}
-                    onChange={v => !ro && set('deadline_time', v)}
-                    disabled={ro}
+                    onChange={v => !roDeadline && set('deadline_time', v)}
+                    disabled={roDeadline}
                     dropUp
                   />
                 </div>

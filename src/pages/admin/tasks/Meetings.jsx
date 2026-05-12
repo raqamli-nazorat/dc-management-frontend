@@ -241,12 +241,21 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* -- AddMeetingModal -- */
-function AddMeetingModal({ onClose, projects }) {
+function AddMeetingModal({ onClose, loadMeetings }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [projects, setProjects] = useState([])
   const [projectMembers, setProjectMembers] = useState([])
   const [membersLoading, setMembersLoading] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+
+  useEffect(() => {
+    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+      .then(res => {
+        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        setProjects(Array.isArray(list) ? list : [])
+      }).catch(() => { })
+  }, [])
   const [form, setForm] = useState({
     project: null, title: '', fine: '', link: '', description: '',
     date: '', time: '', durationVal: '',
@@ -329,7 +338,7 @@ function AddMeetingModal({ onClose, projects }) {
 
       const res = await axiosAPI.post('/meetings/', body)
       toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
-      loadMeetings?.()
+      loadMeetings()
       onClose()
     } catch (err) {
       const errData = err?.response?.data
@@ -606,10 +615,25 @@ function AttendanceItem({ attendance }) {
 }
 
 /* -- EditMeetingModal -- */
-function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, onFinish, onSaved }) {
+function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copyLink, setCopyLink] = useState(null)
+  const [projects, setProjects] = useState([])
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+      .then(res => {
+        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        setProjects(Array.isArray(list) ? list : [])
+      }).catch(() => { })
+    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
+      .then(res => {
+        const list = res.data?.results ?? res.data?.data?.results ?? res.data ?? []
+        setUsers(Array.isArray(list) ? list : [])
+      }).catch(() => { })
+  }, [])
 
   const { date: initDate, time: initTime } = fromIso(meeting.start_time)
   const { val: initDurVal, unit: initDurUnit } = minutesToDisplay(meeting.duration_minutes)
@@ -940,13 +964,18 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
 }
 
 /* -- MeetingDetailModal -- */
-function MeetingDetailModal({ meeting, onClose, projects }) {
-  const project = projects?.find(p => p.id === meeting.project)
+function MeetingDetailModal({ meeting, onClose }) {
+  const [project, setProject] = useState(null)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
   const [copyLink, setCopyLink] = useState(null)
 
   useEffect(() => {
+    if (meeting.project) {
+      axiosAPI.get(`/projects/${meeting.project}/`)
+        .then(res => setProject(res.data?.data ?? res.data))
+        .catch(() => { })
+    }
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         onClose();
@@ -1113,7 +1142,7 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
 }
 
 /* -- FilterModal -- */
-function FilterModal({ onClose, onApply, initial, users, projects }) {
+function FilterModal({ onClose, onApply, initial }) {
   const [organizer, setOrganizer] = useState(initial.organizer ?? '')
   const [project, setProject] = useState(initial.project ?? '')
   const [status, setStatus] = useState(initial.status ?? '')
@@ -1121,6 +1150,21 @@ function FilterModal({ onClose, onApply, initial, users, projects }) {
   const [dateTo, setDateTo] = useState(initial.dateTo ?? '')
   const [orgSearch, setOrgSearch] = useState('')
   const [prjSearch, setPrjSearch] = useState('')
+  const [users, setUsers] = useState([])
+  const [projects, setProjects] = useState([])
+
+  useEffect(() => {
+    axiosAPI.get('/projects/', { params: { page_size: 100 } })
+      .then(res => {
+        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
+        setProjects(Array.isArray(list) ? list : [])
+      }).catch(() => { })
+    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
+      .then(res => {
+        const list = res.data?.results ?? res.data?.data?.results ?? res.data ?? []
+        setUsers(Array.isArray(list) ? list : [])
+      }).catch(() => { })
+  }, [])
 
   const orgDd = useDropdown()
   const prjDd = useDropdown()
@@ -1430,26 +1474,9 @@ export default function MeetingsPage() {
   const [detail, setDetail] = useState(null)
   const [editItem, setEditItem] = useState(null)
   const [meetingLoading, setMeetingLoading] = useState(false)
-  const [projects, setProjects] = useState([])
-  const [users, setUsers] = useState([])
   const [copiedUid, setCopiedUid] = useState(null)
   const [attendanceMeetingId, setAttendanceMeetingId] = useState(null)
   const scrollRef = useRef(null)
-
-  /* load projects & users once */
-  useEffect(() => {
-    axiosAPI.get('/projects/', { params: { page_size: 100 } })
-      .then(res => {
-        const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
-        setProjects(Array.isArray(list) ? list : [])
-      }).catch(() => { })
-
-    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
-      .then(res => {
-        const list = res.data?.results ?? res.data?.data?.results ?? res.data ?? []
-        setUsers(Array.isArray(list) ? list : [])
-      }).catch(() => { })
-  }, [])
 
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
@@ -1694,17 +1721,15 @@ export default function MeetingsPage() {
       </div>
 
       {detail && (
-        <MeetingDetailModal meeting={detail} onClose={() => setDetail(null)} projects={projects} />
+        <MeetingDetailModal meeting={detail} onClose={() => setDetail(null)} />
       )}
       {showFilter && (
         <FilterModal initial={filters} onClose={() => setShowFilter(false)}
-          onApply={handleApplyFilter} users={users} projects={projects} />
+          onApply={handleApplyFilter} />
       )}
       {showAdd && (
         <AddMeetingModal
           onClose={() => setShowAdd(false)}
-          projects={projects}
-          users={users}
           loadMeetings={() => loadMeetings(filters, search, 1)}
         />
       )}
@@ -1712,8 +1737,6 @@ export default function MeetingsPage() {
         <EditMeetingModal
           meeting={editItem}
           onClose={() => setEditItem(null)}
-          projects={projects}
-          users={users}
           onSaved={() => loadMeetings(filters, search, 1)}
           onFinish={(id) => { setEditItem(null); setAttendanceMeetingId(id) }}
           canEdit={(() => {

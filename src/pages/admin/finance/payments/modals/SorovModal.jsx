@@ -39,16 +39,29 @@ function getRules(type) {
   return RULES[type] ?? { projectDisabled: false, categoryDisabled: false, projectRequired: false, reasonRequired: false }
 }
 
-export default function SorovModal({ onClose, onSubmit, categories = [], projects = [] }) {
+export default function SorovModal({ onClose, onSubmit }) {
   const [userCard, setUserCard] = useState(null)
+  const [categories, setCategories] = useState([])
+  const [projects, setProjects] = useState([])
 
-  // Modal ochilganda /users/me/ dan card_number olamiz
   useEffect(() => {
     axiosAPI.get('/users/me/')
       .then(res => {
         const data = res.data?.data ?? res.data
         const raw = data?.card_number
         if (raw) setUserCard(fmtCard(String(raw).replace(/\s/g, '')))
+      })
+      .catch(() => {})
+    axiosAPI.get('/expense-category/')
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        setCategories(Array.isArray(d) ? d : (d.results ?? []))
+      })
+      .catch(() => {})
+    axiosAPI.get('/projects/')
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        setProjects(Array.isArray(d) ? d : (d.results ?? []))
       })
       .catch(() => {})
   }, [])

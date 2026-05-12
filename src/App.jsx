@@ -30,7 +30,6 @@ import ProfilePage from './pages/admin/Profile/Profile'
 import MyTasks from './pages/MyTasks/MyTasks'
 import AnalyticsPage from './pages/admin/Analytics/Analytics'
 import SelectRore from './pages/SelectRore'
-
 const PH = (title) => <PlaceholderPage title={title} />
 
 // Umumiy sahifalar — barcha rollarda ishlatiladi
@@ -59,6 +58,7 @@ const commonRoutes = (prefix) => [
 ]
 
 function App() {
+
   return (
     <ToastProvider>
       <ThemeProvider>

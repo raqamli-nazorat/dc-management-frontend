@@ -76,7 +76,6 @@ export default function UsersPage() {
   }
 
   useEffect(() => {
-    getUsers()
     getPositions()
   }, [])
 

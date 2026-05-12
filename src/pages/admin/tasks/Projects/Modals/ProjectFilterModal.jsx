@@ -9,7 +9,7 @@ import { toast } from "../../../../../Toast/ToastProvider"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
-const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filter = {}, useDropdown }) => {
+const ProjectFilterModal = ({ onClose, onApply, initial, empty_filter = {}, useDropdown }) => {
     const { user } = useAuth()
 
     const [f, setF] = useState({ ...empty_filter, ...initial })
@@ -17,27 +17,29 @@ const ProjectFilterModal = ({ onClose, onApply, initial, users = [], empty_filte
 
     const { isDark } = useTheme()
 
+    const [users, setUsers] = useState([])
     const [employees, setEmployees] = useState([])
 
     useEffect(() => {
-        if (user.active_role === "employee") {
+        if (user.active_role === "admin" || user.active_role === "superadmin") {
+            axiosAPI.get('users/')
+                .then(res => {
+                    const payload = res.data?.data ?? res.data
+                    setUsers(Array.isArray(payload) ? payload : (payload.results ?? []))
+                })
+                .catch(() => {})
+        } else if (user.active_role === "employee") {
             axiosAPI.get(`users/all/?roles=manager`)
                 .then(res => {
                     setEmployees(res.data.data.results)
                 })
-                .catch(err => {
-                    console.error(err)
-                    toast.error(err.response.data.error.errorMsg)
-                })
+                .catch(err => { console.error(err) })
         } else if (user.active_role === "manager") {
             axiosAPI.get(`users/all/?roles=employee`)
                 .then(res => {
                     setEmployees(res.data.data.results)
                 })
-                .catch(err => {
-                    console.error(err)
-                    toast.error(err.response.data.error.errorMsg)
-                })
+                .catch(err => { console.error(err) })
         }
     }, [user])
 
