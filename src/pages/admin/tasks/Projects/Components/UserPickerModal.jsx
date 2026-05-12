@@ -118,10 +118,6 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
                                 <div className="min-w-0 flex-1">
                                     <p className="text-sm font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{u.username}</p>
                                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] truncate">
-                                        {
-                                            console.log(u)
-
-                                        }
                                         {u?.position_info?.name || '—'}
                                     </p>
                                 </div>
@@ -150,7 +146,6 @@ export const UserPickerModal = ({ title, selected, onConfirm, onClose, users = [
 }
 
 export const SelectedUsersField = ({ label, selected, onOpen, onRemove }) => {
-    console.log(selected);
     return (
         <div>
             <label className={labelCls}>{label}</label>

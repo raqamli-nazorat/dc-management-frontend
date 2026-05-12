@@ -9,7 +9,8 @@ import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
-import { requestForToken } from '../firebase'
+import { onMessageListener, requestForToken } from '../firebase'
+import notificationSocket from '../NotificationSocket'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -49,7 +50,7 @@ function formatNotifTime(dateStr) {
 
 function mapApiNotification(item) {
   return {
-    id: item?.user_id,
+    id: item?.id,
     date: formatNotifDate(item.created_at),
     title: item.title || 'Bildirishnoma',
     sub: item.message || item.sub || '',
@@ -66,6 +67,7 @@ function groupByDate(notifs) {
     if (!map[n.date]) map[n.date] = []
     map[n.date].push(n)
   })
+
   // Sanalarni teskari tartibda (yangilari tepada) qaytarish
   return Object.entries(map).sort((a, b) => {
     // "DD.MM.YYYY" formatini taqqoslash uchun "YYYY-MM-DD" ga o'tkazamiz
@@ -93,7 +95,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }
     if (notif?.read) return  // allaqachon o'qilgan — backend ga so'rov yuborma
     setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     try {
-      await axiosAPI.patch(`/notifications/${id}/read/`)
+      await axiosAPI.patch(`notifications/${id}/read/`)
     } catch {
       setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: false } : n))
     }
@@ -145,61 +147,63 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }
         className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5"
         onScroll={onScroll}
       >
-        {grouped.map(([date, items]) => (
-          <div key={date}>
-            <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[var(--text-soft)] mb-3 px-2">{date}</p>
-            <div className="flex flex-col gap-1">
-              {[...items].sort((a, b) => b.time.localeCompare(a.time)).map(n => (
-                <button
-                  key={n.id}
-                  onClick={() => {
-                    markRead(n.id)
-                    if (onItemClick) onItemClick(n)
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
+        {grouped.map(([date, items]) => {
+          return (
+            <div key={date}>
+              <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[var(--text-soft)] mb-3 px-2">{date}</p>
+              <div className="flex flex-col gap-1">
+                {[...items].sort((a, b) => b.time.localeCompare(a.time)).map(n => (
+                  <button
+                    key={new Date() || n?.id}
+                    onClick={() => {
+                      markRead(n.id)
+                      if (onItemClick) onItemClick(n)
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
                     ${!n.read
-                      ? 'bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)]'
-                      : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'
-                    }`}
-                >
-                  {/* Avatar */}
-                  <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[var(--text-sub)]">
-                      Y
+                        ? 'bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)]'
+                        : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'
+                      }`}
+                  >
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[var(--text-sub)]">
+                        Y
+                      </div>
+                      {/* Badge */}
+                      {!n.read ? (
+                        <span
+                          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FF7A45] flex items-center justify-center text-white font-semibold"
+                          style={{ fontSize: 11 }}
+                        >
+                          1
+                        </span>
+                      ) : (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--accent-sub)] flex items-center justify-center">
+                          <MdCheck size={10} color="white" />
+                        </span>
+                      )}
                     </div>
-                    {/* Badge */}
-                    {!n.read ? (
-                      <span
-                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FF7A45] flex items-center justify-center text-white font-semibold"
-                        style={{ fontSize: 11 }}
-                      >
-                        1
-                      </span>
-                    ) : (
-                      <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--accent-sub)] flex items-center justify-center">
-                        <MdCheck size={10} color="white" />
-                      </span>
-                    )}
-                  </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
-                      {n.title}
-                    </p>
-                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-soft)] flex items-center gap-1 mt-0.5 truncate">
-                      <FaFolder size={10} className="shrink-0" />
-                      {n.sub}
-                    </p>
-                  </div>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
+                        {n.title}
+                      </p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-soft)] flex items-center gap-1 mt-0.5 truncate">
+                        <FaFolder size={10} className="shrink-0" />
+                        {n.sub}
+                      </p>
+                    </div>
 
-                  {/* Time */}
-                  <span className="text-xs text-[var(--text-disabled)] dark:text-[var(--text-soft)] shrink-0">{n.time}</span>
-                </button>
-              ))}
+                    {/* Time */}
+                    <span className="text-xs text-[var(--text-disabled)] dark:text-[var(--text-soft)] shrink-0">{n.time}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -274,6 +278,7 @@ export default function Layout() {
 
   const [notifCount, setNotifCount] = useState(NOTIFS_DATA.length)
   const [notifNextUrl, setNotifNextUrl] = useState(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -393,7 +398,7 @@ export default function Layout() {
     }
   }
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = async () => {
     try {
       const { data } = await axiosAPI.get('/notifications/')
       const list = Array.isArray(data?.results)
@@ -405,131 +410,140 @@ export default function Layout() {
       setNotifNextUrl(data?.data?.next)
       // Yangilari tepada turishi uchun created_at bo'yicha teskari tartibda saralash
       const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
       setNotifs(sorted.map(mapApiNotification))
     } catch {
       // static fallback saqlanadi
     }
-  }, [])
+  }
+
+  useEffect(() => {
+    fetchNotifications();
+
+  }, []);
 
   const loadMoreNotifications = async () => {
-    if (!notifNextUrl) return
+    if (!notifNextUrl || isLoadingMore) return;
+    setIsLoadingMore(true);
 
     try {
-      const { data } = await axiosAPI.get(notifNextUrl)
+      const { data } = await axiosAPI.get(notifNextUrl);
+
       const list = Array.isArray(data?.results)
         ? data.results
         : Array.isArray(data?.data?.results)
           ? data.data.results
-          : []
-      setNotifCount(data?.data?.count)
-      setNotifNextUrl(data?.data?.next)
-      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      setNotifs([...notifs, ...sorted.map(mapApiNotification)])
-    } catch {
-      // static fallback saqlanadi
+          : [];
+
+      setNotifCount(data?.data?.count);
+      setNotifNextUrl(data?.data?.next);
+
+      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      // Eski xabarlar ustiga yangilarini qo'shamiz
+      setNotifs(prev => [...prev, ...sorted.map(mapApiNotification)]);
+
+    } catch (error) {
+      console.error("Pagination xatosi:", error);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
   const handleScrollNotif = (e) => {
-    if (!notifNextUrl) return;
+    if (!notifNextUrl || isLoadingMore) return;
 
-    if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight - 10) {
+    const { scrollTop, clientHeight, scrollHeight } = e.target;
+
+    if (scrollTop + clientHeight >= scrollHeight - 20) {
       loadMoreNotifications();
     }
-  }
+  };
 
+  // 1. WebSocket ulanishini sozlash
   const connectNotificationsWs = useCallback(async () => {
     try {
+      // Serverdan ticket olish
       const { data } = await axiosAPI.post('/notifications/tickets/');
       const ticket = data?.data?.ticket;
-      if (!ticket) return;
 
-      const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin;
-      const baseUrl = new URL(apiBase, window.location.origin);
-      const wsProtocol = baseUrl?.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`;
 
-      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
-        wsRef.current.close();
+      if (!ticket) {
+        console.error("❌ Ticket olinmadi");
+        return;
       }
 
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
+      // WS URL ni shakllantirish (VITE_BASE_URL dan foydalanish)
+      const backendUrl = "https://backend.raqamlinazorat.uz"; // Backend manzilingiz
+      const baseUrl = backendUrl.replace(/^http/, 'ws');
 
-      ws.onmessage = (event) => {
-        try {
-          const raw = JSON.parse(event.data);
-          // Backend formatiga moslash:
-          const realData = raw.data?.payload ?
-            (typeof raw.data.payload === 'string' ? JSON.parse(raw.data.payload) : raw.data.payload)
-            : raw;
+      const wsUrl = `${baseUrl}/ws/notifications/?ticket=${ticket}`;
 
-          const mapped = mapApiNotification(realData);
-          if (!mapped.id) return;
+      // NotificationSocket orqali ulanish
+      notificationSocket.connect(wsUrl, (payload) => {
+        console.log("📩 Yangi xabar (WS orqali):", payload);
 
-          // DUBILKATNI TEKSHIRISH
-          if (shownNotifIdsRef.current.has(mapped.id)) return;
-          shownNotifIdsRef.current.add(mapped.id);
+        // Bu yerda xabarni UI da ko'rsatish logikasi (masalan, Toast yoki State)
+        handleIncomingNotification(payload);
+      });
 
-          showSystemNotification(mapped);
-
-          // State-ni yangilash
-          setNotifs(prev => {
-            if (prev.some(n => n.id === mapped.id)) return prev;
-            return [mapped, ...prev];
-          });
-        } catch (err) {
-          console.error("WS xabar xatosi:", err);
-        }
-      };
-
-      ws.onclose = () => {
-        reconnectTimerRef.current = setTimeout(connectNotificationsWs, 5000);
-      };
     } catch (error) {
-      reconnectTimerRef.current = setTimeout(connectNotificationsWs, 10000);
+      console.error("WS ulanishda xato:", error);
     }
   }, []);
 
-  // Firebase va Bildirishnoma ruxsati
-  useEffect(() => {
-    const initNotifications = async () => {
-      if ("Notification" in window) {
-        const permission = await Notification.requestPermission();
+  // 2. Xabarni qayta ishlash funksiyasi
+  const handleIncomingNotification = (payload) => {
+    // Tizim bildirishnomasini ko'rsatish
+    if (Notification.permission === "granted") {
+      new Notification(payload.title || "Yangi xabar", {
+        body: payload.body || payload.message,
+        icon: "/imgs/Logo.png",
+        data: { url: window.location.origin }
+      });
 
-        if (permission === 'granted') {
-          // Firebase tokenni olish funksiyasini shu yerda chaqiring (requestForToken)
-          const token = await requestForToken();
+      notification.onclick = (event) => {
+        event.preventDefault();
 
-        }
-      }
-    };
+        window.focus();
 
-    initNotifications();
-    fetchNotifications();
-    connectNotificationsWs();
+        window.location.href = window.location.origin;
 
-    return () => {
-      if (wsRef.current) wsRef.current.close();
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    };
-  }, [fetchNotifications, connectNotificationsWs]);
-
-
-  useEffect(() => {
-    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-      Notification.requestPermission();
+        notification.close(); // Bosilgandan keyin bildirishnomani yopish
+      };
     }
 
-    fetchNotifications();
+    const newNotif = mapApiNotification({
+      ...payload,
+      created_at: new Date().toISOString(), // kelgan vaqti
+      is_read: false
+    });
+
+    setNotifs(prev => [newNotif, ...prev]); // Yangisini ro'yxat boshiga qo'shish
+    setNotifCount(prev => prev + 1);
+  };
+
+  // 3. Asosiy effekt: Firebase va WebSocket-ni ishga tushirish
+  useEffect(() => {
+    // A. Firebase Token olish va Foreground xabarlarni eshitish
+    const setupFirebase = async () => {
+      await requestForToken(); // Tokenni oladi va backendga yuboradi
+
+      // Sayt ochiq turganda Firebase orqali keladigan xabarlar uchun
+      onMessageListener().then((payload) => {
+        console.log("🔥 Firebase Foreground xabar:", payload);
+        handleIncomingNotification(payload.notification);
+      });
+    };
+
+    setupFirebase();
     connectNotificationsWs();
 
+    // Tozalash (Cleanup): Komponent yopilganda ulanishni uzish
     return () => {
-      if (wsRef.current) wsRef.current.close();
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      notificationSocket.disconnect();
     };
-  }, [fetchNotifications, connectNotificationsWs]);
-
+  }, [connectNotificationsWs]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -506,7 +506,6 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             <div className="flex flex-col gap-3">
                                 <label className={labelCls + "mb-0!"}>Loyiha hujjatlari</label>
                                 {form.links?.map((item, index) => {
-                                    console.log(item)
                                     return (
                                         <div key={index} className="flex flex-col gap-1.5">
                                             <div className="flex items-start gap-3">
