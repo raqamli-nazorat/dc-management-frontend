@@ -241,7 +241,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* -- AddMeetingModal -- */
-function AddMeetingModal({ onClose, projects, loadMeetings }) {
+function AddMeetingModal({ onClose, projects }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [projectMembers, setProjectMembers] = useState([])
@@ -396,7 +396,7 @@ function AddMeetingModal({ onClose, projects, loadMeetings }) {
                   <button type="button" title="Nusxa olish"
                     onClick={() => { navigator.clipboard.writeText(form.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
-                    {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <FaCopy size={12} />}
+                    {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <PiCopyBold size={12} />}
                   </button>
                 )}
               </div>
@@ -544,6 +544,67 @@ function AddMeetingModal({ onClose, projects, loadMeetings }) {
   )
 }
 
+/* -- AttendanceItem -- */
+function AttendanceItem({ attendance }) {
+  const [expanded, setExpanded] = useState(false);
+  const participant = attendance?.user_info;
+  const username = participant?.username || 'Noma\'lum';
+  const position = participant?.position || 'Xodim';
+  const initials = username.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
+
+  return (
+    <div className="flex flex-col gap-2 py-1">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {participant?.avatar ? (
+            <img src={participant?.avatar} alt="avatar" className="w-6 h-6 rounded-full object-cover shrink-0" />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-[#9CA3AF] flex items-center justify-center text-white text-[13px] font-semibold shrink-0">
+              {initials}
+            </div>
+          )}
+          <div className="flex flex-col">
+            <span className="text-[13px] font-medium text-[var(--text-strong)] leading-tight">{username}</span>
+            <span className="text-[11px] text-[var(--text-soft)]">{position}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {attendance.is_attended ? (
+            <div className="px-4 py-1.5 rounded-full bg-[#7A8CEB] text-white text-[11px] font-medium">
+              Qatnashdi
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-white text-[11px] font-medium transition-colors cursor-pointer ${attendance.is_excused ? 'bg-[#22C55E] hover:bg-[#16a34a]' : 'bg-[#EF4444] hover:bg-[#dc2626]'}`}
+            >
+              {attendance.is_excused ? 'Qatnashmadi | Sababli' : 'Qatnashmadi | Sababsiz'}
+              <FaChevronDown size={10} className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {!attendance.is_attended && (
+        <div 
+          className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+        >
+          <div className="overflow-hidden">
+            <textarea
+              readOnly
+              value={attendance.absence_reason || ''}
+              placeholder="Sabab ko'rsatilmagan"
+              className={`w-full p-3 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] text-[13px] text-[var(--text-strong)] outline-none min-h-[75px] ${!attendance.absence_reason && attendance?.absence_reason?.length !== 0 ? "resize-none!" : "resize-y!"}`}
+            />
+          </div>
+        </div>
+      )}
+    </div >
+  )
+}
+
 /* -- EditMeetingModal -- */
 function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, onFinish, onSaved }) {
   const [showParticipants, setShowParticipants] = useState(false)
@@ -564,6 +625,7 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
     durationVal: initDurVal,
     participants: meeting.participants_info ?? [],
     is_completed: meeting.is_completed ?? false,
+    attendances: meeting.attendances ?? []
   })
   const [errors, setErrors] = useState({})
 
@@ -823,6 +885,16 @@ function EditMeetingModal({ meeting, onClose, projects, users, canEdit = true, o
                 )}
               </div>
             </div>
+
+            {/* Yig'ilish qatnashilari ro'yxati */}
+            <div>
+              <label className={labelCls}>Yig'ilishga qatnashishlar</label>
+              <div className="flex flex-col gap-2">
+                {form.attendances?.map(u => (
+                  <AttendanceItem key={u.id} attendance={u} />
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* -- Footer (qotgan) -- */}
@@ -1007,6 +1079,16 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             </div>
           </div>
 
+
+          <div>
+            <label className={labelCls}>Yig'ilishga qatnashishlar</label>
+            <div className="flex flex-col gap-2">
+              {meeting?.attendances?.map(u => (
+                <AttendanceItem key={u.id} attendance={u} />
+              ))}
+            </div>
+          </div>
+
         </div>
 
         {/* Footer — Tugatildimi + Yopish */}
@@ -1025,7 +1107,6 @@ function MeetingDetailModal({ meeting, onClose, projects }) {
             <FaXmark size={13} /> Yopish
           </button>
         </div>
-
       </div>
     </div>
   )
@@ -1450,7 +1531,12 @@ export default function MeetingsPage() {
     setMeetingLoading(true)
     try {
       const res = await axiosAPI.get(`/meetings/${id}/`)
-      const meeting = res.data?.data ?? res.data
+      let meeting = res.data?.data ?? res.data
+      if (meeting.id) {
+        const { data } = await axiosAPI.get(`meeting-attendance/?meeting=${meeting?.id}`)
+        const attendances = data?.data?.results ?? data?.data
+        meeting.attendances = attendances
+      }
       if (mode === 'edit' && meeting.organizer === user.id && !meeting?.is_completed) setEditItem(meeting)
       else setDetail(meeting)
     } catch (err) {

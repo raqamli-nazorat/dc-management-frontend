@@ -1,18 +1,19 @@
 ﻿import { useState, useEffect } from 'react'
 import { usePageAction } from '../../context/PageActionContext'
-import { FaRegBookmark } from 'react-icons/fa6'
+import { FaRegBookmark, FaTrash } from 'react-icons/fa6'
 import { MdCheckCircle, MdCheck } from 'react-icons/md'
 import AddTaskModal from './AddTaskModal'
 import { axiosAPI } from '../../service/axiosAPI'
 import { toast } from '../../Toast/ToastProvider'
 import EmptyState from '../../components/EmptyState'
+import { BsFillTrash3Fill } from 'react-icons/bs'
 
 /* Rang → CSS qiymatlari */
 const COLOR_MAP = {
   yellow: { bg: '#FFD200', text: 'var(--text-strong)' },
-  blue:   { bg: '#005FF9', text: '#ffffff' },
-  green:  { bg: '#15B036', text: '#ffffff' },
-  red:    { bg: '#FF2E2E', text: '#ffffff' },
+  blue: { bg: '#005FF9', text: '#ffffff' },
+  green: { bg: '#15B036', text: '#ffffff' },
+  red: { bg: '#FF2E2E', text: '#ffffff' },
 }
 
 /* Sana formatlash — "Dushanbi, 6-May 2026" */
@@ -71,10 +72,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
             className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/20 hover:bg-red-500/60 transition-colors cursor-pointer"
             title="O'chirish"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
-              <path d="M10 11v6M14 11v6M9 6V4h6v2" />
-            </svg>
+            <BsFillTrash3Fill className='text-white' size={14} />
           </button>
           {/* Holat badge */}
           <button
@@ -98,7 +96,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
 
         <div className="flex flex-col gap-0">
           {/* Scroll qilinadigan subtask ro'yxati — max 4 ta ko'rinadi, har doim 144px */}
-          <div className="flex flex-col gap-3 overflow-y-auto min-h-36 max-h-36 custom-scrollbar pr-1">
+          <div className="flex flex-col gap-3 overflow-y-auto min-h-34 max-h-34 custom-scrollbar pr-1">
             {(task.items || []).map(item => (
               <div
                 key={item.id}
@@ -129,10 +127,7 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
                   className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-md hover:bg-red-500/10 transition-all cursor-pointer"
                   title="O'chirish"
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
-                    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
-                    <path d="M10 11v6M14 11v6" />
-                  </svg>
+                  <BsFillTrash3Fill className='text-red-500' size={11} />
                 </button>
               </div>
             ))}
@@ -141,6 +136,42 @@ function TaskCard({ task, onToggleItem, onToggleDone, onDelete, onEdit, onDelete
               <p className="text-[12px] text-[var(--text-disabled)] dark:text-[#474848] italic">
                 Subtasklar yo'q
               </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 mt-2">
+            <div className="w-[22px] h-[22px] rounded-full bg-[#E2E6F2] dark:bg-[#3A3B3B] shrink-0" />
+            <input
+              type="text"
+              value={newItemTitle}
+              onChange={e => setNewItemTitle(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleAddItem()
+              }}
+              placeholder="Subtask qo'shish..."
+              disabled={addingItem}
+              className="flex-1 bg-transparent outline-none text-[13px]
+                text-[#5B6078] dark:text-[#C2C8E0]
+                placeholder:text-[#D0D5E2] dark:placeholder:text-[#4A4B4B]
+                disabled:opacity-50"
+            />
+            {newItemTitle.trim() && (
+              <button
+                onClick={handleAddItem}
+                disabled={addingItem}
+                className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#3F57B3] hover:bg-[#4A65D8] transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {addingItem ? (
+                  <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" />
+                    <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                )}
+              </button>
             )}
           </div>
 

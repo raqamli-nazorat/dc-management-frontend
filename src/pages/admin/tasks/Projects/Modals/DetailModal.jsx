@@ -216,11 +216,11 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-2.5">
+                            <label className={labelCls + "mb-0!"}>Loyiha hujjatlari</label>
                             {project?.project_documents?.map((item, index) => {
                                 return (
                                     <div key={index} className="flex flex-col gap-2.5">
-                                        <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1">
                                                 <input
@@ -233,14 +233,14 @@ const DetailModal = ({ id, onClose }) => {
                                             <div className="flex-1 relative">
                                                 <input
                                                     className={fCls + " pr-10"}
-                                                    placeholder="Hujjat havolasi"
+                                                    placeholder="Havolasi"
                                                     disabled
-                                                    value={item.url || ''}
+                                                    value={item.value || ''}
                                                 />
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleCopyLink(item.url, index)}
+                                                    onClick={() => handleCopyLink(item.value, index)}
                                                     disabled={copyLink === index}
                                                     className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] cursor-pointer transition-colors"
                                                 >
