@@ -153,6 +153,7 @@ export default function PaymentsPage() {
   const [showAddCheck, setShowAddCheck] = useState(false)
   const [paymentId, setPaymentId] = useState(null)
   const [projectId, setProjectId] = useState(null)
+  const [projects, setProjects] = useState([])
 
   const scrollRef = useRef(null)
 
@@ -190,6 +191,8 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     loadPayments()
+    const res = apiGetProjects()
+    setProjects(res)
   }, [])
 
   useEffect(() => {
@@ -375,7 +378,6 @@ export default function PaymentsPage() {
       )}
       {canSendRequest && showSorov && (
         <SorovModal
-          categories={categories}
           projects={projects}
           onClose={() => setShowSorov(false)}
           onSubmit={handleSubmitSorov}
