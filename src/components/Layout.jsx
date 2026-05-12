@@ -481,8 +481,6 @@ export default function Layout() {
 
       // NotificationSocket orqali ulanish
       notificationSocket.connect(wsUrl, (payload) => {
-        console.log("📩 Yangi xabar (WS orqali):", payload);
-
         // Bu yerda xabarni UI da ko'rsatish logikasi (masalan, Toast yoki State)
         handleIncomingNotification(payload);
       });
