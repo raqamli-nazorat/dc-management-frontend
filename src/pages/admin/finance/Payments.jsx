@@ -349,8 +349,7 @@ export default function PaymentsPage() {
                   <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.paid_at)}</td>
                   <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDate(p.confirmed_at)}</td>
                   <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{p.project_info?.title ?? ''}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] 
-                  group-hover:bg-[#F0F1F5] dark:group-hover:bg-[#202221] ">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
                     <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(p.status)}`}>
                       {statusLabel(p.status)}
                     </span>
