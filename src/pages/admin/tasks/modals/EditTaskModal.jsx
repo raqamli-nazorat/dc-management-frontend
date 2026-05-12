@@ -275,6 +275,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   // New files to upload after save
   const [newAttachments, setNewAttachments] = useState([])
+  const [showDetails, setShowDetails] = useState(false)
   const fileInputRef = useRef(null)
   const normalizePercentInput = (val) => {
     const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
@@ -632,63 +633,82 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
               <SelectDropdown label="Turi" value={form.type} onChange={v => set('type', v)} options={TYPE_OPTIONS} placeholder="Turi" disabled={ro} error={errors.type} />
             </div>
 
-            {/* Topshiruvchi */}
-            <div>
-              <label className={labelCls}>Topshiruvchi</label>
-              {/* in_progress statusida topshiruvchi o'zgartirilmaydi */}
-              {form.status === 'in_progress' && !ro && (
-                <p className="text-xs text-amber-500 dark:text-amber-400 mb-1.5">
-                  ⚠ Jarayondagi vazifada topshiruvchi o'zgartirilmaydi
-                </p>
-              )}
-              <button type="button"
-                onClick={() => !ro && form.project && form.status !== 'in_progress' ? setPickerOpen(true) : null}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
-                  ${ro || !form.project || form.status === 'in_progress'
-                    ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]'
-                    : 'cursor-pointer bg-[var(--bg-base)] hover:border-[var(--accent-sub)]'}
-                  border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]`}>
-                <span className={assigneeLabel ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)] flex-1 text-left truncate' : 'text-[var(--text-sub)] flex-1 text-left'}>
-                  {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
-                </span>
-                {!ro && form.project && form.status !== 'in_progress' && (
-                  <div className="flex items-center gap-1.5 shrink-0 ml-1">
-                    {form.assignees.length > 0 && (
-                      <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
-                        <FaXmark size={11} />
-                      </span>
-                    )}
-                    <FaChevronDown size={11} className="text-[var(--text-soft)]" />
-                  </div>
-                )}
+            {/* Batafsil tugmasi */}
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setShowDetails(!showDetails)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm cursor-pointer bg-[var(--bg-elevation-1)] text-[var(--text-strong)]`}
+              >
+                <span className="flex-1 text-left truncate">Batafsil</span>
+                <div className="flex items-center gap-1.5 shrink-0 ml-1">
+                  <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform duration-300 ${showDetails ? 'rotate-180' : ''}`} />
+                </div>
               </button>
             </div>
 
-            {/* Lavozim + Sprint */}
-            <div className="grid grid-cols-2 gap-4">
-              <SelectDropdown label="Lavozim" value={form.position} onChange={v => set('position', v)} options={positionOptions} placeholder="Lavozim tanlang" disabled={ro} />
-              <div>
-                <label className={labelCls}>Sprint raqami <span className="text-[var(--text-soft)] font-normal">(1–10)</span></label>
-                <input type="text" inputMode="numeric" value={form.sprint}
-                  onChange={e => !ro && handleSprint(e.target.value)}
-                  readOnly={ro} placeholder="1" className={inputCls(errors.sprint, ro)} />
-                {errors.sprint && <p className="text-xs text-red-500 mt-1">{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
-              </div>
-            </div>
+            <div className={`grid transition-all duration-300 ease-in-out ml-1 ${showDetails ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+              <div className="overflow-hidden flex flex-col gap-4">
 
-            {/* Vazifa narxi + Jarima */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Vazifa narxi (UZS)</label>
-                <input type="text" inputMode="numeric" value={form.task_price}
-                  onChange={e => !ro && !isEmployee && set('task_price', formatPrice(e.target.value))}
-                  readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee) + ' text-right'} />
-              </div>
-              <div>
-                <label className={labelCls}>Jarima foizi (%) <span className="text-[var(--text-soft)] font-normal">(0–100)</span></label>
-                <input type="text" inputMode="decimal" value={form.penalty_percentage}
-                  onChange={e => !ro && !isEmployee && handlePenalty(e.target.value)}
-                  readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee)} />
+                {/* Topshiruvchi */}
+                <div>
+                  <label className={labelCls}>Topshiruvchi</label>
+                  {/* in_progress statusida topshiruvchi o'zgartirilmaydi */}
+                  {form.status === 'in_progress' && !ro && (
+                    <p className="text-xs text-amber-500 dark:text-amber-400 mb-1.5">
+                      ⚠ Jarayondagi vazifada topshiruvchi o'zgartirilmaydi
+                    </p>
+                  )}
+                  <button type="button"
+                    onClick={() => !ro && form.project && form.status !== 'in_progress' ? setPickerOpen(true) : null}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border
+                      ${ro || !form.project || form.status === 'in_progress'
+                        ? 'cursor-default bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]'
+                        : 'cursor-pointer bg-[var(--bg-base)] hover:border-[var(--accent-sub)]'}
+                      border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]`}>
+                    <span className={assigneeLabel ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)] flex-1 text-left truncate' : 'text-[var(--text-sub)] flex-1 text-left'}>
+                      {!form.project ? "Avval loyiha tanlang" : (assigneeLabel || 'Topshiruvchi tanlang')}
+                    </span>
+                    {!ro && form.project && form.status !== 'in_progress' && (
+                      <div className="flex items-center gap-1.5 shrink-0 ml-1">
+                        {form.assignees.length > 0 && (
+                          <span onMouseDown={e => { e.stopPropagation(); set('assignees', []) }} className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
+                            <FaXmark size={11} />
+                          </span>
+                        )}
+                        <FaChevronDown size={11} className="text-[var(--text-soft)]" />
+                      </div>
+                    )}
+                  </button>
+                </div>
+
+                {/* Lavozim + Sprint */}
+                <div className="grid grid-cols-2 gap-4">
+                  <SelectDropdown label="Lavozim" value={form.position} onChange={v => set('position', v)} options={positionOptions} placeholder="Lavozim tanlang" disabled={ro} />
+                  <div>
+                    <label className={labelCls}>Sprint raqami <span className="text-[var(--text-soft)] font-normal">(1–10)</span></label>
+                    <input type="text" inputMode="numeric" value={form.sprint}
+                      onChange={e => !ro && handleSprint(e.target.value)}
+                      readOnly={ro} placeholder="1" className={inputCls(errors.sprint, ro)} />
+                    {errors.sprint && <p className="text-xs text-red-500 mt-1">{typeof errors.sprint === 'string' ? errors.sprint : '*Xato'}</p>}
+                  </div>
+                </div>
+
+                {/* Vazifa narxi + Jarima */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Vazifa narxi (UZS)</label>
+                    <input type="text" inputMode="numeric" value={form.task_price}
+                      onChange={e => !ro && !isEmployee && set('task_price', formatPrice(e.target.value))}
+                      readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee) + ' text-right'} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Jarima foizi (%) <span className="text-[var(--text-soft)] font-normal">(0–100)</span></label>
+                    <input type="text" inputMode="decimal" value={form.penalty_percentage}
+                      onChange={e => !ro && !isEmployee && handlePenalty(e.target.value)}
+                      readOnly={ro || isEmployee} placeholder="0" className={inputCls(false, ro || isEmployee)} />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -830,15 +850,15 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             {(task.status === 'rejected' || task.reopened_count > 0) && (task.rejection_reason || rejectionFiles.length > 0) && (
               <div>
                 <label className="text-[11px]  text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-2 flex items-center gap-1.5">
-                  
+
                   Rad etish sabablari
                 </label>
                 <div className="rounded-2xl border border-[var(--stroke-sub)] dark:border-[#262C36] p-4 flex flex-col gap-3">
 
-                  
+
                   {rejectionFiles.length > 0 && (
                     <div>
-                     
+
                       <div className="flex flex-wrap gap-2">
                         {rejectionFiles.map(rf => (
                           <a

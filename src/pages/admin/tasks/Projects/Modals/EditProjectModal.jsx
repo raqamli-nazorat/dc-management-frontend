@@ -102,7 +102,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         deadline: '',
         time: '',
         is_hidden: true,
-        links: [{ name: '', link: '' }],
+        links: [{ name: '', value: '' }],
     })
     const [deletedIds, setDeletedIds] = useState([]);
 
@@ -122,9 +122,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 deadline: project?.deadline ? project.deadline.slice(0, 10) : '',
                 time: project?.deadline ? project.deadline.slice(11, 16) : '',
                 is_hidden: project?.is_hidden !== null ? project?.is_hidden : true,
-                links: project?.links?.length > 0 
-                    ? project.links.map(d => ({ name: d.name, link: d.url, id: d.id }))
-                    : [{ name: '', link: '' }],
+                links: project?.links?.length > 0
+                    ? project.links.map(d => ({ name: d.name, value: d.value, id: d.id }))
+                    : [{ name: '', value: '' }],
             })
         }
     }, [project])
@@ -144,14 +144,12 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
         const linkErrors = form.links.map(item => {
             const hasName = !!item.name?.trim();
-            const hasLink = !!item.link?.trim();
-            const isValidFormat = hasLink && item.link.startsWith('https://');
+            const hasLink = !!item.value?.trim();
 
-            if ((hasName && !hasLink) || (!hasName && hasLink) || (hasLink && !isValidFormat)) {
+            if ((hasName && !hasLink) || (!hasName && hasLink)) {
                 return {
                     name: !hasName,
-                    link: !hasLink || !isValidFormat,
-                    isInvalidFormat: hasLink && !isValidFormat
+                    value: !hasLink
                 };
             }
             return null;
@@ -183,7 +181,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
             if (res.status === 200) {
 
                 const projectId = res?.data?.data?.id || project.id;
-                
+
                 if (deletedIds.length > 0) {
                     const deletePromises = deletedIds.map(docId => axiosAPI.delete(`project-documents/${docId}/`));
                     await Promise.all(deletePromises);
@@ -196,7 +194,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                         const docData = {
                             project: projectId,
                             name: item.name || `Hujjat ${index + 1}`,
-                            url: item.link
+                            value: item.value
                         };
 
                         if (docId) {
@@ -255,7 +253,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
-    
+
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
     bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-soft)]
@@ -506,16 +504,16 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             </ConfigProvider>
 
                             <div className="flex flex-col gap-3">
+                                <label className={labelCls + "mb-0!"}>Loyiha hujjatlari</label>
                                 {form.links?.map((item, index) => {
-                                    const isLast = index === form.links.length - 1;
+                                    console.log(item)
                                     return (
                                         <div key={index} className="flex flex-col gap-1.5">
-                                            <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
                                             <div className="flex items-start gap-3">
                                                 <div className="flex-1">
                                                     <input
                                                         className={inputCls(errors.links?.[index]?.name)}
-                                                        placeholder="Hujjat nomini kiriting"
+                                                        placeholder="Nomini kiriting"
                                                         value={item.name || ''}
                                                         onChange={e => {
                                                             const newLinks = [...form.links];
@@ -528,12 +526,12 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                 <div className="flex-1">
                                                     <div className="relative">
                                                         <input
-                                                            className={inputCls(errors.links?.[index]?.link) + (form.links.length > 1 ? " pr-10" : "")}
-                                                            placeholder="Hujjat havolasi"
-                                                            value={item.link || ''}
+                                                            className={inputCls(errors.links?.[index]?.value) + (form.links.length > 1 ? " pr-10" : "")}
+                                                            placeholder="Havolasi"
+                                                            value={item.value || ''}
                                                             onChange={e => {
                                                                 const newLinks = [...form.links];
-                                                                newLinks[index] = { ...newLinks[index], link: e.target.value };
+                                                                newLinks[index] = { ...newLinks[index], value: e.target.value };
                                                                 set('links', newLinks);
                                                             }}
                                                         />
@@ -553,27 +551,24 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                             </button>
                                                         }
                                                     </div>
-                                                    {errors.links?.[index]?.link && (
+                                                    {errors.links?.[index]?.value && (
                                                         <p className="text-red-500 text-[10px] mt-1">
-                                                            {errors.links[index].isInvalidFormat ? "* Havola https:// bilan boshlanishi kerak" : "* Majburiy"}
+                                                            {errors.links?.[index]?.value && "* Majburiy"}
                                                         </p>
                                                     )}
                                                 </div>
-                                                {isLast && (
-                                                <div className="w-[42px] shrink-0">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => set('links', [...form.links, { name: '', link: '' }])}
-                                                        className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] bg-white flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
-                                                    >
-                                                        <FiPlus size={20} />
-                                                    </button>
-                                                </div>
-                                            )}
                                             </div>
                                         </div>
                                     )
                                 })}
+                                <button
+                                    type="button"
+                                    onClick={() => set('links', [...form.links, { name: '', value: '' }])}
+                                    className="h-[42px] w-full rounded-xl border text-[13px] border-[#E2E6F2] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1)] flex items-center justify-center gap-2 text-[var(--text-sub)] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+                                >
+                                    <FiPlus size={16} className="text-[var(--icon-sub)]" />
+                                    Hujjat qo'shish
+                                </button>
                             </div>
                         </div>
                     )}
