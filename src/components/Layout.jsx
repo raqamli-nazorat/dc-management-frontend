@@ -9,8 +9,6 @@ import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
-import { onMessage } from 'firebase/messaging'
-import { messaging } from '../firebase'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -50,10 +48,10 @@ function formatNotifTime(dateStr) {
 
 function mapApiNotification(item) {
   return {
-    id: item.id,
+    id: item?.user_id,
     date: formatNotifDate(item.created_at),
     title: item.title || 'Bildirishnoma',
-    sub: item.message || '',
+    sub: item.message || item.sub || '',
     time: formatNotifTime(item.created_at),
     read: !!item.is_read,
     urgent: item.type === 'alert',
@@ -262,6 +260,7 @@ export default function Layout() {
   const downloadRef = useRef(null)
   const wsRef = useRef(null)
   const reconnectTimerRef = useRef(null)
+  const shownNotifIdsRef = useRef(new Set())
   const unreadCount = notifs.filter(n => !n.read).length
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
@@ -414,6 +413,10 @@ export default function Layout() {
       const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
       const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
 
+      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
+        wsRef.current.close()
+      }
+
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
 
@@ -425,7 +428,9 @@ export default function Layout() {
               ? JSON.parse(raw.data.payload)
               : raw?.data?.payload || raw;
 
-          const mapped = mapApiNotification(payload);
+          console.log(payload + "salom", raw);
+
+          const mapped = mapApiNotification(raw);
           if (!mapped.id) return;
 
           // --- Tizimli bildirishnomani chiqarish ---
@@ -469,42 +474,6 @@ export default function Layout() {
     };
   }, [fetchNotifications, connectNotificationsWs]);
 
-  useEffect(async () => {
-    const { data } = await axiosAPI.post('/notifications/tickets/')
-    const ticket = data?.data?.ticket
-    if (!ticket) return
-
-    const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin
-    const baseUrl = new URL(apiBase, window.location.origin)
-    const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
-
-    // WebSocket ulanishi
-    const socket = new WebSocket(wsUrl);
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      // WebSocket orqali kelgan xabarni DOIM tizimli bildirishnoma qilib chiqaramiz
-      // Chunki foydalanuvchi saytda bo'lsa, WebSocket eng tezkor yo'l
-      showSystemNotification(data.message);
-
-      // State-ni yangilash (qo'ng'iroqcha belgisi uchun)
-      setNotifs(prev => [data.message, ...prev]);
-    };
-
-    // Firebase Foreground Messaging (Sayt ochiq turganda FCM dan keladigan xabar)
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("FCM dan xabar keldi, lekin biz uni chiqarmaymiz, chunki WebSocket bor");
-      // Bu yerda hech narsa qilmaymiz yoki faqat state-ni yangilaymiz
-      // Agar xabar WebSocketdan kelmay qolsa, ehtiyot shart state-ni yangilash mumkin
-    });
-
-    return () => {
-      socket.close();
-      unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -515,16 +484,6 @@ export default function Layout() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  useEffect(() => {
-    fetchNotifications()
-    connectNotificationsWs()
-
-    return () => {
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
-      if (wsRef.current) wsRef.current.close()
-    }
-  }, [fetchNotifications, connectNotificationsWs])
 
   // navbarExtra mavjud bo'lsa sidebar collapsed holda ko'rsatiladi (kanban mode)
   const isKanban = !!navbarExtra

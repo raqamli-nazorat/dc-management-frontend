@@ -241,7 +241,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* -- AddMeetingModal -- */
-function AddMeetingModal({ onClose, projects }) {
+function AddMeetingModal({ onClose, projects, loadMeetings }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [projectMembers, setProjectMembers] = useState([])
@@ -329,7 +329,7 @@ function AddMeetingModal({ onClose, projects }) {
 
       const res = await axiosAPI.post('/meetings/', body)
       toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
-      loadMeetings?.()
+      loadMeetings()
       onClose()
     } catch (err) {
       const errData = err?.response?.data
