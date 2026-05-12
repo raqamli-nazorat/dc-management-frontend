@@ -597,7 +597,7 @@ function AttendanceItem({ attendance }) {
       </div>
 
       {!attendance.is_attended && (
-        <div 
+        <div
           className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
         >
           <div className="overflow-hidden">
@@ -1478,6 +1478,8 @@ export default function MeetingsPage() {
   const [attendanceMeetingId, setAttendanceMeetingId] = useState(null)
   const scrollRef = useRef(null)
 
+  const [projects, setProjects] = useState([])
+
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
     const p = { page: pg, page_size: 20 }
     if (q) p.search = q
@@ -1488,6 +1490,17 @@ export default function MeetingsPage() {
     if (f.dateTo) p.start_date_lte = f.dateTo
     return p
   }, [filters, search])
+
+  const getProjects = async () => {
+    try {
+      const { data } = await axiosAPI.get("/project-shorts/")
+
+      setProjects(data?.data.results)
+    } catch (error) {
+      console.error(error);
+      toast.error(error.results.data.error.errMsg || "Xatolik yuz berdi")
+    }
+  }
 
   const loadMeetings = useCallback(async (f = filters, q = search, pg = 1) => {
     if (pg === 1) setLoading(true)
@@ -1508,7 +1521,7 @@ export default function MeetingsPage() {
     }
   }, [buildParams])
 
-  useEffect(() => { loadMeetings() }, [])
+  useEffect(() => { loadMeetings(); getProjects() }, [])
 
   /* infinite scroll */
   useEffect(() => {
@@ -1656,13 +1669,13 @@ export default function MeetingsPage() {
                               navigator.clipboard.writeText(m.uid).then(() => {
                                 setCopiedUid(m.id)
                                 setTimeout(() => setCopiedUid(null), 2000)
-                              }).catch(() => {})
+                              }).catch(() => { })
                             }}
                             className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer text-[var(--text-soft)] dark:text-[var(--text-sub)]"
                           >
                             {copiedUid === m.id
-                              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                              : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z"/></svg>
+                              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                              : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z" /></svg>
                             }
                           </button>
                         )}
