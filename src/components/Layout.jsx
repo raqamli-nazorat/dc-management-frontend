@@ -9,6 +9,8 @@ import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
+import { onMessage } from 'firebase/messaging'
+import { messaging } from '../firebase'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -73,6 +75,17 @@ function groupByDate(notifs) {
   })
 }
 
+const showSystemNotification = (notif) => {
+  if (!("Notification" in window)) return;
+
+  if (Notification.permission === "granted") {
+    new Notification(notif.title || "Yangi xabar", {
+      body: notif.sub || notif.message || "Sizga yangi bildirishnoma keldi",
+      icon: "/imgs/Logo.png", // Loyihangiz logotipi
+    });
+  }
+};
+
 function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
   const grouped = groupByDate(notifs)
 
@@ -109,7 +122,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
           <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
-         {/* 
+          {/* 
           <button
             onClick={markAllRead}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
@@ -406,24 +419,28 @@ export default function Layout() {
 
       ws.onmessage = (event) => {
         try {
-          const raw = JSON.parse(event.data)
+          const raw = JSON.parse(event.data);
           const payload =
             typeof raw?.data?.payload === 'string'
               ? JSON.parse(raw.data.payload)
-              : raw?.data?.payload || raw
-          const mapped = mapApiNotification(payload)
-          if (!mapped.id) return
+              : raw?.data?.payload || raw;
+
+          const mapped = mapApiNotification(payload);
+          if (!mapped.id) return;
+
+          // --- Tizimli bildirishnomani chiqarish ---
+          showSystemNotification(mapped);
 
           setNotifs(prev => {
             if (prev.some(n => n.id === mapped.id)) {
-              return prev.map(n => (n.id === mapped.id ? mapped : n))
+              return prev.map(n => (n.id === mapped.id ? mapped : n));
             }
-            return [mapped, ...prev]
-          })
-        } catch {
-          // noto'g'ri payloadlarni e'tiborsiz qoldiramiz
+            return [mapped, ...prev];
+          });
+        } catch (err) {
+          console.error("Xabar qayta ishlashda xato:", err);
         }
-      }
+      };
 
       ws.onclose = () => {
         reconnectTimerRef.current = setTimeout(() => {
@@ -436,6 +453,58 @@ export default function Layout() {
       }, 6000)
     }
   }, [])
+
+
+  useEffect(() => {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
+
+    fetchNotifications();
+    connectNotificationsWs();
+
+    return () => {
+      if (wsRef.current) wsRef.current.close();
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+    };
+  }, [fetchNotifications, connectNotificationsWs]);
+
+  useEffect(async () => {
+    const { data } = await axiosAPI.post('/notifications/tickets/')
+    const ticket = data?.data?.ticket
+    if (!ticket) return
+
+    const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin
+    const baseUrl = new URL(apiBase, window.location.origin)
+    const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
+    const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
+
+    // WebSocket ulanishi
+    const socket = new WebSocket(wsUrl);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // WebSocket orqali kelgan xabarni DOIM tizimli bildirishnoma qilib chiqaramiz
+      // Chunki foydalanuvchi saytda bo'lsa, WebSocket eng tezkor yo'l
+      showSystemNotification(data.message);
+
+      // State-ni yangilash (qo'ng'iroqcha belgisi uchun)
+      setNotifs(prev => [data.message, ...prev]);
+    };
+
+    // Firebase Foreground Messaging (Sayt ochiq turganda FCM dan keladigan xabar)
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("FCM dan xabar keldi, lekin biz uni chiqarmaymiz, chunki WebSocket bor");
+      // Bu yerda hech narsa qilmaymiz yoki faqat state-ni yangilaymiz
+      // Agar xabar WebSocketdan kelmay qolsa, ehtiyot shart state-ni yangilash mumkin
+    });
+
+    return () => {
+      socket.close();
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -601,10 +670,10 @@ export default function Layout() {
       {activeAttendanceMeetingId && (
         <>
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAttendanceMeetingId(null)} />
-          <MeetingAttendanceModal 
+          <MeetingAttendanceModal
             meetingId={activeAttendanceMeetingId}
             closeMeetingOnSave
-            onClose={() => setActiveAttendanceMeetingId(null)} 
+            onClose={() => setActiveAttendanceMeetingId(null)}
           />
         </>
       )}
@@ -612,11 +681,11 @@ export default function Layout() {
       {activeAbsence && (
         <>
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveAbsence(null)} />
-          <MeetingAbsenceModal 
+          <MeetingAbsenceModal
             attendanceId={activeAbsence.attendanceId}
             meetingTitle={activeAbsence.meetingTitle}
             meetingDate={activeAbsence.meetingDate}
-            onClose={() => setActiveAbsence(null)} 
+            onClose={() => setActiveAbsence(null)}
           />
         </>
       )}
