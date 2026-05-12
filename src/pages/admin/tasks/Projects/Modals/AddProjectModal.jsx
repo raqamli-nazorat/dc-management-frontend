@@ -36,7 +36,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
   const [form, setForm] = useState({
     title: '', prefix: '', status: 'planning', description: '', manager: null,
     project_price: '', penalty_percentage: '', employees: [], testers: [],
-    deadline: '', time: '', is_active: true, links: [{ name: '', link: '' }]
+    deadline: '', time: '', is_active: true, links: [{ name: '', value: '' }]
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -96,14 +96,12 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
     const linkErrors = form.links.map(item => {
       const hasName = !!item.name?.trim();
-      const hasLink = !!item.link?.trim();
-      const isValidFormat = hasLink && item.link.startsWith('https://');
+      const hasLink = !!item.value?.trim();
 
-      if ((hasName && !hasLink) || (!hasName && hasLink) || (hasLink && !isValidFormat)) {
+      if ((hasName && !hasLink) || (!hasName && hasLink)) {
         return {
           name: !hasName,
-          link: !hasLink || !isValidFormat,
-          isInvalidFormat: hasLink && !isValidFormat
+          value: !hasLink
         };
       }
       return null;
@@ -138,15 +136,15 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       const res = await axiosAPI.post('/projects/', body)
 
       const id = res?.data?.data?.id
-      
+
       if (id) {
         await Promise.all(
-          form.links.filter(item => item.name.trim() || item.link.trim()).map(async (item, index) => {
-            await axiosAPI.post(`project-documents/`, { project: id, name: item.name || `Hujjat ${index + 1}`, url: item.link })
+          form.links.filter(item => item.name.trim() || item.value.trim()).map(async (item, index) => {
+            await axiosAPI.post(`project-documents/`, { project: id, name: item.name || `Hujjat ${index + 1}`, value: item.value })
           })
         )
       }
-      
+
       if (refreshData) refreshData()
 
       toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
@@ -415,16 +413,15 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
             </ConfigProvider>
 
             <div className="flex flex-col gap-3">
+              <label className={labelCls + "mb-0!"}>Loyiha hujjatlari</label>
               {form.links?.map((item, index) => {
-                const isLast = index === form.links.length - 1;
                 return (
                   <div key={index} className="flex flex-col gap-1.5">
-                    <label className={labelCls}>{index + 1}. Hujjat ma'lumotlari</label>
                     <div className="flex items-start gap-3">
                       <div className="flex-1">
                         <input
                           className={inputCls(errors.links?.[index]?.name)}
-                          placeholder="Hujjat nomini kiriting"
+                          placeholder="Nomini kiriting"
                           value={item.name || ''}
                           onChange={e => {
                             const newLinks = [...form.links];
@@ -437,12 +434,12 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                       <div className="flex-1">
                         <div className="relative">
                           <input
-                            className={inputCls(errors.links?.[index]?.link) + (form.links.length > 1 ? " pr-10" : "")}
-                            placeholder="Hujjat havolasi"
-                            value={item.link || ''}
+                            className={inputCls(errors.links?.[index]?.value) + (form.links.length > 1 ? " pr-10" : "")}
+                            placeholder="Havolasi"
+                            value={item.value || ''}
                             onChange={e => {
                               const newLinks = [...form.links];
-                              newLinks[index] = { ...newLinks[index], link: e.target.value };
+                              newLinks[index] = { ...newLinks[index], value: e.target.value };
                               set('links', newLinks);
                             }}
                           />
@@ -456,27 +453,24 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
                             </button>
                           }
                         </div>
-                        {errors.links?.[index]?.link && (
+                        {errors.links?.[index]?.value && (
                           <p className="text-red-500 text-[10px] mt-1">
-                            {errors.links[index].isInvalidFormat ? "* Havola https:// bilan boshlanishi kerak" : "* Majburiy"}
+                            {errors.links?.[index]?.value && "* Majburiy"}
                           </p>
                         )}
                       </div>
-                      {isLast && (
-                        <div className="w-[42px] shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => set('links', [...form.links, { name: '', link: '' }])}
-                            className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
-                          >
-                            <FiPlus size={20} />
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )
               })}
+              <button
+                type="button"
+                onClick={() => set('links', [...form.links, { name: '', value: '' }])}
+                className="h-[42px] w-full rounded-xl border text-[13px] border-[#E2E6F2] dark:border-[var(--stroke-soft)] bg-[var(--bg-elevation-1)] flex items-center justify-center gap-2 text-[var(--text-sub)] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[var(--bg-elevation-1)]"
+              >
+                <FiPlus size={16} className="text-[var(--icon-sub)]" />
+                Hujjat qo'shish
+              </button>
             </div>
           </div>
 

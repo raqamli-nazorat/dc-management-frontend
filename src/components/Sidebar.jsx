@@ -1,4 +1,4 @@
-﻿import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MdExpandMore, MdExpandLess } from 'react-icons/md'
 import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
@@ -403,13 +403,12 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                   : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
               ].join(' ')}
             >
-              {({ isActive }) => (
-                <>
-                  <img src="/imgs/dashboard-square-03.svg" alt=""
-                    className={`w-4 h-4 shrink-0 brightness-0 ${isActive || location.pathname.includes('analytics') ? 'dark:invert dark:opacity-100' : 'dark:invert dark:opacity-40'}`} />
-                  <span>Analitika</span>
-                </>
-              )}
+              <img
+                alt=""
+                src="/imgs/dashboard-square-03.svg"
+                className={`w-4 h-4 shrink-0 dark:brightness-0 dark:invert ${!(location.pathname.includes('dashboard') || location.pathname.includes('analytics')) ? 'opacity-60' : ''}`}
+              />
+              <span>Analitika</span>
             </NavLink>
           )
         )}
@@ -552,7 +551,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             </h6>
             <div className='w-full h-[6px] bg-[#dbdbd9] rounded-full overflow-hidden'>
               <div
-                style={{ width: `${userSts?.overall_efficiency || 0}%`, background: userSts?.overall_efficiency < 30 ? "#ff4053" : userSts?.overall_efficiency < 75 ? "#fca400" : userSts?.overall_efficiency > 75 ? "#00b253" : "#adaca8" }}
+                style={{ width: `${userSts?.overall_efficiency || 0}%`, background: userSts?.overall_efficiency <= 30 ? "#ff4053" : userSts?.overall_efficiency <= 75 ? "#fca400" : userSts?.overall_efficiency >= 75 ? "#00b253" : "#adaca8" }}
                 className={`h-full rounded-full transition-all duration-1000 ease-in-out`}></div>
             </div>
           </div>
