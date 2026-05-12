@@ -1,12 +1,30 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { FaXmark, FaArrowLeft } from 'react-icons/fa6'
 import { SelectField } from '../components/SelectField'
 import { LoyihaDropdown } from '../components/LoyihaDropdown'
 import { DateTimeRangeRow } from '../components/DateBox'
 import { TYPE_OPTIONS, STATUS_OPTIONS, EMPTY_FILTER, labelCls } from '../constants'
+import { axiosAPI } from '../../../../../service/axiosAPI'
 
-export default function FilterModal({ onClose, onApply, initial, categories = [], projects = [] }) {
+export default function FilterModal({ onClose, onApply, initial }) {
   const [f, setF] = useState({ ...EMPTY_FILTER, ...initial })
+  const [categories, setCategories] = useState([])
+  const [projects, setProjects] = useState([])
+
+  useEffect(() => {
+    axiosAPI.get('/expense-category/')
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        setCategories(Array.isArray(d) ? d : (d.results ?? []))
+      })
+      .catch(() => {})
+    axiosAPI.get('/projects/')
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        setProjects(Array.isArray(d) ? d : (d.results ?? []))
+      })
+      .catch(() => {})
+  }, [])
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }))
 
   const categoryOptions = categories.map(c => ({ label: c.title, value: String(c.id) }))

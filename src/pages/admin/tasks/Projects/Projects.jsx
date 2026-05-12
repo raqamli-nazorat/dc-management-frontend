@@ -161,7 +161,6 @@ const ProjectsPage = () => {
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
-  const [users, setUsers] = useState([])
   const [copiedUid, setCopiedUid] = useState(null)
   const scrollRef = useRef(null)
 
@@ -198,18 +197,6 @@ const ProjectsPage = () => {
       setLoadingMore(false)
     }
   }, [buildParams])
-
-  // Users yuklash (menejer va xodim tanlash uchun)
-  useEffect(() => {
-    if (user.active_role !== "admin" && user.active_role !== "superadmin") return;
-    axiosAPI.get('users/')
-      .then(res => {
-        const payload = res.data?.data ?? res.data
-        const list = Array.isArray(payload) ? payload : (payload.results ?? [])
-        setUsers(list)
-      })
-      .catch(() => { })
-  }, [user])
 
   useEffect(() => {
     loadProjects()
@@ -515,7 +502,6 @@ const ProjectsPage = () => {
           initial={filters}
           onClose={() => setShowFilter(false)}
           onApply={handleApplyFilter}
-          users={users}
           empty_filter={EMPTY_FILTER}
           useDropdown={useDropdown}
         />
@@ -524,7 +510,6 @@ const ProjectsPage = () => {
       {showAdd && (
         <AddProjectModal
           onClose={() => setShowAdd(false)}
-          users={users}
           refreshData={loadProjects}
           useDropdown={useDropdown}
           STATUS_API={STATUS_LABEL}
@@ -536,7 +521,6 @@ const ProjectsPage = () => {
           id={editProject}
           onClose={() => setEditProject(null)}
           refreshData={loadProjects}
-          users={users}
           useDropdown={useDropdown}
           STATUS_LABEL={STATUS_LABEL}
         />

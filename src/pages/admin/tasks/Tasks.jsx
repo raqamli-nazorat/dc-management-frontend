@@ -499,6 +499,8 @@ export default function TasksPage() {
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
   const [editTask, setEditTask] = useState(null)
+  const [editTaskDeadlineOnly, setEditTaskDeadlineOnly] = useState(false)
+  const [overdueStatusPending, setOverdueStatusPending] = useState(null)
   const [taskLoading, setTaskLoading] = useState(false)
   const [cards, setCards] = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
@@ -655,6 +657,7 @@ export default function TasksPage() {
       const { data } = await axiosAPI.get(`task-attachments/?task=${id}`)
 
       setEditTask({ ...task, attachments: data?.data?.results })
+      setEditTaskDeadlineOnly(task.status === 'overdue' && canEdit)
     } catch (err) {
       const status = err?.response?.status
       if (status === 404) {
@@ -743,6 +746,13 @@ export default function TasksPage() {
     // rejected ga tushganda — sabab so'rash
     if (newStatus === 'rejected') {
       setRejectionPending({ taskId, draggableId, sourceColId: srcStatus })
+      return
+    }
+
+    // overdue → in_progress: admin/manager vazifa muddatini yangilashi kerak
+    if (srcStatus === 'overdue' && newStatus === 'in_progress' && canEdit) {
+      setOverdueStatusPending({ taskId, newStatus: 'in_progress' })
+      loadTaskDetail(taskId)
       return
     }
 
@@ -900,13 +910,18 @@ export default function TasksPage() {
           <EditTaskModal
             task={editTask}
             canEdit={canEdit}
-            onClose={() => setEditTask(null)}
+            deadlineOnly={editTaskDeadlineOnly}
+            onClose={() => { setEditTask(null); setEditTaskDeadlineOnly(false); setOverdueStatusPending(null) }}
             onSave={async (id, body) => {
               if (!canEdit) return
               await handleEdit(id, body)
+              if (overdueStatusPending?.taskId === id) {
+                await axiosAPI.patch(`/tasks/${id}/change-status/`, { status: overdueStatusPending.newStatus })
+                setOverdueStatusPending(null)
+              }
               loadKanbanTasks(filters, search)
             }}
-            onDelete={canEdit ? async () => {
+            onDelete={canEdit && !editTaskDeadlineOnly ? async () => {
               await handleDelete(editTask.id)
               setEditTask(null)
             } : undefined}
@@ -1118,13 +1133,14 @@ export default function TasksPage() {
         <EditTaskModal
           task={editTask}
           canEdit={canEdit}
-          onClose={() => setEditTask(null)}
+          deadlineOnly={editTaskDeadlineOnly}
+          onClose={() => { setEditTask(null); setEditTaskDeadlineOnly(false) }}
           onSave={async (id, body) => {
             if (!canEdit) return
             await handleEdit(id, body)
             loadTasks(filters, search, 1)
           }}
-          onDelete={canEdit ? async () => {
+          onDelete={canEdit && !editTaskDeadlineOnly ? async () => {
             await handleDelete(editTask.id)
             setEditTask(null)
           } : undefined}

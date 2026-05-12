@@ -140,8 +140,6 @@ export default function PaymentsPage() {
   const canSelect = !isAuditor && (isAdmin || isManager || isEmployee)
 
   const [payments, setPayments] = useState([])
-  const [categories, setCategories] = useState([])
-  const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
@@ -192,8 +190,6 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     loadPayments()
-    apiGetCategories().then(setCategories).catch(console.error)
-    apiGetProjects().then(setProjects).catch(console.error)
   }, [])
 
   useEffect(() => {
@@ -374,12 +370,11 @@ export default function PaymentsPage() {
 
       {/* Modals */}
       {showFilter && (
-        <FilterModal initial={filters} categories={categories} projects={projects}
+        <FilterModal initial={filters}
           onClose={() => setShowFilter(false)} onApply={handleApplyFilter} />
       )}
       {canSendRequest && showSorov && (
-        <SorovModal 
-        categories={categories} projects={projects}
+        <SorovModal
           onClose={() => setShowSorov(false)} onSubmit={handleSubmitSorov} />
       )}
       {detailPayment && (
