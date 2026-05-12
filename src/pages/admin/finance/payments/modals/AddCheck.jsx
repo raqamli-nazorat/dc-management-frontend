@@ -7,7 +7,7 @@ import { useRef } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 
-const AddCheck = ({ onClose, paymentId, projectId, onConfirm }) => {
+const AddCheck = ({ onClose, paymentId }) => {
     const { isDark } = useTheme()
     const [existingReceipts, setExistingReceipts] = useState([])
     const [newImages, setNewImages] = useState([])

@@ -9,6 +9,7 @@ import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import { useAuth } from '../context/AuthContext'
+import { requestForToken } from '../firebase'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -84,7 +85,7 @@ const showSystemNotification = (notif) => {
   }
 };
 
-function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
+function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }) {
   const grouped = groupByDate(notifs)
 
   const markRead = async (id) => {
@@ -140,7 +141,10 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick }) {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5">
+      <div
+        className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5"
+        onScroll={onScroll}
+      >
         {grouped.map(([date, items]) => (
           <div key={date}>
             <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[var(--text-soft)] mb-3 px-2">{date}</p>
@@ -268,6 +272,9 @@ export default function Layout() {
   const [activeExcuseAttendanceId, setActiveExcuseAttendanceId] = useState(null)
   const [activeSystemNotif, setActiveSystemNotif] = useState(null) // { title, message, date }
 
+  const [notifCount, setNotifCount] = useState(NOTIFS_DATA.length)
+  const [notifNextUrl, setNotifNextUrl] = useState(null)
+
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -394,6 +401,8 @@ export default function Layout() {
         : Array.isArray(data?.data?.results)
           ? data.data.results
           : []
+      setNotifCount(data?.data?.count)
+      setNotifNextUrl(data?.data?.next)
       // Yangilari tepada turishi uchun created_at bo'yicha teskari tartibda saralash
       const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       setNotifs(sorted.map(mapApiNotification))
@@ -402,62 +411,109 @@ export default function Layout() {
     }
   }, [])
 
+  const loadMoreNotifications = async () => {
+    if (!notifNextUrl) return
+
+    try {
+      const { data } = await axiosAPI.get(notifNextUrl)
+      const list = Array.isArray(data?.results)
+        ? data.results
+        : Array.isArray(data?.data?.results)
+          ? data.data.results
+          : []
+      setNotifCount(data?.data?.count)
+      setNotifNextUrl(data?.data?.next)
+      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      setNotifs([...notifs, ...sorted.map(mapApiNotification)])
+    } catch {
+      // static fallback saqlanadi
+    }
+  };
+
+  const handleScrollNotif = (e) => {
+    if (!notifNextUrl) return;
+
+    if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight - 10) {
+      loadMoreNotifications();
+    }
+  }
+
   const connectNotificationsWs = useCallback(async () => {
     try {
-      const { data } = await axiosAPI.post('/notifications/tickets/')
-      const ticket = data?.data?.ticket
-      if (!ticket) return
+      const { data } = await axiosAPI.post('/notifications/tickets/');
+      const ticket = data?.data?.ticket;
+      if (!ticket) return;
 
-      const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin
-      const baseUrl = new URL(apiBase, window.location.origin)
-      const wsProtocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`
+      const apiBase = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const baseUrl = new URL(apiBase, window.location.origin);
+      const wsProtocol = baseUrl?.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${baseUrl.host}/ws/notifications/?ticket=${encodeURIComponent(ticket)}`;
 
       if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
-        wsRef.current.close()
+        wsRef.current.close();
       }
 
-      const ws = new WebSocket(wsUrl)
-      wsRef.current = ws
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
 
       ws.onmessage = (event) => {
         try {
           const raw = JSON.parse(event.data);
-          const payload =
-            typeof raw?.data?.payload === 'string'
-              ? JSON.parse(raw.data.payload)
-              : raw?.data?.payload || raw;
+          // Backend formatiga moslash:
+          const realData = raw.data?.payload ?
+            (typeof raw.data.payload === 'string' ? JSON.parse(raw.data.payload) : raw.data.payload)
+            : raw;
 
-          console.log(payload + "salom", raw);
-
-          const mapped = mapApiNotification(raw);
+          const mapped = mapApiNotification(realData);
           if (!mapped.id) return;
 
-          // --- Tizimli bildirishnomani chiqarish ---
+          // DUBILKATNI TEKSHIRISH
+          if (shownNotifIdsRef.current.has(mapped.id)) return;
+          shownNotifIdsRef.current.add(mapped.id);
+
           showSystemNotification(mapped);
 
+          // State-ni yangilash
           setNotifs(prev => {
-            if (prev.some(n => n.id === mapped.id)) {
-              return prev.map(n => (n.id === mapped.id ? mapped : n));
-            }
+            if (prev.some(n => n.id === mapped.id)) return prev;
             return [mapped, ...prev];
           });
         } catch (err) {
-          console.error("Xabar qayta ishlashda xato:", err);
+          console.error("WS xabar xatosi:", err);
         }
       };
 
       ws.onclose = () => {
-        reconnectTimerRef.current = setTimeout(() => {
-          connectNotificationsWs()
-        }, 4000)
-      }
-    } catch {
-      reconnectTimerRef.current = setTimeout(() => {
-        connectNotificationsWs()
-      }, 6000)
+        reconnectTimerRef.current = setTimeout(connectNotificationsWs, 5000);
+      };
+    } catch (error) {
+      reconnectTimerRef.current = setTimeout(connectNotificationsWs, 10000);
     }
-  }, [])
+  }, []);
+
+  // Firebase va Bildirishnoma ruxsati
+  useEffect(() => {
+    const initNotifications = async () => {
+      if ("Notification" in window) {
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          // Firebase tokenni olish funksiyasini shu yerda chaqiring (requestForToken)
+          const token = await requestForToken();
+
+        }
+      }
+    };
+
+    initNotifications();
+    fetchNotifications();
+    connectNotificationsWs();
+
+    return () => {
+      if (wsRef.current) wsRef.current.close();
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+    };
+  }, [fetchNotifications, connectNotificationsWs]);
 
 
   useEffect(() => {
@@ -604,9 +660,9 @@ export default function Layout() {
                   className="w-[18px] h-[18px] brightness-0 [filter:brightness(0)_saturate(100%)_invert(10%)_sepia(10%)_saturate(1000%)_hue-rotate(190deg)_brightness(90%)] dark:brightness-0 dark:invert"
                 />
               </button>
-              {unreadCount > 0 && (
+              {notifCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--error-strong)] border-2 border-white dark:border-[#191A1A] text-[10px] leading-none font-bold text-white flex items-center justify-center">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {notifCount > 99 ? '99+' : notifCount}
                 </span>
               )}
             </div>
@@ -622,7 +678,13 @@ export default function Layout() {
       {notifOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setNotifOpen(false)} />
-          <NotificationPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} onItemClick={handleNotifClick} />
+          <NotificationPanel
+            notifs={notifs}
+            setNotifs={setNotifs}
+            onClose={() => setNotifOpen(false)}
+            onItemClick={handleNotifClick}
+            onScroll={handleScrollNotif}
+          />
         </>
       )}
 
