@@ -34,12 +34,12 @@ function toIsoWithOffset(date, time, isEnd = false) {
 function buildParams(filters, search, forceMyRequests) {
   const p = {}
   if (search) p.search = search
-  if (filters.type)             p.type             = filters.type
-  if (filters.status)           p.status           = filters.status
+  if (filters.type) p.type = filters.type
+  if (filters.status) p.status = filters.status
   if (filters.expense_category) p.expense_category = filters.expense_category
-  if (filters.project)          p.project          = filters.project
-  if (filters.amount__gte)      p.amount__gte      = filters.amount__gte
-  if (filters.amount__lte)      p.amount__lte      = filters.amount__lte
+  if (filters.project) p.project = filters.project
+  if (filters.amount__gte) p.amount__gte = filters.amount__gte
+  if (filters.amount__lte) p.amount__lte = filters.amount__lte
 
   const cGte = toIsoWithOffset(filters.created_at__date__gte, filters.created_at__time__gte, false)
   const cLte = toIsoWithOffset(filters.created_at__date__lte, filters.created_at__time__lte, true)
@@ -364,8 +364,8 @@ export default function PaymentsPage() {
         {loadingMore && (
           <div className="py-4 text-center text-sm text-[var(--text-disabled)] dark:text-[var(--text-soft)]">
             <svg className="animate-spin inline w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
             Yuklanmoqda...
           </div>
@@ -378,9 +378,12 @@ export default function PaymentsPage() {
           onClose={() => setShowFilter(false)} onApply={handleApplyFilter} />
       )}
       {canSendRequest && showSorov && (
-        <SorovModal 
-        categories={categories} projects={projects}
-          onClose={() => setShowSorov(false)} onSubmit={handleSubmitSorov} />
+        <SorovModal
+          categories={categories}
+          projects={projects}
+          onClose={() => setShowSorov(false)}
+          onSubmit={handleSubmitSorov}
+        />
       )}
       {detailPayment && (
         <XarajatDetailModal
@@ -401,14 +404,9 @@ export default function PaymentsPage() {
         <AddCheck
           onClose={() => setShowAddCheck(false)}
           paymentId={paymentId}
-          projectId={projectId}
-          onConfirm={(id) => {
-            handlePaid(id)
-            setShowAddCheck(false)
-          }}
         />
       )}
-      
+
     </div>
   )
 }

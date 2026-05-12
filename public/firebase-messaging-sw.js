@@ -11,11 +11,13 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    const notificationTitle = payload.notification.title;
+    console.log("BACKGROUND PAYLOAD:", payload);
+
+    const notificationTitle = payload?.notification?.title || "Yangi bildirishnoma";
+
     const notificationOptions = {
-        body: payload.notification.body,
-        icon: "/Logo.png",
-        silent: false,
+        body: payload?.notification?.body || "",
+        icon: "/imgs/Logo.png",
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);

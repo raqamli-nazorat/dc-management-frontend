@@ -346,7 +346,6 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
           onCancel={() => setShowPaidModal(false)}
           onConfirm={() => {
             setShowPaidModal(false)
-            onPaid(payment.id)
             onClose()
             showCheckModal(payment.id, payment.project)
             onPaid(payment.id)
