@@ -378,7 +378,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         ].join(' ')}
       >
         {/* Analitika */}
-        {['employee', 'xodim', 'manager', 'menager', 'admin', 'superadmin'].includes(routeRole) && (
+        {['employee', 'xodim', 'manager', 'menager', 'admin', 'superadmin', 'accountant', 'hisobchi', 'auditor', 'nazoratchi'].includes(routeRole) && (
           isCollapsed ? (
             (() => {
               const isAnalyticActive = location.pathname.includes('dashboard') || location.pathname.includes('analytics')
