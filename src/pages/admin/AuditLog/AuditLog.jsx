@@ -55,10 +55,163 @@ function buildParams(filters, search) {
 
   const tsGte = toIsoWithOffset(filters.timestamp__date__gte, filters.timestamp__time__gte, false)
   const tsLte = toIsoWithOffset(filters.timestamp__date__lte, filters.timestamp__time__lte, true)
-  if (tsGte) p.timestamp__gte = tsGte
-  if (tsLte) p.timestamp__lte = tsLte
+  if (tsGte) p.created_at__gte = tsGte
+  if (tsLte) p.created_at__lte = tsLte
 
   return p
+}
+
+// ── Format JSON string for display ───────────────────────────
+function formatJson(val) {
+  if (!val || val === 'string') return '—'
+  try {
+    const parsed = typeof val === 'string' ? JSON.parse(val) : val
+    return JSON.stringify(parsed, null, 2)
+  } catch {
+    return val
+  }
+}
+
+// ── Detail Modal ──────────────────────────────────────────────
+function DetailModal({ id, onClose }) {
+  const [detail, setDetail] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    axiosAPI.get(`/auditlog/${id}/`)
+      .then(res => setDetail(res.data?.data ?? res.data))
+      .catch(() => setDetail(null))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  const user = detail?.user_info ?? {}
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+
+      <div className="relative w-full max-w-[740px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] z-10">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 flex items-center gap-3 ">
+          <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+            <FaArrowLeft className="text-[var(--text-strong)] dark:text-[var(--text-strong)]" size={16} />
+          </button>
+          <h2 className="text-[18px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+            Foydalanuvchi va so'rov haqida ma'lumot
+          </h2>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <svg className="animate-spin w-6 h-6 text-[var(--accent-strong)]" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+          </div>
+        ) : !detail ? (
+          <div className="py-12 text-center text-sm text-[var(--text-sub)]">Ma'lumot topilmadi</div>
+        ) : (
+          <div className="px-6 py-5 flex flex-col gap-4">
+
+            {/* Foydalanuvchi */}
+            <div>
+              <label className={labelCls}>Foydalanuvchi</label>
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0" />
+                ) : (
+                  <div className="w-7 h-7 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {user.username?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                )}
+                <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
+                  {user.username ?? '—'}
+                </span>
+              </div>
+            </div>
+
+            {/* Vaqt + IP */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Vaqti</label>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                  <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                    {fmtDate(detail.created_at)}
+                  </span>
+                  <svg className="ml-auto shrink-0 text-[var(--text-soft)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>IP manzili</label>
+                <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                  <span className="text-sm font-mono text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                    {detail.ip_address ?? '—'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Harakat + Jadval + Yozuv */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className={labelCls}>Harakati</label>
+                <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                  <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] capitalize">
+                    {detail.action ?? '—'}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Jadval nomi</label>
+                <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                  <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                    {detail.table_name ?? '—'}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Yozuv raqami</label>
+                <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                  <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                    {detail.record_id ?? '—'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Eski qiymat */}
+            <div>
+              <label className={labelCls}>Eski qiymat</label>
+              <pre className="w-full px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[#F8F9FC] dark:bg-[var(--bg-elevation-2)] text-xs text-[var(--text-strong)] dark:text-[var(--text-strong)] font-mono whitespace-pre-wrap break-all min-h-[72px] max-h-[160px] overflow-y-auto">
+                {formatJson(detail.old_values)}
+              </pre>
+            </div>
+
+            {/* Yangi qiymat */}
+            <div>
+              <label className={labelCls}>Yangi qiymat</label>
+              <pre className="w-full px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[#F8F9FC] dark:bg-[var(--bg-elevation-2)] text-xs text-[var(--text-strong)] dark:text-[var(--text-strong)] font-mono whitespace-pre-wrap break-all min-h-[72px] max-h-[160px] overflow-y-auto">
+                {formatJson(detail.new_values)}
+              </pre>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="px-6 py-4 flex justify-end border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
+          >
+            <FaXmark size={13} /> Yopish
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // ── Action badge ──────────────────────────────────────────────
@@ -283,6 +436,7 @@ export default function AuditLogPage() {
   const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState(EMPTY_FILTER)
   const [showFilter, setShowFilter] = useState(false)
+  const [detailId, setDetailId] = useState(null)
   const scrollRef = useRef(null)
 
   const hasFilter = Object.values(filters).some(v => v)
@@ -421,11 +575,12 @@ export default function AuditLogPage() {
             </thead>
             <tbody>
               {data.map((row, idx) => {
-                const user = row.user_details ?? {}
+                const user = row.user_info ?? {}
                 return (
                   <tr
                     key={row.id}
-                    className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/3 dark:hover:bg-white/3"
+                    onClick={() => setDetailId(row.id)}
+                    className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] last:border-0 hover:bg-black/3 dark:hover:bg-white/3 cursor-pointer"
                   >
                     <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] text-xs font-medium">
                       {idx + 1}
@@ -486,6 +641,13 @@ export default function AuditLogPage() {
           initial={filters}
           onClose={() => setShowFilter(false)}
           onApply={handleApplyFilter}
+        />
+      )}
+
+      {detailId !== null && (
+        <DetailModal
+          id={detailId}
+          onClose={() => setDetailId(null)}
         />
       )}
     </div>
