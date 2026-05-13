@@ -993,7 +993,7 @@ export default function TasksPage() {
             <img
               src="/imgs/taskIconRow.svg"
               alt="row view"
-              className="w-3 h-3 text-[var(--accent-strong)] [filter:invert(27%)_sepia(89%)_saturate(500%)_hue-rotate(210deg)_brightness(90%)] dark:[filter:invert(60%)_sepia(30%)_saturate(400%)_hue-rotate(190deg)_brightness(110%)]"
+              className="w-3 h-3 [filter:brightness(0)_saturate(100%)_invert(9%)_sepia(12%)_saturate(800%)_hue-rotate(195deg)_brightness(95%)] dark:[filter:brightness(0)_invert(1)]"
             />
           </button>
           <button onClick={switchToKanban} className="p-1.5 rounded-lg cursor-pointer">
