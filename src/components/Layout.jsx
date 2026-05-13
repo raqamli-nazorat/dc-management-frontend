@@ -225,7 +225,7 @@ function Breadcrumb() {
     return false
   }
 
-  const hiddenParts = ['edit', 'add', 'new', 'create', 'admin', 'manager']
+  const hiddenParts = ['edit', 'add', 'new', 'create', 'admin', 'manager', 'employee', 'auditor', 'accountant', 'menager', 'xodim', 'nazoratchi', 'hisobchi']
 
   const parts = location.pathname.split('/').filter(part => {
     if (!part) return false
