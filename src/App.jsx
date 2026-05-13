@@ -89,13 +89,13 @@ function App() {
 
               {/* ── AUDITOR ── */}
               <Route path="/auditor" element={<ProtectedRoute allowedRole="auditor"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AnalyticsPage />} />
                 {commonRoutes('auditor')}
               </Route>
 
               {/* ── ACCOUNTANT ── */}
               <Route path="/accountant" element={<ProtectedRoute allowedRole="accountant"><Layout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AnalyticsPage />} />
                 {commonRoutes('accountant')}
               </Route>
 
