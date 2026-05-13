@@ -125,15 +125,13 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, 
           <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirshnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
-          {/* 
           <button
             onClick={markAllRead}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
+            className="px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer
               text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
           >
-            Barchasi o'qildi
+            Barchasi o'qish
           </button>
-          */}
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer 
