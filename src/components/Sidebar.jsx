@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { MdExpandMore, MdExpandLess } from 'react-icons/md'
+import { MdExpandMore, MdExpandLess, MdHistory } from 'react-icons/md'
 import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
@@ -492,6 +492,30 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
         ].join(' ')}
       >
 
+
+        {/* Umumiy tarix */}
+        {isCollapsed ? (
+          <button
+            onClick={() => navigate(`/${urlPrefix}/auditlog`)}
+            title="Umumiy tarix"
+            className={iconBtn(location.pathname.includes('auditlog'))}
+          >
+            <MdHistory size={18} />
+          </button>
+        ) : (
+          <NavLink
+            to={`/${urlPrefix}/auditlog`}
+            className={({ isActive }) => [
+              'flex items-center gap-2.5 px-4 py-3 rounded-lg text-[13px] font-medium cursor-pointer border',
+              isActive
+                ? 'bg-[var(--stroke-sub)] text-[var(--text-strong)] border-[var(--stroke-soft)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-strong)] dark:border-[var(--stroke-sub)]'
+                : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
+            ].join(' ')}
+          >
+            <MdHistory size={18} className="shrink-0" />
+            <span>Umumiy tarix</span>
+          </NavLink>
+        )}
 
         {/* Kundalik reja */}
         {isCollapsed ? (

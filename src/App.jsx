@@ -29,6 +29,7 @@ import TrashPage from './pages/admin/Trash/Trash'
 import ProfilePage from './pages/admin/Profile/Profile'
 import MyTasks from './pages/MyTasks/MyTasks'
 import AnalyticsPage from './pages/admin/Analytics/Analytics'
+import AuditLogPage from './pages/admin/AuditLog/AuditLog'
 import SelectRore from './pages/SelectRore'
 const PH = (title) => <PlaceholderPage title={title} />
 
@@ -55,6 +56,7 @@ const commonRoutes = (prefix) => [
   <Route key="user-detail" path="users/detail/:id" element={<AdminUserDetail />} />,
   <Route key="my_tasks" path="my_tasks" element={<MyTasks />} />,
   <Route key="analytics" path="analytics" element={<AnalyticsPage />} />,
+  <Route key="auditlog" path="auditlog" element={<AuditLogPage />} />,
 ]
 
 function App() {
