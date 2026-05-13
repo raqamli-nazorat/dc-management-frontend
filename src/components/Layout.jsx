@@ -87,7 +87,7 @@ const showSystemNotification = (notif) => {
   }
 };
 
-function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }) {
+function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, onCountRefresh }) {
   const grouped = groupByDate(notifs)
 
   const markRead = async (id) => {
@@ -96,6 +96,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }
     setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     try {
       await axiosAPI.patch(`notifications/${id}/read/`)
+      onCountRefresh?.()
     } catch {
       setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: false } : n))
     }
@@ -106,6 +107,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }
     setNotifs(prev => prev.map(n => ({ ...n, read: true })))
     try {
       await axiosAPI.post('/notifications/read-all/')
+      onCountRefresh?.()
     } catch {
       setNotifs(previous)
     }
@@ -152,54 +154,58 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll }
             <div key={date}>
               <p className="text-xs font-semibold text-[var(--text-soft)] dark:text-[var(--text-soft)] mb-3 px-2">{date}</p>
               <div className="flex flex-col gap-1">
-                {[...items].sort((a, b) => b.time.localeCompare(a.time)).map(n => (
-                  <button
-                    key={new Date() || n?.id}
-                    onClick={() => {
-                      markRead(n.id)
-                      if (onItemClick) onItemClick(n)
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
+                {[...items].sort((a, b) => b.time.localeCompare(a.time)).map((n, i) => {
+                  return (
+
+                    <button
+                      key={i}
+                      onClick={() => {
+                        markRead(n.id)
+                        if (onItemClick) onItemClick(n)
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left  cursor-pointer
                     ${!n.read
-                        ? 'bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)]'
-                        : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'
-                      }`}
-                  >
-                    {/* Avatar */}
-                    <div className="relative shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[var(--text-sub)]">
-                        Y
+                          ? 'bg-[#F4F6FD] dark:bg-[var(--bg-elevation-1)]'
+                          : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'
+                        }`}
+                    >
+
+                      {/* Avatar */}
+                      <div className="relative shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-[var(--stroke-strong)] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center text-sm font-bold text-[var(--text-sub)] dark:text-[var(--text-sub)]">
+                          Y
+                        </div>
+                        {/* Badge */}
+                        {!n.read ? (
+                          <span
+                            className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FF7A45] flex items-center justify-center text-white font-semibold"
+                            style={{ fontSize: 11 }}
+                          >
+                            1
+                          </span>
+                        ) : (
+                          <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--accent-sub)] flex items-center justify-center">
+                            <MdCheck size={10} color="white" />
+                          </span>
+                        )}
                       </div>
-                      {/* Badge */}
-                      {!n.read ? (
-                        <span
-                          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FF7A45] flex items-center justify-center text-white font-semibold"
-                          style={{ fontSize: 11 }}
-                        >
-                          1
-                        </span>
-                      ) : (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--accent-sub)] flex items-center justify-center">
-                          <MdCheck size={10} color="white" />
-                        </span>
-                      )}
-                    </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
-                        {n.title}
-                      </p>
-                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-soft)] flex items-center gap-1 mt-0.5 truncate">
-                        <FaFolder size={10} className="shrink-0" />
-                        {n.sub}
-                      </p>
-                    </div>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm truncate ${!n.read ? 'font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)]'}`}>
+                          {n.title}
+                        </p>
+                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-soft)] flex items-center gap-1 mt-0.5 truncate">
+                          <FaFolder size={10} className="shrink-0" />
+                          {n.sub}
+                        </p>
+                      </div>
 
-                    {/* Time */}
-                    <span className="text-xs text-[var(--text-disabled)] dark:text-[var(--text-soft)] shrink-0">{n.time}</span>
-                  </button>
-                ))}
+                      {/* Time */}
+                      <span className="text-xs text-[var(--text-disabled)] dark:text-[var(--text-soft)] shrink-0">{n.time}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )
@@ -276,7 +282,7 @@ export default function Layout() {
   const [activeExcuseAttendanceId, setActiveExcuseAttendanceId] = useState(null)
   const [activeSystemNotif, setActiveSystemNotif] = useState(null) // { title, message, date }
 
-  const [notifCount, setNotifCount] = useState(NOTIFS_DATA.length)
+  const [notifCount, setNotifCount] = useState(0)
   const [notifNextUrl, setNotifNextUrl] = useState(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -398,6 +404,15 @@ export default function Layout() {
     }
   }
 
+  const fetchNotifCount = async () => {
+    try {
+      const { data } = await axiosAPI.get('/notifications/count/')
+      setNotifCount(data?.data?.unread ?? 0)
+    } catch {
+      // silent
+    }
+  }
+
   const fetchNotifications = async () => {
     try {
       const { data } = await axiosAPI.get('/notifications/')
@@ -406,7 +421,6 @@ export default function Layout() {
         : Array.isArray(data?.data?.results)
           ? data.data.results
           : []
-      setNotifCount(data?.data?.count)
       setNotifNextUrl(data?.data?.next)
       // Yangilari tepada turishi uchun created_at bo'yicha teskari tartibda saralash
       const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -418,8 +432,7 @@ export default function Layout() {
   }
 
   useEffect(() => {
-    fetchNotifications();
-
+    fetchNotifCount();
   }, []);
 
   const loadMoreNotifications = async () => {
@@ -435,7 +448,6 @@ export default function Layout() {
           ? data.data.results
           : [];
 
-      setNotifCount(data?.data?.count);
       setNotifNextUrl(data?.data?.next);
 
       const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -661,7 +673,12 @@ export default function Layout() {
             {/* Notification bell */}
             <div className="relative">
               <button
-                onClick={() => setNotifOpen(o => !o)}
+                onClick={() => {
+                  if (!notifOpen) {
+                    fetchNotifications()
+                  }
+                  setNotifOpen(o => !o)
+                }}
                 className="w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer 
                   bg-[#F1F3F9] hover:bg-[#E8EAF2]
                   dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)]"
@@ -672,6 +689,11 @@ export default function Layout() {
                   className="w-[18px] h-[18px] brightness-0 [filter:brightness(0)_saturate(100%)_invert(10%)_sepia(10%)_saturate(1000%)_hue-rotate(190deg)_brightness(90%)] dark:brightness-0 dark:invert"
                 />
               </button>
+              {
+                console.log(notifCount)
+
+              }
+
               {notifCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--error-strong)] border-2 border-white dark:border-[#191A1A] text-[10px] leading-none font-bold text-white flex items-center justify-center">
                   {notifCount > 99 ? '99+' : notifCount}
@@ -696,6 +718,7 @@ export default function Layout() {
             onClose={() => setNotifOpen(false)}
             onItemClick={handleNotifClick}
             onScroll={handleScrollNotif}
+            onCountRefresh={fetchNotifCount}
           />
         </>
       )}
@@ -752,6 +775,7 @@ export default function Layout() {
             message={activeSystemNotif.message}
             date={activeSystemNotif.date}
             onClose={() => setActiveSystemNotif(null)}
+            onBack={() => { setActiveSystemNotif(null); setNotifOpen(true) }}
           />
         </>
       )}

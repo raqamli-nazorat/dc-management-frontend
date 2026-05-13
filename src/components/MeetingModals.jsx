@@ -549,13 +549,13 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
 }
 
 // Tizim xabari modali — "Parolingizni yangilang" va shunga o'xshash system notificationlar
-export function SystemNotifModal({ title, message, date, onClose }) {
+export function SystemNotifModal({ title, message, date, onClose, onBack }) {
   return (
     <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border-l border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] animate-in slide-in-from-right duration-300">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-6 shrink-0">
         <button
-          onClick={onClose}
+          onClick={onBack || onClose}
           className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-elevation-2)] dark:bg-[var(--bg-elevation-2)] text-[var(--text-strong)] dark:text-[var(--text-strong)] cursor-pointer hover:bg-[var(--stroke-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
         >
           <FaArrowLeft size={14} />
