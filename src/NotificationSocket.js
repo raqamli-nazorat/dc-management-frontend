@@ -55,7 +55,7 @@ class NotificationSocket {
         this.socket.onopen = () => {
             if (activeConnectionId !== this.connectionId) return;
 
-            console.log("%c✅ WebSocket ulandi", "color: green; font-weight: bold;", this.url);
+         
             this.reconnectAttempts = 0;
             if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         };
