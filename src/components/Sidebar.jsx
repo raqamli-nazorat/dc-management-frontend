@@ -1,6 +1,6 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { MdExpandMore, MdExpandLess, MdHistory } from 'react-icons/md'
-import { FaTrashCan, FaChevronRight, FaArrowRightFromBracket, FaRegCalendarCheck } from 'react-icons/fa6'
+import { MdExpandMore, MdExpandLess } from 'react-icons/md'
+import { FaChevronRight, FaArrowRightFromBracket } from 'react-icons/fa6'
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -19,6 +19,40 @@ function IconApplications({ size = 20, className = '' }) {
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
       <path d="M5.83334 2.5H14.1667C15.0871 2.5 15.8333 3.24619 15.8333 4.16667V17.5L10 15L4.16667 17.5V4.16667C4.16667 3.24619 4.91286 2.5 5.83334 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M7.5 7.5H12.5M7.5 10.8333H10.8333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconHistory({ size = 19, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 19 19" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.08464 17.4167C13.687 17.4167 17.4179 13.6857 17.4179 9.08333C17.4179 4.48096 13.687 0.75 9.0846 0.75C5.35324 0.75 2.22986 3.20241 1.16797 6.58333H3.2513" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9.08398 5.75V9.08333L10.7507 10.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M0.75 9.08337C0.75 9.36445 0.762671 9.64243 0.787446 9.91671M6.58333 17.4167C6.29867 17.323 6.02059 17.2137 5.75 17.0898M1.75783 13.25C1.59712 12.9404 1.45377 12.6194 1.32914 12.2886M3.10935 15.1721C3.36408 15.4466 3.63588 15.7035 3.92296 15.9411" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+function IconDailyPlan({ size = 19, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 19" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.08659 2C2.79009 2.0389 2.0171 2.1832 1.48223 2.71856C0.75 3.45148 0.75 4.63109 0.75 6.9903L0.75 12.412C0.75 14.7712 0.75 15.9508 1.48223 16.6838C2.21447 17.4167 3.39298 17.4167 5.75 17.4167L9.91667 17.4167C12.2737 17.4167 13.4522 17.4167 14.1844 16.6838C14.9167 15.9508 14.9167 14.7712 14.9167 12.412V6.9903C14.9167 4.63109 14.9167 3.45148 14.1844 2.71856C13.6496 2.1832 12.8766 2.0389 11.5801 2" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M4.08203 2.20833C4.08203 1.40292 4.73495 0.75 5.54036 0.75L10.1237 0.75C10.9291 0.75 11.582 1.40292 11.582 2.20833C11.582 3.01375 10.9291 3.66667 10.1237 3.66667L5.54036 3.66667C4.73495 3.66667 4.08203 3.01375 4.08203 2.20833Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M9.08594 8.25H12.0026" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M3.66992 9.08341C3.66992 9.08341 4.08659 9.08341 4.50326 9.91675C4.50326 9.91675 5.82678 7.83341 7.00326 7.41675" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9.08594 13.25H12.0026" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M4.50195 13.25H5.33529" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+function IconTrash({ size = 19, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 17 19" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.5 3.66675L13.9836 12.021C13.8516 14.1555 13.7856 15.2227 13.2506 15.99C12.9861 16.3693 12.6455 16.6895 12.2506 16.9301C11.4518 17.4167 10.3825 17.4167 8.24395 17.4167C6.1026 17.4167 5.03192 17.4167 4.23254 16.9292C3.83733 16.6881 3.49666 16.3674 3.23224 15.9874C2.6974 15.2189 2.63288 14.1502 2.50384 12.0127L2 3.66675" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M0.75 3.66667L15.75 3.66667M11.6298 3.66667L11.0609 2.49311C10.683 1.71355 10.494 1.32377 10.1681 1.08067C10.0958 1.02675 10.0192 0.978785 9.93919 0.937251C9.57826 0.75 9.1451 0.75 8.27877 0.75C7.39069 0.75 6.94665 0.75 6.57974 0.9451C6.49842 0.98834 6.42082 1.03825 6.34774 1.09431C6.01803 1.34725 5.83386 1.75129 5.4655 2.55938L4.96077 3.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M6.16602 12.8334L6.16602 7.83337" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M10.334 12.8334L10.334 7.83337" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   )
 }
@@ -500,7 +534,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             title="Umumiy tarix"
             className={iconBtn(location.pathname.includes('auditlog'))}
           >
-            <MdHistory size={18} />
+            <IconHistory size={18} />
           </button>
         ) : (
           <NavLink
@@ -512,7 +546,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
             ].join(' ')}
           >
-            <MdHistory size={18} className="shrink-0" />
+            <IconHistory size={18} className="shrink-0" />
             <span>Umumiy tarix</span>
           </NavLink>
         )}
@@ -524,7 +558,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             title="Kundalik reja"
             className={iconBtn(location.pathname.includes('my_tasks'))}
           >
-            <FaRegCalendarCheck size={16} />
+            <IconDailyPlan size={18} />
           </button>
         ) : (
           <NavLink
@@ -536,7 +570,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
             ].join(' ')}
           >
-            <FaRegCalendarCheck size={16} className="shrink-0" />
+            <IconDailyPlan size={18} className="shrink-0" />
             <span>Kundalik reja</span>
           </NavLink>
         )}
@@ -548,7 +582,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             title="Chiqindi qutisi"
             className={iconBtn(location.pathname.includes('trash'))}
           >
-            <FaTrashCan size={16} />
+            <IconTrash size={18} />
           </button>
         ) : (
           <NavLink
@@ -560,7 +594,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                 : 'text-[var(--text-sub)] border-transparent hover:bg-[var(--stroke-sub)] hover:border-[var(--stroke-soft)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)] dark:border-transparent',
             ].join(' ')}
           >
-            <FaTrashCan size={16} className="shrink-0 " />
+            <IconTrash size={18} className="shrink-0" />
             <span>Chiqindi qutisi</span>
           </NavLink>
         ))}
