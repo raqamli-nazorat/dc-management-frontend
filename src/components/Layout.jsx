@@ -262,18 +262,9 @@ export default function Layout() {
   const { action, customAction, breadcrumbExtra, navbarExtra, sidebarClickHandler, print, download } = usePageAction()
   const { user } = useAuth()
   const [notifOpen, setNotifOpen] = useState(false)
-  const [notifs, setNotifs] = useState([...NOTIFS_DATA].sort((a, b) => {
-    const toSortable = (d) => d.split('.').reverse().join('-')
-    const dateCmp = toSortable(b.date).localeCompare(toSortable(a.date))
-    if (dateCmp !== 0) return dateCmp
-    return b.time.localeCompare(a.time)
-  }))
+  const [notifs, setNotifs] = useState([])
   const [downloadOpen, setDownloadOpen] = useState(false)
   const downloadRef = useRef(null)
-  const wsRef = useRef(null)
-  const reconnectTimerRef = useRef(null)
-  const shownNotifIdsRef = useRef(new Set())
-  const unreadCount = notifs.filter(n => !n.read).length
   const [activeAttendanceMeetingId, setActiveAttendanceMeetingId] = useState(null)
   const [activeAbsence, setActiveAbsence] = useState(null)
   const [activeOpenMeeting, setActiveOpenMeeting] = useState(null)
@@ -420,10 +411,8 @@ export default function Layout() {
           ? data.data.results
           : []
       setNotifNextUrl(data?.data?.next)
-      // Yangilari tepada turishi uchun created_at bo'yicha teskari tartibda saralash
-      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
-      setNotifs(sorted.map(mapApiNotification))
+      setNotifs(list.map(mapApiNotification))
     } catch {
       // static fallback saqlanadi
     }
@@ -448,10 +437,8 @@ export default function Layout() {
 
       setNotifNextUrl(data?.data?.next);
 
-      const sorted = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
       // Eski xabarlar ustiga yangilarini qo'shamiz
-      setNotifs(prev => [...prev, ...sorted.map(mapApiNotification)]);
+      setNotifs(prev => [...prev, ...list.map(mapApiNotification)]);
 
     } catch (error) {
       console.error("Pagination xatosi:", error);
