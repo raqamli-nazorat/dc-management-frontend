@@ -128,7 +128,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, 
           <button
             onClick={markAllRead}
             className="px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer
-              text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
+              text-[var(--accent-sub)] hover:bg-[var(--bg-elevation-1)] Umumiy tarixdark:text-[#8EA1E8] dark:hover:bg-[var(--bg-elevation-2)]"
           >
             Barchasi o'qish
           </button>
@@ -225,6 +225,9 @@ function Breadcrumb() {
 
   const hiddenParts = ['edit', 'add', 'new', 'create', 'admin', 'manager', 'employee', 'auditor', 'accountant', 'menager', 'xodim', 'nazoratchi', 'hisobchi']
 
+  // URL prefix (rol) ni olish
+  const urlPrefix = location.pathname.split('/')[1] || 'admin'
+
   const parts = location.pathname.split('/').filter(part => {
     if (!part) return false
     if (hiddenParts.includes(part.toLowerCase())) return false
@@ -232,13 +235,24 @@ function Breadcrumb() {
     return true
   })
 
+  // Har bir part uchun to'liq navigate path hisoblash
+  const getNavigatePath = (partIndex) => {
+    // parts massivida partIndex gacha bo'lgan qismlarni olib, to'liq path yasaymiz
+    const rawParts = location.pathname.split('/').filter(p => p)
+    // hiddenParts ni olib tashlamasdan, lekin rol prefixini saqlab
+    const role = rawParts[0] // admin, manager, etc.
+    // parts[0..partIndex] ga mos keladigan raw path qismlarini topamiz
+    const visibleParts = parts.slice(0, partIndex + 1)
+    // role + visible parts dan path yasaymiz
+    return '/' + [role, ...visibleParts].join('/')
+  }
+
   return (
     <>
       {parts.map((part, i) => {
         const isLast = i === parts.length - 1
         const label = labelMap[part] || part
-        const isReport = ['reports', 'by_tasks', 'project', 'cost_inquiries', 'salary', 'employee'].includes(part)
-        const canClick = !isLast && !isReport
+        const canClick = !isLast
 
         return (
           <span key={i} className="flex items-center gap-1">
@@ -246,8 +260,17 @@ function Breadcrumb() {
               <span className="text-[#D0D5E2] dark:text-[#3A3B3B] mx-0.5">›</span>
             )}
             <span
-              className={`text-[13px] font-medium ${part === "detail" ? "hidden" : ""} ${isLast ? 'text-[var(--text-sub)] dark:text-[var(--text-strong)]' : 'text-[#c2c8e0]'} ${canClick ? 'cursor-pointer' : ''}`}
-              onClick={() => canClick && navigate(part)}
+              className={`text-[13px] font-medium ${part === "detail" ? "hidden" : ""} ${isLast ? 'text-[var(--text-sub)] dark:text-[var(--text-strong)]' : 'text-[#c2c8e0] hover:text-[var(--text-sub)] dark:hover:text-[var(--text-sub)]'} ${canClick ? 'cursor-pointer' : ''}`}
+              onClick={() => {
+                if (!canClick) return
+                const path = getNavigatePath(i)
+                // /reports ga to'g'ridan-to'g'ri route yo'q — birinchi sub-sahifaga yo'naltirish
+                if (part === 'reports') {
+                  navigate(`/${urlPrefix}/reports/employee`)
+                } else {
+                  navigate(path)
+                }
+              }}
             >
               {label}
             </span>
