@@ -32,7 +32,7 @@ const sendTokenToBackend = async (token) => {
             device_type: "web",
             device_id: deviceId, // Barqaror ID
         });
-        console.log("✅ Token backendga muvaffaqiyatli yuborildi");
+       
     } catch (err) {
         console.error("❌ Token yuborishda backend xatosi:", err);
     }
@@ -45,7 +45,7 @@ export const requestForToken = async () => {
     try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-            console.warn("⚠️ Notification ruxsati berilmadi");
+            // console.warn("⚠️ Notification ruxsati berilmadi");
             return null;
         }
 

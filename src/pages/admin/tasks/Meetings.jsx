@@ -620,7 +620,25 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
   const [loading, setLoading] = useState(false)
   const [copyLink, setCopyLink] = useState(null)
   const [projects, setProjects] = useState([])
-  const [users, setUsers] = useState([])
+  const [projectMembers, setProjectMembers] = useState([])
+  const [membersLoading, setMembersLoading] = useState(false)
+
+  const loadProjectMembers = (projectId) => {
+    if (!projectId) { setProjectMembers([]); return }
+    setMembersLoading(true)
+    axiosAPI.get(`/projects/${projectId}/`)
+      .then(res => {
+        const proj = res.data?.data ?? res.data
+        const emps = proj?.employees_info ?? []
+        const testers = proj?.testers_info ?? []
+        const manager = proj?.manager_info ? [proj.manager_info] : []
+        const all = [...emps, ...testers, ...manager]
+        const seen = new Set()
+        setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
+      })
+      .catch(() => setProjectMembers([]))
+      .finally(() => setMembersLoading(false))
+  }
 
   useEffect(() => {
     axiosAPI.get('/projects/', { params: { page_size: 100 } })
@@ -628,11 +646,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setProjects(Array.isArray(list) ? list : [])
       }).catch(() => { })
-    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
-      .then(res => {
-        const list = res.data?.results ?? res.data?.data?.results ?? res.data ?? []
-        setUsers(Array.isArray(list) ? list : [])
-      }).catch(() => { })
+    if (meeting.project) loadProjectMembers(meeting.project)
   }, [])
 
   const { date: initDate, time: initTime } = fromIso(meeting.start_time)
@@ -654,6 +668,14 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
   const [errors, setErrors] = useState({})
 
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
+
+  const handleProjectChange = (v) => {
+    if (!canEdit) return
+    setForm(p => ({ ...p, project: v, participants: [] }))
+    setErrors(p => ({ ...p, project: '' }))
+    setProjectMembers([])
+    loadProjectMembers(v)
+  }
 
   const handleFine = (val) => {
     set('fine', normalizePercentInput(val))
@@ -749,7 +771,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
           {/* -- Scroll qilinadigan content -- */}
           <div className="flex-1 overflow-y-auto px-7 py-4 flex flex-col gap-3" style={{ scrollbarWidth: 'thin', scrollbarColor: '#C2C8E0 transparent' }}>
-            <ProjectDropdown value={form.project} onChange={v => canEdit && set('project', v)} error={errors.project} projects={projects} disabled={!canEdit} />
+            <ProjectDropdown value={form.project} onChange={handleProjectChange} error={errors.project} projects={projects} disabled={!canEdit} />
 
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -870,20 +892,26 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
             <div>
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
-                onClick={() => canEdit && setShowParticipants(true)}
+                onClick={() => canEdit && form.project && !membersLoading ? setShowParticipants(true) : null}
                 className={`w-full min-h-[100px] rounded-[24px] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 flex flex-col transition-all
-                  ${canEdit ? 'bg-[var(--bg-base)] cursor-pointer hover:border-[var(--accent-sub)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default'}
+                  ${canEdit && form.project && !membersLoading ? 'bg-[var(--bg-base)] cursor-pointer hover:border-[var(--accent-sub)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
                     <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-4 text-center">
-                      {canEdit ? "Quyidagi tugma orqali qidiring va tanlang" : "Qatnashchilar yo'q"}
+                      {!canEdit ? "Qatnashchilar yo'q" : membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Quyidagi tugma orqali qidiring va tanlang"}
                     </p>
                     {canEdit && (
-                      <div className="inline-flex items-center cursor-pointer gap-1 p-2 rounded-xl bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] text-sm">
-                        <FaPlus size={15} />
-                        Qatnashchilarni qo'shing
+                      <div className={`inline-flex items-center gap-1 p-2 rounded-xl text-sm font-medium
+                        ${!form.project || membersLoading
+                          ? 'bg-[#F1F3F9] text-[#C2C8E0] dark:bg-[var(--bg-elevation-1)] dark:text-[#474848]'
+                          : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] cursor-pointer'}`}>
+                        {membersLoading
+                          ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                          : <FaPlus size={15} />
+                        }
+                        {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Loyiha tanlanmagan' : "Qatnashchilarni qo'shing"}
                       </div>
                     )}
                   </>
@@ -955,7 +983,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
         </div>
       </div>
       {showParticipants && canEdit && (
-        <ParticipantsModal selected={form.participants} users={users}
+        <ParticipantsModal selected={form.participants} users={projectMembers}
           onClose={() => setShowParticipants(false)}
           onApply={vals => { set('participants', vals); setShowParticipants(false) }} />
       )}

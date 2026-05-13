@@ -687,11 +687,7 @@ export default function Layout() {
                   className="w-[18px] h-[18px] brightness-0 [filter:brightness(0)_saturate(100%)_invert(10%)_sepia(10%)_saturate(1000%)_hue-rotate(190deg)_brightness(90%)] dark:brightness-0 dark:invert"
                 />
               </button>
-              {
-                console.log(notifCount)
-
-              }
-
+        
               {notifCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--error-strong)] border-2 border-white dark:border-[#191A1A] text-[10px] leading-none font-bold text-white flex items-center justify-center">
                   {notifCount > 99 ? '99+' : notifCount}
