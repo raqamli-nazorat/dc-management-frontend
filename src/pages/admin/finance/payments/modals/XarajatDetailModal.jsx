@@ -208,7 +208,7 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
               </div>
               {isCard && payment.card_number && (
                 <div>
-                  <label className={labelCls}>Karta raqam</label>
+                  <label className={labelCls}>Karta raqami</label>
                   <div className={`${fieldCls} font-mono tracking-wider justify-between`}>
                     <span>{fmtCard(payment.card_number)}</span>
                     <button

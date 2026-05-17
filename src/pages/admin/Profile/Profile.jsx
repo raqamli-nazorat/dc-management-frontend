@@ -588,13 +588,12 @@ export default function ProfilePage() {
 
         <div>
           <label className={labelCls}>Karta raqami</label>
-
           <input
             className={inputCls}
             type="text"
             inputMode="numeric"
             placeholder="0000 0000 0000 0000"
-            value={formatCard(data.card_number) || ''}
+            value={formatCard(data?.card_number) || ''}
             onChange={e => set('card_number', formatCard(e.target.value))}
           />
         </div>

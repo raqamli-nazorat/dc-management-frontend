@@ -57,10 +57,6 @@ const formatNum = (val) => {
 const formatCard = (val) => {
     if (!val) return '';
     let value = val;
-
-    if (typeof val === "object") {
-        value = Object.values(val).join('');
-    }
     
     let digits = String(value).replace(/\D/g, '').slice(0, 16);
     return digits.match(/.{1,4}/g)?.join(' ') || digits;
