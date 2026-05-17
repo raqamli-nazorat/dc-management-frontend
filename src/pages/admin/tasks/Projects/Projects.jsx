@@ -147,6 +147,7 @@ const ProjectsPage = () => {
 
   const { user } = useAuth()
   const is_admin = user.active_role === 'superadmin' || user.active_role === 'admin'
+  const is_manager = user.active_role === 'manager'
 
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
@@ -341,7 +342,7 @@ const ProjectsPage = () => {
                 data.map((p, idx) => (
                   <tr key={p.id}
                     onClick={() => {
-                      if (!is_admin || !is_manager) {
+                      if (!is_admin && !is_manager) {
                         setDetailProject(p.id)
                         return
                       }
@@ -377,7 +378,7 @@ const ProjectsPage = () => {
                     <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.created_at)}</td>
                     <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin || is_manager} />
                     </td>
                   </tr>
                 ))
@@ -432,7 +433,7 @@ const ProjectsPage = () => {
               return (
                 <div key={p.id}
                   onClick={() => {
-                    if (!is_admin) {
+                    if (!is_admin && !is_manager) {
                       setDetailProject(p.id)
                       return
                     }
@@ -478,7 +479,7 @@ const ProjectsPage = () => {
                       </div>
                     </div>
                     <div onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin || is_manager} />
                     </div>
                   </div>
                 </div>

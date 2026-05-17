@@ -14,6 +14,7 @@ const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[va
 
 const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL }) => {
     const { user } = useAuth()
+    const isManager = user?.active_role === "manager"
 
     const { isDark } = useTheme()
     const [employees, setEmployees] = useState([])
@@ -295,14 +296,15 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 <div>
                                     <label className={labelCls}>Nomi</label>
                                     <input value={form.title} onChange={e => set('title', e.target.value)}
+                                        disabled={isManager}
                                         placeholder="Nomi kiriting" className={inputCls(errors.title)} />
                                     {errors.title && <p className="text-red-500 text-xs mt-1 ml-1">* Ushbu maydonni to'ldirish majburiy</p>}
                                 </div>
                                 <div ref={statusRef}>
                                     <label className={labelCls}>Holati</label>
                                     <div className="relative">
-                                        <button type="button" onClick={() => setStatusOpen(o => !o)}
-                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer
+                                        <button type="button" onClick={() => !isManager && setStatusOpen(o => !o)}
+                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border ${isManager ? 'cursor-default opacity-70' : 'cursor-pointer'}
                     bg-[var(--bg-base)]
                     ${errors.status ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}
                     ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}>
@@ -331,9 +333,10 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 <label className={labelCls}>Tavsifi</label>
                                 <div className="relative">
                                     <textarea value={form.description} onChange={e => set('description', e.target.value)}
+                                        disabled={isManager}
                                         placeholder="Tavsifni yozing" rows={3}
                                         className={inputCls(false) + ' resize-none'} />
-                                    {form.description && (
+                                    {form.description && !isManager && (
                                         <button type="button" onClick={() => set('description', '')}
                                             className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                                             <FaXmark size={12} />
@@ -347,8 +350,8 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 <div ref={mgrRef}>
                                     <label className={labelCls}>Menejer</label>
                                     <div className="relative">
-                                        <div onClick={() => setMgrOpen(!mgrOpen)}
-                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer
+                                        <div onClick={() => !isManager && setMgrOpen(!mgrOpen)}
+                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border ${isManager ? 'cursor-default opacity-70' : 'cursor-pointer'}
                     bg-[var(--bg-base)]
                     ${errors.manager ? 'border-red-400 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${mgrOpen ? 'border-[var(--accent-sub)]' : ''}`}>
                                             {mgrOpen ? (
@@ -368,7 +371,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                 </span>
                                             )}
                                             <div className="flex items-center gap-1.5 shrink-0">
-                                                {form.manager && !mgrOpen && (
+                                                {form.manager && !mgrOpen && !isManager && (
                                                     <span onMouseDown={e => { e.stopPropagation(); setForm(p => ({ ...p, manager: '', manager_id: null })) }}
                                                         className="text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer"><FaXmark size={11} /></span>
                                                 )}
@@ -397,6 +400,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                 <div>
                                     <label className={labelCls}>Loyiha narxi (UZS)</label>
                                     <input value={form.bonus} onChange={e => set('bonus', fmtBonus(e.target.value))}
+                                        disabled={isManager}
                                         placeholder="Loyiha uchun: 0,0"
                                         className={inputCls(errors.bonus) + ' text-right font-bold'} />
                                     {errors.bonus && <p className="text-red-500 text-xs mt-1 ml-1">* Ushbu maydonni to'ldirish majburiy</p>}
@@ -409,6 +413,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                     <input
                                         value={form.prefix}
                                         onChange={e => set('prefix', e.target.value.toUpperCase())}
+                                        disabled={isManager}
                                         placeholder="Titul kiriting"
                                         className={inputCls(errors.prefix)}
                                         maxLength={3}
@@ -422,6 +427,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         inputMode="decimal"
                                         value={form.penalty_percentage}
                                         onChange={e => set('penalty_percentage', normalizePercentInput(e.target.value))}
+                                        disabled={isManager}
                                         placeholder="0,0"
                                         className={inputCls(errors.penalty_percentage)}
                                     />
@@ -430,19 +436,23 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             </div>
 
                             {/* Xodimlar */}
-                            <SelectedUsersField
-                                label="Xodimlar"
-                                selected={form.employees}
-                                onOpen={() => setPickerOpen('employees')}
-                                onRemove={id => set('employees', form.employees.filter(u => u.id !== id))}
-                            />
+                            <div className={isManager ? "opacity-70 pointer-events-none" : ""}>
+                                <SelectedUsersField
+                                    label="Xodimlar"
+                                    selected={form.employees}
+                                    onOpen={() => !isManager && setPickerOpen('employees')}
+                                    onRemove={id => !isManager && set('employees', form.employees.filter(u => u.id !== id))}
+                                />
+                            </div>
 
-                            <SelectedUsersField
-                                label="Sinovchilar"
-                                selected={form.testers}
-                                onOpen={() => setPickerOpen('testers')}
-                                onRemove={id => set('testers', form.testers.filter(u => u.id !== id))}
-                            />
+                            <div className={isManager ? "opacity-70 pointer-events-none" : ""}>
+                                <SelectedUsersField
+                                    label="Sinovchilar"
+                                    selected={form.testers}
+                                    onOpen={() => !isManager && setPickerOpen('testers')}
+                                    onRemove={id => !isManager && set('testers', form.testers.filter(u => u.id !== id))}
+                                />
+                            </div>
 
 
                             {/* Muddati + Vaqti */}
@@ -474,6 +484,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         <label className={labelCls}>Muddati</label>
                                         <DatePicker
                                             value={form.deadline ? dayjs(form.deadline) : null}
+                                            disabled={isManager}
                                             onChange={(val) => setForm(p => ({
                                                 ...p,
                                                 deadline: val,
@@ -492,6 +503,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         <label className={labelCls}>Vaqti</label>
                                         <TimePicker
                                             value={form.time ? dayjs(form.time, 'HH:mm') : null}
+                                            disabled={isManager}
                                             onChange={(val) => set('time', val)}
                                             getPopupContainer={(triggerNode) => triggerNode.parentNode}
                                             className={`w-full h-11 px-4 bg-slate-50 border border-slate-200! dark:border-[var(--stroke-soft)]! rounded-xl! text-sm dark:text-[var(--text-strong)]! dark:bg-[#0d1117]! outline-none! focus:outline-none! focus:shadow-none! hover:border-slate-200! dark:hover:border-[#292A2A]! ${errors.time ? 'border-red-500!' : ''}`}
@@ -537,21 +549,19 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                                 set('links', newLinks);
                                                             }}
                                                         />
-                                                        {form.links.length > 1 &&
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const itemToRemove = form.links[index];
-                                                                    if (itemToRemove.id) {
-                                                                        setDeletedIds(prev => [...prev, itemToRemove.id]);
-                                                                    }
-                                                                    set('links', form.links.filter((_, i) => i !== index));
-                                                                }}
-                                                                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
-                                                            >
-                                                                <FaXmark size={14} />
-                                                            </button>
-                                                        }
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const itemToRemove = form.links[index];
+                                                                if (itemToRemove.id) {
+                                                                    setDeletedIds(prev => [...prev, itemToRemove.id]);
+                                                                }
+                                                                set('links', form.links.filter((_, i) => i !== index));
+                                                            }}
+                                                            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                                                        >
+                                                            <FaXmark size={14} />
+                                                        </button>
                                                     </div>
                                                     {errors.links?.[index]?.value && (
                                                         <p className="text-red-500 text-[10px] mt-1">
@@ -580,8 +590,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                         {!loading &&
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>
-                                <button type="button" onClick={() => set('is_hidden', !form.is_hidden)}
-                                    className={`relative w-10 h-5 rounded-full  cursor-pointer ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#141414]'}`}>
+                                <button type="button" onClick={() => !isManager && set('is_hidden', !form.is_hidden)}
+                                    disabled={isManager}
+                                    className={`relative w-10 h-5 rounded-full ${isManager ? 'cursor-default opacity-60' : 'cursor-pointer'} ${form.is_hidden ? 'bg-[#000000]' : 'bg-[var(--stroke-sub)] dark:bg-[#141414]'}`}>
                                     <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.is_hidden ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
