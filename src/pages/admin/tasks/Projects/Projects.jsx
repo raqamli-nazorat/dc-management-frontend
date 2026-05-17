@@ -341,7 +341,7 @@ const ProjectsPage = () => {
                 data.map((p, idx) => (
                   <tr key={p.id}
                     onClick={() => {
-                      if (!is_admin) {
+                      if (!is_admin || !is_manager) {
                         setDetailProject(p.id)
                         return
                       }
