@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck, FaCamera, FaUser } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -234,7 +234,8 @@ function Field({ label, value, children, align = 'right', rightIcon }) {
 
 /* ── Format helpers ── */
 const formatPhone = (val) => {
-  let digits = val.replace(/\D/g, '');
+  if (typeof val !== 'string' && typeof val !== 'number') return '+998';
+  let digits = String(val).replace(/\D/g, '');
   if (digits.length < 3) return '+998';
   if (!digits.startsWith('998')) digits = '998' + digits;
 
@@ -249,8 +250,8 @@ const formatPhone = (val) => {
 
 
 const formatCard = (val) => {
-  if (!val) return '';
-  let digits = val.replace(/\D/g, '').slice(0, 16);
+  if (typeof val !== 'string' && typeof val !== 'number') return '';
+  let digits = String(val).replace(/\D/g, '').slice(0, 16);
   return digits.match(/.{1,4}/g)?.join(' ') || digits;
 }
 
@@ -442,8 +443,10 @@ export default function ProfilePage() {
   }
 
   const isAvatarChanged = data?.avatar instanceof File;
-  const isPhoneChanged = (data?.phone_number?.replace(/\s/g, '') || '') !== (profile?.phone_number?.replace(/\s/g, '') || '');
-  const isCardChanged = (data?.card_number?.replace(/\s/g, '') || '') !== (profile?.card_number?.replace(/\s/g, '') || '');
+  const getSafePhone = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : '';
+  const getSafeCard = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : '';
+  const isPhoneChanged = getSafePhone(data?.phone_number) !== getSafePhone(profile?.phone_number);
+  const isCardChanged = getSafeCard(data?.card_number) !== getSafeCard(profile?.card_number);
   const isSocialChanged = JSON.stringify(data?.social_links || []) !== JSON.stringify(profile?.social_links || []);
 
   const isChanged = isAvatarChanged || isPhoneChanged || isCardChanged || isSocialChanged;
@@ -460,16 +463,16 @@ export default function ProfilePage() {
       }
 
       // Telefon raqami (faqat raqamlarni solishtiramiz)
-      const cleanPhone = (val) => String(val || '').replace(/\s/g, '')
+      const cleanPhone = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : ''
       if (cleanPhone(data.phone_number) !== cleanPhone(profile.phone_number)) {
         formData.append('phone_number', cleanPhone(data.phone_number))
         hasChanges = true
       }
 
       // Karta raqami (bo'shliqlarni olib tashlab solishtiramiz)
-      const cleanCard = (val) => String(val || '').replace(/\s/g, '')
+      const cleanCard = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : ''
       if (cleanCard(data.card_number) !== cleanCard(profile.card_number)) {
-        formData.append('card_number', cleanCard(data.card_number))
+        formData.append('card_number', cleanCard(data.card_number) || '{}')
         hasChanges = true
       }
 
@@ -588,13 +591,12 @@ export default function ProfilePage() {
 
         <div>
           <label className={labelCls}>Karta raqami</label>
-
           <input
             className={inputCls}
             type="text"
             inputMode="numeric"
             placeholder="0000 0000 0000 0000"
-            value={formatCard(data.card_number) || ''}
+            value={formatCard(data?.card_number) || ''}
             onChange={e => set('card_number', formatCard(e.target.value))}
           />
         </div>

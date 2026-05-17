@@ -230,9 +230,20 @@ export default function PaymentsPage() {
 
   const handleSubmitSorov = async (body) => {
     try {
+      const historyCards = localStorage.getItem("user_card_history")
       const created = await apiCreatePayment(body)
       setPayments(prev => [created, ...prev])
       setShowSorov(false)
+      if (historyCards) {
+        const cards = JSON.parse(historyCards)
+        if (!cards.includes(body.card_number)) {
+          cards.push(body.card_number)
+          localStorage.setItem("user_card_history", JSON.stringify(cards))
+        }
+      } else {
+        localStorage.setItem("user_card_history", JSON.stringify([body.card_number]))
+      }
+
       toast.success("So'rov yuborildi", "So'rovingiz muvaffaqiyatli yuborildi.")
     } catch (err) {
       console.error(err)

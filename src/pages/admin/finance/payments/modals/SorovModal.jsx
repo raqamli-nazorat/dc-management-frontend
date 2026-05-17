@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import { SelectField } from '../components/SelectField'
 import { LoyihaDropdownForm } from '../components/LoyihaDropdown'
@@ -30,9 +30,9 @@ function toDecimalStr(val) {
 // other:      loyiha disabled, toifa aktiv
 // withdrawal: loyiha disabled, toifa disabled
 const RULES = {
-  company:    { projectDisabled: false, categoryDisabled: true,  projectRequired: true,  reasonRequired: true  },
-  other:      { projectDisabled: true,  categoryDisabled: false, projectRequired: false, reasonRequired: false },
-  withdrawal: { projectDisabled: true,  categoryDisabled: true,  projectRequired: false, reasonRequired: true  },
+  company: { projectDisabled: false, categoryDisabled: true, projectRequired: true, reasonRequired: true },
+  other: { projectDisabled: true, categoryDisabled: false, projectRequired: false, reasonRequired: false },
+  withdrawal: { projectDisabled: true, categoryDisabled: true, projectRequired: false, reasonRequired: true },
 }
 
 function getRules(type) {
@@ -44,6 +44,8 @@ export default function SorovModal({ onClose, onSubmit }) {
   const [categories, setCategories] = useState([])
   const [projects, setProjects] = useState([])
 
+  const [anotherCards, setAnotherCards] = useState([])
+
   useEffect(() => {
     axiosAPI.get('/users/me/')
       .then(res => {
@@ -51,19 +53,25 @@ export default function SorovModal({ onClose, onSubmit }) {
         const raw = data?.card_number
         if (raw) setUserCard(fmtCard(String(raw).replace(/\s/g, '')))
       })
-      .catch(() => {})
+      .catch(() => { })
+
+    const card = localStorage.getItem("user_card_history")
+    if (card) setAnotherCards(JSON.parse(card))
+
     axiosAPI.get('/expense-category/')
       .then(res => {
         const d = res.data?.data ?? res.data
         setCategories(Array.isArray(d) ? d : (d.results ?? []))
       })
-      .catch(() => {})
+      .catch(() => { })
     axiosAPI.get('/projects/')
       .then(res => {
         const d = res.data?.data ?? res.data
         setProjects(Array.isArray(d) ? d : (d.results ?? []))
       })
-      .catch(() => {})
+      .catch(() => { })
+
+    // localStorage.setItem("user_card_history", JSON.stringify(["123454444343", "1234567867543"]))
   }, [])
 
   const [form, setForm] = useState({
@@ -87,12 +95,12 @@ export default function SorovModal({ onClose, onSubmit }) {
 
   const validate = () => {
     const e = {}
-    if (!form.type)             e.type             = 'Xarajat turi tanlanmagan'
+    if (!form.type) e.type = 'Xarajat turi tanlanmagan'
     if (!rules.categoryDisabled && !form.expense_category)
       e.expense_category = 'Toifa tanlanmagan'
     if (!form.amount || isNaN(parseFloat(toDecimalStr(form.amount))))
       e.amount = 'Miqdor kiritilmagan'
-    if (!form.payment_method)   e.payment_method   = "To'lov turi tanlanmagan"
+    if (!form.payment_method) e.payment_method = "To'lov turi tanlanmagan"
     if (showCard && form.card_number.replace(/\s/g, '').length < 16)
       e.card_number = "Karta raqami to'liq emas"
     if (rules.projectRequired && !form.project)
@@ -107,8 +115,8 @@ export default function SorovModal({ onClose, onSubmit }) {
     if (Object.keys(e).length) { setErrors(e); return }
 
     const body = {
-      type:           form.type,
-      amount:         parseFloat(toDecimalStr(form.amount)),
+      type: form.type,
+      amount: parseFloat(toDecimalStr(form.amount)),
       payment_method: form.payment_method,
     }
 
@@ -144,6 +152,41 @@ export default function SorovModal({ onClose, onSubmit }) {
   const projectLabel = rules.projectRequired
     ? 'Loyiha'
     : <span>Loyiha <span className="text-[var(--text-disabled)]">(ixtiyoriy)</span></span>
+
+  // Karta takliflarini hisoblash (Search and Suggest)
+  const queryDigits = form.card_number.replace(/\D/g, '')
+  const suggestions = []
+
+  if (userCard) {
+    const userCardDigits = userCard.replace(/\D/g, '')
+    if (!queryDigits || userCardDigits.includes(queryDigits)) {
+      suggestions.push({
+        type: 'me',
+        label: 'Mening kartam',
+        value: userCard
+      })
+    }
+  }
+
+  // Eng oxirgi qo'shilgan (yangi) kartalar birinchi chiqishi uchun reverse qilamiz
+  const reversedAnotherCards = [...anotherCards].reverse()
+
+  reversedAnotherCards.forEach(card => {
+    const cardDigits = String(card).replace(/\D/g, '')
+    if (!queryDigits || cardDigits.includes(queryDigits)) {
+      // Takrorlanishni oldini olish
+      if (userCard && userCard.replace(/\D/g, '') === cardDigits) {
+        return
+      }
+      suggestions.push({
+        type: 'another',
+        label: 'Boshqa',
+        value: fmtCard(String(card))
+      })
+    }
+  })
+
+  const visibleSuggestions = suggestions.slice(0, 2)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
@@ -228,22 +271,22 @@ export default function SorovModal({ onClose, onSubmit }) {
               Sabab
               {!rules.reasonRequired && <span className="text-[var(--text-disabled)] ml-1">(ixtiyoriy)</span>}
             </label>
-              <div className="relative">
-                <textarea
-                  rows={3}
-                  className={iCls('reason') + ' h-auto! resize-none pr-8'}
-                  placeholder="Sababni yozing..."
-                  value={form.reason}
-                  onChange={e => setF('reason', e.target.value)}
-                />
-                {form.reason && (
-                  <button type="button" onClick={() => setF('reason', '')}
-                    className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[var(--text-soft)] cursor-pointer">
-                    <FaXmark size={12} />
-                  </button>
-                )}
-              </div>
-              {errors.reason && <p className="text-xs text-red-500 mt-1">*{errors.reason}</p>}
+            <div className="relative">
+              <textarea
+                rows={3}
+                className={iCls('reason') + ' h-auto! resize-none pr-8'}
+                placeholder="Sababni yozing..."
+                value={form.reason}
+                onChange={e => setF('reason', e.target.value)}
+              />
+              {form.reason && (
+                <button type="button" onClick={() => setF('reason', '')}
+                  className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[var(--text-soft)] cursor-pointer">
+                  <FaXmark size={12} />
+                </button>
+              )}
+            </div>
+            {errors.reason && <p className="text-xs text-red-500 mt-1">*{errors.reason}</p>}
           </div>
 
           {/* To'lov turi + Karta */}
@@ -265,8 +308,8 @@ export default function SorovModal({ onClose, onSubmit }) {
                     className={iCls('card_number')}
                     placeholder="0000 0000 0000 0000"
                     value={form.card_number}
-                    onChange={e => { setF('card_number', fmtCard(e.target.value)); setShowCardSuggest(false) }}
-                    onFocus={() => { if (userCard) setShowCardSuggest(true) }}
+                    onChange={e => { setF('card_number', fmtCard(e.target.value)); setShowCardSuggest(true) }}
+                    onFocus={() => { if (userCard || anotherCards.length > 0) setShowCardSuggest(true) }}
                     onBlur={() => setTimeout(() => setShowCardSuggest(false), 150)}
                     maxLength={19}
                   />
@@ -277,30 +320,32 @@ export default function SorovModal({ onClose, onSubmit }) {
                     </button>
                   )}
                   {/* Karta taklifi */}
-                  {showCardSuggest && userCard && (
+                  {showCardSuggest && visibleSuggestions.length > 0 && (
                     <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-xl shadow-xl border overflow-hidden
-                      bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
-                      <button
-                        type="button"
-                        onMouseDown={() => {
-                          // userCard allaqachon fmtCard orqali formatlangan — to'g'ridan qo'yamiz
-                          setForm(p => ({ ...p, card_number: userCard }))
-                          setErrors(p => ({ ...p, card_number: '' }))
-                          setShowCardSuggest(false)
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left  cursor-pointer
-                          hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]">
-                        <div className="w-8 h-8 rounded-lg bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center shrink-0">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" strokeWidth="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/>
-                          </svg>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-0.5">Mening kartam</p>
-                          <p className="text-sm font-mono font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] tracking-wider">{userCard}</p>
-                        </div>
-                        <FaChevronDown size={11} className="text-[var(--text-soft)] -rotate-90 shrink-0" />
-                      </button>
+                      bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] divide-y divide-[var(--stroke-sub)] dark:divide-[var(--stroke-soft)]">
+                      {visibleSuggestions.map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={() => {
+                            setForm(p => ({ ...p, card_number: suggestion.value }))
+                            setErrors(p => ({ ...p, card_number: '' }))
+                            setShowCardSuggest(false)
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left cursor-pointer
+                            hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]">
+                          <div className="w-8 h-8 rounded-lg bg-[#EEF1FB] dark:bg-[var(--bg-elevation-2)] flex items-center justify-center shrink-0">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" strokeWidth="2">
+                              <rect x="1" y="4" width="22" height="16" rx="2" /><path d="M1 10h22" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)] mb-0.5">{suggestion.label}</p>
+                            <p className="text-sm font-mono font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)] tracking-wider">{suggestion.value}</p>
+                          </div>
+                          <FaChevronDown size={11} className="text-[var(--text-soft)] -rotate-90 shrink-0" />
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
