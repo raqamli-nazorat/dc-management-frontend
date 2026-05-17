@@ -18,6 +18,7 @@ import autoTable from 'jspdf-autotable'
 import Papa from 'papaparse'
 import { FiCalendar } from 'react-icons/fi'
 import { IoCloseCircle } from 'react-icons/io5'
+import { InfoModal } from './Modals/InfoModal'
 
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
@@ -86,6 +87,7 @@ const Employee = () => {
   const [UserReports, setUserReports] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
+  const [infoModal, setInfoModal] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
@@ -216,6 +218,7 @@ const Employee = () => {
     }
     finally {
       setIsLoading(false)
+      setInfoModal(true)
     }
   }
 
@@ -1014,7 +1017,7 @@ const Employee = () => {
                     <th
                       key={col.key}
                       rowSpan={2}
-                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]  ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                      className={`p-3 text-xs bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]  ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                       style={{
                         width: col.width,
                         minWidth: col.width,
@@ -1036,7 +1039,7 @@ const Employee = () => {
                       </div>
                     </th>
                   ))}
-                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[var(--stroke-soft)]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ right: getPinnedRight('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[var(--stroke-soft)]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ right: getPinnedRight('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center justify-center gap-2">
                       <Checkbox
                         checked={tablePin.tasks}
@@ -1047,11 +1050,11 @@ const Employee = () => {
                     </div>
                   </th>
                 </tr>
-                <tr className="bg-[#7186ED] dark:bg-[#7f95e6] text-[10px] text-center">
+                <tr className="bg-[#7186ED] dark:bg-[#42507a] text-[10px] text-center">
                   {GROUP_SUBS.tasks.map((sub) => (
                     <th
                       key={sub.key}
-                      className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
+                      className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`}
                       style={{
                         width: 140,
                         minWidth: 140,
@@ -1186,6 +1189,13 @@ const Employee = () => {
           title="Sinovchilar tanlang"
           onConfirm={handleSelectTesterConfirm}
           onClose={() => setSelectTester(false)}
+        />
+      )}
+
+      {infoModal && (
+        <InfoModal
+          isOpen={infoModal}
+          onClose={() => setInfoModal(false)}
         />
       )}
 

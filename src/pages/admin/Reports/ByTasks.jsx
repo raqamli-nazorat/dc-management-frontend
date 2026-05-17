@@ -42,6 +42,7 @@ import { usePositions } from '../../../MostUsesDates/'
 import { FiCalendar } from 'react-icons/fi'
 import { IoCloseCircle } from 'react-icons/io5'
 import { MdExpandMore } from 'react-icons/md'
+import { InfoModal } from './Modals/InfoModal'
 
 const type = [
   { label: "Xatolik", value: "bug" },
@@ -110,12 +111,12 @@ const Employee = () => {
   const [selectProject, setSelectProject] = useState(false)
   const [UserReports, setUserReports] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [infoModal, setInfoModal] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
-  const RIGHT_PINNED_KEYS = ['deadline', 'created_at', 'sprint', 'position', 'reopened_count', 'rejection_reason'];
   const [tablePin, setTablePin] = useState({
     number: true,
     project: false,
@@ -201,6 +202,7 @@ const Employee = () => {
     }
     finally {
       setIsLoading(false)
+      setInfoModal(true)
     }
   }
 
@@ -1076,14 +1078,14 @@ const Employee = () => {
             onScroll={handleMoreReportsScroll}
           >
             <table className="text-left border-collapse w-[270px]">
-              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#7f95e6]">
+              <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#42507a]">
                 <tr>
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] sticky z-50!`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] sticky z-50!`}
                     style={{ width: 49.5, minWidth: 49.5, maxWidth: 49.5, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)', textAlign: 'center' }}>
                     №
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.prefix ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.prefix ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 100, minWidth: 100, maxWidth: 100, left: getPinnedLeft('prefix'), boxShadow: tablePin.prefix ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.prefix} onChange={(e) => handlePin('prefix', e.target.checked)} className="custom-header-checkbox" />
@@ -1091,7 +1093,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.project ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.project ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('project'), boxShadow: tablePin.project ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.project} onChange={(e) => handlePin('project', e.target.checked)} className="custom-header-checkbox" />
@@ -1099,7 +1101,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.title ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.title ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 250, minWidth: 250, maxWidth: 250, left: getPinnedLeft('title'), boxShadow: tablePin.title ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.title} onChange={(e) => handlePin('title', e.target.checked)} className="custom-header-checkbox" />
@@ -1107,7 +1109,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.assignee ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.assignee ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 220, minWidth: 220, maxWidth: 220, left: getPinnedLeft('assignee'), boxShadow: tablePin.assignee ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.assignee} onChange={(e) => handlePin('assignee', e.target.checked)} className="custom-header-checkbox" />
@@ -1115,7 +1117,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_by ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_by ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 220, minWidth: 220, maxWidth: 220, left: getPinnedLeft('created_by'), boxShadow: tablePin.created_by ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.created_by} onChange={(e) => handlePin('created_by', e.target.checked)} className="custom-header-checkbox" />
@@ -1123,7 +1125,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.priority ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.priority ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('priority'), boxShadow: tablePin.priority ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
                     <div className="flex items-center gap-2 justify-end">
                       <Checkbox checked={tablePin.priority} onChange={(e) => handlePin('priority', e.target.checked)} className="custom-header-checkbox" />
@@ -1131,7 +1133,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.status ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.status ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 120, minWidth: 120, maxWidth: 120, left: getPinnedLeft('status'), boxShadow: tablePin.status ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.status} onChange={(e) => handlePin('status', e.target.checked)} className="custom-header-checkbox" />
@@ -1139,7 +1141,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.type ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.type ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 140, minWidth: 140, maxWidth: 140, left: getPinnedLeft('type'), boxShadow: tablePin.type ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.type} onChange={(e) => handlePin('type', e.target.checked)} className="custom-header-checkbox" />
@@ -1147,7 +1149,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.task_price ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.task_price ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('task_price'), boxShadow: tablePin.task_price ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
                     <div className="flex items-center gap-2 justify-end">
                       <Checkbox checked={tablePin.task_price} onChange={(e) => handlePin('task_price', e.target.checked)} className="custom-header-checkbox" />
@@ -1155,7 +1157,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.penalty_percentage ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.penalty_percentage ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 150, minWidth: 150, maxWidth: 150, left: getPinnedLeft('penalty_percentage'), boxShadow: tablePin.penalty_percentage ? (isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
                     <div className="flex items-center gap-2 justify-end">
                       <Checkbox checked={tablePin.penalty_percentage} onChange={(e) => handlePin('penalty_percentage', e.target.checked)} className="custom-header-checkbox" />
@@ -1163,7 +1165,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.deadline ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.deadline ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 160, minWidth: 160, maxWidth: 160, right: getPinnedRight('deadline'), boxShadow: tablePin.deadline ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.deadline} onChange={(e) => handlePin('deadline', e.target.checked)} className="custom-header-checkbox" />
@@ -1171,7 +1173,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_at ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.created_at ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 160, minWidth: 160, maxWidth: 160, right: getPinnedRight('created_at'), boxShadow: tablePin.created_at ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.created_at} onChange={(e) => handlePin('created_at', e.target.checked)} className="custom-header-checkbox" />
@@ -1179,7 +1181,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.sprint ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.sprint ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('sprint'), boxShadow: tablePin.sprint ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.sprint} onChange={(e) => handlePin('sprint', e.target.checked)} className="custom-header-checkbox" />
@@ -1187,7 +1189,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 180, minWidth: 180, maxWidth: 180, right: getPinnedRight('position'), boxShadow: tablePin.position ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'end' }}>
                     <div className="flex items-center gap-2 justify-end">
                       <Checkbox checked={tablePin.position} onChange={(e) => handlePin('position', e.target.checked)} className="custom-header-checkbox" />
@@ -1195,7 +1197,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.reopened_count ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.reopened_count ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 150, minWidth: 150, maxWidth: 150, right: getPinnedRight('reopened_count'), boxShadow: tablePin.reopened_count ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'center' }}>
                     <div className="flex items-center gap-2 justify-center">
                       <Checkbox checked={tablePin.reopened_count} onChange={(e) => handlePin('reopened_count', e.target.checked)} className="custom-header-checkbox" />
@@ -1203,7 +1205,7 @@ const Employee = () => {
                     </div>
                   </th>
 
-                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.rejection_reason ? 'sticky z-50!' : 'z-20!'}`}
+                  <th className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[#292A2A] ${tablePin.rejection_reason ? 'sticky z-50!' : 'z-20!'}`}
                     style={{ width: 220, minWidth: 220, maxWidth: 220, right: getPinnedRight('rejection_reason'), boxShadow: tablePin.rejection_reason ? (isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)') : 'none', textAlign: 'start' }}>
                     <div className="flex items-center gap-2 justify-start">
                       <Checkbox checked={tablePin.rejection_reason} onChange={(e) => handlePin('rejection_reason', e.target.checked)} className="custom-header-checkbox" />
@@ -1373,6 +1375,13 @@ const Employee = () => {
           selectedList={filters.project ? filters.project.split(',') : []}
           onConfirm={handleSelectProjectConfirm}
           onClose={() => setSelectProject(false)}
+        />
+      )}
+
+      {infoModal && (
+        <InfoModal
+          isOpen={infoModal}
+          onClose={() => setInfoModal(false)}
         />
       )}
 

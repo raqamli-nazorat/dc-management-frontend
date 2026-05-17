@@ -20,6 +20,7 @@ import { saveAs } from 'file-saver'
 import { FiCalendar } from 'react-icons/fi'
 import { IoCloseCircle } from 'react-icons/io5'
 import { MdExpandMore } from 'react-icons/md'
+import { InfoModal } from './Modals/InfoModal'
 
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
@@ -143,6 +144,8 @@ const Employee = () => {
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const filterRef = useRef(null)
   const filterButtonRef = useRef(null)
+
+  const [infoModal, setInfoModal] = useState(false)
 
   const [tablePin, setTablePin] = useState({ number: true })
 
@@ -281,9 +284,9 @@ const Employee = () => {
     }
     finally {
       setIsLoading(false)
+      setInfoModal(true)
     }
   }
-
 
   const loadMoreReports = async () => {
     if (!ReportsNextURL) return
@@ -1290,14 +1293,14 @@ const Employee = () => {
           onScroll={handleMoreReportsScroll}
         >
           <table className="text-left border-collapse w-[4500px]">
-            <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#7f95e6]">
+            <thead className="bg-[#7186ED] text-white sticky top-0 z-20! dark:bg-[#42507a]">
               <tr>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] w-[40px] dark:border-[#292A2A]  sticky z-50!`} style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] w-[40px] dark:border-[#292A2A]  sticky z-50!`} style={{ width: 45, minWidth: 45, maxWidth: 45, left: getPinnedLeft('number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex flex-col items-center gap-1">
                     №
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.username ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('username'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.username ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 200, minWidth: 200, maxWidth: 200, left: getPinnedLeft('username'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.username}
@@ -1307,7 +1310,7 @@ const Employee = () => {
                     Ism Sharifi
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('position'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.position ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('position'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.position}
@@ -1317,7 +1320,7 @@ const Employee = () => {
                     Lavozim
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.region ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('region'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.region ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('region'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.region}
@@ -1327,7 +1330,7 @@ const Employee = () => {
                     Viloyati
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.district ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('district'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.district ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 160, minWidth: 160, maxWidth: 160, left: getPinnedLeft('district'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.district}
@@ -1337,7 +1340,7 @@ const Employee = () => {
                     Tumani
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.phone_number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('phone_number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.phone_number ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('phone_number'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.phone_number}
@@ -1347,7 +1350,7 @@ const Employee = () => {
                     Telefon raqami
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.fixed_salary ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('fixed_salary'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.fixed_salary ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('fixed_salary'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.fixed_salary}
@@ -1357,7 +1360,7 @@ const Employee = () => {
                     Oylik maosh (UZS)
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.balance ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('balance'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-3 text-[13px] bg-[#7186ED] dark:bg-[#42507a] font-bold border-[var(--stroke-sub)] dark:border-[#292A2A] text-start  ${tablePin.balance ? 'sticky z-50!' : 'z-20!'}`} style={{ width: 180, minWidth: 180, maxWidth: 180, left: getPinnedLeft('balance'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={tablePin.balance}
@@ -1367,7 +1370,7 @@ const Employee = () => {
                     Balans (UZS)
                   </div>
                 </th>
-                <th colSpan={6} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[#292A2A]  ${tablePin.projects ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('projects'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={6} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[#292A2A]  ${tablePin.projects ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('projects'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.projects}
@@ -1377,7 +1380,7 @@ const Employee = () => {
                     Loyihalar
                   </div>
                 </th>
-                <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[#292A2A]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={8} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[#292A2A]  ${tablePin.tasks ? 'sticky z-50!' : 'z-20!'}`} style={{ left: getPinnedLeft('tasks'), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.tasks}
@@ -1387,7 +1390,7 @@ const Employee = () => {
                     Vazifalar
                   </div>
                 </th>
-                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[#292A2A]  ${tablePin.meetings ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('meetings'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[#292A2A]  ${tablePin.meetings ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('meetings'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.meetings}
@@ -1397,7 +1400,7 @@ const Employee = () => {
                     Yig'ilishlar
                   </div>
                 </th>
-                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[#292A2A]  ${tablePin.expenses ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('expenses'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={4} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[#292A2A]  ${tablePin.expenses ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('expenses'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.expenses}
@@ -1407,7 +1410,7 @@ const Employee = () => {
                     Xarajat so'rovlari (UZS)
                   </div>
                 </th>
-                <th colSpan={3} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#7f95e6] dark:border-[#292A2A]  ${tablePin.payroll ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('payroll'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                <th colSpan={3} className={`p-2 text-xs font-bold border-b border-[var(--stroke-sub)] bg-[#7186ED] dark:bg-[#42507a] dark:border-[#292A2A]  ${tablePin.payroll ? 'sticky z-60!' : 'z-20!'}`} style={{ right: getPinnedRight('payroll'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                   <div className="flex items-center justify-center gap-2">
                     <Checkbox
                       checked={tablePin.payroll}
@@ -1417,19 +1420,19 @@ const Employee = () => {
                     Ish haqi (UZS)
                   </div>
                 </th>
-                <th rowSpan={2} className={`p-2 text-xs bg-[#7186ED] font-bold border-[var(--stroke-sub)] text-center dark:bg-[#7f95e6]! dark:border-[#292A2A]  ${tablePin.date_joined ? 'sticky right-0 z-60!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('date_joined'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                <th rowSpan={2} className={`p-2 text-xs bg-[#7186ED] font-bold border-[var(--stroke-sub)] text-center dark:bg-[#42507a]! dark:border-[#292A2A]  ${tablePin.date_joined ? 'sticky right-0 z-60!' : 'z-20!'}`} style={{ width: 140, minWidth: 140, maxWidth: 140, right: getPinnedRight('date_joined'), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                   <Checkbox
                     checked={tablePin.date_joined}
                     onChange={(e) => handlePin('date_joined', e.target.checked)}
-                    className="custom-header-checkbox scale-75"
+                    className="custom-header-checkbox mr-2!"
                   />
                   Ishga kirgan vaqti
                 </th>
               </tr>
 
-              <tr className="bg-[#7186ED] dark:bg-[#7f95e6] text-[10px] text-center">
+              <tr className="bg-[#7186ED] dark:bg-[#42507a] text-[10px] text-center">
                 {GROUP_SUBS.projects.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1438,7 +1441,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.tasks.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-50!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, left: getSubPinnedLeft(sub.key), boxShadow: isDark ? 'inset -1px 0 0 0 #292A2A' : 'inset -1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1447,7 +1450,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.meetings.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 100, minWidth: 100, maxWidth: 100, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1456,7 +1459,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.expenses.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1465,7 +1468,7 @@ const Employee = () => {
                 ))}
 
                 {GROUP_SUBS.payroll.map((sub) => (
-                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#7f95e6]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
+                  <th key={sub.key} className={`p-2 bg-[#7186ED] dark:bg-[#42507a]  ${tablePin[sub.key] ? 'sticky z-60!' : ''}`} style={{ width: 120, minWidth: 120, maxWidth: 120, right: getSubPinnedRight(sub.key), boxShadow: isDark ? 'inset 1px 0 0 0 #292A2A' : 'inset 1px 0 0 0 var(--stroke-sub)' }}>
                     <div className="flex items-center gap-0.5">
                       <Checkbox checked={!!tablePin[sub.key]} onChange={(e) => handlePin(sub.key, e.target.checked)} className="custom-header-checkbox scale-75" />
                       {sub.label}
@@ -1622,6 +1625,11 @@ const Employee = () => {
           onClose={() => setSelectEmployee(false)}
         />
       )}
+
+      <InfoModal
+        isOpen={infoModal}
+        onClose={() => setInfoModal(false)}
+      />
 
     </div>
   )

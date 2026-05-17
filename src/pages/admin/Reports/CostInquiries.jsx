@@ -39,6 +39,7 @@ import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import { FiCalendar } from 'react-icons/fi'
 import { IoCloseCircle } from 'react-icons/io5'
+import { InfoModal } from './Modals/InfoModal'
 
 const payment_type = [
   { label: "Naqd pul orqali", value: "cash" },
@@ -99,6 +100,7 @@ const CostInquiries = () => {
   const [UserReports, setUserReports] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
+  const [infoModal, setInfoModal] = useState(false)
   const [ReportsNextURL, setReportsNextURL] = useState(null)
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const filterRef = useRef(null)
@@ -190,6 +192,7 @@ const CostInquiries = () => {
     }
     finally {
       setIsLoading(false)
+      setInfoModal(true)
     }
   }
 
@@ -1088,7 +1091,7 @@ const CostInquiries = () => {
                       <th
                         key={col.key}
                         rowSpan={2}
-                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#7f95e6] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
+                        className={`p-3 text-xs bg-[#7186ED] dark:bg-[#42507a] font-bold border-r border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] ${tablePin[col.key] ? 'sticky z-50!' : 'z-20!'}`}
                         style={{
                           width: col.width,
                           minWidth: col.width,
@@ -1234,6 +1237,13 @@ const CostInquiries = () => {
           selectedList={filters.projects ? filters.projects.split(',') : []}
           onConfirm={handleSelectProjectConfirm}
           onClose={() => setSelectProject(false)}
+        />
+      )}
+
+      {infoModal && (
+        <InfoModal
+          isOpen={infoModal}
+          onClose={() => setInfoModal(false)}
         />
       )}
 
