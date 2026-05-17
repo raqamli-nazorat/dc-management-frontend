@@ -501,20 +501,18 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       {pickerOpen === 'employees' && (
         <UserPickerModal title="Xodim tanlang"
           selected={form.employees}
-          users={users}
+          roles="employee"
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('employees', list); setPickerOpen(null) }}
-          onSearch={getUsers}
         />
       )}
 
       {pickerOpen === 'testers' && (
         <UserPickerModal title="Sinovchi tanlang"
           selected={form.testers}
-          users={users}
+          roles="employee"
           onClose={() => setPickerOpen(null)}
           onConfirm={list => { set('testers', list); setPickerOpen(null) }}
-          onSearch={getUsers}
         />
       )}
     </>

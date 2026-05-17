@@ -18,6 +18,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
     const { isDark } = useTheme()
     const [employees, setEmployees] = useState([])
+    const [managers, setManagers] = useState([])
     const [mgrQuery, setMgrQuery] = useState('')
 
     const [project, setProject] = useState({})
@@ -240,17 +241,26 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     const getEmployee = async (search) => {
         const searchTerm = typeof search === 'object' ? search.search : search
         try {
-            const { data } = await axiosAPI.get("users/all/", { params: { search: searchTerm, role: "employee" } })
-
-            setEmployees(data.results || [])
+            const { data } = await axiosAPI.get("users/all/", { params: { search: searchTerm, roles: "employee" } })
+            setEmployees(data?.data?.results || data?.results || [])
         } catch (error) {
             console.log(error)
             toast.error(error?.response?.data?.error?.errorMsg || "Xodimlar olinmadi")
         }
     }
 
+    const getManagers = async (search = '') => {
+        try {
+            const { data } = await axiosAPI.get("users/all/", { params: { search, roles: "manager" } })
+            setManagers(data?.data?.results || data?.results || [])
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         getEmployee({ search: '' })
+        getManagers()
     }, [])
 
     useEffect(() => {
@@ -366,7 +376,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                     value={mgrQuery}
                                                     onChange={e => {
                                                         setMgrQuery(e.target.value)
-                                                        getEmployee({ search: e.target.value })
+                                                        getManagers(e.target.value)
                                                     }}
                                                     className="flex-1 outline-none bg-transparent text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)]"
                                                 />
@@ -385,9 +395,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                         </div>
                                         {mgrOpen && (
                                             <div className="absolute top-full left-0 mt-1 z-60 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-44 bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
-                                                {employees.filter(e => e.roles?.includes('manager')).map((u, i) => (
+                                                {managers.map((u, i) => (
                                                     <button key={u.id} type="button" onClick={() => { setForm(p => ({ ...p, manager: u.username, manager_id: u.id })); setMgrOpen(false); setMgrQuery('') }}
-                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < employees.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
+                                                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm cursor-pointer ${i < managers.length - 1 ? 'border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]' : ''} ${form.manager === u.username ? 'bg-[#EEF1FB] text-[var(--accent-strong)] font-semibold dark:bg-[var(--bg-elevation-2)] dark:text-[var(--accent-soft)]' : 'text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)]'}`}>
                                                         <div className="w-6 h-6 rounded-full bg-[var(--accent-sub)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-sub)] shrink-0">
                                                             {u.username?.slice(0, 2).toUpperCase()}
                                                         </div>
@@ -623,20 +633,18 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
             {pickerOpen === 'employees' && (
                 <UserPickerModal title="Xodim tanlang"
                     selected={form.employees}
-                    users={employees}
+                    roles="employee"
                     onClose={() => setPickerOpen(null)}
                     onConfirm={list => { set('employees', list); setPickerOpen(null) }}
-                    onSearch={getEmployee}
                 />
             )}
 
             {pickerOpen === 'testers' && (
                 <UserPickerModal title="Sinovchi tanlang"
                     selected={form.testers}
-                    users={employees}
+                    roles="employee"
                     onClose={() => setPickerOpen(null)}
                     onConfirm={list => { set('testers', list); setPickerOpen(null) }}
-                    onSearch={getEmployee}
                 />
             )}
         </>
