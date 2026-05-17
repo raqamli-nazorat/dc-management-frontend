@@ -351,20 +351,20 @@ const ProjectsPage = () => {
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">{idx + 1}</td>
                     <td className="px-4 py-3 text-sm font-medium" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5 group">
-                        <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)]">{p.uid || p.title || p.name}</span>
+                        <span className="text-[var(--text-soft)] dark:text-[var(--text-sub)]">{p.prefix}</span>
                         <button
                           onClick={() => {
-                            const val = p.uid || p.title || p.name || ''
+                            const val = p.prefix || ''
                             navigator.clipboard.writeText(val).then(() => {
                               setCopiedUid(p.id)
                               setTimeout(() => setCopiedUid(null), 2000)
-                            }).catch(() => {})
+                            }).catch(() => { })
                           }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded-md hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-soft)] dark:text-[var(--text-sub)] cursor-pointer"
                         >
                           {copiedUid === p.id
-                            ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                            : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z"/></svg>
+                            ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            : <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z" /></svg>
                           }
                         </button>
                       </div>
