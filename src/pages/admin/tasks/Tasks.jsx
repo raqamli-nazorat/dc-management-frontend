@@ -727,12 +727,6 @@ export default function TasksPage() {
     const taskId = Number(draggableId)
     const draggedCard = cards.find(c => String(c.id) === String(draggableId))
 
-    // Xodim faqat 'checked' va 'rejected' ga o'tkaza olmaydi
-    if (isEmployee && (newStatus === 'checked' || newStatus === 'rejected')) {
-      toast.error("Ruxsat yo'q", "Siz vazifani bu bo'limga o'tkaza olmaysiz")
-      return
-    }
-
     // Ruxsat etilgan o'tishlarni tekshirish
     const allowed = ALLOWED_TRANSITIONS[srcStatus] || []
     if (!allowed.includes(newStatus)) {
@@ -870,9 +864,8 @@ export default function TasksPage() {
             >
               {COLUMNS.map(col => {
                 const allowedCols = dragSourceCol ? (ALLOWED_TRANSITIONS[dragSourceCol] || []) : [];
-                const isRestrictedForEmployee = !!(dragSourceCol && isEmployee && (col.id === 'checked' || col.id === 'rejected'));
-                const isDropDisabled = isRestrictedForEmployee || !!(dragSourceCol && dragSourceCol !== col.id && !allowedCols.includes(col.id));
-                const isDimmed = isRestrictedForEmployee || !!(dragSourceCol && dragSourceCol !== col.id && !allowedCols.includes(col.id));
+                const isDropDisabled = !!(dragSourceCol && dragSourceCol !== col.id && !allowedCols.includes(col.id));
+                const isDimmed = !!(dragSourceCol && dragSourceCol !== col.id && !allowedCols.includes(col.id));
 
                 return (
                   <KanbanColumn
