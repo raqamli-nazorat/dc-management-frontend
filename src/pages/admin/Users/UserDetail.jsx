@@ -1,4 +1,4 @@
-﻿import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
+import { FaArrowLeft, FaCamera, FaTrash, FaUser } from "react-icons/fa"
 import FilterSelect from "../Components/FilterSelect"
 import { usePageAction } from "../../../context/PageActionContext"
 import { useEffect, useState } from "react"
@@ -7,6 +7,7 @@ import { axiosAPI } from "../../../service/axiosAPI"
 import { FaArrowsRotate, FaCheck, FaFileLines, FaXmark } from "react-icons/fa6"
 import { PiTelegramLogo } from "react-icons/pi"
 import { FiPlus } from "react-icons/fi"
+import { useAuth } from "../../../context/AuthContext"
 import { toast } from "../../../Toast/ToastProvider"
 
 const Dropdown = FilterSelect
@@ -62,6 +63,9 @@ const formatCard = (val) => {
 const UserDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
+
+    const { user: userInfo } = useAuth()
+    const isAuditor = userInfo?.active_role === "auditor"
 
     const { registerBreadcrumb, clearBreadcrumb } = usePageAction()
 
@@ -180,7 +184,6 @@ const UserDetail = () => {
         }
     })() : {}
 
-    const handleCancel = () => setForm(initial)
 
     const handleSave = async () => {
         try {
@@ -307,8 +310,8 @@ const UserDetail = () => {
                     <p className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-1">Foydalanuvchi topilmadi</p>
                     <p className="text-sm">Qidirilayotgan foydalanuvchi mavjud emas yoki o'chirilgan bo'lishi mumkin.</p>
                 </div>
-                <button 
-                    onClick={() => navigate('/admin/users')} 
+                <button
+                    onClick={() => navigate('/admin/users')}
                     className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--accent-strong)] text-white font-medium hover:bg-[#32458C] transition-all shadow-lg shadow-blue-500/20 active:scale-95"
                 >
                     <FaArrowLeft size={14} /> Foydalanuvchilar ro'yxatiga qaytish
@@ -365,14 +368,16 @@ const UserDetail = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Foydalanuvchining ma'lumotlari</h1>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setConfirmDelete(true)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer text-[var(--error-strong)] bg-[#FFF2F2] hover:bg-[#fdcaca] dark:text-[var(--error-sub)] dark:hover:bg-[var(--error-strong)]/6 dark:bg-[var(--error-strong)]/10"
-                        >
-                            <FaTrash size={13} /> O'chirish
-                        </button>
-                    </div>
+                    {!isAuditor && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setConfirmDelete(true)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium  cursor-pointer text-[var(--error-strong)] bg-[#FFF2F2] hover:bg-[#fdcaca] dark:text-[var(--error-sub)] dark:hover:bg-[var(--error-strong)]/6 dark:bg-[var(--error-strong)]/10"
+                            >
+                                <FaTrash size={13} /> O'chirish
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Avatar */}
@@ -387,29 +392,31 @@ const UserDetail = () => {
                                 />
                             ) : (
                                 <div
-                                    className="w-full h-full rounded-xl bg-gradient-to-br from-[#bdc4eb] to-[#a1abf7] flex items-center justify-center  cursor-pointer"
-                                    onClick={() => document.getElementById('avatar-input').click()}
+                                    className={`w-full h-full rounded-xl bg-gradient-to-br from-[#bdc4eb] to-[#a1abf7] flex items-center justify-center ${!isAuditor ? 'cursor-pointer' : ''}`}
+                                    onClick={() => !isAuditor && document.getElementById('avatar-input').click()}
                                 >
                                     <FaUser color="#fff" size={50} />
                                 </div>
                             )}
-                            <label>
-                                <span className="bg-[#3F67FF] rounded-full p-1.5 absolute left-[55px] bottom-0 cursor-pointer cam">
-                                    <FaCamera className="text-white" size={13} />
-                                </span>
-                                <input
-                                    type="file"
-                                    hidden
-                                    accept="image/*"
-                                    id='avatar-input'
-                                    onChange={e => {
-                                        const file = e.target.files?.[0]
-                                        if (file) {
-                                            set('avatar', file)
-                                        }
-                                    }}
-                                />
-                            </label>
+                            {!isAuditor && (
+                                <label>
+                                    <span className="bg-[#3F67FF] rounded-full p-1.5 absolute left-[55px] bottom-0 cursor-pointer cam">
+                                        <FaCamera className="text-white" size={13} />
+                                    </span>
+                                    <input
+                                        type="file"
+                                        hidden
+                                        accept="image/*"
+                                        id='avatar-input'
+                                        onChange={e => {
+                                            const file = e.target.files?.[0]
+                                            if (file) {
+                                                set('avatar', file)
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            )}
                         </div>
 
                         <h2 className="text-2xl font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
@@ -427,7 +434,7 @@ const UserDetail = () => {
                     <div className="grid grid-cols-3 gap-3">
                         <div>
                             <label className={labelCls}>Ism Sharifi</label>
-                            <input className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} />
+                            <input className={inputCls} disabled={isAuditor} value={form.name} onChange={e => set('name', e.target.value)} />
                         </div>
 
                         <div>
@@ -437,6 +444,7 @@ const UserDetail = () => {
                                 type="text"
                                 inputMode="numeric"
                                 placeholder="0.00"
+                                disabled={isAuditor}
                                 value={formatNum(form.fixed_salary)}
                                 onChange={e => set('fixed_salary', formatNum(e.target.value))}
                             />
@@ -465,6 +473,7 @@ const UserDetail = () => {
                                 type="text"
                                 inputMode="numeric"
                                 placeholder="+998 90 123 45 67"
+                                disabled={isAuditor}
                                 value={form.phone_number}
                                 onChange={e => set('phone_number', formatPhone(e.target.value))}
                             />
@@ -476,6 +485,7 @@ const UserDetail = () => {
                                 type="text"
                                 inputMode="numeric"
                                 placeholder="0000 0000 0000 0000"
+                                disabled={isAuditor}
                                 value={form.card_number || ''}
                                 onChange={e => set('card_number', formatCard(e.target.value))}
                             />
@@ -496,6 +506,7 @@ const UserDetail = () => {
                                 }}
                                 placeholder='Viloyatni tanlang'
                                 padding="11px 11px"
+                                disabled={isAuditor}
                                 className="dark:bg-[#0d1117]!"
                             />
                         </div>
@@ -510,7 +521,7 @@ const UserDetail = () => {
                                 }}
                                 className="dark:bg-[#0d1117]!"
                                 padding="11px 11px"
-                                disabled={!form.region_info}
+                                disabled={isAuditor || !form.region_info}
                             />
                         </div>
                     </div>
@@ -522,9 +533,11 @@ const UserDetail = () => {
                             <div className="flex gap-2">
                                 <input className={inputCls} style={{ maxWidth: 72 }} placeholder="AA" maxLength={2}
                                     value={form.passportSeria}
+                                    disabled={isAuditor}
                                     onChange={e => set('passportSeria', e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2))} />
                                 <input className={inputCls} placeholder="1234567" maxLength={7}
                                     value={form.passportRaqam}
+                                    disabled={isAuditor}
                                     onChange={e => set('passportRaqam', e.target.value.replace(/\D/g, '').slice(0, 7))} />
                             </div>
                         </div>
@@ -536,31 +549,35 @@ const UserDetail = () => {
                                     <a href={typeof form.passport_image === 'string' ? form.passport_image : URL.createObjectURL(form.passport_image)} target="_blank" rel="noreferrer" className="flex-1 truncate hover:underline text-[var(--accent-strong)]">
                                         Passport rasmini ko'rish
                                     </a>
-                                    <button
-                                        onClick={() => set('passport_image', null)}
-                                        className="text-[var(--error-strong)] hover:opacity-70 transition-opacity cursor-pointer shrink-0"
-                                        title="O'chirish"
-                                    >
-                                        <FaTrash size={14} />
-                                    </button>
+                                    {!isAuditor && (
+                                        <button
+                                            onClick={() => set('passport_image', null)}
+                                            className="text-[var(--error-strong)] hover:opacity-70 transition-opacity cursor-pointer shrink-0"
+                                            title="O'chirish"
+                                        >
+                                            <FaTrash size={14} />
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-between gap-3 pl-3 pr-1.5 py-1.5 rounded-lg border text-sm bg-[var(--bg-elevation-1)] border-[var(--stroke-sub)] text-[var(--text-soft)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-soft)]">
                                     <span className="truncate">Rasm yuklanmagan</span>
-                                    <label className="cursor-pointer bg-[var(--accent-strong)] text-white px-3 py-1.5 rounded-md hover:bg-[#32458C]  text-xs font-medium shrink-0">
-                                        Rasm yuklash
-                                        <input
-                                            type="file"
-                                            hidden
-                                            accept="image/*"
-                                            onChange={e => {
-                                                const file = e.target.files?.[0]
-                                                if (file) {
-                                                    set('passport_image', file)
-                                                }
-                                            }}
-                                        />
-                                    </label>
+                                    {!isAuditor && (
+                                        <label className="cursor-pointer bg-[var(--accent-strong)] text-white px-3 py-1.5 rounded-md hover:bg-[#32458C]  text-xs font-medium shrink-0">
+                                            Rasm yuklash
+                                            <input
+                                                type="file"
+                                                hidden
+                                                accept="image/*"
+                                                onChange={e => {
+                                                    const file = e.target.files?.[0]
+                                                    if (file) {
+                                                        set('passport_image', file)
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -579,21 +596,24 @@ const UserDetail = () => {
                                                 className={inputCls + " pr-10"}
                                                 placeholder="Havola yuklang"
                                                 value={link || ''}
+                                                disabled={isAuditor}
                                                 onChange={e => {
                                                     const newLinks = [...form.links];
                                                     newLinks[index] = e.target.value;
                                                     set('links', newLinks);
                                                 }}
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={() => set('links', form.links.filter((_, i) => i !== index))}
-                                                className="absolute right-3 top-[34px] text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
-                                            >
-                                                <FaXmark size={14} />
-                                            </button>
+                                            {!isAuditor && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => set('links', form.links.filter((_, i) => i !== index))}
+                                                    className="absolute right-3 top-[34px] text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
+                                                >
+                                                    <FaXmark size={14} />
+                                                </button>
+                                            )}
                                         </div>
-                                        {isLast && index < 4 && (
+                                        {isLast && index < 4 && !isAuditor && (
                                             <button
                                                 type="button"
                                                 onClick={() => set('links', [...form.links, ''])}
@@ -605,7 +625,7 @@ const UserDetail = () => {
                                     </div>
                                 )
                             })}
-                            {(!form.links || form.links.length === 0) && (
+                            {(!form.links || form.links.length === 0) && !isAuditor && (
                                 <button
                                     type="button"
                                     onClick={() => set('links', [''])}
@@ -636,6 +656,7 @@ const UserDetail = () => {
                                         const selectedPosition = positions.find(p => p.name === v);
                                         set('position_info', selectedPosition || null);
                                     }}
+                                    disabled={isAuditor}
                                     placeholder='Lavozimni tanlang'
                                     padding="10px 12px"
                                 />
@@ -655,6 +676,7 @@ const UserDetail = () => {
                                     value={form.roles}
                                     onChange={v => set('roles', v)}
                                     multiple
+                                    disabled={isAuditor}
                                     placeholder={form.roles?.length === 0 ? "Rolni tanlang" : "Tanlangan rollar:"}
                                     padding="10px 12px"
                                 />
@@ -688,15 +710,16 @@ const UserDetail = () => {
 
                         const changed = hasChanged();
 
+                        if (isAuditor) return null;
+
                         return (
                             <button
                                 onClick={handleSave}
                                 disabled={!changed}
-                                className={`px-6 py-2.5 mt-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${
-                                    changed 
-                                    ? 'cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C] active:scale-95 shadow-md' 
-                                    : 'cursor-default text-[var(--text-disabled)] bg-[var(--bg-elevation-1)] border border-[var(--stroke-soft)] opacity-80'
-                                }`}
+                                className={`px-6 py-2.5 mt-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${changed
+                                        ? 'cursor-pointer text-white bg-[var(--accent-strong)] hover:bg-[#32458C] active:scale-95 shadow-md'
+                                        : 'cursor-default text-[var(--text-disabled)] bg-[var(--bg-elevation-1)] border border-[var(--stroke-soft)] opacity-80'
+                                    }`}
                             >
                                 <FaCheck size={14} />
                                 Saqlash

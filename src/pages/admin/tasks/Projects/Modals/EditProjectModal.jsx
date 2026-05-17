@@ -8,10 +8,13 @@ import { IoCloseCircle } from "react-icons/io5"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
+import { useAuth } from "../../../../../context/AuthContext"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
 const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL }) => {
+    const { user } = useAuth()
+
     const { isDark } = useTheme()
     const [employees, setEmployees] = useState([])
     const [mgrQuery, setMgrQuery] = useState('')
