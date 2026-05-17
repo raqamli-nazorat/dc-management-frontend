@@ -137,14 +137,17 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
     const validate = () => {
         const e = {}
-        if (!form.title.trim()) e.title = true
-        if (!form.prefix?.trim()) e.prefix = true
-        if (!form.status) e.status = true
-        if (!form.manager) e.manager = true
-        if (!form.bonus) e.bonus = true
-        if (!form.penalty_percentage) e.penalty_percentage = true
-        if (!form.deadline) e.deadline = true
-        if (!form.time) e.time = true
+
+        if (!isManager) {
+            if (!form.title.trim()) e.title = true
+            if (!form.prefix?.trim()) e.prefix = true
+            if (!form.status) e.status = true
+            if (!form.manager) e.manager = true
+            if (!form.bonus) e.bonus = true
+            if (!form.penalty_percentage) e.penalty_percentage = true
+            if (!form.deadline) e.deadline = true
+            if (!form.time) e.time = true
+        }
 
         const linkErrors = form.links.map(item => {
             const hasName = !!item.name?.trim();
@@ -167,53 +170,55 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     const saveChanges = async () => {
         if (!validate()) return
         try {
-            const payload = {
-                title: form.title,
-                prefix: form.prefix,
-                status: form.status,
-                description: form.description,
-                manager: form.manager_id,
-                project_price: Number(form.bonus.toString().replace(/\s/g, '')) || 0,
-                penalty_percentage: Number(form.penalty_percentage.toString().replace(/\s/g, '')) || 0,
-                employees: form.employees?.map((emp) => emp.id),
-                testers: form.testers?.map((tst) => tst.id),
-                deadline: form.deadline && form.time ? dayjs(dayjs(form.deadline).format('YYYY-MM-DD') + ' ' + (typeof form.time === 'string' ? form.time : form.time.format('HH:mm'))).toISOString() : form.deadline,
-                is_hidden: form.is_hidden,
-            }
+            let projectId = project.id;
 
-            const res = await axiosAPI.patch(`projects/${project.id}/`, payload)
-            if (res.status === 200) {
-
-                const projectId = res?.data?.data?.id || project.id;
-
-                if (deletedIds.length > 0) {
-                    const deletePromises = deletedIds.map(docId => axiosAPI.delete(`project-documents/${docId}/`));
-                    await Promise.all(deletePromises);
+            if (!isManager) {
+                const payload = {
+                    title: form.title,
+                    prefix: form.prefix,
+                    status: form.status,
+                    description: form.description,
+                    manager: form.manager_id,
+                    project_price: Number(form.bonus.toString().replace(/\s/g, '')) || 0,
+                    penalty_percentage: Number(form.penalty_percentage.toString().replace(/\s/g, '')) || 0,
+                    employees: form.employees?.map((emp) => emp.id),
+                    testers: form.testers?.map((tst) => tst.id),
+                    deadline: form.deadline && form.time ? dayjs(dayjs(form.deadline).format('YYYY-MM-DD') + ' ' + (typeof form.time === 'string' ? form.time : form.time.format('HH:mm'))).toISOString() : form.deadline,
+                    is_hidden: form.is_hidden,
                 }
 
-                const linkPromises = form.links
-                    .filter(item => item.name.trim() || item.link.trim())
-                    .map((item, index) => {
-                        const docId = item.id;
-                        const docData = {
-                            project: projectId,
-                            name: item.name || `Hujjat ${index + 1}`,
-                            value: item.value
-                        };
-
-                        if (docId) {
-                            return axiosAPI.patch(`project-documents/${docId}/`, docData);
-                        } else {
-                            return axiosAPI.post(`project-documents/`, docData);
-                        }
-                    });
-
-                await Promise.all(linkPromises);
-
-                toast.success('Malumotlar saqlandi');
-                onClose();
-                refreshData();
+                const res = await axiosAPI.patch(`projects/${project.id}/`, payload)
+                if (res.status !== 200) return
+                projectId = res?.data?.data?.id || project.id
             }
+
+            if (deletedIds.length > 0) {
+                const deletePromises = deletedIds.map(docId => axiosAPI.delete(`project-documents/${docId}/`));
+                await Promise.all(deletePromises);
+            }
+
+            const linkPromises = form.links
+                .filter(item => item.name.trim() || item.value.trim())
+                .map((item, index) => {
+                    const docId = item.id;
+                    const docData = {
+                        project: projectId,
+                        name: item.name || `Hujjat ${index + 1}`,
+                        value: item.value
+                    };
+
+                    if (docId) {
+                        return axiosAPI.patch(`project-documents/${docId}/`, docData);
+                    } else {
+                        return axiosAPI.post(`project-documents/`, docData);
+                    }
+                });
+
+            await Promise.all(linkPromises);
+
+            toast.success('Malumotlar saqlandi');
+            onClose();
+            refreshData();
         } catch (error) {
             console.error(error)
             const errData = error?.response?.data?.error;
@@ -235,9 +240,9 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     const getEmployee = async (search) => {
         const searchTerm = typeof search === 'object' ? search.search : search
         try {
-            const { data } = await axiosAPI.get("users/", { params: { search: searchTerm, roles: "employee" } })
+            const { data } = await axiosAPI.get("users/all/", { params: { search: searchTerm, role: "employee" } })
 
-            setEmployees(data.data.results || [])
+            setEmployees(data.results || [])
         } catch (error) {
             console.log(error)
             toast.error(error?.response?.data?.error?.errorMsg || "Xodimlar olinmadi")
