@@ -779,6 +779,11 @@ export default function TasksPage() {
     setDragSourceCol(start.source.droppableId)
   }
 
+  // Kanban rejimiga o'tilganda vazifalarni yuklash (faqat viewMode o'zganda)
+  useEffect(() => {
+    if (viewMode === 'kanban') loadKanbanTasks(filters, search)
+  }, [viewMode])
+
   useEffect(() => {
     if (!isAuditor) {
       registerAction({
@@ -789,7 +794,6 @@ export default function TasksPage() {
     }
 
     if (viewMode === 'kanban') {
-      loadKanbanTasks(filters, search)
       registerNavbarExtra(
         <div className="flex items-center gap-3 flex-1">
           <span
@@ -840,7 +844,7 @@ export default function TasksPage() {
     }
 
     return () => { clearAction(); clearNavbarExtra(); clearSidebarClick() }
-  }, [viewMode, search, hasFilter])
+  }, [viewMode, searchInput, search, hasFilter])
 
   /* ── KANBAN VIEW ── */
   if (viewMode === 'kanban') {
