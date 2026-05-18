@@ -337,7 +337,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
       if (mins && !isNaN(mins)) body.duration_minutes = mins
 
       const res = await axiosAPI.post('/meetings/', body)
-      toast.success("Yig'ilish yaratildi", "Yangi yig'ilish muvaffaqiyatli qo'shildi")
+      toast.success("Yig'ilish yaratildi", `${form.uid.trim() ? form.uid.trim() + ' — ' : ''}Yangi yig'ilish muvaffaqiyatli qo'shildi`)
       loadMeetings()
       onClose()
     } catch (err) {
@@ -713,7 +713,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
       const res = await axiosAPI.put(`/meetings/${meeting?.id}/`, body)
 
-      toast.success("Yig'ilish yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
+      toast.success("Yig'ilish yangilandi", `${meeting?.uid ? meeting.uid + ' — ' : ''}O'zgarishlar muvaffaqiyatli saqlandi`)
       onSaved?.()
       onClose()
     } catch (error) {
@@ -1573,10 +1573,11 @@ export default function MeetingsPage() {
 
   const handleClose = async (id) => {
     try {
+      const meeting = data.find(m => m.id === id)
       const res = await axiosAPI.post(`/meetings/${id}/close/`)
       const updated = res.data?.data ?? res.data
       setData(prev => prev.map(m => m.id === id ? { ...m, is_completed: true, ...updated } : m))
-      toast.success("Yig'ilish yakunlandi", "Yig'ilish muvaffaqiyatli yakunlandi")
+      toast.success("Yig'ilish yakunlandi", `${meeting?.uid ? meeting.uid + ' — ' : ''}Yig'ilish muvaffaqiyatli yakunlandi`)
       loadMeetings(filters, search, 1)
     } catch (err) {
       toast.error('Xatolik', parseApiError(err, "Yakunlashda xatolik"))
@@ -1585,9 +1586,10 @@ export default function MeetingsPage() {
 
   const handleDelete = async (id) => {
     try {
+      const meeting = data.find(m => m.id === id)
       await axiosAPI.delete(`/meetings/${id}/`)
       setData(prev => prev.filter(m => m.id !== id))
-      toast.delete("Yig'ilish o'chirildi", "Yig'ilish chiqindi qutisiga yuborildi")
+      toast.delete("Yig'ilish o'chirildi", `${meeting?.uid ? meeting.uid + ' — ' : ''}Yig'ilish chiqindi qutisiga yuborildi`)
       loadMeetings(filters, search, 1)
     } catch (err) {
       toast.error('Xatolik', parseApiError(err, "O'chirishda xatolik"))

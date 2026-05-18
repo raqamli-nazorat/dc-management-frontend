@@ -236,9 +236,10 @@ const ProjectsPage = () => {
 
   const handleDelete = async (id) => {
     try {
+      const project = data.find(p => p.id === id)
       await axiosAPI.delete(`/projects/${id}/`)
       setData(prev => prev.filter(p => p.id !== id))
-      toast.delete("Loyiha o'chirildi", "Loyiha chiqindi qutisiga yuborildi.")
+      toast.delete("Loyiha o'chirildi", `${project?.prefix ? project.prefix + ' — ' : ''}Loyiha chiqindi qutisiga yuborildi.`)
     } catch (err) {
       const msg = err?.response?.data?.error?.errorMsg
         || err?.response?.data?.detail
