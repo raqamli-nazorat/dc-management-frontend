@@ -217,7 +217,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
 
             await Promise.all(linkPromises);
 
-            toast.success('Malumotlar saqlandi');
+            toast.success('Malumotlar saqlandi', `${form.prefix?.trim() ? form.prefix.trim().toUpperCase() + ' — ' : ''}O'zgarishlar muvaffaqiyatli saqlandi`);
             onClose();
             refreshData();
         } catch (error) {

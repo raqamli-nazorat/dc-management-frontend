@@ -593,7 +593,7 @@ export default function TasksPage() {
     try {
       const res = await axiosAPI.post('/tasks/', body)
       const created = res.data?.data ?? res.data
-      toast.success("Vazifa yaratildi", "Yangi vazifa muvaffaqiyatli qo'shildi")
+      toast.success("Vazifa yaratildi", `${created?.uid ? created.uid + ' — ' : ''}Yangi vazifa muvaffaqiyatli qo'shildi`)
       return created
     } catch (err) {
       const details = err?.response?.data?.error?.details
@@ -613,7 +613,7 @@ export default function TasksPage() {
       const res = await axiosAPI.patch(`/tasks/${id}/`, body)
       const updated = res.data?.data ?? res.data
       setData(prev => prev.map(t => t.id === id ? { ...updated, id } : t))
-      toast.success("Vazifa yangilandi", "O'zgarishlar muvaffaqiyatli saqlandi")
+      toast.success("Vazifa yangilandi", `${updated?.uid ? updated.uid + ' — ' : ''  }O'zgarishlar muvaffaqiyatli saqlandi`)
     } catch (err) {
       const details = err?.response?.data?.error?.details
       const errorMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Yangilashda xatolik"
@@ -629,10 +629,11 @@ export default function TasksPage() {
 
   const handleDelete = async (id) => {
     try {
+      const task = data.find(t => t.id === id) || cards.find(c => c.id === id)
       await axiosAPI.delete(`/tasks/${id}/`)
       setData(prev => prev.filter(t => t.id !== id))
       setCards(prev => prev.filter(c => c.id !== id))
-      toast.delete("Vazifa o'chirildi", "Vazifa chiqindi qutisiga yuborildi.")
+      toast.delete("Vazifa o'chirildi", `${task?.uid ? task.uid + ' — ' : ''}Vazifa chiqindi qutisiga yuborildi.`)
     } catch (err) {
       const msg = parseApiError(err, "O'chirishda xatolik")
       toast.error('Xatolik', msg)

@@ -147,7 +147,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
 
       if (refreshData) refreshData()
 
-      toast.success('Loyiha yaratildi.', "Yangi loyiha muvaffaqiyatli qo'shildi.")
+      toast.success('Loyiha yaratildi.', `${form.prefix?.trim() ? form.prefix.trim().toUpperCase() + ' — ' : ''}Yangi loyiha muvaffaqiyatli qo'shildi.`)
       onClose()
     } catch (err) {
       const details = err?.response?.data?.error?.details
