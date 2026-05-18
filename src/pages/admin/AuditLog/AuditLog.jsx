@@ -615,7 +615,7 @@ export default function AuditLogPage() {
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                       {row.record_id ?? '—'}
                     </td>
-                    <td className="px-4 py-3 text-[var(--text-soft)] dark:text-[var(--text-sub)] font-mono text-xs">
+                    <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                       {row.ip_address ?? '—'}
                     </td>
                   </tr>
