@@ -342,7 +342,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
       if (mins && !isNaN(mins)) body.duration_minutes = mins
 
       const res = await axiosAPI.post('/meetings/', body)
-      toast.success("Yig'ilish yaratildi", `${form.uid.trim() ? form.uid.trim() + ' — ' : ''}Yangi yig'ilish muvaffaqiyatli qo'shildi`)
+      toast.success("Yig'ilish yaratildi", `${form.uid?.trim() ? form.uid.trim() + ' — ' : ''}Yangi yig'ilish muvaffaqiyatli qo'shildi`)
       loadMeetings()
       onClose()
     } catch (err) {
