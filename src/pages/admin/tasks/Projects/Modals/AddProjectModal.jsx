@@ -189,7 +189,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [isDirty]);
 
 
   const inputCls = (err) =>

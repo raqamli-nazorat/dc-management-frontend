@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import { FaArrowLeft, FaRegStar, FaStar, FaXmark, FaRegBookmark } from 'react-icons/fa6'
+import DiscardModal from '../../components/DiscardModal'
 
 const COLORS = [
   { id: 'red', hex: '#FF2E2E' },
@@ -18,6 +19,10 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
   const [isStarred, setIsStarred] = useState(false)
   const [showColors, setShowColors] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
+
+  const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
 
   /* Subtasklar: tahrirlashda mavjud items, yaratishda 5 ta bo'sh qator */
   const [subtasks, setSubtasks] = useState(
@@ -34,6 +39,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
       updated.push('')
     }
     setSubtasks(updated)
+    setIsDirty(true)
   }
 
   const handleSubmit = async () => {
@@ -65,26 +71,25 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") handleClose();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [isDirty]);
 
   return (
-    /* Overlay */
+    <>
+    {/* Overlay */}
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* X tugmasi */}
       <button
-        onClick={onClose}
+        onClick={handleClose}
         className="absolute top-8 right-6 w-8 h-8 flex items-center justify-center rounded-full
             bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)]
             hover:bg-[var(--stroke-sub)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
@@ -100,7 +105,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
           <div>
             <div className="flex items-center gap-3">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer"
               >
                 <FaArrowLeft className="text-[var(--text-strong)] dark:text-[var(--text-strong)]" size={16} />
@@ -136,7 +141,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
                 type="text"
                 placeholder="Vazifa nomi"
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={e => { setTitle(e.target.value); setIsDirty(true) }}
                 className="bg-transparent outline-none text-[15px] font-bold
                   text-[var(--text-strong)] dark:text-[var(--text-strong)]
                   placeholder:text-[var(--text-disabled)] dark:placeholder:text-[#474848]"
@@ -211,7 +216,7 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         {/* ── Footer ── */}
         <div className="flex items-center justify-end gap-3 px-7 py-5 shrink-0 border-t border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
               text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-2)] transition-colors"
           >
@@ -238,5 +243,9 @@ export default function AddTaskModal({ onClose, onSave, task = null }) {
         </div>
       </div>
     </div>
+    {showDiscard && (
+      <DiscardModal onCancel={() => setShowDiscard(false)} onConfirm={onClose} />
+    )}
+    </>
   )
 }

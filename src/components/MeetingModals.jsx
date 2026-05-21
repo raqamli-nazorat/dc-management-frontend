@@ -74,6 +74,12 @@ export function MeetingAttendanceModal({ meetingId, onClose, title = "Yig'ilish"
   const [dynamicProjectTitle, setDynamicProjectTitle] = useState('')
 
   useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  useEffect(() => {
     setLoading(true)
 
     Promise.all([
@@ -248,6 +254,12 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
   const [reason, setReason] = useState('')
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
   const handleSave = async () => {
     if (!reason.trim()) return toast.error("Xatolik", "Iltimos, sababni yozing")
     setSaving(true)
@@ -305,6 +317,12 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
   const [attendanceId, setAttendanceId] = useState(null)
   const [meetingTitle, setMeetingTitle] = useState("Yig'ilish")
   const [meetingDate, setMeetingDate] = useState('')
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   useEffect(() => {
     if (!meetingId || !userId) return
@@ -424,6 +442,12 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [data, setData] = useState(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   useEffect(() => {
     if (!attendanceId) return
@@ -550,6 +574,12 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
 
 // Tizim xabari modali — "Parolingizni yangilang" va shunga o'xshash system notificationlar
 export function SystemNotifModal({ title, message, date, onClose, onBack }) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
     <div className="fixed inset-y-0 right-0 z-[100] flex w-full sm:w-[500px] flex-col bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-elevation-1)] shadow-2xl border-l border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] animate-in slide-in-from-right duration-300">
       {/* Header */}

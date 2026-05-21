@@ -8,6 +8,7 @@ import FilterSelect from "../../Components/FilterSelect"
 import { FaArrowLeft } from "react-icons/fa"
 import { toast } from "../../../../Toast/ToastProvider"
 import { IoIosCamera } from "react-icons/io"
+import DiscardModal from "../../../../components/DiscardModal"
 
 const Dropdown = FilterSelect;
 
@@ -52,13 +53,18 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     const [form, setForm] = useState(EMPTY_FORM)
     const [errors, setErrors] = useState({})
     const [avatarPreview, setAvatarPreview] = useState(null)
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false)
+    const [isDirty, setIsDirty] = useState(false)
+    const [showDiscard, setShowDiscard] = useState(false)
+
+    const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
 
     const [regions, setRegions] = useState([])
     const [districts, setDistricts] = useState([])
 
     const fileRef = useRef(null)
     const set = (k, v) => {
+        setIsDirty(true)
         setForm(prev => ({ ...prev, [k]: v }))
         if (errors[k]) setErrors(prev => ({ ...prev, [k]: false }))
     }
@@ -206,23 +212,20 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     }
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === "Escape") {
-                onClose();
-            }
-        };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+        const handleKeyDown = (e) => { if (e.key === "Escape") handleClose() }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [isDirty])
 
     const getInputCls = (err) => `w-full px-3 py-2.5 rounded-lg text-sm outline-none border  bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-[#FF5B5B] focus:border-[#FF5B5B] dark:border-[#FF5B5B]' : 'border-[var(--stroke-sub)] focus:border-[var(--accent-sub)] dark:border-[var(--stroke-soft)]'}`
     const inputCls = getInputCls(false)
     const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
     return (
+        <>
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto modal-scroll py-8 px-4">
             <div className="fixed inset-0 bg-black/60" />
-            <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
+            <button onClick={handleClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer  bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
                 <FaXmark size={16} />
             </button>
             <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
@@ -230,7 +233,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     <div className="flex flex-col items-start gap-3">
                         <div className='flex gap-3'>
                             <button
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="mt-1 text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer shrink-0"
                             >
                                 <FaArrowLeft size={18} />
@@ -491,7 +494,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     </div>
                 </div>
                 <div className="px-7 py-5 flex items-center justify-end gap-3">
-                    <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+                    <button onClick={handleClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
                         <FaXmark size={14} />
                         Yopish
                     </button>
@@ -502,6 +505,10 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                 </div>
             </div>
         </div>
+        {showDiscard && (
+            <DiscardModal onCancel={() => setShowDiscard(false)} onConfirm={onClose} />
+        )}
+        </>
     )
 }
 

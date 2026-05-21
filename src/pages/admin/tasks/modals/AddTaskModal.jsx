@@ -432,7 +432,7 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, pickerOpen]);  
+  }, [isDirty, pickerOpen]);
 
   return (
     <>

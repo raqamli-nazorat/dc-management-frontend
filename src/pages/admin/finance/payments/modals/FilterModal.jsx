@@ -12,6 +12,12 @@ export default function FilterModal({ onClose, onApply, initial }) {
   const [projects, setProjects] = useState([])
 
   useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  useEffect(() => {
     axiosAPI.get('/expense-category/')
       .then(res => {
         const d = res.data?.data ?? res.data

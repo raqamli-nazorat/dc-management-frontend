@@ -1,7 +1,15 @@
-﻿import { FaArrowLeft } from "react-icons/fa"
+﻿import { useEffect } from 'react'
+import { FaArrowLeft } from "react-icons/fa"
 import { FaXmark } from "react-icons/fa6"
 
 export const ConfirmationModal = ({title, description, onClose, onAction, buttonText, confirmIcon, confirmColor, showModal}) => {
+    useEffect(() => {
+        if (!showModal) return
+        const handler = (e) => { if (e.key === 'Escape') onClose() }
+        window.addEventListener('keydown', handler)
+        return () => window.removeEventListener('keydown', handler)
+    }, [showModal, onClose])
+
     return (
         <>
             {showModal && (

@@ -282,7 +282,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, showParticipants]);
+  }, [isDirty, showParticipants]);
 
   // Loyha o'zgarganda qatnashchilarni tozalash va xodimlarni yuklash
   const handleProjectChange = (v) => {
@@ -761,7 +761,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, showParticipants]);
+  }, [isDirty, showParticipants]);
 
   return (
     <>

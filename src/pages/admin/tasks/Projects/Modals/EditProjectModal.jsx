@@ -276,7 +276,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+    }, [isDirty]);
 
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
