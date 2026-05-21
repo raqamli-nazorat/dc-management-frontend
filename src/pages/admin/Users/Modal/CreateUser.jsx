@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaFileLines, FaCamera, FaEye, FaRegEyeSlash, FaRegEye } from "react-icons/fa6"
 import { MdCheck, MdOutlineFileUpload, MdOutlineRemoveRedEye } from "react-icons/md"
 import { PiTelegramLogo } from "react-icons/pi"
@@ -9,6 +9,7 @@ import { FaArrowLeft } from "react-icons/fa"
 import { toast } from "../../../../Toast/ToastProvider"
 import { IoIosCamera } from "react-icons/io"
 import DiscardModal from "../../../../components/DiscardModal"
+import { useImagePaste } from "../../../../hooks/useImagePaste"
 
 const Dropdown = FilterSelect;
 
@@ -56,6 +57,14 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
     const [showPassword, setShowPassword] = useState(false)
     const [isDirty, setIsDirty] = useState(false)
     const [showDiscard, setShowDiscard] = useState(false)
+
+    useImagePaste((files) => {
+        if (files && files.length > 0) {
+            const file = files[0];
+            set('avatar', file);
+            setAvatarPreview(URL.createObjectURL(file));
+        }
+    });
 
     const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
 

@@ -6,6 +6,7 @@ import { useTheme } from "../../../../../context/ThemeContext"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 import DiscardModal from '../../../../../components/DiscardModal'
+import { useImagePaste } from '../../../../../hooks/useImagePaste'
 
 const AddCheck = ({ onClose, paymentId }) => {
     const { isDark } = useTheme()
@@ -43,6 +44,16 @@ const AddCheck = ({ onClose, paymentId }) => {
         }))
         setNewImages(prev => [...prev, ...mapped])
     }
+
+    useImagePaste((files) => {
+        if (!files || files.length === 0) return;
+        const mapped = files.map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            url: URL.createObjectURL(file),
+            file,
+        }))
+        setNewImages(prev => [...prev, ...mapped])
+    });
 
     const removeNew = (id) => {
         setNewImages(prev => prev.filter(img => img.id !== id))

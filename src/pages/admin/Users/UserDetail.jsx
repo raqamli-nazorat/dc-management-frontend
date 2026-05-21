@@ -9,6 +9,7 @@ import { PiTelegramLogo } from "react-icons/pi"
 import { FiPlus } from "react-icons/fi"
 import { useAuth } from "../../../context/AuthContext"
 import { toast } from "../../../Toast/ToastProvider"
+import { useImagePaste } from "../../../hooks/useImagePaste"
 
 const Dropdown = FilterSelect
 
@@ -160,6 +161,12 @@ const UserDetail = () => {
             return () => clearBreadcrumb()
         }
     }, [user, registerBreadcrumb, clearBreadcrumb])
+
+    useImagePaste((files) => {
+        if (!isAuditor && files && files.length > 0) {
+            set('avatar', files[0]);
+        }
+    });
 
     const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 

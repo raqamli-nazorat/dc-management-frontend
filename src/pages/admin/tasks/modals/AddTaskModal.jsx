@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from "react-icons/fa6"
 import { labelCls } from "../components/constants"
 import { axiosAPI } from "../../../../service/axiosAPI"
@@ -6,6 +6,7 @@ import { toast } from "../../../../Toast/ToastProvider"
 import { parseApiError } from "../../../../service/parseApiError"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 import DiscardModal from "../../../../components/DiscardModal"
+import { useImagePaste, readFromClipboard } from "../../../../hooks/useImagePaste"
 
 const PRIORITY_OPTIONS = [
   { label: 'Past', value: 'low' },
@@ -242,6 +243,14 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
   const [projectEmployees, setProjectEmployees] = useState([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  useImagePaste((files) => {
+    const newAtts = files.map(f => ({
+      file: f,
+      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+    }))
+    setAttachments(prev => [...prev, ...newAtts])
+  })
 
   useEffect(() => {
     // project-shorts � tezroq endpoint (faqat ro'yxat uchun)
@@ -630,11 +639,42 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex flex-col items-center justify-center gap-1 text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)] cursor-pointer transition-colors"
+                  className="h-20 px-4 rounded-xl border-2 border-dashed border-[var(--accent-sub)] dark:border-[var(--stroke-soft)] flex flex-col items-center justify-center gap-1.5 hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer transition-colors"
                 >
-                  <FaPaperclip size={16} />
-                  <span className="text-[10px] font-medium">Fayl</span>
+                  <div className="flex items-center gap-1.5 text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                    <FaPaperclip size={14} />
+                    <span className="text-xs font-semibold">Fayl yuklash</span>
+                  </div>
+                  <div 
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const files = await readFromClipboard();
+                        if (files && files.length > 0) {
+                          const newAtts = files.map(f => ({
+                            file: f,
+                            preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                          }));
+                          setAttachments(prev => [...prev, ...newAtts]);
+                        } else {
+                          toast.error("Buferda rasm topilmadi");
+                        }
+                      } catch (err) {
+                        toast.error("Buferdan o'qish ruxsati berilmadi yoki xatolik yuz berdi");
+                      }
+                    }}
+                    className="bg-[#EEF1FB] dark:bg-[var(--bg-elevation-1)] text-[var(--text-sub)] text-[9px] font-medium px-2 py-0.5 rounded-full cursor-pointer hover:bg-[var(--accent-sub)] hover:text-white transition-colors"
+                  >
+                    Buferdan qo'shish
+                  </div>
                 </button>
+
+                {/* Placeholders */}
+                {attachments.length < 2 && Array.from({ length: 2 - attachments.length }).map((_, i) => (
+                  <div key={`placeholder-${i}`} className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex items-center justify-center opacity-50">
+                    <span className="text-[var(--text-sub)] text-lg">+</span>
+                  </div>
+                ))}
 
                 <input
                   ref={fileInputRef}

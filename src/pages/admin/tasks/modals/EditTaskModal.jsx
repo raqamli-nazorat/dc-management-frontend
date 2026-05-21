@@ -6,6 +6,7 @@ import { toast } from '../../../../Toast/ToastProvider'
 import { parseApiError } from '../../../../service/parseApiError'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 import DiscardModal from '../../../../components/DiscardModal'
+import { useImagePaste, readFromClipboard } from '../../../../hooks/useImagePaste'
 
 const ALLOWED_TRANSITIONS = {
   todo: ['in_progress'],
@@ -291,6 +292,15 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   const [newAttachments, setNewAttachments] = useState([])
   const [showDetails, setShowDetails] = useState(false)
   const fileInputRef = useRef(null)
+
+  useImagePaste((files) => {
+    if (!canEdit) return;
+    const added = files.map(f => ({
+      file: f,
+      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+    }))
+    setNewAttachments(prev => [...prev, ...added])
+  })
   const normalizePercentInput = (val) => {
     const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
     if (!cleaned) return ''
@@ -872,11 +882,42 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex flex-col items-center justify-center gap-1 text-[var(--text-soft)] hover:border-[var(--accent-sub)] hover:text-[var(--accent-sub)] cursor-pointer transition-colors"
+                        className="h-20 px-4 rounded-xl border-2 border-dashed border-[var(--accent-sub)] dark:border-[var(--stroke-soft)] flex flex-col items-center justify-center gap-1.5 hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer transition-colors"
                       >
-                        <FaPaperclip size={16} />
-                        <span className="text-[10px] font-medium">Fayl</span>
+                        <div className="flex items-center gap-1.5 text-[var(--text-strong)] dark:text-[var(--text-strong)]">
+                          <FaPaperclip size={14} />
+                          <span className="text-xs font-semibold">Fayl yuklash</span>
+                        </div>
+                        <div 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const files = await readFromClipboard();
+                              if (files && files.length > 0) {
+                                const added = files.map(f => ({
+                                  file: f,
+                                  preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+                                }));
+                                setNewAttachments(prev => [...prev, ...added]);
+                              } else {
+                                toast.error("Buferda rasm topilmadi");
+                              }
+                            } catch (err) {
+                              toast.error("Buferdan o'qish ruxsati berilmadi yoki xatolik yuz berdi");
+                            }
+                          }}
+                          className="bg-[#EEF1FB] dark:bg-[var(--bg-elevation-1)] text-[var(--text-sub)] text-[9px] font-medium px-2 py-0.5 rounded-full cursor-pointer hover:bg-[var(--accent-sub)] hover:text-white transition-colors"
+                        >
+                          Buferdan qo'shish
+                        </div>
                       </button>
+                      
+                      {/* Placeholders */}
+                      {existingAttachments.length + newAttachments.length < 2 && Array.from({ length: 2 - (existingAttachments.length + newAttachments.length) }).map((_, i) => (
+                        <div key={`placeholder-${i}`} className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex items-center justify-center opacity-50">
+                          <span className="text-[var(--text-sub)] text-lg">+</span>
+                        </div>
+                      ))}
                       <input
                         ref={fileInputRef}
                         type="file"

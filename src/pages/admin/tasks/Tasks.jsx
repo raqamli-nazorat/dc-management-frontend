@@ -12,6 +12,7 @@ import EmptyState from '../../../components/EmptyState'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
+import { useImagePaste } from '../../../hooks/useImagePaste'
 
 // ── Label maps ──
 const TYPE_LABEL = { bug: 'Xatolik (Bug)', feature: 'Yangi funksiya', extra: "Qo'shimcha", improvement: "Qo'shimcha", research: "Tadqiqot/O'rganish" }
@@ -281,6 +282,16 @@ function RejectionModal({ task, onClose, onConfirm }) {
   const [reasonError, setReasonError] = useState(false)
   const [filesError, setFilesError] = useState(false)
   const fileRef = useRef(null)
+
+  useImagePaste((pastedFiles) => {
+    if (!pastedFiles || pastedFiles.length === 0) return;
+    const added = pastedFiles.map(f => ({
+      file: f,
+      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+    }))
+    setFiles(p => [...p, ...added])
+    setFilesError(false)
+  })
 
   const handleSubmit = async () => {
     if (!reason.trim()) {
