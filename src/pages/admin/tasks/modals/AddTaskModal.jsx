@@ -236,8 +236,7 @@ function UserPickerModal({ title, selected, onConfirm, onClose, users }) {
     </div>
   )
 }
-
-export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
+export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -253,7 +252,7 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
   })
 
   useEffect(() => {
-    // project-shorts � tezroq endpoint (faqat ro'yxat uchun)
+    // project-shorts  tezroq endpoint (faqat ro'yxat uchun)
     axiosAPI.get("/project-shorts/", { params: { page_size: 200 } })
       .then(res => {
         const payload = res.data?.data ?? res.data
@@ -274,15 +273,55 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
         const list = Array.isArray(payload) ? payload : (payload.results ?? [])
         setPositions(Array.isArray(list) ? list : [])
       }).catch(() => { })
-  }, [])
 
-  const [form, setForm] = useState({
-    project: "", title: "", description: "", priority: "low", type: "bug",
-    assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
-    deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
+    if (initialData?.project) {
+      axiosAPI.get(`/projects/${initialData.project}/`)
+        .then(res => {
+          const proj = res.data?.data ?? res.data
+          const emps = proj?.employees_info ?? []
+          setProjectEmployees(Array.isArray(emps) ? emps : [])
+        })
+        .catch(() => setProjectEmployees([]))
+    }
+  }, [initialData])
+
+  const [form, setForm] = useState(() => {
+    if (initialData) {
+      return {
+        project: initialData.project ? String(initialData.project) : "",
+        title: initialData.title || "",
+        description: initialData.description || "",
+        priority: initialData.priority || "low",
+        type: initialData.type || "bug",
+        assignees: [],
+        position: initialData.position ? String(initialData.position) : "",
+        sprint: initialData.sprint ? String(initialData.sprint) : "",
+        task_price: initialData.task_price ? String(initialData.task_price) : "",
+        penalty_percentage: initialData.penalty_percentage ? String(initialData.penalty_percentage) : "",
+        deadline: initialData.deadline ? initialData.deadline.split('T')[0] : "",
+        deadline_time: initialData.deadline && initialData.deadline.includes('T') ? initialData.deadline.split('T')[1].substring(0, 5) : "00:00",
+        estimated_hours: initialData.estimated_input_hours || "",
+        estimated_minutes: initialData.estimated_input_minutes || "",
+      }
+    }
+    return {
+      project: "", title: "", description: "", priority: "low", type: "bug",
+      assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
+      deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
+    }
   })
   const [errors, setErrors] = useState({})
-  const [attachments, setAttachments] = useState([]) // { file, preview, id? }
+  const [attachments, setAttachments] = useState(() => {
+    if (initialData?.attachments) {
+      return initialData.attachments.map(att => ({
+        ...att,
+        isExisting: true,
+        preview: att.file, // assuming existing attachment has 'file' property as URL
+        file: { name: att.file.split('/').pop() || 'fayl' } // Create a mock file object for name display
+      }))
+    }
+    return []
+  }) // { file, preview, id?, isExisting? }
   const fileInputRef = useRef(null)
   const normalizePercentInput = (val) => {
     const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
@@ -404,22 +443,57 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
 
       // 2. Fayllarni yuklash (task yaratilgandan keyin)
       if (taskId && attachments.length > 0) {
-        const uploadResults = await Promise.allSettled(
-          attachments.map(att => {
-            const fd = new FormData()
-            fd.append('task', taskId)
-            fd.append('file', att.file)
-            return axiosAPI.post('/task-attachments/', fd, {
-              headers: { 'Content-Type': 'multipart/form-data' }
+        const newAttachments = attachments.filter(att => !att.isExisting)
+        const existingAttachments = attachments.filter(att => att.isExisting)
+        
+        // Yangi fayllarni yuklash
+        if (newAttachments.length > 0) {
+          const uploadResults = await Promise.allSettled(
+            newAttachments.map(att => {
+              const fd = new FormData()
+              fd.append('task', taskId)
+              fd.append('file', att.file)
+              return axiosAPI.post('/task-attachments/', fd, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+              })
             })
+          )
+          uploadResults.forEach((result, i) => {
+            if (result.status === 'rejected') {
+              const fname = newAttachments[i]?.file?.name || 'fayl'
+              toast.error(`"${fname}" yuklanmadi`, parseApiError(result.reason, "Fayl yuklashda xatolik"))
+            }
           })
-        )
-        uploadResults.forEach((result, i) => {
-          if (result.status === 'rejected') {
-            const fname = attachments[i]?.file?.name || 'fayl'
-            toast.error(`"${fname}" yuklanmadi`, parseApiError(result.reason, "Fayl yuklashda xatolik"))
-          }
-        })
+        }
+        
+        // Eski fayllarni nusxalash (backend'da nusxalash endpoint'i bo'lsa)
+        if (existingAttachments.length > 0) {
+          const duplicateResults = await Promise.allSettled(
+            existingAttachments.map(async (att) => {
+               try {
+                 // get existing file contents as blob
+                 const response = await fetch(att.file)
+                 const blob = await response.blob()
+                 const filename = att.file.split('/').pop() || 'fayl'
+                 const file = new File([blob], filename, { type: blob.type })
+                 
+                 const fd = new FormData()
+                 fd.append('task', taskId)
+                 fd.append('file', file)
+                 return axiosAPI.post('/task-attachments/', fd, {
+                   headers: { 'Content-Type': 'multipart/form-data' }
+                 })
+               } catch (e) {
+                 throw new Error("Faylni yuklab olishda xatolik")
+               }
+            })
+          )
+          duplicateResults.forEach((result, i) => {
+            if (result.status === 'rejected') {
+              toast.error(`Eski faylni nusxalashda xatolik yuz berdi`)
+            }
+          })
+        }
       }
 
       onClose()
@@ -617,12 +691,12 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee }) {
                 {/* Yuklangan fayllar */}
                 {attachments.map((att, i) => (
                   <div key={i} className="relative w-20 h-20 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] overflow-hidden bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] flex items-center justify-center group">
-                    {att.preview ? (
-                      <img src={att.preview} alt="" className="w-full h-full object-cover" />
+                    {att.preview || att.file?.file ? (
+                      <img src={typeof att.preview === 'string' ? att.preview : (att.file?.file || att.preview)} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center gap-1 px-1">
                         <FaPaperclip size={16} className="text-[var(--accent-sub)]" />
-                        <span className="text-[9px] text-[var(--text-sub)] dark:text-[var(--text-sub)] text-center truncate w-full px-1">{att.file.name}</span>
+                        <span className="text-[9px] text-[var(--text-sub)] dark:text-[var(--text-sub)] text-center truncate w-full px-1">{att.file?.name || 'Fayl'}</span>
                       </div>
                     )}
                     <button
