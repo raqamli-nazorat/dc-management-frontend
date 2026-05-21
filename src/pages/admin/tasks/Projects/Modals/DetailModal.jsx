@@ -216,7 +216,7 @@ const DetailModal = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2.5">
+                        {project?.project_documents?.length > 0 && <div className="flex flex-col gap-2.5">
                             <label className={labelCls + "mb-0!"}>Loyiha hujjatlari</label>
                             {project?.project_documents?.map((item, index) => {
                                 return (
@@ -254,7 +254,7 @@ const DetailModal = ({ id, onClose }) => {
                                     </div>
                                 )
                             })}
-                        </div>
+                        </div>}
 
                     </div>
                 )}

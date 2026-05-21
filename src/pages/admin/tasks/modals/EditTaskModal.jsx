@@ -7,6 +7,17 @@ import { parseApiError } from '../../../../service/parseApiError'
 import { DateTimeBox } from '../../Components/DateTimeBox'
 import DiscardModal from '../../../../components/DiscardModal'
 
+const ALLOWED_TRANSITIONS = {
+  todo: ['in_progress'],
+  in_progress: ['done'],
+  done: ['production'],
+  production: ['rejected', 'checked'],
+  checked: ['done', 'production', 'rejected'],
+  rejected: [],
+  overdue: ['in_progress'],
+  cancelled: [],
+}
+
 const PRIORITY_OPTIONS = [
   { label: 'Past', value: 'low' },
   { label: "O'rta", value: 'medium' },
@@ -26,6 +37,8 @@ const STATUS_OPTIONS = [
   { label: 'Ishga tushirilgan', value: 'production' },
   { label: 'Tekshirilgan', value: 'checked' },
   { label: 'Rad etilgan', value: 'rejected' },
+  { label: "Muddati o'tgan", value: 'overdue' },
+  { label: 'Bekor qilingan', value: 'cancelled' },
 ]
 
 function useDropdown() {
@@ -61,7 +74,7 @@ function SelectDropdown({ label, value, onChange, options, placeholder, error, d
         </button>
         {error && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
         {open && !disabled && (
-          <div className="absolute top-full left-0 mt-1 z-50 w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
+          <div className="absolute top-full left-0 mt-1 z-[200] w-full rounded-2xl shadow-xl border overflow-y-auto max-h-52
             bg-[var(--bg-base)] border-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-soft)]">
             {options.map((o, i) => (
               <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false) }}
@@ -259,7 +272,7 @@ function parseRejectionReason(reason) {
   })
 }
 
-export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete, isEmployee, deadlineOnly = false }) {
+export default function EditTaskModal({ task, onClose, onSave, canEdit = true, onDelete, isEmployee, deadlineOnly = false, onStatusChange }) {
   const [projects, setProjects] = useState([])
   const [positions, setPositions] = useState([])
   const [projectEmployees, setProjectEmployees] = useState([])
@@ -402,7 +415,26 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
   const [isDirty, setIsDirty] = useState(false)
   const [showDiscard, setShowDiscard] = useState(false)
+  const [statusLoading, setStatusLoading] = useState(false)
   const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+  const allowedNextStatuses = ALLOWED_TRANSITIONS[form.status || task.status] || []
+  const statusEditable = !canEdit && allowedNextStatuses.length > 0
+
+  const handleStatusOnly = async (newStatus) => {
+    if (!newStatus || newStatus === form.status) return
+    setStatusLoading(true)
+    try {
+      await axiosAPI.patch(`/tasks/${task.id}/change-status/`, { status: newStatus })
+      toast.success('Holat yangilandi')
+      setForm(p => ({ ...p, status: newStatus }))
+      if (onStatusChange) onStatusChange(task.id, newStatus)
+    } catch (err) {
+      toast.error('Xatolik', parseApiError(err, 'Holat yangilashda xatolik'))
+    } finally {
+      setStatusLoading(false)
+    }
+  }
 
   const set = (k, v) => {
     setIsDirty(true)
@@ -638,7 +670,17 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
 
             {/* Holati + Darajasi + Turi */}
             <div className="grid grid-cols-3 gap-4">
-              <SelectDropdown label="Holati" value={form.status} onChange={v => set('status', v)} options={STATUS_OPTIONS} placeholder="Holati" disabled={ro} />
+              <SelectDropdown
+                label="Holati"
+                value={form.status}
+                onChange={v => statusEditable ? handleStatusOnly(v) : set('status', v)}
+                options={statusEditable
+                  ? STATUS_OPTIONS.filter(o => o.value === (form.status || task.status) || allowedNextStatuses.includes(o.value))
+                  : STATUS_OPTIONS
+                }
+                placeholder="Holati"
+                disabled={(ro && !statusEditable) || statusLoading}
+              />
 
               <SelectDropdown label="Darajasi" value={form.priority} onChange={v => set('priority', v)} options={PRIORITY_OPTIONS} placeholder="Daraja" disabled={ro} error={errors.priority} />
 
@@ -660,7 +702,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             </div>
 
             <div className={`grid transition-all duration-300 ease-in-out ml-1 ${showDetails ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-              <div className="overflow-hidden flex flex-col gap-4">
+              <div className={`${showDetails ? 'overflow-visible' : 'overflow-hidden'} flex flex-col gap-4`}>
 
                 {/* Topshiruvchi */}
                 <div>
@@ -921,7 +963,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-7 py-5 flex items-center justify-between  shrink-0 rounded-b-3xl bg-[var(--bg-base)]">
+          <div className="px-7 py-5 flex items-center justify-between shrink-0 rounded-b-3xl bg-[var(--bg-base)]">
             {/* O'chirish tugmasi — faqat onDelete prop berilganda */}
             {onDelete ? (
               <button
