@@ -9,6 +9,7 @@ import { parseApiError } from '../../../service/parseApiError'
 import { DateTimeBox } from '../Components/DateTimeBox'
 import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 import { PiCopyBold } from 'react-icons/pi'
+import DiscardModal from '../../../components/DiscardModal'
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 const DURATION_UNITS = ['daqiqa']
@@ -263,7 +264,11 @@ function AddMeetingModal({ onClose, loadMeetings }) {
   })
   const [errors, setErrors] = useState({})
 
-  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
+  const [isDirty, setIsDirty] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
+  const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+  const set = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const handleFine = (val) => {
     set('fine', normalizePercentInput(val))
@@ -272,7 +277,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && !showParticipants) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -364,7 +369,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
+        <button onClick={handleClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
@@ -372,7 +377,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
           {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 ">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <button onClick={handleClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Yig'ilish qo'shish</h2>
             </div>
             <p className="text-sm text-[var(--text-soft)] ">Yangi yig'ilish yaratish uchun ma'lumotlarni kiriting</p>
@@ -528,7 +533,7 @@ function AddMeetingModal({ onClose, loadMeetings }) {
               </button>
             </div> */}
             <div className="flex items-center gap-3">
-              <button onClick={onClose}
+              <button onClick={handleClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
@@ -544,6 +549,12 @@ function AddMeetingModal({ onClose, loadMeetings }) {
           </div>
         </div>
       </div>
+      {showDiscard && (
+        <DiscardModal
+          onCancel={() => setShowDiscard(false)}
+          onConfirm={() => { setShowDiscard(false); onClose() }}
+        />
+      )}
       {showParticipants && (
         <ParticipantsModal selected={form.participants} users={projectMembers}
           onClose={() => setShowParticipants(false)}
@@ -667,10 +678,15 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
   })
   const [errors, setErrors] = useState({})
 
-  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
+  const [isDirty, setIsDirty] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
+  const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+  const set = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const handleProjectChange = (v) => {
     if (!canEdit) return
+    setIsDirty(true)
     setForm(p => ({ ...p, project: v, participants: [] }))
     setErrors(p => ({ ...p, project: '' }))
     setProjectMembers([])
@@ -740,7 +756,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && !showParticipants) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -751,7 +767,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
+        <button onClick={handleClose} className="fixed top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer  z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: "90vh" }}>
@@ -759,7 +775,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
           {/* -- Header (qotgan) -- */}
           <div className="px-7 pt-7 pb-3 shrink-0 ">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <button onClick={handleClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {canEdit ? "Yig'ilishni tahrirlash" : "Yig'ilish ma'lumotlari"}
               </h2>
@@ -964,7 +980,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
               )}
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={onClose}
+              <button onClick={handleClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
@@ -982,6 +998,12 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
           </div>
         </div>
       </div>
+      {showDiscard && (
+        <DiscardModal
+          onCancel={() => setShowDiscard(false)}
+          onConfirm={() => { setShowDiscard(false); onClose() }}
+        />
+      )}
       {showParticipants && canEdit && (
         <ParticipantsModal selected={form.participants} users={projectMembers}
           onClose={() => setShowParticipants(false)}

@@ -5,6 +5,7 @@ import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import { parseApiError } from '../../../../service/parseApiError'
 import { DateTimeBox } from '../../Components/DateTimeBox'
+import DiscardModal from '../../../../components/DiscardModal'
 
 const PRIORITY_OPTIONS = [
   { label: 'Past', value: 'low' },
@@ -399,7 +400,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   })
   const [errors, setErrors] = useState({})
 
+  const [isDirty, setIsDirty] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
+  const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
   const set = (k, v) => {
+    setIsDirty(true)
     if (k === 'project') {
       setForm(p => ({ ...p, project: v, assignees: [] }))
       setErrors(p => ({ ...p, project: false }))
@@ -570,7 +576,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && !pickerOpen) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -582,7 +588,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="fixed inset-0 bg-black/60" />
-        <button onClick={onClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
+        <button onClick={handleClose} className="fixed top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white cursor-pointer z-[200]">
           <FaXmark size={14} />
         </button>
         <div className="relative w-full max-w-[600px] flex flex-col rounded-3xl shadow-2xl bg-[var(--bg-base)] overflow-hidden" style={{ height: 700, maxHeight: '90vh' }}>
@@ -590,7 +596,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
           {/* ── Header ── */}
           <div className="px-7 pt-7 pb-4 shrink-0  rounded-t-3xl">
             <div className="flex items-center gap-3 mb-1">
-              <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
+              <button onClick={handleClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                 {deadlineOnly ? 'Muddatni yangilash' : canEdit ? 'Vazifa tahrirlash' : "Vazifa ma'lumotlari"}
               </h2>
@@ -931,7 +937,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             ) : <div />}
 
             <div className="flex items-center gap-3">
-              <button onClick={onClose}
+              <button onClick={handleClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
@@ -951,6 +957,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
         </div>
       </div>
 
+      {showDiscard && (
+        <DiscardModal
+          onCancel={() => setShowDiscard(false)}
+          onConfirm={() => { setShowDiscard(false); onClose() }}
+        />
+      )}
       {pickerOpen && !ro && (
         <UserPickerModal
           title="Topshiruvchi tanlang"

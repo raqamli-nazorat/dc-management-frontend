@@ -9,6 +9,7 @@ import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
 import { useAuth } from "../../../../../context/AuthContext"
+import DiscardModal from "../../../../../components/DiscardModal"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
@@ -134,7 +135,11 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         }
     }, [project])
 
-    const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+    const [isDirty, setIsDirty] = useState(false)
+    const [showDiscard, setShowDiscard] = useState(false)
+    const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+    const set = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })) }
 
     const validate = () => {
         const e = {}
@@ -266,7 +271,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "Escape") {
-                onClose();
+                handleClose();
             }
         };
         window.addEventListener("keydown", handleKeyDown);
@@ -283,7 +288,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                 <div className="fixed inset-0 bg-black/60" />
-                <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
+                <button onClick={handleClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer bg-white/20 text-white hover:bg-white/30">
                     <FaXmark size={16} />
                 </button>
                 <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)]">
@@ -291,7 +296,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     {/* Header */}
                     <div className="px-7 pt-7 pb-4 sticky top-0 z-20 rounded-t-2xl bg-[var(--bg-base)]">
                         <div className="flex items-center gap-3 mb-1">
-                            <button onClick={onClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
+                            <button onClick={handleClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0 transition-opacity">
                                 <FaArrowLeft size={17} />
                             </button>
                             <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Loyiha tahrirlash</h2>
@@ -613,7 +618,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             </div>
                         }
                         <div className="flex items-center gap-3">
-                            <button onClick={onClose}
+                            <button onClick={handleClose}
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
                 text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                                 <FaXmark size={13} /> Yopish
@@ -630,6 +635,12 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                 </div>
             </div>
 
+            {showDiscard && (
+                <DiscardModal
+                    onCancel={() => setShowDiscard(false)}
+                    onConfirm={() => { setShowDiscard(false); onClose() }}
+                />
+            )}
             {pickerOpen === 'employees' && (
                 <UserPickerModal title="Xodim tanlang"
                     selected={form.employees}
