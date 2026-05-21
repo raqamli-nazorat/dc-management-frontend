@@ -165,7 +165,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                     formData.append(key, clean)
                 } else if (key === "card_number") {
                     const clean = form.card_number.replace(/\s/g, '');
-                    formData.append(key, clean)
+                    if (clean) formData.append(key, clean)
                 } else if (form[key] !== null && form[key] !== '') {
                     formData.append(key, form[key])
                 }
@@ -313,6 +313,7 @@ const CreateUser = ({ onClose, setUsers, positions, Roles }) => {
                                 value={form.card_number}
                                 onChange={e => set('card_number', formatCard(e.target.value))}
                             />
+                            {errors.card_number && <p className="text-[13px] text-[#FF5B5B] mt-1.5">{errors.card_number}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">

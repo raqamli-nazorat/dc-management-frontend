@@ -924,6 +924,7 @@ export default function TasksPage() {
               setEditTask(null)
             } : undefined}
             isEmployee={isEmployee}
+            onStatusChange={() => loadKanbanTasks(filters, search, true)}
           />
         )}
         {rejectionPending && (
@@ -1143,6 +1144,9 @@ export default function TasksPage() {
             setEditTask(null)
           } : undefined}
           isEmployee={isEmployee}
+          onStatusChange={(taskId, newStatus) => {
+            setData(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
+          }}
         />
       )}
 

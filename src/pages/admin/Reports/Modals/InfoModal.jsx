@@ -31,7 +31,7 @@ export const InfoModal = ({ isOpen, onClose }) => {
 
             {/* Modal Card */}
             <div
-                className="relative w-full max-w-[520px] rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-white dark:bg-[var(--bg-base)] p-6 flex flex-col items-start gap-1 transform transition-all duration-300 scale-100 opacity-100 animate-in fade-in zoom-in-95 duration-200"
+                className="relative w-full max-w-[520px] rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-white dark:bg-[var(--bg-base)] p-6 flex  items-center gap-1 transform transition-all duration-300 scale-100 opacity-100 animate-in fade-in zoom-in-95 duration-200 "
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Info Icon with Premium Background */}
