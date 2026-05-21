@@ -5,6 +5,7 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { toast } from '../../../Toast/ToastProvider'
 import { FiPlus } from 'react-icons/fi'
+import { useImagePaste } from '../../../hooks/useImagePaste'
 
 /* ── Change Password Modal ── */
 function ChangePasswordModal({ onClose }) {
@@ -428,6 +429,12 @@ export default function ProfilePage() {
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
   }, [])
+
+  useImagePaste((files) => {
+    if (files && files.length > 0) {
+      set('avatar', files[0]);
+    }
+  });
 
   if (loading) return <Skeleton />
 
