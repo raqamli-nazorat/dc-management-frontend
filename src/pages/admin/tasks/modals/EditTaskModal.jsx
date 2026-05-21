@@ -581,7 +581,7 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, pickerOpen]);
+  }, [isDirty, pickerOpen]);
 
 
   return (

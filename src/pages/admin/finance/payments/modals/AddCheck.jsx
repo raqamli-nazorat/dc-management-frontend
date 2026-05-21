@@ -1,11 +1,11 @@
 import { FiArrowRight, FiX } from "react-icons/fi"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { FaArrowLeft } from "react-icons/fa"
 import { FaArrowUp, FaXmark } from "react-icons/fa6"
 import { useTheme } from "../../../../../context/ThemeContext"
-import { useRef } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { toast } from "../../../../../Toast/ToastProvider"
+import DiscardModal from '../../../../../components/DiscardModal'
 
 const AddCheck = ({ onClose, paymentId }) => {
     const { isDark } = useTheme()
@@ -13,6 +13,15 @@ const AddCheck = ({ onClose, paymentId }) => {
     const [newImages, setNewImages] = useState([])
     const [previewImg, setPreviewImg] = useState(null)
     const fileInputRef = useRef(null)
+    const [showDiscard, setShowDiscard] = useState(false)
+
+    const handleClose = () => { if (newImages.length > 0) setShowDiscard(true); else onClose() }
+
+    useEffect(() => {
+        const handleKeyDown = (e) => { if (e.key === 'Escape' && !previewImg) handleClose() }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [newImages.length, previewImg])
 
     useEffect(() => {
         if (!paymentId) return
@@ -81,7 +90,7 @@ const AddCheck = ({ onClose, paymentId }) => {
                     <div className="flex items-start justify-between">
                         <div className="flex flex-col gap-3 pl-4 border-b border-b-gray-100 dark:border-[var(--stroke-soft)] pb-3 flex-1">
                             <div className="flex items-center">
-                                <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-[var(--text-strong)]">
+                                <button onClick={handleClose} className="p-2 hover:bg-gray-100 dark:hover:bg-[#2c2d2d] rounded-full text-[#1A1D2E] dark:text-[var(--text-strong)]">
                                     <FaArrowLeft size={18} />
                                 </button>
                                 <h2 className="ml-2 text-[20px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">To'lov chekini yuklang.</h2>
@@ -163,7 +172,7 @@ const AddCheck = ({ onClose, paymentId }) => {
 
                     {/* Footer */}
                     <div className="flex items-center justify-end gap-10">
-                        <button onClick={onClose} className="flex items-center gap-2 text-[#526ED3] font-extrabold text-[15px] cursor-pointer">
+                        <button onClick={handleClose} className="flex items-center gap-2 text-[#526ED3] font-extrabold text-[15px] cursor-pointer">
                             <FiArrowRight size={16} />
                             O'tkazib yuborish
                         </button>
@@ -199,6 +208,9 @@ const AddCheck = ({ onClose, paymentId }) => {
                     />
                 </div>
             )}
+        {showDiscard && (
+            <DiscardModal onCancel={() => setShowDiscard(false)} onConfirm={onClose} />
+        )}
         </>
     )
 }

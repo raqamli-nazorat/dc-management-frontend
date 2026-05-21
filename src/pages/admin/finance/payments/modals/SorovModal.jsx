@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
+import DiscardModal from '../../../../../components/DiscardModal'
 import { SelectField } from '../components/SelectField'
 import { LoyihaDropdownForm } from '../components/LoyihaDropdown'
 import { axiosAPI } from '../../../../../service/axiosAPI'
@@ -81,17 +82,28 @@ export default function SorovModal({ onClose, onSubmit }) {
   const [errors, setErrors] = useState({})
   const [showCardSuggest, setShowCardSuggest] = useState(false)
   const cardRef = useRef(null)
+  const [isDirty, setIsDirty] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
 
-  const setF = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
+  const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+  const setF = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })) }
 
   const showCard = form.payment_method === 'card'
   const rules = getRules(form.type)
 
   // Tur o'zgarganda loyiha va sababni tozalash
   const handleTypeChange = (v) => {
+    setIsDirty(true)
     setForm(p => ({ ...p, type: v, project: '', reason: '' }))
     setErrors({})
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => { if (e.key === 'Escape') handleClose() }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isDirty])
 
   const validate = () => {
     const e = {}
@@ -189,9 +201,10 @@ export default function SorovModal({ onClose, onSubmit }) {
   const visibleSuggestions = suggestions.slice(0, 2)
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-8 px-4">
       <div className="fixed inset-0 bg-black/60" />
-      <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer 
+      <button onClick={handleClose} className="w-8 h-8 flex items-center justify-center rounded-full absolute top-5 right-5 cursor-pointer
         bg-[#FFFFFF29] hover:bg-[#FFFFFF40] text-white">
         <FaXmark size={14} />
       </button>
@@ -200,7 +213,7 @@ export default function SorovModal({ onClose, onSubmit }) {
         {/* Header */}
         <div className="px-6 pt-7">
           <div className="flex items-center gap-3 mb-2">
-            <button onClick={onClose} className="hover:opacity-70 cursor-pointer shrink-0">
+            <button onClick={handleClose} className="hover:opacity-70 cursor-pointer shrink-0">
               <FaArrowLeft size={16} className="dark:text-[var(--text-strong)] text-[var(--text-strong)]" />
             </button>
             <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">So'rov yuborish</h2>
@@ -358,7 +371,7 @@ export default function SorovModal({ onClose, onSubmit }) {
 
         {/* Footer */}
         <div className="px-6 py-4 flex items-center justify-end gap-3">
-          <button onClick={onClose}
+          <button onClick={handleClose}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer
               text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
             <FaXmark size={14} /> Yopish
@@ -372,5 +385,9 @@ export default function SorovModal({ onClose, onSubmit }) {
         </div>
       </div>
     </div>
+    {showDiscard && (
+      <DiscardModal onCancel={() => setShowDiscard(false)} onConfirm={onClose} />
+    )}
+    </>
   )
 }

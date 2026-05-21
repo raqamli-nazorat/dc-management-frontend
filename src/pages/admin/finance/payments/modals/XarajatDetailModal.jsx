@@ -14,6 +14,12 @@ function CancelReasonModal({ onCancel, onConfirm }) {
   const [reason, setReason] = useState('')
   const [error, setError] = useState(false)
 
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onCancel() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onCancel])
+
   const handleSubmit = () => {
     if (!reason.trim()) { setError(true); return }
     onConfirm(reason.trim())
@@ -64,6 +70,11 @@ function CancelReasonModal({ onCancel, onConfirm }) {
 
 // ── To'lov tasdiqlash modali ─────────────────────────────────
 function PaidConfirmModal({ onCancel, onConfirm }) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onCancel() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onCancel])
 
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center px-4">
@@ -105,6 +116,16 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
   const [copied, setCopied] = useState(false)
   const [receipts, setReceipts] = useState([])
   const [previewImg, setPreviewImg] = useState(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key !== 'Escape') return
+      if (previewImg) { setPreviewImg(null); return }
+      if (!showCancelModal && !showPaidModal && !showConfirmModal) onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [previewImg, showCancelModal, showPaidModal, showConfirmModal, onClose])
 
   useEffect(() => {
     if (!payment?.id) return

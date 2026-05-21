@@ -1,16 +1,24 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { MdCheck } from "react-icons/md";
 import { toast } from "../../../../Toast/ToastProvider";
 import { axiosAPI } from "../../../../service/axiosAPI";
+import DiscardModal from "../../../../components/DiscardModal";
 
 const CreatePosition = ({ onClose, refetch }) => {
 
-     const [form, setForm] = useState({
-          name: '',
-          is_application: false
-     })
+     const [form, setForm] = useState({ name: '', is_application: false })
+     const [isDirty, setIsDirty] = useState(false)
+     const [showDiscard, setShowDiscard] = useState(false)
+
+     const handleClose = () => { if (isDirty) setShowDiscard(true); else onClose() }
+
+     useEffect(() => {
+          const onKey = (e) => { if (e.key === 'Escape') handleClose() }
+          window.addEventListener('keydown', onKey)
+          return () => window.removeEventListener('keydown', onKey)
+     }, [isDirty])
 
      const handleCreate = async () => {
           try {
@@ -40,9 +48,10 @@ const CreatePosition = ({ onClose, refetch }) => {
      const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1'
 
      return (
+          <>
           <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto modal-scroll py-8 px-4">
                <div className="fixed inset-0 bg-black/60" />
-               <button onClick={onClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
+               <button onClick={handleClose} className="fixed top-5 right-5 z-10 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-white/20 text-white hover:bg-white/30">
                     <FaXmark size={16} />
                </button>
                <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)]">
@@ -50,7 +59,7 @@ const CreatePosition = ({ onClose, refetch }) => {
                          <div className="flex flex-col items-start gap-3">
                               <div className='flex gap-3'>
                                    <button
-                                        onClick={onClose}
+                                        onClick={handleClose}
                                         className="mt-1 text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-70 cursor-pointer shrink-0"
                                    >
                                         <FaArrowLeft size={18} />
@@ -74,7 +83,7 @@ const CreatePosition = ({ onClose, refetch }) => {
                                    className={inputCls}
                                    placeholder="Viloyat nomi"
                                    value={form.name}
-                                   onChange={e => setForm({ ...form, name: e.target.value })}
+                                   onChange={e => { setIsDirty(true); setForm({ ...form, name: e.target.value }) }}
                                    maxLength={255}
                               />
                          </div>
@@ -84,7 +93,7 @@ const CreatePosition = ({ onClose, refetch }) => {
                               </span>
                               <button
                                    type="button"
-                                   onClick={() => setForm({ ...form, is_application: !form.is_application })}
+                                   onClick={() => { setIsDirty(true); setForm({ ...form, is_application: !form.is_application }) }}
                                    className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${form.is_application ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}
                               >
                                    <span
@@ -94,7 +103,7 @@ const CreatePosition = ({ onClose, refetch }) => {
                          </div>
                     </div>
                     <div className="px-7 py-5 flex items-center justify-end gap-3">
-                         <button onClick={onClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
+                         <button onClick={handleClose} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-sub)] dark:hover:bg-[var(--bg-elevation-2)]">
                               <FaXmark size={14} />
                               Yopish
                          </button>
@@ -108,6 +117,10 @@ const CreatePosition = ({ onClose, refetch }) => {
                     </div>
                </div>
           </div>
+          {showDiscard && (
+               <DiscardModal onCancel={() => setShowDiscard(false)} onConfirm={onClose} />
+          )}
+          </>
      )
 }
 
