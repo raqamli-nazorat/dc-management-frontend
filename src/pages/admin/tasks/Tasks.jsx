@@ -503,6 +503,7 @@ export default function TasksPage() {
   const [searchInput, setSearchInput] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
+  const [duplicateTaskData, setDuplicateTaskData] = useState(null)
   const [filters, setFilters] = useState(TASK_EMPTY_FILTER)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -681,6 +682,28 @@ export default function TasksPage() {
       } else {
         toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
       }
+    } finally {
+      setTaskLoading(false)
+    }
+  }
+
+  const handleDuplicate = async (id) => {
+    setTaskLoading(true)
+    try {
+      const res = await axiosAPI.get(`/tasks/${id}/`)
+      const task = res.data?.data ?? res.data
+      if (!task.project && task.project_info) {
+        if (typeof task.project_info === 'object' && task.project_info?.id) {
+          task.project = task.project_info.id
+        }
+      }
+      
+      const { data } = await axiosAPI.get(`task-attachments/?task=${id}`)
+      
+      setDuplicateTaskData({ ...task, attachments: data?.data?.results })
+      setShowAdd(true)
+    } catch (err) {
+      toast.error('Xatolik', "Vazifa ma'lumotlarini yuklashda xatolik")
     } finally {
       setTaskLoading(false)
     }
@@ -906,7 +929,8 @@ export default function TasksPage() {
         )}
         {showAdd && (
           <AddTaskModal
-            onClose={() => setShowAdd(false)}
+            initialData={duplicateTaskData}
+            onClose={() => { setShowAdd(false); setDuplicateTaskData(null); }}
             onAdd={async (body) => {
               const created = await handleAdd(body)
               loadKanbanTasks(filters, search)
@@ -1091,6 +1115,7 @@ export default function TasksPage() {
                       <TaskRowMenu
                         onDetail={() => loadTaskDetail(t.id)}
                         onEdit={() => loadTaskDetail(t.id)}
+                        onDuplicate={() => handleDuplicate(t.id)}
                         onDelete={() => handleDelete(t.id)}
                       />
                     )}
@@ -1130,7 +1155,8 @@ export default function TasksPage() {
       )}
       {showAdd && (
         <AddTaskModal
-          onClose={() => setShowAdd(false)}
+          initialData={duplicateTaskData}
+          onClose={() => { setShowAdd(false); setDuplicateTaskData(null); }}
           onAdd={async (body) => {
             const created = await handleAdd(body)
             loadTasks(filters, search, 1)

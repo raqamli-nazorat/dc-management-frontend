@@ -1,7 +1,7 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FaEllipsisVertical } from 'react-icons/fa6'
 
-export default function TaskRowMenu({ onDelete, onEdit, onDetail }) {
+export default function TaskRowMenu({ onDelete, onEdit, onDetail, onDuplicate }) {
   const [open, setOpen]   = useState(false)
   const [dropUp, setDropUp] = useState(false)
   const ref    = useRef(null)
@@ -41,6 +41,13 @@ export default function TaskRowMenu({ onDelete, onEdit, onDetail }) {
               className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
               Tahrirlash
+            </button>
+          )}
+          {onDuplicate && (
+            <button onClick={() => { onDuplicate?.(); setOpen(false) }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Takrorlash
             </button>
           )}
           <button onClick={() => { onDelete?.(); setOpen(false) }}
