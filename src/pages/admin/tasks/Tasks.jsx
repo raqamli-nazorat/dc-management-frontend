@@ -429,9 +429,16 @@ function RejectionModal({ task, onClose, onConfirm }) {
 }
 
 /* ── KanbanColumn ── */
-function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarget, isDraggingGlobal }) {
+function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarget, isDraggingGlobal, hasMore, loadingMore, onLoadMore, total }) {
   const { isDark } = useTheme()
   const colBg = isDark ? col.darkBg : col.bg
+
+  const handleScroll = (e) => {
+    const el = e.currentTarget
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100 && hasMore && !loadingMore) {
+      onLoadMore?.()
+    }
+  }
 
   return (
     <div
@@ -448,7 +455,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
           className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
           style={{ backgroundColor: col.color }}
         >
-          {cards.length}
+          {total ?? cards.length}
         </span>
       </div>
 
@@ -458,6 +465,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
+            onScroll={handleScroll}
             className="kanban-col-scroll flex flex-col gap-2 rounded-2xl p-1.5 overflow-y-auto"
             style={{
               flex: '1 1 0',
@@ -482,6 +490,14 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
               />
             ))}
             {provided.placeholder}
+            {loadingMore && (
+              <div className="flex justify-center py-2">
+                <svg className="animate-spin w-5 h-5 text-[var(--text-sub)]" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+              </div>
+            )}
           </div>
         )}
       </Droppable>
@@ -516,6 +532,11 @@ export default function TasksPage() {
   const [taskLoading, setTaskLoading] = useState(false)
   const [cards, setCards] = useState([])
   const [kanbanLoading, setKanbanLoading] = useState(false)
+  const [colMeta, setColMeta] = useState(
+    Object.fromEntries(COLUMNS.map(c => [c.id, { page: 1, hasMore: false, loading: false, total: 0 }]))
+  )
+  const colMetaRef = useRef(colMeta)
+  useEffect(() => { colMetaRef.current = colMeta }, [colMeta])
   const [draggingOver, setDraggingOver] = useState(null)
   const [copiedUid, setCopiedUid] = useState(null)
   const [dragSourceCol, setDragSourceCol] = useState(null)
@@ -709,45 +730,90 @@ export default function TasksPage() {
     }
   }
 
-  // Kanban uchun barcha vazifalarni yuklash (pagination yo'q, ko'proq yuklash)
+  const buildKanbanBaseParams = useCallback((f = filters, q = search) => {
+    const toIso = (date, time, isEnd = false) => {
+      if (!date) return null
+      const t = time || (isEnd ? '23:59' : '00:00')
+      const now = new Date()
+      const offsetMin = -now.getTimezoneOffset()
+      const sign = offsetMin >= 0 ? '+' : '-'
+      const absMin = Math.abs(offsetMin)
+      const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
+      const mm = String(absMin % 60).padStart(2, '0')
+      return `${date}T${t}:00${sign}${hh}:${mm}`
+    }
+    const params = {}
+    if (q) params.search = q
+    if (f.daraja) params.priority = f.daraja
+    if (f.turi) params.type = f.turi
+    if (f.projects?.length) params.project = f.projects.map(pr => pr.id || pr).join(',')
+    const fromIso = toIso(f.deadFromD, f.deadFromT, false)
+    const toIsoVal = toIso(f.deadToD, f.deadToT, true)
+    if (fromIso) params.deadline_from = fromIso
+    if (toIsoVal) params.deadline_to = toIsoVal
+    if (f.created_by?.length) params.created_by = f.created_by.map(pr => pr.id || pr).join(',')
+    if (f.assignee?.length) params.assignee = f.assignee.map(pr => pr.id || pr).join(',')
+    return params
+  }, [filters, search])
+
+  // Kanban uchun har column alohida sahifalanadi (parallel so'rovlar)
   // silent=true bo'lsa loading spinner ko'rsatilmaydi (status o'zgarishidan keyin)
   const loadKanbanTasks = useCallback(async (f = filters, q = search, silent = false) => {
     if (!silent) setKanbanLoading(true)
     try {
-      const toIso = (date, time, isEnd = false) => {
-        if (!date) return null
-        const t = time || (isEnd ? '23:59' : '00:00')
-        const now = new Date()
-        const offsetMin = -now.getTimezoneOffset()
-        const sign = offsetMin >= 0 ? '+' : '-'
-        const absMin = Math.abs(offsetMin)
-        const hh = String(Math.floor(absMin / 60)).padStart(2, '0')
-        const mm = String(absMin % 60).padStart(2, '0')
-        return `${date}T${t}:00${sign}${hh}:${mm}`
-      }
-
-      const params = { page_size: 200 }
-      if (q) params.search = q
-      if (f.holat) params.status = f.holat
-      if (f.daraja) params.priority = f.daraja
-      if (f.turi) params.type = f.turi
-      if (f.projects?.length) params.project = f.projects.map(pr => pr.id || pr).join(',')
-      const fromIso = toIso(f.deadFromD, f.deadFromT, false)
-      const toIsoVal = toIso(f.deadToD, f.deadToT, true)
-      if (fromIso) params.deadline_from = fromIso
-      if (toIsoVal) params.deadline_to = toIsoVal
-      if (f.created_by?.length) params.created_by = f.created_by.map(pr => pr.id || pr).join(',')
-      if (f.assignee?.length) params.assignee = f.assignee.map(pr => pr.id || pr).join(',')
-      const res = await axiosAPI.get('/tasks/', { params })
-      const payload = res.data?.data ?? res.data
-      const results = Array.isArray(payload) ? payload : (payload.results ?? [])
-      setCards(results)
+      const baseParams = buildKanbanBaseParams(f, q)
+      const columnsToLoad = f.holat ? COLUMNS.filter(c => c.id === f.holat) : COLUMNS
+      const responses = await Promise.all(
+        columnsToLoad.map(col =>
+          axiosAPI.get('/tasks/', { params: { ...baseParams, status: col.id, page: 1, page_size: 20 } })
+        )
+      )
+      const allCards = []
+      const newMeta = Object.fromEntries(COLUMNS.map(c => [c.id, { page: 1, hasMore: false, loading: false, total: 0 }]))
+      responses.forEach((res, i) => {
+        const col = columnsToLoad[i]
+        const payload = res.data?.data ?? res.data
+        const items = Array.isArray(payload) ? payload : (payload.results ?? [])
+        const next = Array.isArray(payload) ? null : (payload.next ?? null)
+        const total = Array.isArray(payload) ? items.length : (payload.count ?? items.length)
+        allCards.push(...items)
+        newMeta[col.id] = { page: 1, hasMore: !!next, loading: false, total }
+      })
+      setCards(allCards)
+      setColMeta(newMeta)
     } catch (err) {
       toast.error('Xatolik', "Kanban ma'lumotlarini yuklashda xatolik")
     } finally {
       if (!silent) setKanbanLoading(false)
     }
-  }, [filters, search])
+  }, [buildKanbanBaseParams, filters, search])
+  const loadMoreForColumn = useCallback(async (colId) => {
+    const meta = colMetaRef.current[colId]
+    if (!meta?.hasMore || meta?.loading) return
+    setColMeta(prev => ({ ...prev, [colId]: { ...prev[colId], loading: true } }))
+    try {
+      const baseParams = buildKanbanBaseParams()
+      const nextPage = meta.page + 1
+      const res = await axiosAPI.get('/tasks/', {
+        params: { ...baseParams, status: colId, page: nextPage, page_size: 20 },
+      })
+      const payload = res.data?.data ?? res.data
+      const items = Array.isArray(payload) ? payload : (payload.results ?? [])
+      const next = Array.isArray(payload) ? null : (payload.next ?? null)
+      setCards(prev => {
+        const existingIds = new Set(prev.map(c => c.id))
+        return [...prev, ...items.filter(item => !existingIds.has(item.id))]
+      })
+      setColMeta(prev => ({
+        ...prev,
+        [colId]: { ...prev[colId], page: nextPage, hasMore: !!next, loading: false },
+      }))
+    } catch {
+      toast.error('Xatolik', "Ko'proq yuklashda xatolik")
+      setColMeta(prev => ({ ...prev, [colId]: { ...prev[colId], loading: false } }))
+    }
+  }, [buildKanbanBaseParams])
+
   const switchToTable = () => { setViewMode('table'); localStorage.setItem('tasks_view_mode', 'table') }
   const switchToKanban = () => { setViewMode('kanban'); localStorage.setItem('tasks_view_mode', 'kanban')}
 
@@ -916,6 +982,10 @@ export default function TasksPage() {
                     isDropDisabled={isDropDisabled}
                     isDragTarget={draggingOver === col.id}
                     isDraggingGlobal={!!dragSourceCol}
+                    hasMore={colMeta[col.id]?.hasMore}
+                    loadingMore={colMeta[col.id]?.loading}
+                    onLoadMore={() => loadMoreForColumn(col.id)}
+                    total={colMeta[col.id]?.total}
                   />
                 )
               })}
