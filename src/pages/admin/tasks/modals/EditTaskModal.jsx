@@ -812,7 +812,12 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                     onChange={e => !ro && set('estimated_hours', e.target.value)}
                     readOnly={ro} placeholder="0 soat" className={inputCls(false, ro)} />
                   <input type="number" min="0" max="59" value={form.estimated_minutes}
-                    onChange={e => !ro && set('estimated_minutes', e.target.value)}
+                    onChange={e => {
+                      if (ro) return
+                      const v = e.target.value
+                      if (v === "") { set('estimated_minutes', ""); return }
+                      set('estimated_minutes', String(Math.max(0, Math.min(59, Math.floor(Number(v))))))
+                    }}
                     readOnly={ro} placeholder="0 daqiqa" className={inputCls(false, ro)} />
                 </div>
               </div>

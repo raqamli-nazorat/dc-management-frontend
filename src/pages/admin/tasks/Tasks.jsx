@@ -13,6 +13,12 @@ import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
 import { useImagePaste } from '../../../hooks/useImagePaste'
+import ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import Papa from 'papaparse'
+import dayjs from 'dayjs'
 
 // ── Label maps ──
 const TYPE_LABEL = { bug: 'Xatolik (Bug)', feature: 'Yangi funksiya', extra: "Qo'shimcha", improvement: "Qo'shimcha", research: "Tadqiqot/O'rganish" }
@@ -35,6 +41,43 @@ const fmtTaskDt = (iso) => {
     return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
   } catch { return iso }
 }
+
+// ── Eksport (Excel / PDF / CSV / Chop etish) uchun ustunlar ──
+const EXPORT_COLUMNS = [
+  { key: 'no', header: '№', width: 6 },
+  { key: 'uid', header: 'UID', width: 14 },
+  { key: 'title', header: 'Vazifa nomi', width: 30 },
+  { key: 'project', header: 'Loyiha', width: 24 },
+  { key: 'created_by', header: 'Yaratuvchi', width: 20 },
+  { key: 'assignee', header: 'Topshiruvchi', width: 20 },
+  { key: 'type', header: 'Turi', width: 16 },
+  { key: 'priority', header: 'Darajasi', width: 12 },
+  { key: 'status', header: 'Holati', width: 16 },
+  { key: 'task_price', header: 'Vazifa narxi (UZS)', width: 18 },
+  { key: 'penalty', header: 'Jarima foizi (%)', width: 14 },
+  { key: 'deadline', header: 'Muddati', width: 18 },
+  { key: 'created_at', header: 'Yaratilgan vaqti', width: 18 },
+  { key: 'sprint', header: 'Sprint', width: 10 },
+  { key: 'reopened', header: 'Qaytishlar soni', width: 14 },
+]
+
+const mapTaskRow = (t, index) => ({
+  no: index + 1,
+  uid: t?.uid || '—',
+  title: t?.title || t?.name || '—',
+  project: typeof t?.project_info === 'object' ? (t?.project_info?.title || '—') : (t?.project_info || t?.project || '—'),
+  created_by: t?.created_by_info?.username || t?.creator || '—',
+  assignee: t?.assignee_info?.username || t?.assignee || '—',
+  type: TYPE_LABEL[t?.type] || t?.type || '—',
+  priority: PRIORITY_LABEL[t?.priority] || '—',
+  status: TASK_STATUS_LABEL[t?.status] || t?.status || '—',
+  task_price: t?.task_price ?? 0,
+  penalty: t?.penalty_percentage ?? 0,
+  deadline: t?.deadline ? fmtTaskDt(t.deadline) : '—',
+  created_at: t?.created_at ? fmtTaskDt(t.created_at) : '—',
+  sprint: t?.sprint ?? '—',
+  reopened: t?.reopened_count ?? 0,
+})
 
 // ── Status → Column mapping ──
 const STATUS_TO_COL = {
@@ -507,7 +550,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
 
 /* ── Main Page ── */
 export default function TasksPage() {
-  const { registerAction, clearAction, registerNavbarExtra, clearNavbarExtra, registerSidebarClick, clearSidebarClick } = usePageAction()
+  const { registerAction, clearAction, registerNavbarExtra, clearNavbarExtra, registerSidebarClick, clearSidebarClick, setDownload, clearDownload, setPrint, clearPrint } = usePageAction()
   const { user } = useAuth()
   const activeRole = user?.active_role || user?.roles?.[0]
   const isAuditor = activeRole === 'auditor'
@@ -596,6 +639,174 @@ export default function TasksPage() {
   }, [buildParams])
 
   useEffect(() => { loadTasks() }, [])
+
+  /* ── Eksport (Excel / PDF / CSV / Chop etish) — Hisobotlardagidek ── */
+  const exportingRef = useRef(false)
+
+  // Joriy filtr/qidiruvga mos BARCHA vazifalarni sahifalab yuklab olish
+  const fetchAllTasksForExport = async () => {
+    const all = []
+    let pg = 1
+    while (pg <= 200) {
+      const res = await axiosAPI.get('/tasks/', { params: { ...buildParams(filters, search, pg), page_size: 100 } })
+      const payload = res.data?.data ?? res.data
+      const results = Array.isArray(payload) ? payload : (payload.results ?? [])
+      all.push(...results)
+      const next = Array.isArray(payload) ? null : (payload.next ?? null)
+      if (!next || results.length === 0) break
+      pg++
+    }
+    return all
+  }
+
+  // Eksport uchun ma'lumotni bir marta tayyorlash (qayta bosishdan himoya)
+  const prepareExport = async () => {
+    if (exportingRef.current) return null
+    exportingRef.current = true
+    try {
+      const list = await fetchAllTasksForExport()
+      if (!list.length) {
+        toast.info("Yuklab olish uchun ma'lumot yo'q")
+        return null
+      }
+      return list
+    } catch (err) {
+      toast.error('Xatolik', parseApiError(err, "Ma'lumotlarni yuklashda xatolik"))
+      return null
+    } finally {
+      exportingRef.current = false
+    }
+  }
+
+  const handleExcelDownload = async () => {
+    const list = await prepareExport()
+    if (!list) return
+
+    const workbook = new ExcelJS.Workbook()
+    const ws = workbook.addWorksheet('Vazifalar')
+    ws.columns = EXPORT_COLUMNS.map(c => ({ header: c.header, key: c.key, width: c.width }))
+
+    const headerRow = ws.getRow(1)
+    headerRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF7186ED' } }
+      cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, size: 11 }
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        left: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        bottom: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        right: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+      }
+    })
+    headerRow.height = 30
+
+    list.forEach((t, i) => {
+      const row = ws.addRow(mapTaskRow(t, i))
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          left: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          bottom: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+          right: { style: 'thin', color: { argb: 'FFE2E6F2' } },
+        }
+        const isText = [3, 4, 5, 6].includes(colNumber)
+        const isPrice = colNumber === 10
+        cell.alignment = { vertical: 'middle', horizontal: isText ? 'left' : (isPrice ? 'right' : 'center'), wrapText: true }
+        cell.font = { color: { argb: 'FF334155' }, bold: isText || isPrice, size: 10 }
+        if (isPrice) cell.numFmt = '#,##0'
+      })
+      row.height = 22
+    })
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    saveAs(blob, `Vazifalar_${dayjs().format('DD_MM_YYYY')}.xlsx`)
+  }
+
+  const handlePdfDownload = async () => {
+    const list = await prepareExport()
+    if (!list) return
+
+    const doc = new jsPDF({ orientation: 'landscape' })
+    autoTable(doc, {
+      head: [EXPORT_COLUMNS.map(c => c.header)],
+      body: list.map((t, i) => {
+        const r = mapTaskRow(t, i)
+        return EXPORT_COLUMNS.map(c => String(r[c.key] ?? '—'))
+      }),
+      headStyles: { fillColor: [113, 134, 237], textColor: [255, 255, 255], halign: 'center', valign: 'middle', fontStyle: 'bold', fontSize: 7 },
+      styles: { fontSize: 6, lineColor: [226, 230, 242], lineWidth: 0.1, cellPadding: 2 },
+      theme: 'grid',
+      margin: { top: 15, left: 5, right: 5 },
+      didDrawPage: () => {
+        doc.setFontSize(12)
+        doc.text('Vazifalar', 14, 10)
+      },
+    })
+    doc.save(`Vazifalar_${dayjs().format('DD_MM_YYYY')}.pdf`)
+  }
+
+  const handleCsvDownload = async () => {
+    const list = await prepareExport()
+    if (!list) return
+
+    const csvData = list.map((t, i) => {
+      const r = mapTaskRow(t, i)
+      return EXPORT_COLUMNS.reduce((acc, c) => { acc[c.header] = r[c.key]; return acc }, {})
+    })
+    const csvContent = '﻿' + Papa.unparse(csvData)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    saveAs(blob, `Vazifalar_${dayjs().format('DD_MM_YYYY')}.csv`)
+  }
+
+  const handlePrint = async () => {
+    const list = await prepareExport()
+    if (!list) return
+
+    const rowsHtml = list.map((t, i) => {
+      const r = mapTaskRow(t, i)
+      return `<tr>${EXPORT_COLUMNS.map(c => `<td>${r[c.key] ?? '—'}</td>`).join('')}</tr>`
+    }).join('')
+
+    const htmlContent = `
+      <!DOCTYPE html><html><head><title>Vazifalar</title>
+      <style>
+        @page { size: landscape; margin: 5mm; }
+        body { font-family: 'Inter','Segoe UI',Roboto,Arial,sans-serif; font-size: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        h2 { text-align: center; margin-bottom: 15px; font-size: 16px; color: #1e293b; }
+        table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        th, td { border: 1px solid #e2e8f0; padding: 4px 6px; text-align: left; word-wrap: break-word; }
+        th { background-color: #7186ED; font-weight: bold; color: #fff; text-align: center; font-size: 7px; }
+        td { color: #334155; }
+      </style></head><body>
+      <h2>Vazifalar</h2>
+      <table>
+        <thead><tr>${EXPORT_COLUMNS.map(c => `<th>${c.header}</th>`).join('')}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      </body></html>`
+
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'absolute'
+    iframe.style.width = '0px'
+    iframe.style.height = '0px'
+    iframe.style.border = 'none'
+    document.body.appendChild(iframe)
+    const idoc = iframe.contentWindow.document
+    idoc.open(); idoc.write(htmlContent); idoc.close()
+    setTimeout(() => {
+      iframe.contentWindow.focus()
+      iframe.contentWindow.print()
+      setTimeout(() => document.body.removeChild(iframe), 1000)
+    }, 100)
+  }
+
+  // Navbarga yuklab olish va chop etish tugmalarini ro'yxatdan o'tkazish
+  useEffect(() => {
+    setDownload({ show: true, excel: handleExcelDownload, pdf: handlePdfDownload, csv: handleCsvDownload })
+    setPrint({ show: true, onClick: handlePrint })
+    return () => { clearDownload(); clearPrint() }
+  }, [filters, search])
 
   useEffect(() => {
     const el = scrollRef.current
