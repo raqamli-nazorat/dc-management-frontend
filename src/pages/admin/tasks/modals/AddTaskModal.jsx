@@ -678,7 +678,11 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
                 <div className="grid grid-cols-2 gap-2">
                   <input type="number" min="0" value={form.estimated_hours} onChange={e => set("estimated_hours", e.target.value)}
                     placeholder="0 soat" className={inputCls(false)} />
-                  <input type="number" min="0" max="59" value={form.estimated_minutes} onChange={e => set("estimated_minutes", e.target.value)}
+                  <input type="number" min="0" max="59" value={form.estimated_minutes} onChange={e => {
+                    const v = e.target.value
+                    if (v === "") { set("estimated_minutes", ""); return }
+                    set("estimated_minutes", String(Math.max(0, Math.min(59, Math.floor(Number(v))))))
+                  }}
                     placeholder="0 daqiqa" className={inputCls(false)} />
                 </div>
               </div>
@@ -744,7 +748,7 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
                 </button>
 
                 {/* Placeholders */}
-                {attachments.length < 2 && Array.from({ length: 2 - attachments.length }).map((_, i) => (
+                {attachments.length < 1 && Array.from({ length: 1 - attachments.length }).map((_, i) => (
                   <div key={`placeholder-${i}`} className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex items-center justify-center opacity-50">
                     <span className="text-[var(--text-sub)] text-lg">+</span>
                   </div>

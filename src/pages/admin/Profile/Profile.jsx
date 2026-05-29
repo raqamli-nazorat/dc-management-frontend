@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FaXmark, FaArrowLeft, FaEye, FaEyeSlash, FaPencil, FaChevronDown, FaCheck, FaCamera, FaUser } from 'react-icons/fa6'
 import { useAuth } from '../../../context/AuthContext'
 import { axiosAPI } from '../../../service/axiosAPI'
@@ -6,6 +6,159 @@ import { getErrorMessage } from '../../../service/getErrorMessage'
 import { toast } from '../../../Toast/ToastProvider'
 import { FiPlus } from 'react-icons/fi'
 import { useImagePaste } from '../../../hooks/useImagePaste'
+import Cropper from 'react-easy-crop'
+
+/* ── Canvas crop helper ── */
+function createImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.addEventListener('load', () => resolve(img))
+    img.addEventListener('error', reject)
+    img.setAttribute('crossOrigin', 'anonymous')
+    img.src = url
+  })
+}
+
+async function getCroppedFile(imageSrc, pixelCrop) {
+  const image = await createImage(imageSrc)
+  const canvas = document.createElement('canvas')
+  canvas.width = pixelCrop.width
+  canvas.height = pixelCrop.height
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(
+    image,
+    pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height,
+    0, 0, pixelCrop.width, pixelCrop.height
+  )
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(new File([blob], 'avatar.jpg', { type: 'image/jpeg' }))
+    }, 'image/jpeg', 0.92)
+  })
+}
+
+/* ── Avatar Crop Modal ── */
+function AvatarCropModal({ src, onClose, onSave }) {
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  const onCropComplete = useCallback((_, pixels) => {
+    setCroppedAreaPixels(pixels)
+  }, [])
+
+  const handleSave = async () => {
+    if (!croppedAreaPixels) return
+    setSaving(true)
+    try {
+      const file = await getCroppedFile(src, croppedAreaPixels)
+      onSave(file)
+    } catch {
+      toast.error('Xatolik', "Rasmni qirqishda muammo yuz berdi")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+      <div className="fixed inset-0 bg-black/70" onClick={onClose} />
+      <div
+        className="relative w-full max-w-[480px] rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        style={{ background: 'var(--bg-base)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--stroke-soft)]">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="text-[var(--text-strong)] hover:opacity-60 cursor-pointer transition-opacity"
+            >
+              <FaArrowLeft size={15} />
+            </button>
+            <h2 className="text-base font-extrabold text-[var(--text-strong)]">Rasmni qirqish</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer
+              bg-[var(--bg-elevation-1)] hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)]"
+          >
+            <FaXmark size={13} />
+          </button>
+        </div>
+
+        {/* Crop area */}
+        <div className="relative w-full" style={{ height: 340, background: '#111' }}>
+          <Cropper
+            image={src}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            cropShape="rect"
+            showGrid={false}
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={onCropComplete}
+            style={{
+              containerStyle: { borderRadius: 0 },
+              cropAreaStyle: { borderRadius: 12, border: '2px solid #526ED3' },
+            }}
+          />
+        </div>
+
+        {/* Zoom slider */}
+        <div className="px-6 pt-5 pb-1 flex items-center gap-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            <path d="M11 8v6M8 11h6" />
+          </svg>
+          <input
+            type="range"
+            min={1} max={3} step={0.05}
+            value={zoom}
+            onChange={e => setZoom(Number(e.target.value))}
+            className="flex-1 accent-[#526ED3] cursor-pointer"
+          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+          </svg>
+        </div>
+        <p className="text-center text-xs text-[var(--text-soft)] mb-4">
+          Sichqoncha bilan surating, kattalashtirish uchun slayderni torting
+        </p>
+
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-3 px-6 pb-6">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
+              text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] border border-[var(--stroke-sub)]"
+          >
+            <FaXmark size={12} /> Bekor qilish
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold cursor-pointer
+              bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60"
+          >
+            {saving ? (
+              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+            ) : (
+              <FaCheck size={12} />
+            )}
+            Tasdiqlash
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 /* ── Change Password Modal ── */
 function ChangePasswordModal({ onClose }) {
@@ -396,6 +549,7 @@ export default function ProfilePage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passportOpen, setPassportOpen] = useState(false)
   const [openImg, setOpenImg] = useState(false)
+  const [cropSrc, setCropSrc] = useState(null)
 
   const [data, setData] = useState({})
 
@@ -424,15 +578,21 @@ export default function ProfilePage() {
         setOpenImg(false)
         setShowPasswordModal(false)
         setPassportOpen(false)
+        setCropSrc(null)
       }
     }
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
   }, [])
 
+  const openCropFor = (file) => {
+    const url = URL.createObjectURL(file)
+    setCropSrc(url)
+  }
+
   useImagePaste((files) => {
     if (files && files.length > 0) {
-      set('avatar', files[0]);
+      openCropFor(files[0])
     }
   });
 
@@ -557,9 +717,8 @@ export default function ProfilePage() {
               id='avatar-input'
               onChange={e => {
                 const file = e.target.files?.[0]
-                if (file) {
-                  set('avatar', file)
-                }
+                if (file) openCropFor(file)
+                e.target.value = ''
               }}
             />
           </label>
@@ -760,6 +919,21 @@ export default function ProfilePage() {
           Saqlash
         </button>
       </div>
+
+      {cropSrc && (
+        <AvatarCropModal
+          src={cropSrc}
+          onClose={() => {
+            URL.revokeObjectURL(cropSrc)
+            setCropSrc(null)
+          }}
+          onSave={(file) => {
+            URL.revokeObjectURL(cropSrc)
+            setCropSrc(null)
+            set('avatar', file)
+          }}
+        />
+      )}
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
       {passportOpen && data?.passport_image && (

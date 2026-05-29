@@ -8,6 +8,7 @@ import { MdCheck, MdOutlineFileDownload, MdOutlinePrint } from 'react-icons/md'
 import { ExcelIcon, PdfIcon } from './icons'
 import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
+import ImageLightbox from './ImageLightbox'
 import { useAuth } from '../context/AuthContext'
 import { onMessageListener, requestForToken } from '../firebase'
 import notificationSocket from '../NotificationSocket'
@@ -578,6 +579,7 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
+      <ImageLightbox />
       <Sidebar forceCollapsed={isKanban} onForceClick={sidebarClickHandler} />
       <div className="flex-1 flex flex-col min-w-0">
 
