@@ -31,6 +31,16 @@ const MEETING_COLORS = ['#2DBE2C', '#92BFFF', '#FA5252']
 // Grid chiziq rangi
 const GRID_COLOR = '#E8EAF0'
 
+/* Daqiqani "X soat Y daq" ko'rinishiga aylantirish */
+function formatDuration(totalMinutes) {
+  const min = Math.max(0, Math.round(Number(totalMinutes) || 0))
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  if (h === 0) return `${m} daq`
+  if (m === 0) return `${h} soat`
+  return `${h} soat ${m} daq`
+}
+
 /* ── Tooltip ──────────────────────────────────────────────── */
 function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
@@ -362,96 +372,86 @@ export default function AnalyticsPage() {
 
         {/* Yig'ilishlar Donut Chart */}
         <div className="rounded-3xl bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] p-6 flex flex-col">
-          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)] mb-4 shrink-0">Yig'ilishlar dinamikasi</h3>
+          <h3 className="text-[17px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]  shrink-0">Yig'ilishlar dinamikasi</h3>
           {loading ? <Spinner /> : (
-            <div className="flex-1 flex items-center gap-6">
+            <div className="flex-1 flex flex-col min-h-0 ">
 
-              {/* Donut */}
-              <div className="h-full flex-shrink-0" style={{ width: 160 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={
-                        meetingData.every(d => d.value === 0)
-                          ? meetingData.map(d => ({ ...d, value: 1 }))
-                          : meetingData
-                      }
-                      cx="50%" cy="50%"
-                      innerRadius="48%" outerRadius="90%"
-                      paddingAngle={3}
-                      dataKey="value"
-                      stroke="none"
-                      startAngle={90}
-                      endAngle={-270}
-                      cornerRadius={4}
-                    >
-                      {meetingData.map((_, i) => (
-                        <Cell
-                          key={i}
-                          fill={
-                            meetingData.every(d => d.value === 0)
-                              ? (isDark ? '#2A2B2B' : '#E8EAF0')
-                              : MEETING_COLORS[i % MEETING_COLORS.length]
-                          }
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip isDark={isDark} />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              {/* Donut + Legend */}
+              <div className="flex-1 flex items-center gap-5 min-h-0">
 
-              {/* Legend */}
-              <div className="flex-1 flex flex-col gap-1 min-w-0">
-                {/* Umumiy */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[13px] font-[500] text-[#000000] dark:text-[var(--text-sub)]">Umumiy soni:</span>
-                  <span className="text-[13px] font-semibold text-[#1A1D2E] dark:text-[var(--text-strong)]">
-                    {stats.meetings} / {stats.total_duration_minutes} daqiqa
-                  </span>
+                {/* Donut */}
+                <div className="shrink-0" style={{ width: 150, height: 150 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={
+                          meetingData.every(d => d.value === 0)
+                            ? meetingData.map(d => ({ ...d, value: 1 }))
+                            : meetingData
+                        }
+                        cx="50%" cy="50%"
+                        innerRadius="48%" outerRadius="90%"
+                        paddingAngle={3}
+                        dataKey="value"
+                        stroke="none"
+                        startAngle={90}
+                        endAngle={-270}
+                        cornerRadius={4}
+                      >
+                        {meetingData.map((_, i) => (
+                          <Cell
+                            key={i}
+                            fill={
+                              meetingData.every(d => d.value === 0)
+                                ? (isDark ? '#2A2B2B' : '#E8EAF0')
+                                : MEETING_COLORS[i % MEETING_COLORS.length]
+                            }
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip isDark={isDark} />} />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
 
-                {/* Har bir qator */}
-                {meetingData.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#E8EAF0] dark:border-[var(--stroke-soft)] last:border-0">
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ background: MEETING_COLORS[i] }}
-                      />
-                      <span className="text-[13px] text-[#000000] dark:text-[var(--text-sub)]">{item.name}</span>
-                    </div>
-                    {i === 0 ? (
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[14px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">{stats.unique_participants}</span>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14.6489 13.125C13.792 11.6211 12.4539 10.4493 10.8502 9.79817C11.6477 9.2 12.2368 8.36606 12.5341 7.41446C12.8313 6.46287 12.8217 5.44187 12.5064 4.49609C12.1911 3.5503 11.5863 2.72769 10.7775 2.14477C9.96876 1.56185 8.99709 1.24817 8.00015 1.24817C7.00321 1.24817 6.03154 1.56185 5.22278 2.14477C4.41402 2.72769 3.80917 3.5503 3.4939 4.49609C3.17864 5.44187 3.16895 6.46287 3.46621 7.41446C3.76347 8.36606 4.3526 9.2 5.15015 9.79817C3.54635 10.4493 2.2083 11.6211 1.3514 13.125C1.2983 13.2104 1.26291 13.3056 1.24734 13.4049C1.23176 13.5043 1.23631 13.6057 1.26073 13.7032C1.28514 13.8008 1.32891 13.8924 1.38944 13.9727C1.44997 14.0529 1.52603 14.1202 1.61308 14.1705C1.70014 14.2208 1.79642 14.2531 1.8962 14.2655C1.99598 14.2778 2.09722 14.27 2.19391 14.2424C2.2906 14.2148 2.38076 14.1681 2.45903 14.105C2.5373 14.0419 2.60208 13.9637 2.64952 13.875C3.78203 11.9175 5.78203 10.75 8.00015 10.75C10.2183 10.75 12.2183 11.9182 13.3508 13.875C13.4536 14.0404 13.6167 14.1592 13.8056 14.2065C13.9944 14.2538 14.1943 14.2258 14.3629 14.1284C14.5314 14.031 14.6555 13.8718 14.7089 13.6846C14.7623 13.4974 14.7408 13.2967 14.6489 13.125ZM4.75015 6.00004C4.75015 5.35725 4.94076 4.7289 5.29787 4.19444C5.65499 3.65998 6.16257 3.24342 6.75643 2.99744C7.35029 2.75145 8.00376 2.68709 8.63419 2.81249C9.26463 2.93789 9.84373 3.24743 10.2982 3.70195C10.7528 4.15647 11.0623 4.73556 11.1877 5.366C11.3131 5.99644 11.2487 6.64991 11.0028 7.24376C10.7568 7.83762 10.3402 8.34521 9.80575 8.70232C9.27129 9.05943 8.64294 9.25004 8.00015 9.25004C7.1385 9.24905 6.31243 8.90632 5.70315 8.29704C5.09387 7.68777 4.75114 6.86169 4.75015 6.00004Z" fill="#2DBE2C" />
-                          </svg>
-
+                {/* Legend — har qatorda rangli foiz badge */}
+                <div className="flex-1 flex flex-col justify-center gap-1.5 min-w-0">
+                  {meetingData.map((item, i) => {
+                    const total = stats.meetings || 0
+                    const pct = total ? Math.round((item.value / total) * 100) : 0
+                    return (
+                      <div key={i} className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: MEETING_COLORS[i] }} />
+                          <span className="text-[14px] text-[#000000] dark:text-[var(--text-sub)] truncate">{item.name}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[14px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">{stats.unique_meetings}</span>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_2508_364956)">
-                              <path d="M0.833008 4.66669C0.833008 3.28598 1.9523 2.16669 3.33301 2.16669C4.71372 2.16669 5.83301 3.28598 5.83301 4.66669C5.83301 6.0474 4.71372 7.16669 3.33301 7.16669C1.9523 7.16669 0.833008 6.0474 0.833008 4.66669Z" fill="#526ED3" />
-                              <path d="M2.16699 12C2.16699 10.2511 3.58476 8.83331 5.33366 8.83331C7.08256 8.83331 8.50033 10.2511 8.50033 12C8.50033 13.7489 7.08256 15.1666 5.33366 15.1666C3.58476 15.1666 2.16699 13.7489 2.16699 12Z" fill="#526ED3" />
-                              <path d="M7.5 4.66665C7.5 2.54955 9.21624 0.833313 11.3333 0.833313C13.4504 0.833313 15.1667 2.54955 15.1667 4.66665C15.1667 6.78374 13.4504 8.49998 11.3333 8.49998C9.21624 8.49998 7.5 6.78374 7.5 4.66665Z" fill="#526ED3" />
-                            </g>
-                            <defs>
-                              <clipPath id="clip0_2508_364956">
-                                <rect width="16" height="16" fill="white" />
-                              </clipPath>
-                            </defs>
-                          </svg>
-
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <span className="text-[14px] text-[var(--text-strong)] dark:text-[var(--text-strong)] tabular-nums">
+                            {item.value} <span className="text-[var(--text-soft)]">ta</span>
+                          </span>
+                          <span
+                            className="inline-flex items-center justify-center min-w-[42px] px-2 py-[3px] rounded-full text-[11px] font-semibold text-white tabular-nums"
+                            style={{ background: MEETING_COLORS[i] }}
+                          >
+                            {pct}%
+                          </span>
                         </div>
                       </div>
-                    ) : (
-                      <span className="text-[14px] font-bold text-[#1A1D2E] dark:text-[var(--text-strong)]">{item.value}</span>
-                    )}
-                  </div>
-                ))}
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Pastki qutilar */}
+              <div className="grid grid-cols-2 gap-3 mt-3 shrink-0 ">
+                <div className="rounded-2xl px-4 py-3 bg-[var(--bg-elevation-2)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)]">
+                  <p className="text-[12px] text-[var(--text-soft)] mb-1">Jami yig'ilishlar</p>
+                  <p className="text-[16px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{stats.meetings} ta</p>
+                </div>
+                <div className="rounded-2xl px-4 py-3 bg-[var(--bg-elevation-2)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)]">
+                  <p className="text-[12px] text-[var(--text-soft)] mb-1">Sarflangan vaqt</p>
+                  <p className="text-[16px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">{formatDuration(stats.total_duration_minutes)}</p>
+                </div>
               </div>
             </div>
           )}
