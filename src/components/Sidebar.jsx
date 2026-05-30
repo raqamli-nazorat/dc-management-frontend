@@ -382,7 +382,7 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
         )}
 
         <div className="flex items-end justify-between mb-2.5">
-          <span className={pctCls}>{loading && !data ? '—' : `${overall}%`}</span>
+          <span className={` font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-none tabular-nums text-[16px] `}>{loading && !data ? '—' : `${overall}%`}</span>
           <span className={capCls}>Umumiy samaradorlik</span>
         </div>
 
