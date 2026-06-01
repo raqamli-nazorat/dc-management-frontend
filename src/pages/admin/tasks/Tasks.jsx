@@ -1403,6 +1403,7 @@ export default function TasksPage() {
                     {!isAuditor && !canEdit && (
                       <TaskRowMenu
                         onDetail={() => loadTaskDetail(t.id)}
+                        onDuplicate={() => handleDuplicate(t.id)}
                         onDelete={() => handleDelete(t.id)}
                       />
                     )}
