@@ -16,10 +16,10 @@ const EMPTY_FILTER = {
   manager: '',
   status: '',
   employee: '',
-  startFromD: dayjs().startOf('month').format('YYYY-MM-DD'),
-  startFromT: '00:00',
-  startToD: dayjs().endOf('month').format('YYYY-MM-DD'),
-  startToT: '23:59',
+  startFromD: '',
+  startFromT: '',
+  startToD: '',
+  startToT: '',
   deadFromD: '',
   deadFromT: '',
   deadToD: '',
@@ -118,7 +118,7 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
           {canEdit && (
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+                className="w-ful  l flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
                   hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
