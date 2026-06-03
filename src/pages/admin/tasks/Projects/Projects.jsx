@@ -16,10 +16,10 @@ const EMPTY_FILTER = {
   manager: '',
   status: '',
   employee: '',
-  startFromD: dayjs().startOf('month').format('YYYY-MM-DD'),
-  startFromT: '00:00',
-  startToD: dayjs().endOf('month').format('YYYY-MM-DD'),
-  startToT: '23:59',
+  startFromD: '',
+  startFromT: '',
+  startToD: '',
+  startToT: '',
   deadFromD: '',
   deadFromT: '',
   deadToD: '',
@@ -92,7 +92,7 @@ const DeleteConfirmModal = ({ project, onClose, onConfirm }) => {
 }
 
 /* ── RowMenu ── */
-const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
+const RowMenu = ({ onEdit, onDetail, onDelete, onDuplicate, canEdit = false }) => {
   const { open, setOpen, ref } = useDropdown()
   return (
     <div ref={ref} className="relative" onClick={e => e.stopPropagation()}>
@@ -118,13 +118,23 @@ const RowMenu = ({ onEdit, onDetail, onDelete, canEdit = false }) => {
           {canEdit && (
             <>
               <button onClick={() => { onEdit?.(); setOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+                className="w-ful  l flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
                   hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                 </svg>
                 Tahrirlash
               </button>
+              {onDuplicate && (
+                <button onClick={() => { onDuplicate?.(); setOpen(false) }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)]
+                    hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)] cursor-pointer transition-colors">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[var(--text-sub)] dark:text-[var(--text-sub)]">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  Takrorlash
+                </button>
+              )}
               <button onClick={() => { onDelete?.(); setOpen(false) }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[var(--error-strong)]
                   hover:bg-[#FFF5F5] dark:hover:bg-[#2A1A1A] cursor-pointer transition-colors">
@@ -152,6 +162,7 @@ const ProjectsPage = () => {
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
+  const [duplicateData, setDuplicateData] = useState(null)
   const [editProject, setEditProject] = useState(null)
   const [detailProject, setDetailProject] = useState(null)
   const [deleteProject, setDeleteProject] = useState(null)
@@ -234,6 +245,23 @@ const ProjectsPage = () => {
     loadProjects(f, search, 1)
   }
 
+  const handleDuplicate = async (id) => {
+    try {
+      const { data } = await axiosAPI.get(`/projects/${id}/`)
+      const project = data?.data ?? data
+      let links = []
+      try {
+        const docRes = await axiosAPI.get(`project-documents/?project=${id}`)
+        links = docRes.data?.data?.results ?? docRes.data?.results ?? []
+      } catch { /* hujjatlarsiz davom etamiz */ }
+      setDuplicateData({ ...project, links })
+      setShowAdd(true)
+    } catch (err) {
+      const msg = err?.response?.data?.error?.errorMsg || "Loyiha ma'lumotlarini yuklashda xatolik"
+      toast.error('Xatolik', msg)
+    }
+  }
+
   const handleDelete = async (id) => {
     try {
       const project = data.find(p => p.id === id)
@@ -250,8 +278,6 @@ const ProjectsPage = () => {
 
   return (
     <div className="flex flex-col h-[85vh] gap-4">
-
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] shrink-0">Loyihalar</h1>
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 shrink-0">
@@ -379,7 +405,7 @@ const ProjectsPage = () => {
                     <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.created_at)}</td>
                     <td className="px-4 py-3 text-right text-[var(--text-strong)] dark:text-[var(--text-strong)]">{fmtDt(p.deadline)}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin || is_manager} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} onDuplicate={is_admin ? () => handleDuplicate(p.id) : undefined} canEdit={is_admin || is_manager} />
                     </td>
                   </tr>
                 ))
@@ -480,7 +506,7 @@ const ProjectsPage = () => {
                       </div>
                     </div>
                     <div onClick={e => e.stopPropagation()}>
-                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} canEdit={is_admin || is_manager} />
+                      <RowMenu onEdit={() => setEditProject(p.id)} onDetail={() => setDetailProject(p.id)} onDelete={() => setDeleteProject(p)} onDuplicate={is_admin ? () => handleDuplicate(p.id) : undefined} canEdit={is_admin || is_manager} />
                     </div>
                   </div>
                 </div>
@@ -511,10 +537,11 @@ const ProjectsPage = () => {
 
       {showAdd && (
         <AddProjectModal
-          onClose={() => setShowAdd(false)}
+          onClose={() => { setShowAdd(false); setDuplicateData(null) }}
           refreshData={loadProjects}
           useDropdown={useDropdown}
           STATUS_API={STATUS_LABEL}
+          initialData={duplicateData}
         />
       )}
 

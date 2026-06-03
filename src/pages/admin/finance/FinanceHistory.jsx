@@ -403,7 +403,6 @@ export default function FinanceHistoryPage() {
 
       {/* Sticky yuqori qism */}
       <div className="shrink-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] pb-3">
-        <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-3">Tarix</h1>
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
             <div className="relative">

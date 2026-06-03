@@ -271,12 +271,51 @@ export default function MyTasks() {
     }
   }
 
-  /* ── Vazifani yangilash (PUT) ── */
+  /* ── Vazifani yangilash (PUT + subtask sinxronlash) ── */
   const handleUpdateTask = async (id, body) => {
+    const { items: itemOps, ...todoBody } = body
     try {
-      const res = await axiosAPI.put(`/todos/${id}/`, body)
+      // 1. Todo o'zini yangilash
+      const res = await axiosAPI.put(`/todos/${id}/`, todoBody)
       const updated = res.data?.data ?? res.data
-      setTasks(prev => prev.map(t => t.id === id ? updated : t))
+
+      // 2. Subtask operatsiyalari (create / patch / delete)
+      const existing = tasks.find(t => t.id === id)
+      let finalItems = [...(existing?.items || [])]
+
+      if (Array.isArray(itemOps)) {
+        for (const op of itemOps) {
+          try {
+            if (op.id && op.deleted) {
+              await axiosAPI.delete(`/todo-items/${op.id}/`)
+              finalItems = finalItems.filter(i => i.id !== op.id)
+            } else if (op.id) {
+              const r = await axiosAPI.patch(`/todo-items/${op.id}/`, {
+                title: op.title,
+                is_done: op.is_done,
+              })
+              const saved = r.data?.data ?? r.data
+              finalItems = finalItems.map(i => i.id === op.id ? { ...i, ...saved } : i)
+            } else if (op.title) {
+              const r = await axiosAPI.post('/todo-items/', {
+                todo: id,
+                title: op.title,
+                is_done: op.is_done ?? false,
+              })
+              const created = r.data?.data ?? r.data
+              finalItems.push(created)
+            }
+          } catch {
+            // bitta subtask xato bo'lsa davom etamiz
+          }
+        }
+      }
+
+      // Backend qaytargan items bo'lsa o'shani, aks holda hisoblangan ro'yxatni ishlatamiz
+      const mergedItems = Array.isArray(updated?.items) && updated.items.length > 0
+        ? updated.items
+        : finalItems
+      setTasks(prev => prev.map(t => t.id === id ? { ...updated, items: mergedItems } : t))
       toast.success("Yangilandi", "Vazifa muvaffaqiyatli yangilandi")
     } catch (err) {
       const msg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Yangilashda xatolik"

@@ -291,7 +291,7 @@ function MetricRow({ label, value, dot }) {
   )
 }
 
-function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, onTip, cardRef }) {
+function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, onTip, cardRef, is_manager }) {
   const overall = Math.round(data?.overall_efficiency || 0)
   const taskScore = Math.round(data?.task_score || 0)
   const meetScore = Math.round(data?.meeting_score || 0)
@@ -317,7 +317,7 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
           <div className="mb-3">
             <div className="flex items-end justify-between mb-1.5">
               <span className={pctCls}>{taskScore}%</span>
-              <span className={capCls}>Vazifalar bo'yicha</span>
+              <span className={capCls}>{is_manager ? "Loyiha va vazifalar bo'yicha" : "Vazifalar bo'yicha"}</span>
             </div>
             <EffBar value={taskScore} color={EFF_GREEN} />
           </div>
@@ -334,11 +334,13 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
           {/* Ajratuvchi */}
           <div className="border-t border-dashed border-[var(--stroke-sub)] my-2.5" />
 
-          <p className={`${capCls} mb-1`}>Vazifa ko'rsatkichlari</p>
+          <p className={`${capCls} mb-1`}>{is_manager ? "Loyiha va vazifalar ko'rsatkichlari" : "Vazifa ko'rsatkichlari"}</p>
           <MetricRow label="Jami vazifalar" value={m.total_tasks ?? 0} />
-          <MetricRow label="Muddati o'tgan" value={m.overdue_tasks ?? 0} dot={EFF_GREEN} />
-          <MetricRow label="Rad etilgan" value={m.rejected_tasks ?? 0} dot={EFF_RED} />
-          <MetricRow label="Qayta ochilgan" value={m.total_reopened_actions ?? 0} dot={EFF_ORANGE} />
+          <MetricRow label={is_manager ? "Muddati o'tgan vazifalar" : "Muddati o'tgan"} value={m.overdue_tasks ?? 0} dot={EFF_GREEN} />
+          {/* {is_manager && <MetricRow label="Muddati o'tgan loyihalar" value={m.overdue_projects ?? 0} dot={EFF_ORANGE} />} */}
+          <MetricRow label={is_manager ? "Muddati o'tgan loyihalar" : "Rad etilgan"} value={is_manager ? m.overdue_projects : m.rejected_tasks ?? 0} dot={EFF_RED} />
+          {/* {is_manager && <MetricRow label="Qatnashmagan yig'ilishlar" value={m.unexcused_meetings ?? 0} dot={EFF_GREEN} />} */}
+          <MetricRow label={is_manager ? "Qatnashmagan yig'ilishlar" : "Qayta ochilgan"} value={is_manager ? m.unexcused_meetings : m.total_reopened_actions ?? 0} dot={EFF_ORANGE} />
         </div>
       </div>
 
@@ -753,7 +755,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           </NavLink>
         ))}
 
-        {!isCollapsed && <EfficiencyCard
+        {!isCollapsed && routeRole !== 'admin' && routeRole !== 'superadmin' && routeRole !== 'auditor' && <EfficiencyCard
           cardRef={effRef}
           data={userSts}
           loading={stsLoading}
@@ -761,6 +763,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           onToggleDetail={() => setStsDetailOpen(o => !o)}
           tipOpen={stsTipOpen}
           onTip={setStsTipOpen}
+          is_manager={routeRole === "manager"}
         />}
 
         {/* Separator */}

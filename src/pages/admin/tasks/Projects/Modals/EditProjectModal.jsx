@@ -606,7 +606,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                     )}
 
                     {/* Footer */}
-                    <div className="px-7 py-5 flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-[var(--bg-base)]">
+                    <div className="px-7 pt-5 pb-[25px] flex items-center justify-between sticky bottom-0 z-10! rounded-b-2xl bg-[var(--bg-base)]">
                         {!loading &&
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">Muzlatilganmi ?</span>

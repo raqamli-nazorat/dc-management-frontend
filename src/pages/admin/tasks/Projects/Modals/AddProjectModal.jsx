@@ -13,7 +13,7 @@ import DiscardModal from "../../../../../components/DiscardModal"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
-const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
+const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initialData }) => {
   const { isDark } = useTheme()
   const { open: statusOpen, setOpen: setStatusOpen, ref: statusRef } = useDropdown()
   const { open: mgrOpen, setOpen: setMgrOpen, ref: mgrRef } = useDropdown()
@@ -88,6 +88,30 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
       return Number(resultStr) > 100 ? '100' : resultStr
     }
   }
+
+  // Takrorlash (dublikat) — mavjud loyiha ma'lumotlarini formaga yozish
+  useEffect(() => {
+    if (!initialData) return
+    setForm({
+      title: initialData.title || '',
+      prefix: initialData.prefix || '',
+      status: initialData.status || 'planning',
+      description: initialData.description || '',
+      manager: initialData.manager_info || null,
+      project_price: initialData.project_price != null && initialData.project_price !== ''
+        ? fmtBonus(String(initialData.project_price)) : '',
+      penalty_percentage: initialData.penalty_percentage != null && initialData.penalty_percentage !== ''
+        ? normalizePercentInput(String(initialData.penalty_percentage)) : '',
+      employees: initialData.employees_info || [],
+      testers: initialData.testers_info || [],
+      deadline: initialData.deadline ? dayjs(initialData.deadline) : '',
+      time: initialData.deadline ? dayjs(initialData.deadline).format('HH:mm') : '',
+      is_active: initialData.is_active ?? true,
+      links: (initialData.links && initialData.links.length > 0)
+        ? initialData.links.map(d => ({ name: d.name || '', value: d.value || '' }))
+        : [{ name: '', value: '' }],
+    })
+  }, [initialData])
 
   const validate = () => {
     const e = {}
@@ -206,7 +230,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           <FaXmark size={14} />
         </button>
 
-        <div className="relative w-full max-w-[600px] h-[650px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
+        <div className="relative w-full max-w-[600px] rounded-3xl shadow-2xl bg-[var(--bg-base)]">
           {/* header */}
           <div className="px-7 pt-7 pb-4 sticky top-0 bg-[var(--bg-base)] z-[100] rounded-t-xl">
             <div className="flex items-center gap-3 mb-1">
@@ -481,7 +505,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API }) => {
           </div>
 
           {/* footer */}
-          <div className="flex items-center justify-end mt-4 mr-5 gap-3">
+          <div className="flex items-center justify-end mt-4 mr-5 gap-3 pb-[5px]">
             <button onClick={handleClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={13} /> Yopish

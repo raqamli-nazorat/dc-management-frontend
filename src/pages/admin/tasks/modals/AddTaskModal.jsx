@@ -747,13 +747,6 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
                   </div>
                 </button>
 
-                {/* Placeholders */}
-                {attachments.length < 1 && Array.from({ length: 1 - attachments.length }).map((_, i) => (
-                  <div key={`placeholder-${i}`} className="w-20 h-20 rounded-xl border-2 border-dashed border-[#C2C8E0] dark:border-[var(--stroke-sub)] flex items-center justify-center opacity-50">
-                    <span className="text-[var(--text-sub)] text-lg">+</span>
-                  </div>
-                ))}
-
                 <input
                   ref={fileInputRef}
                   type="file"
