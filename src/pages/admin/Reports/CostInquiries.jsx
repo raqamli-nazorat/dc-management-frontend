@@ -1069,7 +1069,7 @@ const CostInquiries = () => {
           </div>
         ) : !hasFetched ? (
           <div className="mt-6 rounded-2xl flex flex-col justify-center items-center h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakillantirish tugmasini bosing.</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakllantirish tugmasini bosing.</p>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
           </div>
         ) : UserReports.length === 0 ? (

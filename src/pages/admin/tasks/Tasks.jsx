@@ -1279,8 +1279,6 @@ export default function TasksPage() {
   return (
     <div className="flex flex-col h-full gap-4" >
 
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Vazifalar</h1>
-
       <div className="flex items-center gap-2">
         <div className="relative">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-soft)] dark:text-[var(--text-sub)]"

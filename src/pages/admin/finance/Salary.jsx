@@ -495,8 +495,7 @@ export default function SalaryPage() {
       <div className="shrink-0 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Ish haqi</h1>
+        <div className="flex items-center justify-end mb-3">
           {isAccountant && (selecting ? (
             <button onClick={() => { setSelecting(false); setSelected(new Set()) }}
               className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-extrabold cursor-pointer

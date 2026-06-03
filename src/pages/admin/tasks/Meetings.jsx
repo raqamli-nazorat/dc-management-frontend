@@ -242,7 +242,7 @@ function ParticipantsModal({ selected, onClose, onApply, users = [] }) {
 }
 
 /* -- AddMeetingModal -- */
-function AddMeetingModal({ onClose, loadMeetings }) {
+function AddMeetingModal({ onClose, loadMeetings, initialData }) {
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [projects, setProjects] = useState([])
@@ -257,10 +257,46 @@ function AddMeetingModal({ onClose, loadMeetings }) {
         setProjects(Array.isArray(list) ? list : [])
       }).catch(() => { })
   }, [])
-  const [form, setForm] = useState({
-    project: null, title: '', fine: '', link: '', description: '',
-    date: '', time: '', durationVal: '',
-    participants: [], is_completed: false,
+
+  // Takrorlash (dublikat) — tanlangan loyiha a'zolarini yuklash (qatnashchilar tozalanmaydi)
+  useEffect(() => {
+    if (!initialData?.project) return
+    setMembersLoading(true)
+    axiosAPI.get(`/projects/${initialData.project}/`)
+      .then(res => {
+        const proj = res.data?.data ?? res.data
+        const emps = proj?.employees_info ?? []
+        const testers = proj?.testers_info ?? []
+        const manager = proj?.manager_info ? [proj.manager_info] : []
+        const all = [...emps, ...testers, ...manager]
+        const seen = new Set()
+        setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
+      })
+      .catch(() => setProjectMembers([]))
+      .finally(() => setMembersLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const [form, setForm] = useState(() => {
+    if (initialData) {
+      const { date, time } = fromIso(initialData.start_time)
+      const { val } = minutesToDisplay(initialData.duration_minutes)
+      return {
+        project: initialData.project ?? null,
+        title: initialData.title ?? '',
+        fine: initialData.penalty_percentage ? String(Math.abs(parseFloat(initialData.penalty_percentage))) : '',
+        link: initialData.link ?? '',
+        description: initialData.description ?? '',
+        date, time, durationVal: val,
+        participants: initialData.participants_info ?? [],
+        is_completed: false,
+      }
+    }
+    return {
+      project: null, title: '', fine: '', link: '', description: '',
+      date: '', time: '', durationVal: '',
+      participants: [], is_completed: false,
+    }
   })
   const [errors, setErrors] = useState({})
 
@@ -1452,7 +1488,7 @@ function FilterModal({ onClose, onApply, initial }) {
 }
 
 /* -- RowMenu -- */
-function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted, project }) {
+function RowMenu({ onDetail, onEdit, onDelete, onFinish, onDuplicate, isCompleted, project }) {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
 
@@ -1487,6 +1523,13 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, isCompleted, project })
               Tahrirlash
             </button>
           }
+          {onDuplicate && (
+            <button onClick={() => { onDuplicate(); setOpen(false) }}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+              Takrorlash
+            </button>
+          )}
           {!isCompleted && (
             <button onClick={() => { onFinish(); setOpen(false) }}
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
@@ -1520,6 +1563,7 @@ export default function MeetingsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState({})
   const [showAdd, setShowAdd] = useState(false)
+  const [duplicateMeeting, setDuplicateMeeting] = useState(null)
   const [showFilter, setShowFilter] = useState(false)
   const [detail, setDetail] = useState(null)
   const [editItem, setEditItem] = useState(null)
@@ -1638,6 +1682,21 @@ export default function MeetingsPage() {
     }
   }
 
+  // Takrorlash (dublikat) — yig'ilish ma'lumotini olib qo'shish modalini ochish
+  const handleDuplicate = async (id) => {
+    setMeetingLoading(true)
+    try {
+      const res = await axiosAPI.get(`/meetings/${id}/`)
+      const meeting = res.data?.data ?? res.data
+      setDuplicateMeeting(meeting)
+      setShowAdd(true)
+    } catch (err) {
+      toast.error('Xatolik', parseApiError(err, "Yig'ilish ma'lumotlarini yuklashda xatolik"))
+    } finally {
+      setMeetingLoading(false)
+    }
+  }
+
   const hasFilter = Object.values(filters).some(v => v !== '' && v !== undefined && v !== null)
 
   useEffect(() => {
@@ -1652,7 +1711,6 @@ export default function MeetingsPage() {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Yig'ilishlar</h1>
 
       <div className="flex items-center gap-2">
         <div className="relative">
@@ -1754,6 +1812,7 @@ export default function MeetingsPage() {
                           onDetail={() => loadMeetingDetail(m.id, 'detail')}
                           onEdit={() => loadMeetingDetail(m.id, 'edit')}
                           onFinish={() => setAttendanceMeetingId(m.id)}
+                          onDuplicate={() => handleDuplicate(m.id)}
                           isCompleted={!!m.is_completed}
                           onDelete={() => handleDelete(m.id)}
                           project={m}
@@ -1794,8 +1853,9 @@ export default function MeetingsPage() {
       )}
       {showAdd && (
         <AddMeetingModal
-          onClose={() => setShowAdd(false)}
+          onClose={() => { setShowAdd(false); setDuplicateMeeting(null) }}
           loadMeetings={() => loadMeetings(filters, search, 1)}
+          initialData={duplicateMeeting}
         />
       )}
       {editItem && (
