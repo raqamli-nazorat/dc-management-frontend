@@ -166,7 +166,7 @@ export default function ImportTasks({ onImported }) {
       {/* Vazifa yuklash */}
       <button onClick={openPicker} disabled={busy} type="button"
         className="relative flex items-center gap-1.5 px-3 py-[4px] rounded-xl text-[13px] font-extrabold border cursor-pointer disabled:opacity-60
-          bg-[var(--accent-strong)] border-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)]">
+          bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
         <FaFileExcel size={13} /> {busy ? 'Yuklanmoqda…' : 'Vazifa yuklash'}
       </button>
 
