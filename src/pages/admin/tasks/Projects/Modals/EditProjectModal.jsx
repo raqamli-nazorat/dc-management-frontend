@@ -310,7 +310,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-sub)]"> Ma'lumotlar yuklanmoqda...</p>
                         </div>
                     ) : (
-                        <div className="px-7 pb-4 flex flex-col gap-4 h-[500px] max-h-[70vh] overflow-y-auto">
+                        <div className="px-7 pb-4 flex flex-col gap-4 h-[500px] max-h-[80vh] overflow-y-auto">
                             {/* Nomi + Holati */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

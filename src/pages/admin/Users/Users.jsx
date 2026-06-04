@@ -245,7 +245,7 @@ export default function UsersPage() {
         </div>
 
         {/* Table */}
-        <div className="max-h-[70vh] overflow-y-auto">
+        <div className="max-h-[80vh] overflow-y-auto">
           <table className="w-full rounded-2xl" style={{ fontSize: 13 }}>
             <thead className="sticky top-0 z-10 bg-[#F9F9FA] dark:bg-[var(--bg-elevation-1)] shadow-xs">
               <tr className="border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">

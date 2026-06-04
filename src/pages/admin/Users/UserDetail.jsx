@@ -302,7 +302,7 @@ const UserDetail = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center gap-3 min-h-[70vh]">
+            <div className="flex flex-col items-center justify-center gap-3 min-h-[80vh]">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--accent-strong)]"></div>
                 <p className='text-[var(--text-sub)]'>Yuklanmoqda...</p>
             </div>
@@ -311,7 +311,7 @@ const UserDetail = () => {
 
     if (!user) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 text-[var(--text-sub)]">
+            <div className="flex flex-col items-center justify-center min-h-[80vh] gap-6 text-[var(--text-sub)]">
                 <div className="w-20 h-20 rounded-full bg-[var(--bg-elevation-1)] flex items-center justify-center shadow-inner">
                     <FaUser size={40} className="opacity-20" />
                 </div>
