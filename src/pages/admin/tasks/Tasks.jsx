@@ -9,6 +9,7 @@ import TaskFilterModal, { TASK_EMPTY_FILTER } from './modals/TaskFilterModal'
 import AddTaskModal from './modals/AddTaskModal'
 import EditTaskModal from './modals/EditTaskModal'
 import EmptyState from '../../../components/EmptyState'
+import ImportTasks from './ImportTasks'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import { parseApiError } from '../../../service/parseApiError'
@@ -1301,6 +1302,10 @@ export default function TasksPage() {
           <img src="/imgs/filterIcon.svg" alt="" className="w-3.5 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" /> Filtrlash
           {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
         </button>
+
+        {/* Excel orqali vazifa yuklash + namuna shablon (auditor uchun yashirin) */}
+        {!isAuditor && <ImportTasks onImported={() => loadTasks(filters, search, 1)} />}
+
         <div className="ml-auto flex items-center gap-1 p-1 rounded-xl border border-[var(--stroke-sub)] bg-[#F1F3F9] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)]">
           <button className="p-1.5 rounded-lg bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] shadow-sm cursor-pointer">
             <img
