@@ -235,7 +235,7 @@ const ApplicationsPage = () => {
           </div>
 
           <div
-            className="overflow-y-auto h-[80vh] rounded-xl"
+            className="overflow-y-auto h-[calc(100vh-210px)] rounded-xl"
             onScroll={handleMoreApplications}
           >
             <table className="w-full" style={{ fontSize: 13 }}>

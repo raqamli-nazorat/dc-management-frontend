@@ -564,7 +564,7 @@ export default function SalaryPage() {
             description="Ma'lumotlar keyinroq paydo bo'ladi yoki filtrlarni tekshiring"
           />
         ) : (
-          <table className="w-full text-sm whitespace-nowrap">
+          <table className="w-full h-[calc(100vh-190px)] text-sm whitespace-nowrap">
             <thead className="sticky top-0 z-10 bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)]">
               <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">
                 {selecting && (

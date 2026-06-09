@@ -1733,7 +1733,7 @@ export default function MeetingsPage() {
         </button>
       </div>
 
-      <div ref={scrollRef} className="overflow-auto h-[80vh]">
+      <div ref={scrollRef} className="overflow-auto h-[calc(100vh-155px)]">
         <table className="w-full text-sm whitespace-nowrap">
           <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
             <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">

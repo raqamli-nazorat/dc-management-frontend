@@ -277,7 +277,7 @@ const ProjectsPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-[85vh] gap-4">
+    <div className="flex flex-col gap-4">
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 shrink-0">
@@ -340,7 +340,7 @@ const ProjectsPage = () => {
 
       {/* Table */}
       {viewMode === 'table' && (
-        <div ref={scrollRef} className="flex-1 overflow-auto">
+        <div ref={scrollRef} className="h-[calc(100vh-165px)] overflow-auto">
           <table className="w-full text-sm whitespace-nowrap">
             <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[var(--bg-elevation-1)]">
               <tr className="border-b border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]">

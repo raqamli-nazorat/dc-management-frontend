@@ -1272,24 +1272,24 @@ const Employee = () => {
 
       {/* Table Section */}
       {isLoading ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col items-center justify-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[calc(100vh-190px)] flex flex-col items-center justify-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ma'lumotlar shakllantirilmoqda...</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Iltimos, biroz kuting.</p>
         </div>
       ) : !hasFetched ? (
-        <div className="mt-6 rounded-2xl h-[74vh] flex flex-col justify-center items-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl h-[calc(100vh-190px)] flex flex-col justify-center items-center border border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Filtrlarni tanlang va Shakllantirish tugmasini bosing.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Bu yerda ma'lumotlar ko'rsatiladi.</p>
         </div>
       ) : UserReports.length === 0 ? (
-        <div className="mt-6 rounded-2xl border h-[74vh] flex flex-col items-center justify-center border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
+        <div className="mt-6 rounded-2xl border h-[calc(100vh-190px)] flex flex-col items-center justify-center border-slate-200 dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-1)] p-10 text-center">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Natija topilmadi.</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Filtrlarni o'zgartirib qayta urinib ko'ring.</p>
         </div>
       ) : (
         <div
-          className="mt-6 overflow-auto h-[74vh] border border-slate-200 dark:border-[var(--stroke-soft)]"
+          className="mt-6 overflow-auto h-[calc(100vh-190px)] border border-slate-200 dark:border-[var(--stroke-soft)]"
           onScroll={handleMoreReportsScroll}
         >
           <table className="text-left border-collapse w-[4500px]">
