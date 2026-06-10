@@ -293,7 +293,7 @@ function MetricRow({ label, value, dot }) {
 
 function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, onTip, cardRef, is_manager }) {
   const overall = Math.round(data?.overall_efficiency || 0)
-  const taskScore = Math.round(data?.task_score || 0)
+  const taskScore = Math.round((is_manager ? data?.supervision_score : data?.task_score) || 0)
   const meetScore = Math.round(data?.meeting_score || 0)
   const m = data?.metrics || {}
 
