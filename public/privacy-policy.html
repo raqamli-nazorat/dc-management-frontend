@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Project Management & Financial Tracking System</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+      color: #1f2937;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      background: #ffffff;
+    }
+
+    h1,
+    h2 {
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-top: 34px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    p,
+    li {
+      font-size: 16px;
+    }
+
+    .meta {
+      color: #64748b;
+      margin-bottom: 26px;
+    }
+
+    .note {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      padding: 14px 16px;
+      margin: 22px 0;
+    }
+
+    .language-switcher {
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      padding: 14px 0;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 24px;
+      z-index: 10;
+    }
+
+    .language-switcher button {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-right: 8px;
+    }
+
+    .language-switcher button.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 24px;
+      font-size: 15px;
+    }
+
+    th,
+    td {
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    .lang-section {
+      display: none;
+    }
+
+    .lang-section.active {
+      display: block;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <div class="language-switcher">
+      <button id="btn-uz" class="active" onclick="setLanguage('uz')">O‘zbek</button>
+      <button id="btn-en" onclick="setLanguage('en')">English</button>
+    </div>
+
+    <section id="uz" class="lang-section active">
+      <h1>Raqamli Nazorat Tashkiloti Boshqaruv Tizimi uchun Maxfiylik siyosati</h1>
+      <p class="meta">Oxirgi yangilangan sana: 2026-yil 19-iyun</p>
+
+      <div class="note">
+        Ushbu Maxfiylik siyosati loyiha boshqaruvi, task management, xodimlar unumdorligi,
+        moliyaviy xarajatlar, payroll, audit, nomzodlar arizasi va ichki hisobotlarni yurituvchi
+        tizimdan foydalanishda shaxsiy va xizmat ma’lumotlari qanday yig‘ilishi, ishlatilishi,
+        saqlanishi va himoya qilinishini tushuntiradi.
+      </div>
+
+      <h2>1. Umumiy qoidalar</h2>
+      <p>
+        Tizim tashkilotning ichki jarayonlarini, loyiha boshqaruvini, xodimlar unumdorligini,
+        tasklarni, moliyaviy so‘rovlarni, oylik hisob-kitoblarni va audit jarayonlarini
+        avtomatlashtirish uchun mo‘ljallangan.
+      </p>
+
+      <h2>2. Qanday ma’lumotlar yig‘iladi?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ma’lumot turi</th>
+            <th>Misollar</th>
+            <th>Foydalanish maqsadi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Foydalanuvchi ma’lumotlari</td>
+            <td>Ism-familiya, login, rol, lavozim, tashkilot, bo‘lim, telefon raqam</td>
+            <td>Foydalanuvchini identifikatsiya qilish va RBAC asosida ruxsat berish</td>
+          </tr>
+          <tr>
+            <td>Autentifikatsiya ma’lumotlari</td>
+            <td>Parol, PIN-kod, JWT access/refresh tokenlari</td>
+            <td>Tizimga xavfsiz kirish va sessiyani boshqarish</td>
+          </tr>
+          <tr>
+            <td>Loyiha va task ma’lumotlari</td>
+            <td>Loyiha nomi, tavsifi, deadline, status, task sarlavhasi, priority, type, commentlar</td>
+            <td>Loyihalar va vazifalarni boshqarish, monitoring va hisobotlar</td>
+          </tr>
+          <tr>
+            <td>Task fayllari</td>
+            <td>Rasm, PDF, DOC, video, texnik hujjatlar, xodim yuklagan fayllar</td>
+            <td>Task bo‘yicha bajarilgan ishni tasdiqlash va tekshirish</td>
+          </tr>
+          <tr>
+            <td>Moliyaviy ma’lumotlar</td>
+            <td>Xarajat so‘rovi, summa, sabab, karta, xarajat turi, paid/confirmed statuslari</td>
+            <td>Xarajatlar, payroll, ledger va buxgalteriya nazoratini yuritish</td>
+          </tr>
+          <tr>
+            <td>Audit loglar</td>
+            <td>Kim, qachon, qayerdan, eski qiymat, yangi qiymat, IP-manzil</td>
+            <td>Moliyaviy shaffoflik, xavfsizlik va tekshiruvlar</td>
+          </tr>
+          <tr>
+            <td>Nomzod ariza ma’lumotlari</td>
+            <td>F.I.O., tug‘ilgan sana, telefon, Telegram, talabalik holati, universitet, resume, portfolio</td>
+            <td>Ishga qabul qilish jarayonini yuritish va nomzodlarni saralash</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Ma’lumotlardan foydalanish maqsadlari</h2>
+      <ul>
+        <li>foydalanuvchini tizimga kiritish va roliga mos huquqlarni berish;</li>
+        <li>loyihalar, sprintlar, tasklar va deadline jarayonlarini boshqarish;</li>
+        <li>xodimlarning task bajarish samaradorligi va KPI ko‘rsatkichlarini hisoblash;</li>
+        <li>xarajat so‘rovlari, oylik to‘lovlari va moliyaviy registrlarni yuritish;</li>
+        <li>buxgalteriya va auditorlik nazoratini ta’minlash;</li>
+        <li>nomzodlar arizalarini qabul qilish, ko‘rib chiqish va xulosa kiritish;</li>
+        <li>hisobotlar, dashboard va analitika shakllantirish;</li>
+        <li>xavfsizlik, audit va noqonuniy harakatlarni aniqlash.</li>
+      </ul>
+
+      <h2>4. Rollar va kirish huquqlari</h2>
+      <p>
+        Tizimda kirish huquqlari RBAC prinsipi asosida boshqariladi. Har bir foydalanuvchi
+        faqat o‘z roliga tegishli bo‘lgan ma’lumot va funksiyalarni ko‘radi.
+      </p>
+      <ul>
+        <li><strong>Superadmin:</strong> global sozlamalar va barcha foydalanuvchilar ustidan nazorat.</li>
+        <li><strong>Admin:</strong> loyiha yaratish va jamoani biriktirish.</li>
+        <li><strong>Manager:</strong> tasklarni boshqarish va xodimlarni tasklarga biriktirish.</li>
+        <li><strong>Xodim:</strong> o‘z tasklarini bajarish, status o‘zgartirish, xarajat so‘rovi yuborish.</li>
+        <li><strong>Nazoratchi:</strong> jarayonlar va moliya tarixini kuzatish, audit xulosasi yozish.</li>
+        <li><strong>Buxgalter:</strong> moliyaviy xarajatlar registrini ko‘rish va tasdiqlash.</li>
+      </ul>
+
+      <h2>5. Moliyaviy ma’lumotlar va payroll</h2>
+      <p>
+        Tizimda xarajatlar, oyliklar, balanslar va moliyaviy registrlar alohida himoyalangan
+        holda yuritiladi. Moliyaviy yozuvlarni o‘chirishga ruxsat berilmaydi. Xatoliklar faqat
+        korreksiya yoki reverse transaction orqali tuzatiladi.
+      </p>
+
+      <h2>6. Nomzodlar arizasi bo‘yicha ma’lumotlar</h2>
+      <p>
+        Tizim ishga qabul qilish jarayonida nomzodlardan F.I.O., tug‘ilgan sana, telefon raqam,
+        Telegram profili, talabalik holati, universitet, region, yo‘nalish, resume, portfolio va
+        qo‘shimcha ma’lumotlarni qabul qilishi mumkin.
+      </p>
+
+      <h2>7. Audit va tarixiylik</h2>
+      <p>
+        Tizimdagi har bir muhim o‘zgarish audit logga yoziladi: foydalanuvchi, sana-vaqt,
+        IP-manzil, eski qiymat va yangi qiymat saqlanishi mumkin.
+      </p>
+
+      <h2>8. Ma’lumotlarni himoya qilish</h2>
+      <ul>
+        <li>JWT access va refresh tokenlar;</li>
+        <li>parol va PIN-kod orqali autentifikatsiya;</li>
+        <li>RBAC asosida kirish huquqlarini cheklash;</li>
+        <li>moliyaviy amallarda atomic transactions;</li>
+        <li>audit log va transaction traceability;</li>
+        <li>Sentry orqali xatoliklarni kuzatish;</li>
+        <li>S3 Storage yoki mos fayl saqlash xizmati.</li>
+      </ul>
+
+      <h2>9. Uchinchi tomon xizmatlari</h2>
+      <p>
+        Tizim FCM Push Notifications, Sentry Error Tracking, S3 Storage, Zoom yoki Google Meet
+        havolalari, CI/CD va deployment xizmatlaridan foydalanishi mumkin.
+      </p>
+
+      <h2>10. Foydalanuvchi huquqlari</h2>
+      <ul>
+        <li>o‘ziga tegishli ma’lumotlarni ko‘rish;</li>
+        <li>noto‘g‘ri ma’lumotlarni tuzatishni so‘rash;</li>
+        <li>o‘z tasklari, xarajat so‘rovlari va payroll tarixini ko‘rish;</li>
+        <li>ariza holatini bilish;</li>
+        <li>ma’lumotlar qanday maqsadda ishlatilayotganini bilish.</li>
+      </ul>
+
+      <h2>11. Aloqa ma’lumotlari</h2>
+      <p>
+        <strong>Tashkilot:</strong> "Raqamli Nazorat" MCHJ<br />
+        <strong>Telefon:</strong> +998 50 200 21 22<br />
+        <strong>Email:</strong> raqamlinazorat3@gmail.com
+      </p>
+    </section>
+
+    <section id="en" class="lang-section">
+      <h1>Privacy Policy for the Digital Control Organization Management System</h1>
+      <p class="meta">Last updated: June 19, 2026</p>
+
+      <div class="note">
+        This Privacy Policy explains how personal and business-related data is collected,
+        used, stored, and protected when using the system designed for project management,
+        task management, employee performance tracking, financial expenses, payroll, audit,
+        candidate applications, and internal reporting.
+      </div>
+
+      <h2>1. General Provisions</h2>
+      <p>
+        The system is intended to automate internal organizational processes, project management,
+        employee productivity tracking, tasks, financial requests, payroll calculations, and audit processes.
+      </p>
+
+      <h2>2. What Data Is Collected?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Examples</th>
+            <th>Purpose of Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>User data</td>
+            <td>Full name, login, role, position, organization, department, phone number</td>
+            <td>Identifying users and granting permissions based on RBAC</td>
+          </tr>
+          <tr>
+            <td>Authentication data</td>
+            <td>Password, PIN code, JWT access and refresh tokens</td>
+            <td>Secure login and session management</td>
+          </tr>
+          <tr>
+            <td>Project and task data</td>
+            <td>Project name, description, deadline, status, task title, priority, type, comments</td>
+            <td>Managing projects, tasks, monitoring, and reports</td>
+          </tr>
+          <tr>
+            <td>Task files</td>
+            <td>Images, PDF, DOC, video, technical documents, employee-uploaded files</td>
+            <td>Confirming and reviewing completed task work</td>
+          </tr>
+          <tr>
+            <td>Financial data</td>
+            <td>Expense request, amount, reason, card, expense type, paid/confirmed statuses</td>
+            <td>Managing expenses, payroll, ledger, and accounting control</td>
+          </tr>
+          <tr>
+            <td>Audit logs</td>
+            <td>Who, when, from where, old value, new value, IP address</td>
+            <td>Financial transparency, security, and inspections</td>
+          </tr>
+          <tr>
+            <td>Candidate application data</td>
+            <td>Full name, birth date, phone, Telegram, student status, university, resume, portfolio</td>
+            <td>Managing recruitment and candidate selection</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Purposes of Data Use</h2>
+      <ul>
+        <li>to authenticate users and assign permissions according to their roles;</li>
+        <li>to manage projects, sprints, tasks, and deadlines;</li>
+        <li>to calculate employee performance and KPI indicators;</li>
+        <li>to manage expense requests, salary payments, and financial registers;</li>
+        <li>to support accounting and audit control;</li>
+        <li>to receive, review, and process candidate applications;</li>
+        <li>to generate reports, dashboards, and analytics;</li>
+        <li>to ensure security, auditing, and detection of suspicious activity.</li>
+      </ul>
+
+      <h2>4. Roles and Access Rights</h2>
+      <p>
+        Access rights are managed according to the RBAC principle. Each user can only access
+        the data and features allowed for their role.
+      </p>
+      <ul>
+        <li><strong>Superadmin:</strong> controls global settings and all users.</li>
+        <li><strong>Admin:</strong> creates projects and assigns teams.</li>
+        <li><strong>Manager:</strong> manages tasks and assigns employees to tasks.</li>
+        <li><strong>Employee:</strong> completes assigned tasks, changes statuses, and sends expense requests.</li>
+        <li><strong>Auditor:</strong> reviews processes and financial history, and writes audit conclusions.</li>
+        <li><strong>Accountant:</strong> reviews and approves financial expense records.</li>
+      </ul>
+
+      <h2>5. Financial Data and Payroll</h2>
+      <p>
+        Expenses, salaries, balances, and financial registers are processed with additional protection.
+        Financial records cannot be deleted. Errors may only be corrected through correction or reverse
+        transactions.
+      </p>
+
+      <h2>6. Candidate Application Data</h2>
+      <p>
+        During recruitment, the system may collect candidate data such as full name, birth date,
+        phone number, Telegram profile, student status, university, region, direction, resume,
+        portfolio, and additional information.
+      </p>
+
+      <h2>7. Audit and Traceability</h2>
+      <p>
+        Every important system change is recorded in audit logs. These records may include the user,
+        date and time, IP address, old value, and new value.
+      </p>
+
+      <h2>8. Data Protection</h2>
+      <ul>
+        <li>JWT access and refresh tokens;</li>
+        <li>authentication by password and PIN code;</li>
+        <li>RBAC-based access restrictions;</li>
+        <li>atomic transactions for financial operations;</li>
+        <li>audit logs and transaction traceability;</li>
+        <li>error tracking through Sentry;</li>
+        <li>S3 Storage or an equivalent secure file storage service.</li>
+      </ul>
+
+      <h2>9. Third-Party Services</h2>
+      <p>
+        The system may use FCM Push Notifications, Sentry Error Tracking, S3 Storage, Zoom or
+        Google Meet links, CI/CD, and deployment services.
+      </p>
+
+      <h2>10. User Rights</h2>
+      <ul>
+        <li>to view their own data;</li>
+        <li>to request correction of inaccurate data;</li>
+        <li>to view their tasks, expense requests, and payroll history;</li>
+        <li>to check application status;</li>
+        <li>to know why their data is being used.</li>
+      </ul>
+
+      <h2>11. Contact Information</h2>
+      <p>
+        <strong>Organization:</strong> "Raqamli Nazorat" LLC<br />
+        <strong>Phone:</strong> +998 50 200 21 22<br />
+        <strong>Email:</strong> raqamlinazorat3@gmail.com
+      </p>
+    </section>
+
+    <footer>
+      This bilingual document is a sample privacy policy for the Project Management & Financial Tracking System.
+      It is recommended to review it with legal, accounting, and information security specialists before official use.
+    </footer>
+  </main>
+
+  <script>
+    function setLanguage(lang) {
+      const uz = document.getElementById('uz');
+      const en = document.getElementById('en');
+      const btnUz = document.getElementById('btn-uz');
+      const btnEn = document.getElementById('btn-en');
+
+      if (lang === 'uz') {
+        uz.classList.add('active');
+        en.classList.remove('active');
+        btnUz.classList.add('active');
+        btnEn.classList.remove('active');
+        document.documentElement.lang = 'uz';
+      } else {
+        en.classList.add('active');
+        uz.classList.remove('active');
+        btnEn.classList.add('active');
+        btnUz.classList.remove('active');
+        document.documentElement.lang = 'en';
+      }
+    }
+  </script>
+</body>
+
+</html>
