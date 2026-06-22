@@ -281,10 +281,10 @@ function EffBar({ value, color }) {
 
 function MetricRow({ label, value, dot }) {
   return (
-    <div className="flex items-center justify-between py-[5px] text-[13px]">
+    <div className="flex items-center justify-between py-[5px] text-[11px]">
       <span className="text-[var(--text-strong)] dark:text-[var(--text-sub)]">{label}</span>
-      <span className="flex items-center gap-2">
-        {dot && <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dot }} />}
+      <span className="flex items-center gap-1">
+        {dot && <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />}
         <span className="font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] tabular-nums">{value}</span>
       </span>
     </div>
@@ -298,19 +298,19 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
   const m = data?.metrics || {}
 
   /* Izchil uslublar (ikkala kartochkada bir xil) */
-  const cardCls = 'rounded-2xl p-4 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-sm'
-  const titleCls = 'text-[15px] font-semibold text-[var(--text-strong)] dark:text-[var(--text-strong)]'
-  const pctCls = 'text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-none tabular-nums'
-  const capCls = 'text-[13px] text-[var(--text-soft)]'
+  const cardCls = 'rounded-2xl p-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)]'
+  const titleCls = 'text-[13px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]'
+  const pctCls = 'text-[13px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-none tabular-nums'
+  const capCls = 'text-[11px] text-[var(--text-soft)]'
 
   return (
     <div ref={cardRef} className="relative">
       {/* ── Tafsilot paneli — absolute overlay, yuqoriga ochiladi (boshqa elementlarni siljitmaydi) ── */}
       <div
-        className={`absolute bottom-full left-0 right-0 mb-2 z-50 transition-all duration-200 ease-out
+        className={`absolute bottom-full left-0 right-0 -mb-px z-50 transition-all duration-200 ease-out
           ${detailOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}`}
       >
-        <div className={`${cardCls} shadow-sm`}>
+        <div className={`${cardCls}`}>
           <h6 className={`${titleCls} mb-3`}>Samaradorlik tafsiloti</h6>
 
           {/* Vazifalar bo'yicha */}
@@ -345,16 +345,16 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
       </div>
 
       {/* ── Samaradorlik darajasi (asosiy karta) ── */}
-      <div className={`rounded-2xl p-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-sm relative`}>
+      <div className={`rounded-2xl p-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] border border-[var(--stroke-soft)] dark:border-[var(--stroke-sub)] shadow-sm relative ${detailOpen ? "before:absolute before:top-0 before:left-4 before:right-4 before:border-t-2 before:border-dashed before:border-[var(--stroke-soft)] dark:before:border-[var(--stroke-sub)] before:content-['']" : ""}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-0.5">
-            <span className={`text-[12px] font-semibold text-nowrap text-[var(--text-strong)] dark:text-[var(--text-strong)]`}>Samaradorlik darajasi</span>
+            <span className={`text-[13px] font-semibold text-nowrap text-[var(--text-strong)] dark:text-[var(--text-strong)]`}>Samaradorlik darajasi</span>
             <button
               type="button"
               onMouseEnter={() => onTip(true)}
               onMouseLeave={() => onTip(false)}
               onClick={(e) => { e.stopPropagation(); onTip(!tipOpen) }}
-              className="w-[16px] h-[16px] rounded-full bg-[var(--text-soft)] text-white text-[10px] font-bold flex items-center justify-center shrink-0 cursor-pointer hover:bg-[var(--text-sub)] transition-colors"
+              className="w-[11px] h-[11px] rounded-full bg-[var(--text-soft)] text-white text-[8px] font-bold flex items-center justify-center shrink-0 cursor-pointer hover:bg-[var(--text-sub)] transition-colors"
             >
               ?
             </button>
@@ -362,7 +362,7 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onToggleDetail() }}
-            className="px-3 py-1 rounded-lg text-[13px] font-medium cursor-pointer shrink-0
+            className="w-14.5 h-6 rounded-lg text-[11px] font-medium cursor-pointer shrink-0
               text-[var(--text-sub)] border border-[var(--stroke-sub)]
               hover:bg-[var(--bg-elevation-2)] hover:text-[var(--text-strong)]
               dark:hover:bg-[var(--bg-elevation-1)] transition-colors"
@@ -384,7 +384,7 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
         )}
 
         <div className="flex items-end justify-between mb-2.5">
-          <span className={` font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-none tabular-nums text-[16px] `}>{loading && !data ? '—' : `${overall}%`}</span>
+          <span className={` font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] leading-none tabular-nums text-[15px] `}>{loading && !data ? '—' : `${overall}%`}</span>
           <span className={capCls}>Umumiy samaradorlik</span>
         </div>
 

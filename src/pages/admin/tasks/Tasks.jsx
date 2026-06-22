@@ -1136,14 +1136,14 @@ export default function TasksPage() {
                 }
               }}
               onKeyDown={e => { if (e.key === 'Enter') runSearch(searchInput) }}
-              className="pl-8 pr-3 py-[5px] rounded-xl text-[13px] outline-none  w-[200px]
+              className="pl-8 pr-3 h-9 rounded-xl text-[13px] outline-none  w-[225px]
                 bg-[#F1F3F9] border border-[var(--stroke-sub)] text-[var(--text-soft)] placeholder-[var(--text-soft)] focus:border-[var(--accent-sub)]
                 dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)] dark:placeholder-[#C2C8E0]"
             />
           </div>
           {/* Filter */}
           <button onClick={() => setShowFilter(true)}
-            className="relative flex items-center gap-1.5 px-3 py-[5px] rounded-xl text-[13px] font-semibold border  cursor-pointer
+            className="relative flex items-center justify-center gap-1.5 w-9 h-9 rounded-xl text-[13px] font-semibold border  cursor-pointer
               bg-[#F1F3F9] border-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-1)] dark:border-[var(--stroke-sub)] dark:text-[var(--text-sub)]">
             <img src="/imgs/filterIcon.svg" alt="" className="w-3.5 h-3.5 [filter:brightness(0)_saturate(100%)_invert(38%)_sepia(10%)_saturate(500%)_hue-rotate(190deg)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)_sepia(10%)_saturate(300%)_hue-rotate(190deg)]" />
             {hasFilter && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent-strong)]" />}
