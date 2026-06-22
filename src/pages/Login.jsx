@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getRouteRole } from '../components/ProtectedRoute'
 import { LuEye, LuEyeClosed } from 'react-icons/lu'
@@ -34,7 +34,7 @@ export default function Login() {
   const [throttleSecs, setThrottleSecs] = useState(() => getThrottleSeconds())
   const timerRef = useRef(null)
 
-  const { login } = useAuth()
+  const { login, user } = useAuth()
   const navigate = useNavigate()
 
   // Countdown timer
@@ -98,6 +98,13 @@ export default function Login() {
   }
 
   const filled = loginVal && parolVal
+
+  // Agar foydalanuvchi allaqachon ro'yxatdan o'tgan (tizimga kirgan) bo'lsa,
+  // login sahifasini ko'rsatmasdan to'g'ridan-to'g'ri dashboardga yo'naltiramiz.
+  if (user) {
+    const role = getRouteRole(user)
+    return <Navigate to={role ? `/${role}/dashboard` : '/role'} replace />
+  }
 
   return (
     <div
