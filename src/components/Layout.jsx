@@ -12,6 +12,7 @@ import ImageLightbox from './ImageLightbox'
 import { useAuth } from '../context/AuthContext'
 import { onMessageListener, requestForToken } from '../firebase'
 import notificationSocket from '../NotificationSocket'
+import { NotifConnectTelegram } from './NotifConnectTelegram'
 
 const labelMap = {
   menager: 'Menager', xodim: 'Xodim',
@@ -123,7 +124,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, 
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5  shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirshnomalar</h2>
+          <h2 className="text-xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Bildirishnomalar</h2>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -142,6 +143,8 @@ function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, 
           </button>
         </div>
       </div>
+
+      {/* <NotifConnectTelegram /> */}
 
       {/* List */}
       <div

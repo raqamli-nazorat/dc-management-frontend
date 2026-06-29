@@ -13,6 +13,7 @@ import {
 } from './icons'
 import { toast } from '../Toast/ToastProvider'
 import { axiosAPI } from '../service/axiosAPI'
+import { ConnectTelegramModal } from './ConnectTelegramModal'
 
 function IconApplications({ size = 20, className = '' }) {
   return (
@@ -412,6 +413,8 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const [stsTipOpen, setStsTipOpen] = useState(false)
   const effRef = useRef(null)
 
+  const [telegramBannerClosed, setTelegramBannerClosed] = useState(false)
+
   const getUserSts = async () => {
     setStsLoading(true)
     try {
@@ -673,6 +676,10 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           )
         })}
       </nav>
+
+      {/* {!telegramBannerClosed && !isCollapsed &&
+        <ConnectTelegramModal isOpen onClose={() => setTelegramBannerClosed(true)} />
+      } */}
 
       {/* ── Bottom ── */}
       <div

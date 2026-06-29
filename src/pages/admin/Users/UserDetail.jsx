@@ -82,7 +82,7 @@ const UserDetail = () => {
     const getUser = async (refresh = false) => {
         try {
             if (!refresh) setLoading(true)
-            const { data } = await axiosAPI.get(`users/${id}`)
+            const { data } = await axiosAPI.get(`users/${id}/`)
             setUser(data.data)
             if (!refresh) setLoading(false)
 
