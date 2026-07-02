@@ -341,13 +341,44 @@ export default function Layout() {
       }
     }
 
+    // extra_data.action === 'open_task' — vazifa detalini ochish
+    if (extraData?.action === 'open_task') {
+      const taskId = extraData.task_id
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      if (taskId) {
+        navigate(`/${prefix}/tasks?task=${taskId}`)
+      } else {
+        navigate(`/${prefix}/tasks`)
+      }
+      setNotifOpen(false)
+      return
+    }
+
+    // extra_data.action === 'open_project' — loyiha detalini ochish
+    if (extraData?.action === 'open_project') {
+      const projectId = extraData.project_id
+      const prefix = location.pathname.split('/')[1] || 'admin'
+      if (projectId) {
+        navigate(`/${prefix}/projects?project=${projectId}`)
+      } else {
+        navigate(`/${prefix}/projects`)
+      }
+      setNotifOpen(false)
+      return
+    }
+
     // Allaqachon o'qilgan bo'lsa backend ga so'rov yuborilmaydi (markRead ichida tekshiriladi)
 
     // type ga qarab yo'naltirish
     if (type === 'task') {
-      // Vazifa notification — tasks sahifasiga
+      // Vazifa notification — task_id bo'lsa detalini ochamiz, bo'lmasa ro'yxatga
       const prefix = location.pathname.split('/')[1] || 'admin'
-      navigate(`/${prefix}/tasks`)
+      const taskId = extraData?.task_id || n.raw?.task_id || n.raw?.data?.task_id
+      if (taskId) {
+        navigate(`/${prefix}/tasks?task=${taskId}`)
+      } else {
+        navigate(`/${prefix}/tasks`)
+      }
       setNotifOpen(false)
     } else if (type === 'finance') {
       // Moliya notification — payments sahifasiga

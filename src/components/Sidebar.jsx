@@ -395,6 +395,33 @@ function EfficiencyCard({ data, loading, detailOpen, onToggleDetail, tipOpen, on
   )
 }
 
+/* ── Foydalanuvchi avatari — rasm bo'lsa rasm, bo'lmasa initials ── */
+function UserAvatar({ user, size, rounded, letters = 1, fallbackClass = '' }) {
+  const [imgError, setImgError] = useState(false)
+  const name = user?.username || ''
+  const initials = (letters === 2
+    ? (name[0] || '') + (name[1] || '')
+    : (name[0] || '')
+  ).toUpperCase()
+
+  const base = `${size} ${rounded} shrink-0 flex items-center justify-center overflow-hidden`
+
+  if (user?.avatar && !imgError) {
+    return (
+      <div className={`${base} bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]`}>
+        <img
+          src={user.avatar}
+          alt={name || 'user'}
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    )
+  }
+
+  return <div className={`${base} ${fallbackClass}`}>{initials}</div>
+}
+
 export default function Sidebar({ forceCollapsed = false, onForceClick }) {
   const { user, logout } = useAuth()
   const { isDark, toggleTheme } = useTheme()
@@ -782,9 +809,15 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
             <button
               onClick={() => setProfileOpen(o => !o)}
               title={`${user?.username} (${user?.roles?.[0]})`}
-              className="w-9 h-9 rounded-xl bg-[#3A3B3B] flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+              className="cursor-pointer hover:opacity-80 transition-opacity"
             >
-              {user?.username?.[0]?.toUpperCase()}
+              <UserAvatar
+                user={user}
+                size="w-9 h-9"
+                rounded="rounded-xl"
+                letters={1}
+                fallbackClass="bg-[#3A3B3B] text-white text-xs font-medium"
+              />
             </button>
           ) : (
             <button
@@ -792,9 +825,13 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
               className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg  cursor-pointer
                 hover:bg-[var(--stroke-sub)] dark:hover:bg-[var(--bg-elevation-2)]"
             >
-              <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-medium bg-[#3A3B3B]">
-                {user?.username?.[0]?.toUpperCase()}
-              </div>
+              <UserAvatar
+                user={user}
+                size="w-7 h-7"
+                rounded="rounded-lg"
+                letters={1}
+                fallbackClass="bg-[#3A3B3B] text-white text-xs font-medium"
+              />
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[13px] font-medium truncate leading-tight text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                   {user?.username}
@@ -837,10 +874,13 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
                       className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer 
                         ${isActive ? 'bg-[#F1F3F9] dark:bg-[var(--bg-elevation-2)]' : 'hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-1)]'}`}
                     >
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0
-                        ${isActive ? 'bg-[var(--accent-sub)] text-white' : 'bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)]'}`}>
-                        {user?.username?.[0]?.toUpperCase()}{user?.username?.[1]?.toUpperCase()}
-                      </div>
+                      <UserAvatar
+                        user={user}
+                        size="w-9 h-9"
+                        rounded="rounded-xl"
+                        letters={2}
+                        fallbackClass={`text-xs font-bold ${isActive ? 'bg-[var(--accent-sub)] text-white' : 'bg-[var(--stroke-sub)] text-[var(--text-sub)] dark:bg-[var(--bg-elevation-2)] dark:text-[var(--text-sub)]'}`}
+                      />
                       <div className="min-w-0 text-left">
                         <p className="text-[13px] font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] truncate">{user?.username}</p>
                         <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-sub)]">{roleLabels[role] || role}</p>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { usePageAction } from '../../../context/PageActionContext'
@@ -558,6 +559,7 @@ export default function TasksPage() {
   const isEmployee = activeRole === 'employee'
   const canEdit = activeRole === 'admin' || activeRole === 'superadmin' || activeRole === 'manager'
 
+  const [searchParams, setSearchParams] = useSearchParams()
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('tasks_view_mode') || 'table')
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -1096,6 +1098,20 @@ export default function TasksPage() {
   useEffect(() => {
     if (viewMode === 'kanban') loadKanbanTasks(filters, search)
   }, [viewMode])
+
+  // Bildirishnomadan ?task=<id> bilan kelinganda vazifa detalini ochish
+  useEffect(() => {
+    const taskId = searchParams.get('task')
+    if (!taskId) return
+    loadTaskDetail(Number(taskId))
+    // URL dan query param ni tozalaymiz (qayta ochilib qolmasligi uchun)
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      next.delete('task')
+      return next
+    }, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   useEffect(() => {
     if (!isAuditor) {

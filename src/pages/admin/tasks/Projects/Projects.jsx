@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { FaXmark, FaArrowLeft, FaEllipsisVertical } from 'react-icons/fa6'
 import { usePageAction } from '../../../../context/PageActionContext'
 import { useAuth } from '../../../../context/AuthContext'
@@ -159,6 +160,7 @@ const ProjectsPage = () => {
   const is_admin = user.active_role === 'superadmin' || user.active_role === 'admin'
   const is_manager = user.active_role === 'manager'
 
+  const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
@@ -175,6 +177,19 @@ const ProjectsPage = () => {
   const [page, setPage] = useState(1)
   const [copiedUid, setCopiedUid] = useState(null)
   const scrollRef = useRef(null)
+
+  // Bildirishnomadan ?project=<id> bilan kelinganda loyiha detalini ochish
+  useEffect(() => {
+    const projectId = searchParams.get('project')
+    if (!projectId) return
+    setDetailProject(Number(projectId))
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      next.delete('project')
+      return next
+    }, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   // ── API funksiyalari ──
   const buildParams = useCallback((f = filters, q = search, pg = 1) => {
