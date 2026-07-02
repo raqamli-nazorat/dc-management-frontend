@@ -20,9 +20,10 @@ export const FilterModal = ({ show, onClose, onSubmit }) => {
     const [f, setF] = useState({ ...EMPTY_FILTER })
     const set = (k, v) => setF(p => ({ ...p, [k]: v }))
 
-    const regions = useRegions()
-    const districts = useDistricts()
-    const positions = usePositions()
+    // Faqat modal ochilganda (Filtrlash bosilganda) so'rovlar yuboriladi
+    const regions = useRegions(show)
+    const districts = useDistricts(show)
+    const positions = usePositions(show)
 
     const handleApply = () => {
         const params = {}

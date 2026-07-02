@@ -44,8 +44,9 @@ const ApplicationsPage = () => {
   }
 
   const handleFilterSubmit = (filters) => {
+    // Faqat activeFilters ni yangilaymiz — quyidagi useEffect so'rovni yuboradi
+    // (aks holda ikkita bir xil applications/ so'rovi ketardi)
     setActiveFilters(filters)
-    fetchApplications({ search, ...filters })
   }
 
   useEffect(() => {
@@ -76,10 +77,6 @@ const ApplicationsPage = () => {
       loadMoreApplications()
     }
   }
-
-  useEffect(() => {
-    fetchApplications()
-  }, [])
 
   const openConfirmModal = (application, status) => {
     setConfirmModal(true)
