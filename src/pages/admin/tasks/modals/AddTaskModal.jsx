@@ -20,6 +20,29 @@ const TYPE_OPTIONS = [
   { label: "Qo'shimcha", value: 'extra' },
   { label: "Tadqiqot/O'rganish", value: 'research' },
 ]
+
+function getEstimatedTimeInitialValues(data) {
+  if (!data) return { hours: "", minutes: "" }
+
+  const hasInputHours = data.estimated_input_hours !== undefined && data.estimated_input_hours !== null && data.estimated_input_hours !== ""
+  const hasInputMinutes = data.estimated_input_minutes !== undefined && data.estimated_input_minutes !== null && data.estimated_input_minutes !== ""
+
+  if (hasInputHours || hasInputMinutes) {
+    return {
+      hours: hasInputHours ? String(data.estimated_input_hours) : "",
+      minutes: hasInputMinutes ? String(data.estimated_input_minutes) : "",
+    }
+  }
+
+  const totalMinutes = Number(data.estimated_minutes)
+  if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) return { hours: "", minutes: "" }
+
+  return {
+    hours: String(Math.floor(totalMinutes / 60)),
+    minutes: String(totalMinutes % 60),
+  }
+}
+
 function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -287,6 +310,8 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
 
   const [form, setForm] = useState(() => {
     if (initialData) {
+      const estimatedTime = getEstimatedTimeInitialValues(initialData)
+
       return {
         project: initialData.project ? String(initialData.project) : "",
         title: initialData.title || "",
@@ -300,8 +325,8 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
         penalty_percentage: initialData.penalty_percentage ? String(initialData.penalty_percentage) : "",
         deadline: initialData.deadline ? initialData.deadline.split('T')[0] : "",
         deadline_time: initialData.deadline && initialData.deadline.includes('T') ? initialData.deadline.split('T')[1].substring(0, 5) : "00:00",
-        estimated_hours: initialData.estimated_input_hours || "",
-        estimated_minutes: initialData.estimated_input_minutes || "",
+        estimated_hours: estimatedTime.hours,
+        estimated_minutes: estimatedTime.minutes,
       }
     }
     return {
