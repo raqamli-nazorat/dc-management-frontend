@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa6'
 import dayjs from 'dayjs'
 import { DatePicker, TimePicker, ConfigProvider, theme } from 'antd'
 import { useTheme } from "../../../../../context/ThemeContext"
@@ -10,6 +10,7 @@ import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
 import { useAuth } from "../../../../../context/AuthContext"
 import DiscardModal from "../../../../../components/DiscardModal"
+import { PiCopyBold } from "react-icons/pi"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
@@ -277,6 +278,22 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [isDirty]);
+
+
+    const [copyLink, setCopyLink] = useState(null);
+
+    const handleCopyLink = (link, index) => {
+        if (!link) return;
+
+        navigator.clipboard.writeText(link).then(() => {
+            setCopyLink(index);
+            setTimeout(() => {
+                setCopyLink(null);
+            }, 3000);
+        }).catch(err => {
+            console.log("Failed to copy:", err);
+        });
+    };
 
     const inputCls = (err) =>
         `w-full px-3 py-2.5 rounded-xl text-sm outline-none border 
@@ -560,7 +577,7 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                 <div className="flex-1">
                                                     <div className="relative">
                                                         <input
-                                                            className={inputCls(errors.links?.[index]?.value) + (form.links.length > 1 ? " pr-10" : "")}
+                                                            className={inputCls(errors.links?.[index]?.value) + " pr-16"}
                                                             placeholder="Havolasi"
                                                             value={item.value || ''}
                                                             onChange={e => {
@@ -569,6 +586,17 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                                                                 set('links', newLinks);
                                                             }}
                                                         />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleCopyLink(item.value, index)}
+                                                            disabled={copyLink === index}
+                                                            className="absolute top-1/2 right-10 -translate-y-1/2 text-[#8F95A8] cursor-pointer transition-colors"
+                                                        >
+                                                            {copyLink === index ?
+                                                                <FaCheck size={14} color="green" />
+                                                                : <PiCopyBold size={14} />
+                                                            }
+                                                        </button>
                                                         <button
                                                             type="button"
                                                             onClick={() => {

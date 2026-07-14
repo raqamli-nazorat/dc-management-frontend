@@ -10,6 +10,7 @@ import { FiCalendar, FiPlus } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { UserPickerModal, SelectedUsersField } from "../Components/UserPickerModal"
 import DiscardModal from "../../../../../components/DiscardModal"
+import { PiCopyBold } from "react-icons/pi"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
@@ -215,6 +216,20 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initia
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isDirty]);
 
+  const [copyLink, setCopyLink] = useState(null);
+
+  const handleCopyLink = (link, index) => {
+    if (!link) return;
+
+    navigator.clipboard.writeText(link).then(() => {
+      setCopyLink(index);
+      setTimeout(() => {
+        setCopyLink(null);
+      }, 3000);
+    }).catch(err => {
+      console.log("Failed to copy:", err);
+    });
+  };
 
   const inputCls = (err) =>
     `w-full px-3 py-2.5 rounded-xl text-sm outline-none border bg-white text-[var(--text-strong)] placeholder-[var(--text-sub)] dark:bg-[var(--bg-base)] dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)] ${err ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-slate-400 dark:focus:border-[var(--stroke-sub)]'}`
@@ -464,7 +479,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initia
                       <div className="flex-1">
                         <div className="relative">
                           <input
-                            className={inputCls(errors.links?.[index]?.value) + (form.links.length > 1 ? " pr-10" : "")}
+                            className={inputCls(errors.links?.[index]?.value) + " pr-10" + (form.links.length > 1 ? " pr-16" : "")}
                             placeholder="Havolasi"
                             value={item.value || ''}
                             onChange={e => {
@@ -473,6 +488,17 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initia
                               set('links', newLinks);
                             }}
                           />
+                          <button
+                            type="button"
+                            onClick={() => handleCopyLink(item.value, index)}
+                            disabled={copyLink === index}
+                            className={"absolute top-1/2 -translate-y-1/2 text-[#8F95A8] cursor-pointer transition-colors " + (form.links.length > 1 ? "right-10" : "right-3")}
+                          >
+                            {copyLink === index ?
+                              <FaCheck size={14} color="green" />
+                              : <PiCopyBold size={14} />
+                            }
+                          </button>
                           {form.links.length > 1 &&
                             <button
                               type="button"
