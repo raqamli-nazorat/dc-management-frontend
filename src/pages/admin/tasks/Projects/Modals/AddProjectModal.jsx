@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { FaArrowLeft, FaCheck, FaChevronDown, FaXmark } from "react-icons/fa6"
 import { Roles } from "../../../../../MostUsesDates/"
@@ -276,8 +276,7 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initia
                   <button
                     type="button"
                     onClick={() => setStatusOpen(o => !o)}
-                    className={`w-full flex items-center disabled:cursor-default! justify-between px-3 py-2.5 rounded-xl text-sm border  cursor-pointer bg-white dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
-                    disabled
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm border cursor-pointer bg-white dark:bg-[var(--bg-base)] ${errors.status ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'} ${form.status ? 'text-[var(--text-strong)] dark:text-[var(--text-strong)]' : 'text-[var(--text-soft)] dark:text-[var(--text-sub)]'}`}
                   >
                     <span>{currentStatusLabel}</span>
                     <FaChevronDown size={11} className={`text-[var(--text-soft)] transition-transform ${statusOpen ? 'rotate-180' : ''}`} />

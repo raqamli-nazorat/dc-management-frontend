@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { FaXmark, FaArrowLeft, FaEllipsisVertical } from 'react-icons/fa6'
 import { usePageAction } from '../../../../context/PageActionContext'
@@ -456,11 +456,13 @@ const ProjectsPage = () => {
                 'active': { label: 'Faol', bg: 'bg-[#22c55e]', text: 'text-white' },
                 'Rejalashtirilmoqda': { label: 'Rejalashtirilmoqda', bg: 'bg-[var(--stroke-sub)]', text: 'text-[var(--text-sub)]' },
                 'planning': { label: 'Rejalashtirilmoqda', bg: 'bg-[var(--stroke-sub)]', text: 'text-[var(--text-sub)]' },
+                'overdue': { label: "Muddati o'tgan", bg: 'bg-orange-500', text: 'text-white' },
+                "Muddati o'tgan": { label: "Muddati o'tgan", bg: 'bg-orange-500', text: 'text-white' },
                 'Yakunlangan': { label: 'Yakunlangan', bg: 'bg-[var(--accent-sub)]', text: 'text-white' },
                 'completed': { label: 'Yakunlangan', bg: 'bg-[var(--accent-sub)]', text: 'text-white' },
                 'cancelled': { label: 'Bekor qilingan', bg: 'bg-[var(--error-strong)]', text: 'text-white' },
               }
-              const st = statusMap[p.status] || statusMap['Rejalashtirilmoqda']
+              const st = statusMap[p.status] || { label: STATUS_LABEL[p.status] || p.status || 'Rejalashtirilmoqda', bg: 'bg-[var(--stroke-sub)]', text: 'text-[var(--text-sub)]' }
               const managerName = p.manager_info?.username || p.manager || '—'
               const managerRole = p.manager_info?.position || 'Menejer'
               const managerInitials = managerName.slice(0, 2).toUpperCase()
