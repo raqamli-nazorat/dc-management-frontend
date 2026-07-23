@@ -177,7 +177,7 @@ function KanbanCard({ card, index, onOpen, colColor, isDraggingGlobal }) {
   const countdown = useCountdown(showCountdown ? card.deadline : null, isDraggingGlobal)
 
   return (
-    <Draggable draggableId={String(card.id)} index={index}>
+    <Draggable draggableId={String(card._key || card.id)} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
@@ -526,7 +526,7 @@ function KanbanColumn({ col, cards, onOpen, isDimmed, isDropDisabled, isDragTarg
           >
             {cards.map((card, index) => (
               <KanbanCard
-                key={card.id}
+                key={card._key || card.id}
                 card={card}
                 index={index}
                 onOpen={onOpen}
@@ -990,7 +990,15 @@ export default function TasksPage() {
         const items = Array.isArray(payload) ? payload : (payload.results ?? [])
         const next = Array.isArray(payload) ? null : (payload.next ?? null)
         const total = Array.isArray(payload) ? items.length : (payload.count ?? items.length)
-        allCards.push(...items)
+
+        items.forEach(item => {
+          allCards.push({
+            ...item,
+            _colId: col.id,
+            _key: `${col.id}-${item.id}`,
+          })
+        })
+
         newMeta[col.id] = { page: 1, hasMore: !!next, loading: false, total }
       })
       setCards(allCards)
@@ -1001,6 +1009,7 @@ export default function TasksPage() {
       if (!silent) setKanbanLoading(false)
     }
   }, [buildKanbanBaseParams, filters, search])
+
   const loadMoreForColumn = useCallback(async (colId) => {
     const meta = colMetaRef.current[colId]
     if (!meta?.hasMore || meta?.loading) return
@@ -1014,9 +1023,10 @@ export default function TasksPage() {
       const payload = res.data?.data ?? res.data
       const items = Array.isArray(payload) ? payload : (payload.results ?? [])
       const next = Array.isArray(payload) ? null : (payload.next ?? null)
+      const itemsWithCol = items.map(item => ({ ...item, _colId: colId, _key: `${colId}-${item.id}` }))
       setCards(prev => {
-        const existingIds = new Set(prev.map(c => c.id))
-        return [...prev, ...items.filter(item => !existingIds.has(item.id))]
+        const existingKeys = new Set(prev.map(c => c._key || `${c._colId || c.status}-${c.id}`))
+        return [...prev, ...itemsWithCol.filter(item => !existingKeys.has(item._key))]
       })
       setColMeta(prev => ({
         ...prev,
@@ -1039,8 +1049,9 @@ export default function TasksPage() {
 
     const newStatus = destination.droppableId
     const srcStatus = source.droppableId
-    const taskId = Number(draggableId)
-    const draggedCard = cards.find(c => String(c.id) === String(draggableId))
+    const rawIdStr = String(draggableId)
+    const taskId = Number(rawIdStr.includes('-') ? rawIdStr.split('-').pop() : rawIdStr)
+    const draggedCard = cards.find(c => (c._key ? c._key === rawIdStr : String(c.id) === rawIdStr))
 
     // Ruxsat etilgan o'tishlarni tekshirish
     const allowed = ALLOWED_TRANSITIONS[srcStatus] || []
@@ -1054,7 +1065,7 @@ export default function TasksPage() {
 
     // rejected ga tushganda — sabab so'rash
     if (newStatus === 'rejected') {
-      setRejectionPending({ taskId, draggableId, sourceColId: srcStatus })
+      setRejectionPending({ taskId, draggableId: rawIdStr, sourceColId: srcStatus })
       return
     }
 
@@ -1066,7 +1077,7 @@ export default function TasksPage() {
     }
 
     // Optimistic update
-    setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: newStatus } : c))
+    setCards(prev => prev.map(c => (c._key === rawIdStr || (c.id === taskId && c._colId === srcStatus)) ? { ...c, status: newStatus, _colId: newStatus, _key: `${newStatus}-${taskId}` } : c))
 
     try {
       await axiosAPI.patch(`/tasks/${taskId}/change-status/`, { status: newStatus })
@@ -1074,7 +1085,7 @@ export default function TasksPage() {
       loadKanbanTasks(filters, search, true)
     } catch (err) {
       // Rollback
-      setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: srcStatus } : c))
+      setCards(prev => prev.map(c => String(c.id) === draggableId ? { ...c, status: srcStatus, _colId: srcStatus } : c))
       const errMsg = err?.response?.data?.error?.errorMsg || err?.response?.data?.detail || "Holat yangilashda xatolik"
       const details = err?.response?.data?.error?.details
       if (details) {
@@ -1204,7 +1215,7 @@ export default function TasksPage() {
                   <KanbanColumn
                     key={col.id}
                     col={col}
-                    cards={cards.filter(c => (STATUS_TO_COL[c.status] || c.status) === col.id)}
+                    cards={cards.filter(c => (c._colId || STATUS_TO_COL[c.status] || c.status) === col.id)}
                     onOpen={loadTaskDetail}
                     isDimmed={isDimmed}
                     isDropDisabled={isDropDisabled}
@@ -1267,7 +1278,7 @@ export default function TasksPage() {
             onConfirm={(actualStatus) => {
               setCards(prev => prev.map(c =>
                 String(c.id) === String(rejectionPending.draggableId)
-                  ? { ...c, status: actualStatus }
+                  ? { ...c, status: actualStatus, _colId: actualStatus }
                   : c
               ))
               setData(prev => prev.map(t =>
