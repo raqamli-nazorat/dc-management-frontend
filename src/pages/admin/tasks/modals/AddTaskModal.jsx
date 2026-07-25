@@ -337,16 +337,19 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
   })
   const [errors, setErrors] = useState({})
   const [attachments, setAttachments] = useState(() => {
-    if (initialData?.attachments) {
-      return initialData.attachments.map(att => ({
-        ...att,
-        isExisting: true,
-        preview: att.file, // assuming existing attachment has 'file' property as URL
-        file: { name: att.file.split('/').pop() || 'fayl' } // Create a mock file object for name display
-      }))
+    if (Array.isArray(initialData?.attachments)) {
+      return initialData.attachments
+        .filter(att => typeof att?.file === 'string' && att.file)
+        .map(att => ({
+          ...att,
+          isExisting: true,
+          url: att.file,     // asl fayl manzili — takrorlashda shu orqali nusxalanadi
+          preview: att.file, // assuming existing attachment has 'file' property as URL
+          file: { name: att.file.split('/').pop().split('?')[0] || 'fayl' } // Create a mock file object for name display
+        }))
     }
     return []
-  }) // { file, preview, id?, isExisting? }
+  }) // { file, preview, url?, id?, isExisting? }
   const fileInputRef = useRef(null)
   const normalizePercentInput = (val) => {
     const cleaned = String(val || '').replace(/,/g, '.').replace(/[^\d.]/g, '')
@@ -495,13 +498,17 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
         if (existingAttachments.length > 0) {
           const duplicateResults = await Promise.allSettled(
             existingAttachments.map(async (att) => {
+               // att.file — ekranda ko'rsatish uchun mock obyekt, asl manzil att.url da
+               const src = att.url || att.preview
+               if (typeof src !== 'string' || !src) throw new Error("Fayl manzili topilmadi")
                try {
                  // get existing file contents as blob
-                 const response = await fetch(att.file)
+                 const response = await fetch(src)
+                 if (!response.ok) throw new Error(`HTTP ${response.status}`)
                  const blob = await response.blob()
-                 const filename = att.file.split('/').pop() || 'fayl'
+                 const filename = src.split('/').pop().split('?')[0] || 'fayl'
                  const file = new File([blob], filename, { type: blob.type })
-                 
+
                  const fd = new FormData()
                  fd.append('task', taskId)
                  fd.append('file', file)
@@ -515,7 +522,8 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
           )
           duplicateResults.forEach((result, i) => {
             if (result.status === 'rejected') {
-              toast.error(`Eski faylni nusxalashda xatolik yuz berdi`)
+              const fname = existingAttachments[i]?.file?.name || 'fayl'
+              toast.error(`"${fname}" nusxalanmadi`, "Eski faylni nusxalashda xatolik yuz berdi")
             }
           })
         }
