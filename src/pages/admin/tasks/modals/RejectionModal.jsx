@@ -3,6 +3,7 @@ import { FaXmark, FaPaperclip } from 'react-icons/fa6'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
 import { useImagePaste } from '../../../../hooks/useImagePaste'
+import ResizableTextarea from '../../../../components/ResizableTextarea'
 
 /* ── RejectionModal ── */
 export default function RejectionModal({ task, onClose, onConfirm }) {
@@ -126,12 +127,12 @@ export default function RejectionModal({ task, onClose, onConfirm }) {
 
         {/* Sabab */}
         <div>
-          <textarea
+          <ResizableTextarea
             value={reason}
             onChange={e => { setReason(e.target.value); if (e.target.value.trim()) setReasonError(false) }}
             placeholder="Sababini yozing..."
             rows={4}
-            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none
+            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border
               bg-[var(--bg-base)] text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-disabled)] dark:placeholder-[var(--text-sub)]
               focus:border-[var(--accent-sub)] transition-colors
               ${reasonError ? 'border-red-500 dark:border-red-500' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)]'}`}

@@ -7,6 +7,7 @@ import { parseApiError } from "../../../../service/parseApiError"
 import { DateTimeBox } from "../../Components/DateTimeBox"
 import DiscardModal from "../../../../components/DiscardModal"
 import { useImagePaste, readFromClipboard } from "../../../../hooks/useImagePaste"
+import ResizableTextarea from "../../../../components/ResizableTextarea"
 
 const PRIORITY_OPTIONS = [
   { label: 'Past', value: 'low' },
@@ -585,16 +586,15 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
             {/* Tavsifi */}
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className="relative">
-                <textarea value={form.description} onChange={e => set("description", e.target.value)}
-                  placeholder="Tavsifni yozing" rows={3} className={inputCls(false) + " resize-none pr-8"} />
+              <ResizableTextarea value={form.description} onChange={e => set("description", e.target.value)}
+                placeholder="Tavsifni yozing" rows={3} className={inputCls(false) + " pr-8"}>
                 {form.description && (
                   <button type="button" onClick={() => set("description", "")}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
-              </div>
+              </ResizableTextarea>
             </div>
 
             {/* Darajasi + Turi */}

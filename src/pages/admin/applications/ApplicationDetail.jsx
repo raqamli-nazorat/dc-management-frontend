@@ -8,6 +8,7 @@ import { FaFileLines, FaXmark, FaArrowLeft, FaCheck } from 'react-icons/fa6'
 import { CopyIcon } from '../../../components/icons'
 import { Alert } from '../Components/Alert'
 import { useAuth } from '../../../context/AuthContext'
+import ResizableTextarea from '../../../components/ResizableTextarea'
 
 const ApplicationDetail = () => {
   const { id } = useParams()
@@ -260,8 +261,9 @@ const ApplicationDetail = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>O'qish joyi va kursi</label>
-            <textarea
+            <ResizableTextarea
               disabled
+              minH={80}
               placeholder="O'qish joyi yoki kursi ma'lumotlari"
               className={`${inputCls} h-[80px]`}
               value={application.university || ''}
@@ -269,8 +271,9 @@ const ApplicationDetail = () => {
           </div>
           <div>
             <label className={labelCls}>Qo'shimcha ma'lumotlar yoki savollar</label>
-            <textarea
+            <ResizableTextarea
               disabled
+              minH={80}
               placeholder="Qo'shimcha ma'lumot"
               className={`${inputCls} h-[80px]`}
               value={application.extra_info || ''}
@@ -280,7 +283,8 @@ const ApplicationDetail = () => {
 
         <div className="flex flex-col gap-2 -mt-3!">
           <span className="text-[20px] font-bold dark:text-[var(--text-strong)]">Xodim hulosasi</span>
-          <textarea
+          <ResizableTextarea
+            minH={95}
             className={`${inputCls} h-[95px]`}
             placeholder='Xodim hulosasini kiriting'
             value={conclusion}
@@ -342,13 +346,13 @@ const ApplicationDetail = () => {
             </div>
 
             <div className="relative mb-5">
-              <textarea
+              <ResizableTextarea
                 value={modalConclusion}
                 onChange={(e) => {
                   setModalConclusion(e.target.value)
                   if (e.target.value.trim()) setError('')
                 }}
-                className={`w-full h-[150px] p-4 rounded-xl dark:bg-[#141414] border ${error ? 'border-[#fa5252]' : 'border-slate-300'} dark:text-[var(--text-strong)] text-black text-sm placeholder:text-gray-500 outline-none resize-none dark:placeholder-white/20 dark:focus:border-white/20 dark:border-[var(--stroke-soft)] focus:border-slate-400 transition-colors`}
+                className={`w-full h-[150px] p-4 rounded-xl dark:bg-[#141414] border ${error ? 'border-[#fa5252]' : 'border-slate-300'} dark:text-[var(--text-strong)] text-black text-sm placeholder:text-gray-500 outline-none dark:placeholder-white/20 dark:focus:border-white/20 dark:border-[var(--stroke-soft)] focus:border-slate-400 transition-colors`}
                 placeholder="Xulosangizni shu yerga yozing..."
               />
               {error && (

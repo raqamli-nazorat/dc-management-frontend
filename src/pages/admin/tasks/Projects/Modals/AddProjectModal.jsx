@@ -10,6 +10,7 @@ import { FiCalendar, FiPlus } from "react-icons/fi"
 import { IoCloseCircle } from "react-icons/io5"
 import { UserPickerModal, SelectedUsersField } from "../Components/UserPickerModal"
 import DiscardModal from "../../../../../components/DiscardModal"
+import ResizableTextarea from "../../../../../components/ResizableTextarea"
 import { PiCopyBold } from "react-icons/pi"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
@@ -298,17 +299,16 @@ const AddProjectModal = ({ onClose, refreshData, useDropdown, STATUS_API, initia
 
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className="relative">
-                <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder="Tavsifni yozing" rows={3}
-                  className={inputCls(errors.description) + ' resize-none'} />
+              <ResizableTextarea value={form.description} onChange={e => set('description', e.target.value)}
+                placeholder="Tavsifni yozing" rows={3}
+                className={inputCls(errors.description) + ' pr-8'}>
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
-              </div>
+              </ResizableTextarea>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

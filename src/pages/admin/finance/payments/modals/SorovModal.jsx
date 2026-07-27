@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
 import DiscardModal from '../../../../../components/DiscardModal'
+import ResizableTextarea from '../../../../../components/ResizableTextarea'
 import { SelectField } from '../components/SelectField'
 import { LoyihaDropdownForm } from '../components/LoyihaDropdown'
 import { axiosAPI } from '../../../../../service/axiosAPI'
@@ -284,21 +285,20 @@ export default function SorovModal({ onClose, onSubmit }) {
               Sabab
               {!rules.reasonRequired && <span className="text-[var(--text-disabled)] ml-1">(ixtiyoriy)</span>}
             </label>
-            <div className="relative">
-              <textarea
-                rows={3}
-                className={iCls('reason') + ' h-auto! resize-none pr-8'}
-                placeholder="Sababni yozing..."
-                value={form.reason}
-                onChange={e => setF('reason', e.target.value)}
-              />
+            <ResizableTextarea
+              rows={3}
+              className={iCls('reason') + ' h-auto! pr-8'}
+              placeholder="Sababni yozing..."
+              value={form.reason}
+              onChange={e => setF('reason', e.target.value)}
+            >
               {form.reason && (
                 <button type="button" onClick={() => setF('reason', '')}
                   className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] dark:text-[var(--text-soft)] cursor-pointer">
                   <FaXmark size={12} />
                 </button>
               )}
-            </div>
+            </ResizableTextarea>
             {errors.reason && <p className="text-xs text-red-500 mt-1">*{errors.reason}</p>}
           </div>
 

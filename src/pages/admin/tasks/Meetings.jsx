@@ -10,6 +10,7 @@ import { DateTimeBox } from '../Components/DateTimeBox'
 import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 import { PiCopyBold } from 'react-icons/pi'
 import DiscardModal from '../../../components/DiscardModal'
+import ResizableTextarea, { ResizableBox } from '../../../components/ResizableTextarea'
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 const DURATION_UNITS = ['daqiqa']
@@ -455,17 +456,16 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
 
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className="relative">
-                <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder="Tavsifni yozing" rows={3}
-                  className={inputCls(errors.description) + ' resize-none pr-8'} />
+              <ResizableTextarea value={form.description} onChange={e => set('description', e.target.value)}
+                placeholder="Tavsifni yozing" rows={3}
+                className={inputCls(errors.description) + ' pr-8'}>
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
-              </div>
+              </ResizableTextarea>
               {errors.description && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
             </div>
 
@@ -887,17 +887,16 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className="relative">
-                <textarea value={form.description} onChange={e => canEdit && set('description', e.target.value)}
-                  readOnly={!canEdit} placeholder="Tavsifni yozing" rows={3}
-                  className={inputCls(false) + ' resize-none' + (canEdit ? ' pr-8' : '')} />
+              <ResizableTextarea value={form.description} onChange={e => canEdit && set('description', e.target.value)}
+                readOnly={!canEdit} placeholder="Tavsifni yozing" rows={3}
+                className={inputCls(false) + (canEdit ? ' pr-8' : '')}>
                 {form.description && canEdit && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
-              </div>
+              </ResizableTextarea>
             </div>
 
             <div className="grid grid-cols-4 gap-2">
@@ -1145,9 +1144,9 @@ function MeetingDetailModal({ meeting, onClose }) {
           {/* Tavsif */}
           <div>
             <label className={labelCls}>Tavsifi</label>
-            <div className={fieldCls + " min-h-[80px] whitespace-pre-wrap"}>
+            <ResizableBox className={fieldCls + " min-h-[80px] whitespace-pre-wrap"}>
               {meeting.description || <span className="text-[var(--text-soft)]">—</span>}
-            </div>
+            </ResizableBox>
           </div>
 
           {/* Sana + Vaqt + Davomiylik */}

@@ -2,6 +2,7 @@
 import { FaCheck, FaArrowLeft } from 'react-icons/fa6'
 import { axiosAPI } from '../service/axiosAPI'
 import { toast } from '../Toast/ToastProvider'
+import ResizableTextarea from './ResizableTextarea'
 
 // Avatar komponenti — URL bo'lsa rasm, bo'lmasa initials
 function UserAvatar({ user }) {
@@ -292,11 +293,11 @@ export function MeetingAbsenceModal({ attendanceId, meetingTitle = "Yig'ilish", 
       </div>
 
       <div className="px-6 flex-1">
-        <textarea 
-          value={reason} 
-          onChange={e => setReason(e.target.value)} 
-          placeholder="Sababni yozing..." 
-          className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] resize-none outline-none focus:border-[var(--accent-strong)]"
+        <ResizableTextarea
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          placeholder="Sababni yozing..."
+          className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] outline-none focus:border-[var(--accent-strong)]"
         />
       </div>
 
@@ -414,11 +415,11 @@ export function MeetingOpenModal({ meetingId, userId, onClose }) {
         {loading ? (
           <p className="text-sm text-[var(--text-soft)] text-center mt-10">Yuklanmoqda...</p>
         ) : (
-          <textarea
+          <ResizableTextarea
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder="Sababni yozing..."
-            className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] resize-none outline-none focus:border-[var(--accent-strong)]"
+            className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] placeholder-[var(--text-sub)] outline-none focus:border-[var(--accent-strong)]"
           />
         )}
       </div>
@@ -538,10 +539,10 @@ export function AttendanceExcuseModal({ attendanceId, onClose }) {
 
           {/* Sabab matni */}
           <div className="px-6 flex-1">
-            <textarea
+            <ResizableTextarea
               readOnly
               value={absenceReason || "Sabab ko'rsatilmagan"}
-              className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] resize-none outline-none cursor-default"
+              className="w-full h-36 px-4 py-3 bg-[var(--bg-base)] dark:bg-[var(--bg-elevation-2)] rounded-2xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-sub)] text-[14px] font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)] outline-none cursor-default"
             />
           </div>
 
