@@ -83,11 +83,18 @@ export default function Login() {
         // 429 throttle xatosini tekshirish
         const raw = result.error
         const errorId = raw?.errorId ?? raw?.error?.errorId
+        const errorCode = raw?.errorCode ?? raw?.error?.errorCode
         const errorMsg = String(raw?.errorMsg ?? raw?.error?.errorMsg ?? '')
 
-        if (errorId === 429 || errorMsg.toLowerCase().includes('throttled')) {
-          const match = errorMsg.match(/(\d+)\s*second/i)
-          const secs = match ? parseInt(match[1], 10) : 60
+        if (errorId === 429 || errorCode === 'throttled' || errorMsg.toLowerCase().includes('throttled')) {
+          // Asosiy manba — backend bergan retry_after_seconds qiymati
+          const details = raw?.details ?? raw?.error?.details
+          const retryAfter = Number(details?.retry_after_seconds)
+          // Zaxira — xabar matnidan sonni ajratib olish ("1429 soniya" / "60 seconds")
+          const match = errorMsg.match(/(\d+)\s*(soniya|sekund|second)/i)
+          const secs = Number.isFinite(retryAfter) && retryAfter > 0
+            ? retryAfter
+            : (match ? parseInt(match[1], 10) : 60)
           setThrottleUntil(secs)
           setThrottleSecs(secs)
         } else {
