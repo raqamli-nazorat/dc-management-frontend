@@ -455,9 +455,20 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
     }
   }
 
+  // Samaradorlik faqat manager va employee rollari uchun mavjud —
+  // boshqa rollarda so'rov yuborilmaydi (backend 403 qaytaradi)
+  const stsFetchedRef = useRef(false)
   useEffect(() => {
-    if (user) getUserSts()
-  }, [])
+    const role = getRouteRole(user)
+    if (role === 'manager' || role === 'employee') {
+      if (!stsFetchedRef.current) {
+        stsFetchedRef.current = true
+        getUserSts()
+      }
+    } else {
+      setStsLoading(false)
+    }
+  }, [user])
 
   // Samaradorlik paneli — tashqariga bosilganda yopish
   useEffect(() => {
@@ -789,7 +800,7 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           </NavLink>
         ))}
 
-        {!isCollapsed && routeRole !== 'admin' && routeRole !== 'superadmin' && routeRole !== 'auditor' && <EfficiencyCard
+        {!isCollapsed && (routeRole === 'manager' || routeRole === 'employee') && <EfficiencyCard
           cardRef={effRef}
           data={userSts}
           loading={stsLoading}

@@ -5,6 +5,7 @@ import { toast } from "../../../../../Toast/ToastProvider"
 import { axiosAPI } from "../../../../../service/axiosAPI"
 import { FiPlus } from "react-icons/fi"
 import { PiCopyBold } from "react-icons/pi"
+import { ResizableBox } from "../../../../../components/ResizableTextarea"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 
@@ -122,9 +123,9 @@ const DetailModal = ({ id, onClose }) => {
                         {/* Tavsifi */}
                         <div>
                             <label className={labelCls}>Tavsifi</label>
-                            <div className={fCls + ' min-h-[80px] whitespace-pre-wrap leading-relaxed'}>
+                            <ResizableBox className={fCls + ' min-h-[80px] whitespace-pre-wrap leading-relaxed'}>
                                 {project.description || '—'}
-                            </div>
+                            </ResizableBox>
                         </div>
 
                         {/* Menejer + Loyiha narxi */}

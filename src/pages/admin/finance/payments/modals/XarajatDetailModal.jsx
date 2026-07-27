@@ -4,6 +4,7 @@ import { MdCheck } from 'react-icons/md'
 import { fmt, typeLabel, methodLabel, labelCls, fmtCard } from '../constants'
 import { useAuth } from '../../../../../context/AuthContext'
 import { axiosAPI } from '../../../../../service/axiosAPI'
+import ResizableTextarea, { ResizableBox } from '../../../../../components/ResizableTextarea'
 
 const fieldCls = `w-full h-[42px] px-3 py-2.5 rounded-xl text-sm border flex items-center
   bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
@@ -36,12 +37,12 @@ function CancelReasonModal({ onCancel, onConfirm }) {
           <h2 className="text-base font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Rad etish sababini kiriting</h2>
         </div>
         <div className="px-6 py-4">
-          <textarea
+          <ResizableTextarea
             rows={4}
             value={reason}
             onChange={e => { setReason(e.target.value); setError(false) }}
             placeholder="Iltimos, sababni yozing. Bu majburiy"
-            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border resize-none 
+            className={`w-full px-3 py-2.5 rounded-xl text-sm outline-none border
               bg-[var(--bg-base)] text-[var(--text-strong)] placeholder-[var(--text-sub)]
               dark:text-[var(--text-strong)] dark:placeholder-[var(--text-sub)]
               ${error ? 'border-[var(--error-strong)]' : 'border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] focus:border-[var(--accent-sub)]'}`}
@@ -216,9 +217,9 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
             {/* Sababi */}
             <div>
               <label className={labelCls}>Sababi</label>
-              <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
+              <ResizableBox className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
                 {payment.reason || ''}
-              </div>
+              </ResizableBox>
             </div>
 
             {/* To'lov turi + Karta */}
@@ -253,9 +254,9 @@ export default function XarajatDetailModal({ payment, onClose, showCheckModal, o
             {payment.status === 'cancelled' && payment.cancel_reason && (
               <div>
                 <label className={labelCls}>Rad etish sababi</label>
-                <div className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
+                <ResizableBox className={`${fieldCls} h-auto! min-h-[80px] max-h-[120px] overflow-y-auto items-start whitespace-pre-wrap leading-relaxed`}>
                   {payment.cancel_reason}
-                </div>
+                </ResizableBox>
               </div>
             )}
 

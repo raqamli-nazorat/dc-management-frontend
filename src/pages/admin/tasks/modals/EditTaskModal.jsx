@@ -8,6 +8,7 @@ import { DateTimeBox } from '../../Components/DateTimeBox'
 import DiscardModal from '../../../../components/DiscardModal'
 import RejectionModal from './RejectionModal'
 import { useImagePaste, readFromClipboard } from '../../../../hooks/useImagePaste'
+import ResizableTextarea from '../../../../components/ResizableTextarea'
 
 const ALLOWED_TRANSITIONS = {
   todo: ['in_progress'],
@@ -19,10 +20,6 @@ const ALLOWED_TRANSITIONS = {
   overdue: ['in_progress'],
   cancelled: [],
 }
-
-// Tavsif maydonining eng kichik va eng katta balandligi (px)
-const DESC_MIN_H = 92
-const DESC_MAX_H = 600
 
 const PRIORITY_OPTIONS = [
   { label: 'Past', value: 'low' },
@@ -297,35 +294,6 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
   const [newAttachments, setNewAttachments] = useState([])
   const [showDetails, setShowDetails] = useState(false)
   const fileInputRef = useRef(null)
-
-  // Tavsif maydonini pastga surib kattalashtirish
-  const descRef = useRef(null)
-  const [descHeight, setDescHeight] = useState(null)
-
-  const startDescResize = e => {
-    e.preventDefault()
-    const startY = e.touches ? e.touches[0].clientY : e.clientY
-    const startH = descRef.current?.offsetHeight || DESC_MIN_H
-
-    const onMove = ev => {
-      if (ev.touches) ev.preventDefault() // telefonda sahifa siljib ketmasligi uchun
-      const y = ev.touches ? ev.touches[0].clientY : ev.clientY
-      setDescHeight(Math.min(Math.max(startH + (y - startY), DESC_MIN_H), DESC_MAX_H))
-    }
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-      window.removeEventListener('touchmove', onMove)
-      window.removeEventListener('touchend', onUp)
-      document.body.style.userSelect = ''
-    }
-
-    document.body.style.userSelect = 'none'
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-    window.addEventListener('touchmove', onMove, { passive: false })
-    window.addEventListener('touchend', onUp)
-  }
 
   useImagePaste((files) => {
     if (!canEdit) return;
@@ -710,23 +678,16 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
             {/* Tavsifi */}
             <div>
               <label className={labelCls}>Tavsifi</label>
-              <div className="relative">
-                <textarea ref={descRef} value={form.description} onChange={e => !ro && set('description', e.target.value)}
-                  readOnly={ro} placeholder="Tavsifni yozing" rows={3}
-                  style={descHeight ? { height: descHeight } : undefined}
-                  className={inputCls(false, ro) + ' resize-none pr-8 block'} />
+              <ResizableTextarea value={form.description} onChange={e => !ro && set('description', e.target.value)}
+                readOnly={ro} placeholder="Tavsifni yozing" rows={3}
+                className={inputCls(false, ro) + ' pr-8'}>
                 {form.description && !ro && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                     <FaXmark size={12} />
                   </button>
                 )}
-                {/* Pastga surib kattalashtirish uchun tutqich */}
-                <div onMouseDown={startDescResize} onTouchStart={startDescResize} title="Pastga suring"
-                  className="absolute left-0 right-0 -bottom-1.5 h-3 flex items-center justify-center cursor-ns-resize group">
-                  <span className="w-10 h-1 rounded-full transition-colors bg-[var(--stroke-sub)] dark:bg-[var(--stroke-soft)] group-hover:bg-[var(--accent-sub)]" />
-                </div>
-              </div>
+              </ResizableTextarea>
             </div>
 
             {/* Holati + Darajasi + Turi */}

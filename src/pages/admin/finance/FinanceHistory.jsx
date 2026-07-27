@@ -5,6 +5,7 @@ import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { DateTimeBox } from '../Components/DateTimeBox'
+import { ResizableBox } from '../../../components/ResizableTextarea'
 
 // ── Constants ────────────────────────────────────────────────
 const TRANSACTION_TYPE_OPTIONS = [
@@ -287,9 +288,9 @@ function HistoryDetailModal({ item, userInfo, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Xarajat</label>
-              <div className="w-full min-h-[42px] max-h-[100px] overflow-y-auto px-3 py-2.5 rounded-xl text-sm border flex items-start bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] whitespace-pre-wrap break-words leading-relaxed">
+              <ResizableBox minH={42} className="w-full min-h-[42px] max-h-[100px] overflow-y-auto px-3 py-2.5 rounded-xl text-sm border flex items-start bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)] dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)] whitespace-pre-wrap break-words leading-relaxed">
                 {item.description || ''}
-              </div>
+              </ResizableBox>
             </div>
             <div>
               <label className={labelCls}>Turi</label>

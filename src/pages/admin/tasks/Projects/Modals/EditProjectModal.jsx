@@ -10,6 +10,7 @@ import { toast } from "../../../../../Toast/ToastProvider"
 import { SelectedUsersField, UserPickerModal } from "../Components/UserPickerModal"
 import { useAuth } from "../../../../../context/AuthContext"
 import DiscardModal from "../../../../../components/DiscardModal"
+import ResizableTextarea from "../../../../../components/ResizableTextarea"
 import { PiCopyBold } from "react-icons/pi"
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
@@ -368,18 +369,17 @@ const EditProjectModal = ({ id, onClose, refreshData, useDropdown, STATUS_LABEL 
                             {/* Tavsifi */}
                             <div>
                                 <label className={labelCls}>Tavsifi</label>
-                                <div className="relative">
-                                    <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                                        disabled={isManager}
-                                        placeholder="Tavsifni yozing" rows={3}
-                                        className={inputCls(false) + ' resize-none'} />
+                                <ResizableTextarea value={form.description} onChange={e => set('description', e.target.value)}
+                                    disabled={isManager}
+                                    placeholder="Tavsifni yozing" rows={3}
+                                    className={inputCls(false) + ' pr-8'}>
                                     {form.description && !isManager && (
                                         <button type="button" onClick={() => set('description', '')}
                                             className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
                                             <FaXmark size={12} />
                                         </button>
                                     )}
-                                </div>
+                                </ResizableTextarea>
                             </div>
 
                             {/* Menejer + Bonus */}
