@@ -9,6 +9,13 @@ import { useAuth } from '../../../context/AuthContext'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
+// Backend `month` filtri YYYY-MM-DD formatdagi sana qabul qiladi (oyning 1-kuni)
+const monthToApi = (name) => {
+  const idx = MONTHS.indexOf(name)
+  if (idx === -1) return undefined
+  return `${new Date().getFullYear()}-${String(idx + 1).padStart(2, '0')}-01`
+}
+
 const EMPTY_FILTER = {
   month: '',
   created_at__date__gte: '', created_at__time__gte: '',
