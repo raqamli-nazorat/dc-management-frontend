@@ -44,20 +44,18 @@ const status_type = [
 const monthStart = dayjs().startOf('month').hour(0).minute(0).second(0).millisecond(0)
 const monthEnd = dayjs().endOf('month').hour(23).minute(59).second(0).millisecond(0)
 
-const months = [
-  { label: "Yanvar", value: 1 },
-  { label: "Fevral", value: 2 },
-  { label: "Mart", value: 3 },
-  { label: "Aprel", value: 4 },
-  { label: "May", value: 5 },
-  { label: "Iyun", value: 6 },
-  { label: "Iyul", value: 7 },
-  { label: "Avgust", value: 8 },
-  { label: "Sentabr", value: 9 },
-  { label: "Oktabr", value: 10 },
-  { label: "Noyabr", value: 11 },
-  { label: "Dekabr", value: 12 },
-]
+const MONTH_LABELS = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"]
+
+// Backend `month_year` filtri YYYY-MM formatdagi qiymat kutadi (masalan: 2026-06)
+const months = (() => {
+  const opts = []
+  let cursor = dayjs().startOf('month')
+  for (let i = 0; i < 24; i++) {
+    opts.push({ label: `${MONTH_LABELS[cursor.month()]} ${cursor.year()}`, value: cursor.format('YYYY-MM') })
+    cursor = cursor.subtract(1, 'month')
+  }
+  return opts
+})()
 
 const initialFilters = {
   created_at_min: monthStart,
@@ -65,8 +63,8 @@ const initialFilters = {
   confirmed_at_min: '',
   confirmed_at_max: '',
   user: '',
-  accountants: '',
-  month: '',
+  accountant: '',
+  month_year: '',
   is_confirmed: '',
   total_amount_min: '',
   total_amount_max: '',
@@ -164,7 +162,7 @@ const Salary = () => {
       const errData = error?.response?.data?.error;
 
       // Field-level detail xatolarini chiqarish (masalan: password, name ...)
-      let errMsg = "Xatolik yuz berdi" || error?.response?.data?.error?.errorMsg;
+      let errMsg = "Xatolik yuz berdi";
       if (errData?.details && typeof errData.details === 'object') {
         const detailMsgs = Object.values(errData.details).flat().join(' ');
         if (detailMsgs) errMsg = detailMsgs;
@@ -853,8 +851,8 @@ const Salary = () => {
                 padding='13.5px 12px'
                 placeholder="Oy tanlang"
                 options={months}
-                value={filters.month}
-                onChange={(value) => handleFilterChange('month', value)}
+                value={filters.month_year}
+                onChange={(value) => handleFilterChange('month_year', value)}
               />
             </div>
 
