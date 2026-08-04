@@ -6,6 +6,7 @@ import EmptyState from '../../../components/EmptyState'
 import { getErrorMessage } from '../../../service/getErrorMessage'
 import { DateTimeBox } from '../Components/DateTimeBox'
 import { useAuth } from '../../../context/AuthContext'
+import ResizableTextarea from '../../../components/ResizableTextarea'
 
 const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
@@ -354,11 +355,15 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <Field label="Jami miqdori (UZS)" value={fmt(user.total_amount)} right />
             <div className="col-span-2">
               <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">Jarima sababi</label>
-              <div className="w-full min-h-[42px] px-3 py-2.5 rounded-xl text-sm border whitespace-pre-wrap break-words
-                bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
-                dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
-                {user.reason || ''}
-              </div>
+              <ResizableTextarea
+                readOnly
+                rows={3}
+                minH={42}
+                value={user.reason || ''}
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none border cursor-default
+                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
+                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]"
+              />
             </div>
           </div>
 
