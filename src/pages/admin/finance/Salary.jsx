@@ -352,16 +352,14 @@ function UserDetailModal({ user, onClose, onApprove }) {
             <Field label="Qatnashilmagan majlislar soni" value={user.missed_meetings_count ?? 0} />
             <Field label="Jarima miqdori (UZS)" value={parseFloat(user.penalty_amount) > 0 ? `-${fmt(user.penalty_amount)}` : fmt(user.penalty_amount)} red right />
             <Field label="Jami miqdori (UZS)" value={fmt(user.total_amount)} right />
-            {user.reason && (
-              <div className="col-span-2">
-                <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">Jarima sababi</label>
-                <div className="w-full min-h-[42px] px-3 py-2.5 rounded-xl text-sm border whitespace-pre-wrap break-words
-                  bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
-                  dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
-                  {user.reason}
-                </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5">Jarima sababi</label>
+              <div className="w-full min-h-[42px] px-3 py-2.5 rounded-xl text-sm border whitespace-pre-wrap break-words
+                bg-[var(--bg-base)] border-[var(--stroke-sub)] text-[var(--text-strong)]
+                dark:bg-[var(--bg-base)] dark:border-[var(--stroke-soft)] dark:text-[var(--text-strong)]">
+                {user.reason || ''}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Footer */}
