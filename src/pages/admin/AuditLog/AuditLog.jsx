@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaUser } from 'react-icons/fa6'
 import { axiosAPI } from '../../../service/axiosAPI'
 import { toast } from '../../../Toast/ToastProvider'
 import EmptyState from '../../../components/EmptyState'
@@ -72,6 +72,37 @@ function formatJson(val) {
   }
 }
 
+// ── Audit User Component ──────────────────────────────────────
+function AuditUser({ user, size = 'sm' }) {
+  const u = user || {}
+  const rawName = u.username || u.name || ''
+  const isDefault = !rawName || rawName === '—' || rawName === '-'
+  const displayName = isDefault ? 'Default user' : rawName
+
+  return (
+    <div className="flex items-center gap-2.5">
+      {u.avatar ? (
+        <img
+          src={u.avatar}
+          alt=""
+          className="w-7 h-7 rounded-lg object-cover shrink-0"
+        />
+      ) : !isDefault ? (
+        <div className="w-7 h-7 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+          {displayName[0]?.toUpperCase() ?? 'D'}
+        </div>
+      ) : (
+        <div className="w-7 h-7 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center text-white shrink-0">
+          <FaUser size={12} />
+        </div>
+      )}
+      <span className={size === 'md' ? 'text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium' : 'font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]'}>
+        {displayName}
+      </span>
+    </div>
+  )
+}
+
 // ── Detail Modal ──────────────────────────────────────────────
 function DetailModal({ id, onClose }) {
   const [detail, setDetail] = useState(null)
@@ -116,17 +147,8 @@ function DetailModal({ id, onClose }) {
             {/* Foydalanuvchi */}
             <div>
               <label className={labelCls}>Foydalanuvchi</label>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
-                {user.avatar ? (
-                  <img src={user.avatar} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0" />
-                ) : (
-                  <div className="w-7 h-7 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                    {user.username?.[0]?.toUpperCase() ?? '?'}
-                  </div>
-                )}
-                <span className="text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] font-medium">
-                  {user.username ?? '—'}
-                </span>
+              <div className="px-3 py-2.5 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] dark:bg-[var(--bg-base)]">
+                <AuditUser user={user} size="md" />
               </div>
             </div>
 
@@ -586,22 +608,7 @@ export default function AuditLogPage() {
                       {idx + 1}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        {user.avatar ? (
-                          <img
-                            src={user.avatar}
-                            alt=""
-                            className="w-7 h-7 rounded-lg object-cover shrink-0"
-                          />
-                        ) : (
-                          <div className="w-7 h-7 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                            {user.username?.[0]?.toUpperCase() ?? '?'}
-                          </div>
-                        )}
-                        <span className="font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-                          {user.username ?? '—'}
-                        </span>
-                      </div>
+                      <AuditUser user={user} />
                     </td>
                     <td className="px-4 py-3 text-[var(--text-strong)] dark:text-[var(--text-strong)]">
                       {fmtDate(row.created_at)}
