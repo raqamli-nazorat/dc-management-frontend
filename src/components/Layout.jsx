@@ -576,7 +576,8 @@ export default function Layout() {
     const notifId = payload.id || payload.raw?.id || payload.data?.id;
     const title = payload.title || "Yangi xabar";
     const body = payload.body || payload.message || payload.sub || "";
-    const notificationTag = notifId ? `notif_${notifId}` : `notif_${title}_${body}`;
+    const key = `${(title || '').trim()}:::${(body || '').trim()}`;
+    const notificationTag = notifId ? `notif_${notifId}` : `sw_${key.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40)}`;
 
     // Tizim bildirishnomasini ko'rsatish
     if (Notification.permission === "granted") {

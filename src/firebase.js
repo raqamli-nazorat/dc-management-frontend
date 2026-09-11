@@ -49,8 +49,20 @@ export const requestForToken = async () => {
             return null;
         }
 
+        // Service Worker mavjudligini tekshirish va uni yangilash (keshni chetlab o'tish uchun)
+        let serviceWorkerRegistration = undefined;
+        if ('serviceWorker' in navigator) {
+            serviceWorkerRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            try {
+                await serviceWorkerRegistration.update();
+            } catch (swErr) {
+                console.warn("SW update warning:", swErr);
+            }
+        }
+
         const currentToken = await getToken(messaging, {
-            vapidKey: "BEJUVInA0TavhXQWeS7mCDuQWUVpnobSAr2OF2GQAYv8FfIB-X2fRcFQ9qxGhXNlRxCq91Ppssen2E3HQAR8_VM"
+            vapidKey: "BEJUVInA0TavhXQWeS7mCDuQWUVpnobSAr2OF2GQAYv8FfIB-X2fRcFQ9qxGhXNlRxCq91Ppssen2E3HQAR8_VM",
+            serviceWorkerRegistration
         });
 
         if (currentToken) {
