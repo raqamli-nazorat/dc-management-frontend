@@ -579,12 +579,15 @@ export default function Layout() {
     const key = `${(title || '').trim()}:::${(body || '').trim()}`;
     const notificationTag = notifId ? `notif_${notifId}` : `sw_${key.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40)}`;
 
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const shouldShowPageNotification = isLocalhost || !('serviceWorker' in navigator);
+
     // Tizim bildirishnomasini ko'rsatish
-    if (Notification.permission === "granted") {
+    if (shouldShowPageNotification && Notification.permission === "granted") {
       const notification = new Notification(title, {
         body: body,
         icon: "/imgs/Logo.png",
-        tag: notificationTag, // Bir xil tag bo'lsa brauzer o'zi dublikat chiqarmaydi
+        tag: notificationTag,
         data: { url: window.location.origin }
       });
 
@@ -786,7 +789,7 @@ export default function Layout() {
                   className="w-[18px] h-[18px] brightness-0 [filter:brightness(0)_saturate(100%)_invert(10%)_sepia(10%)_saturate(1000%)_hue-rotate(190deg)_brightness(90%)] dark:brightness-0 dark:invert"
                 />
               </button>
-        
+
               {notifCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--error-strong)] border-2 border-white dark:border-[#191A1A] text-[10px] leading-none font-bold text-white flex items-center justify-center">
                   {notifCount > 99 ? '99+' : notifCount}
