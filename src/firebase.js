@@ -66,8 +66,15 @@ export const requestForToken = async () => {
 };
 
 /**
- * Foreground xabarlarni tinglash
+ * Foreground xabarlarni tinglash (doimiy tinglash va tozalash imkoniyati bilan)
  */
+export const onForegroundMessage = (callback) => {
+    return onMessage(messaging, (payload) => {
+        console.log("📨 Foreground xabar keldi:", payload);
+        if (callback) callback(payload);
+    });
+};
+
 export const onMessageListener = () =>
     new Promise((resolve) => {
         onMessage(messaging, (payload) => {

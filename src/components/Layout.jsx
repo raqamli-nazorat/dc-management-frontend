@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { usePageAction } from '../context/PageActionContext'
@@ -10,7 +10,7 @@ import { axiosAPI } from '../service/axiosAPI'
 import { MeetingAttendanceModal, MeetingAbsenceModal, MeetingOpenModal, AttendanceExcuseModal, SystemNotifModal } from './MeetingModals'
 import ImageLightbox from './ImageLightbox'
 import { useAuth } from '../context/AuthContext'
-import { onMessageListener, requestForToken } from '../firebase'
+import { onForegroundMessage, requestForToken } from '../firebase'
 import notificationSocket from '../NotificationSocket'
 import { NotifConnectTelegram } from './NotifConnectTelegram'
 
@@ -78,16 +78,38 @@ function groupByDate(notifs) {
   })
 }
 
-const showSystemNotification = (notif) => {
-  if (!("Notification" in window)) return;
+// Dublikat bildirishnomalarni oldini olish uchun kesh
+const recentNotifCache = new Map()
 
-  if (Notification.permission === "granted") {
-    new Notification(notif.title || "Yangi xabar", {
-      body: notif.sub || notif.message || "Sizga yangi bildirishnoma keldi",
-      icon: "/imgs/Logo.png", // Loyihangiz logotipi
-    });
+function isDuplicateNotification(payload) {
+  if (!payload) return true
+  const now = Date.now()
+  const notifId = payload.id || payload.raw?.id || payload.data?.id
+  const title = (payload.title || '').trim()
+  const body = (payload.body || payload.message || payload.sub || '').trim()
+
+  const idKey = notifId ? `id_${notifId}` : null
+  const textKey = (title || body) ? `text_${title}_${body}` : null
+
+  if (idKey && recentNotifCache.has(idKey)) {
+    if (now - recentNotifCache.get(idKey) < 15000) return true
   }
-};
+  if (textKey && recentNotifCache.has(textKey)) {
+    if (now - recentNotifCache.get(textKey) < 15000) return true
+  }
+
+  if (idKey) recentNotifCache.set(idKey, now)
+  if (textKey) recentNotifCache.set(textKey, now)
+
+  // Keshni tozalash (1 daqiqadan oshgan yozuvlarni olib tashlash)
+  if (recentNotifCache.size > 100) {
+    for (const [k, time] of recentNotifCache.entries()) {
+      if (now - time > 60000) recentNotifCache.delete(k)
+    }
+  }
+
+  return false
+}
 
 function NotificationPanel({ notifs, setNotifs, onClose, onItemClick, onScroll, onCountRefresh }) {
   const grouped = groupByDate(notifs)
@@ -547,11 +569,21 @@ export default function Layout() {
 
   // 2. Xabarni qayta ishlash funksiyasi
   const handleIncomingNotification = (payload) => {
+    if (!payload || isDuplicateNotification(payload)) {
+      return;
+    }
+
+    const notifId = payload.id || payload.raw?.id || payload.data?.id;
+    const title = payload.title || "Yangi xabar";
+    const body = payload.body || payload.message || payload.sub || "";
+    const notificationTag = notifId ? `notif_${notifId}` : `notif_${title}_${body}`;
+
     // Tizim bildirishnomasini ko'rsatish
     if (Notification.permission === "granted") {
-      const notification = new Notification(payload.title || "Yangi xabar", {
-        body: payload.body || payload.message,
+      const notification = new Notification(title, {
+        body: body,
         icon: "/imgs/Logo.png",
+        tag: notificationTag, // Bir xil tag bo'lsa brauzer o'zi dublikat chiqarmaydi
         data: { url: window.location.origin }
       });
 
@@ -568,24 +600,41 @@ export default function Layout() {
 
     const newNotif = mapApiNotification({
       ...payload,
-      created_at: new Date().toISOString(), // kelgan vaqti
+      id: notifId,
+      created_at: payload.created_at || new Date().toISOString(), // kelgan vaqti
       is_read: false
     });
 
-    setNotifs(prev => [newNotif, ...prev]); // Yangisini ro'yxat boshiga qo'shish
+    setNotifs(prev => {
+      // Ro'yxatda allaqachon mavjud bo'lsa qayta qo'shmaymiz
+      if (newNotif.id && prev.some(n => n.id === newNotif.id)) {
+        return prev;
+      }
+      return [newNotif, ...prev];
+    });
+
     setNotifCount(prev => prev + 1);
   };
 
   // 3. Asosiy effekt: Firebase va WebSocket-ni ishga tushirish
   useEffect(() => {
+    let unsubscribeFirebase = null;
+
     // A. Firebase Token olish va Foreground xabarlarni eshitish
     const setupFirebase = async () => {
       await requestForToken(); // Tokenni oladi va backendga yuboradi
 
       // Sayt ochiq turganda Firebase orqali keladigan xabarlar uchun
-      onMessageListener().then((payload) => {
+      // (Agar WebSocket ulangan bo'lsa dublikat kesh orqali filtrlanadi)
+      unsubscribeFirebase = onForegroundMessage((payload) => {
         console.log("🔥 Firebase Foreground xabar:", payload);
-        handleIncomingNotification(payload.notification);
+        const data = {
+          ...payload?.data,
+          ...payload?.notification,
+          title: payload?.notification?.title || payload?.data?.title,
+          body: payload?.notification?.body || payload?.data?.body || payload?.data?.message,
+        };
+        handleIncomingNotification(data);
       });
     };
 
@@ -594,6 +643,9 @@ export default function Layout() {
 
     // Tozalash (Cleanup): Komponent yopilganda ulanishni uzish
     return () => {
+      if (typeof unsubscribeFirebase === 'function') {
+        unsubscribeFirebase();
+      }
       notificationSocket.disconnect();
     };
   }, [connectNotificationsWs]);

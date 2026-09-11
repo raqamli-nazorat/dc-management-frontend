@@ -13,11 +13,19 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log("BACKGROUND PAYLOAD:", payload);
 
-    const notificationTitle = payload?.notification?.title || "Yangi bildirishnoma";
+    // Agar payload'da notification mavjud bo'lsa, Firebase Web SDK uni avtomatik ko'rsatadi.
+    // Qo'lda yana showNotification chaqirilsa 2 marta chiqadi.
+    if (payload?.notification) {
+        return;
+    }
+
+    const data = payload?.data || {};
+    const notificationTitle = data.title || "Yangi bildirishnoma";
 
     const notificationOptions = {
-        body: payload?.notification?.body || "",
+        body: data.body || data.message || "",
         icon: "/imgs/Logo.png",
+        tag: data.id ? `notif_${data.id}` : undefined,
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
