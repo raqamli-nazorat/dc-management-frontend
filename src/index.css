@@ -13,6 +13,8 @@
 
   body {
     font-family: "Manrope", sans-serif;
+    background-color: var(--bg-base);
+    overflow-x: hidden;
   }
 }
 

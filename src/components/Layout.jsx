@@ -551,7 +551,7 @@ export default function Layout() {
       }
 
       // WS URL ni shakllantirish (VITE_BASE_URL dan foydalanish)
-      const backendUrl = "https://backend.raqamlinazorat.uz"; // Backend manzilingiz
+      const backendUrl = "https://locale.alijonov.uz"; // Backend manzilingiz
       const baseUrl = backendUrl.replace(/^http/, 'ws');
 
       const wsUrl = `${baseUrl}/ws/notifications/?ticket=${ticket}`;

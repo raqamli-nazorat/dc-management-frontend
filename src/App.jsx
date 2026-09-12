@@ -31,6 +31,7 @@ import MyTasks from './pages/MyTasks/MyTasks'
 import AnalyticsPage from './pages/admin/Analytics/Analytics'
 import AuditLogPage from './pages/admin/AuditLog/AuditLog'
 import SelectRore from './pages/SelectRore'
+import MeetingRoom from './pages/MeetingRoom/MeetingRoom'
 const PH = (title) => <PlaceholderPage title={title} />
 
 // Umumiy sahifalar — barcha rollarda ishlatiladi
@@ -41,6 +42,7 @@ const commonRoutes = (prefix) => [
   <Route key="projects" path="projects" element={<AdminProjects />} />,
   <Route key="tasks" path="tasks" element={<AdminTasks />} />,
   <Route key="meetings" path="meetings" element={<AdminMeetings />} />,
+  <Route key="meeting-room" path="meetings/:id/room" element={<MeetingRoom />} />,
   <Route key="trash" path="trash" element={<TrashPage />} />,
   <Route key="profile" path="profile" element={<ProfilePage />} />,
   <Route key="rep-employee" path="reports/employee" element={<Employee />} />,
@@ -69,6 +71,8 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/role" element={<ProtectedRoute><SelectRore /></ProtectedRoute>} />
+              <Route path="/meeting-room/:id" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
+              <Route path="/meetings/:id/room" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
               {/* ── ADMIN ── */}

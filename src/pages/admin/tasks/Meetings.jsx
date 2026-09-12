@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy, FaVideo } from 'react-icons/fa6'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
 import EmptyState from '../../../components/EmptyState'
@@ -251,31 +251,41 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
   const [membersLoading, setMembersLoading] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
+  const loadProjectMembers = (projectId) => {
+    setMembersLoading(true)
+    if (projectId) {
+      axiosAPI.get(`/projects/${projectId}/`)
+        .then(res => {
+          const proj = res.data?.data ?? res.data
+          const emps = proj?.employees_info ?? []
+          const testers = proj?.testers_info ?? []
+          const manager = proj?.manager_info ? [proj.manager_info] : []
+          const all = [...emps, ...testers, ...manager]
+          const seen = new Set()
+          setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
+        })
+        .catch(() => setProjectMembers([]))
+        .finally(() => setMembersLoading(false))
+    } else {
+      axiosAPI.get('/users/all/', { params: { page_size: 200 } })
+        .then(res => {
+          const list = res.data?.results ?? res.data?.data?.results ?? res.data?.data ?? res.data ?? []
+          const seen = new Set()
+          setProjectMembers(Array.isArray(list) ? list.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }) : [])
+        })
+        .catch(() => setProjectMembers([]))
+        .finally(() => setMembersLoading(false))
+    }
+  }
+
   useEffect(() => {
     axiosAPI.get('/projects/', { params: { page_size: 100 } })
       .then(res => {
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setProjects(Array.isArray(list) ? list : [])
       }).catch(() => { })
-  }, [])
 
-  // Takrorlash (dublikat) — tanlangan loyiha a'zolarini yuklash (qatnashchilar tozalanmaydi)
-  useEffect(() => {
-    if (!initialData?.project) return
-    setMembersLoading(true)
-    axiosAPI.get(`/projects/${initialData.project}/`)
-      .then(res => {
-        const proj = res.data?.data ?? res.data
-        const emps = proj?.employees_info ?? []
-        const testers = proj?.testers_info ?? []
-        const manager = proj?.manager_info ? [proj.manager_info] : []
-        const all = [...emps, ...testers, ...manager]
-        const seen = new Set()
-        setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
-      })
-      .catch(() => setProjectMembers([]))
-      .finally(() => setMembersLoading(false))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadProjectMembers(initialData?.project || null)
   }, [])
 
   const [form, setForm] = useState(() => {
@@ -286,17 +296,18 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
         project: initialData.project ?? null,
         title: initialData.title ?? '',
         fine: initialData.penalty_percentage ? String(Math.abs(parseFloat(initialData.penalty_percentage))) : '',
-        link: initialData.link ?? '',
         description: initialData.description ?? '',
         date, time, durationVal: val,
         participants: initialData.participants_info ?? [],
         is_completed: false,
+        requires_approval: initialData.requires_approval ?? false,
       }
     }
     return {
-      project: null, title: '', fine: '', link: '', description: '',
+      project: null, title: '', fine: '', description: '',
       date: '', time: '', durationVal: '',
       participants: [], is_completed: false,
+      requires_approval: false,
     }
   })
   const [errors, setErrors] = useState({})
@@ -326,29 +337,12 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
     setForm(p => ({ ...p, project: v, participants: [] }))
     setErrors(p => ({ ...p, project: '' }))
     setProjectMembers([])
-    if (v) {
-      setMembersLoading(true)
-      axiosAPI.get(`/projects/${v}/`)
-        .then(res => {
-          const proj = res.data?.data ?? res.data
-          const emps = proj?.employees_info ?? []
-          const testers = proj?.testers_info ?? []
-          const manager = proj?.manager_info ? [proj.manager_info] : []
-          const all = [...emps, ...testers, ...manager]
-          const seen = new Set()
-          setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
-        })
-        .catch(() => setProjectMembers([]))
-        .finally(() => setMembersLoading(false))
-    }
+    loadProjectMembers(v)
   }
 
   const validate = () => {
     const e = {}
-    if (!form.project) e.project = true
     if (!form.title.trim()) e.title = true
-    if (!form.description.trim()) e.description = true
-    if (!form.link.trim()) e.link = true
     if (!form.date) e.date = true
     if (!form.time) e.time = true
     if (!form.durationVal || isNaN(parseInt(form.durationVal, 10))) e.durationVal = true
@@ -364,13 +358,13 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
     setLoading(true)
     try {
       const body = {
-        project: form.project,
         title: form.title.trim(),
         is_completed: form.is_completed,
         participants: form.participants.map(u => u.id),
+        requires_approval: Boolean(form.requires_approval),
       }
-      if (form.description.trim()) body.description = form.description.trim()
-      if (form.link.trim()) body.link = form.link.trim()
+      if (form.project) body.project = form.project
+      if (form.description?.trim()) body.description = form.description.trim()
       const fineNum = parseFloat(form.fine)
       if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
@@ -439,26 +433,10 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
             </div>
 
             <div>
-              <label className={labelCls}>Havolasi</label>
-              <div className="relative">
-                <input value={form.link} onChange={e => set('link', e.target.value)}
-                  placeholder="URL manzil kiriting" className={inputCls(errors.link) + (form.link ? ' pr-9' : '')} />
-                {form.link && (
-                  <button type="button" title="Nusxa olish"
-                    onClick={() => { navigator.clipboard.writeText(form.link); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer transition-colors text-[var(--text-soft)] hover:text-[var(--text-strong)]">
-                    {copiedLink ? <FaCheck size={12} className="text-green-500" /> : <PiCopyBold size={12} />}
-                  </button>
-                )}
-              </div>
-              {errors.link && <p className="text-xs text-red-500 mt-1">*To'g'ri URL manzil kiriting</p>}
-            </div>
-
-            <div>
               <label className={labelCls}>Tavsifi</label>
               <ResizableTextarea value={form.description} onChange={e => set('description', e.target.value)}
                 placeholder="Tavsifni yozing" rows={3}
-                className={inputCls(errors.description) + ' pr-8'}>
+                className={inputCls(false) + ' pr-8'}>
                 {form.description && (
                   <button type="button" onClick={() => set('description', '')}
                     className="absolute top-2.5 right-2.5 text-[var(--text-disabled)] hover:text-[var(--text-sub)] cursor-pointer">
@@ -466,7 +444,6 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
                   </button>
                 )}
               </ResizableTextarea>
-              {errors.description && <p className="text-xs text-red-500 mt-1">*Bu maydon majburiy</p>}
             </div>
 
             <div className="grid grid-cols-4 gap-3">
@@ -514,18 +491,18 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
             <div>
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
-                onClick={() => form.project && !membersLoading ? setShowParticipants(true) : null}
+                onClick={() => !membersLoading ? setShowParticipants(true) : null}
                 className={`w-full min-h-[100px] rounded-[24px] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] p-3 flex flex-col transition-all
-                  ${!form.project || membersLoading ? 'cursor-default' : 'cursor-pointer hover:border-[var(--accent-sub)]'}
+                  ${membersLoading ? 'cursor-default' : 'cursor-pointer hover:border-[var(--accent-sub)]'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
                     <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-4 text-center">
-                      {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : 'Quyidagi tugma orqali qidiring va tanlang'}
+                      {membersLoading ? 'Yuklanmoqda...' : 'Quyidagi tugma orqali qidiring va tanlang'}
                     </p>
                     <div className={`inline-flex items-center gap-1 p-2 rounded-xl text-sm font-medium
-                      ${!form.project || membersLoading
+                      ${membersLoading
                         ? 'bg-[#F1F3F9] text-[#C2C8E0] dark:bg-[var(--bg-elevation-1)] dark:text-[#474848]'
                         : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] cursor-pointer'}`}>
                       {membersLoading ? (
@@ -533,7 +510,7 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
                       ) : (
                         <FaPlus size={15} />
                       )}
-                      {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Loyiha tanlanmagan' : "Qatnashchilarni qo'shing"}
+                      {membersLoading ? 'Yuklanmoqda...' : "Qatnashchilarni qo'shing"}
                     </div>
                   </>
                 ) : (
@@ -559,15 +536,15 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
           </div>
 
           {/* -- Footer (qotgan) -- */}
-          <div className="px-7 py-5 flex items-center justify-end gap-3 shrink-0 bg-[var(--bg-base)]">
+          <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
 
-            {/* <div className="flex items-center gap-2.5">
-              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-sub)]">Tugatildimi?</span>
-              <button type="button" onClick={() => set('is_completed', !form.is_completed)}
-                className={`relative w-10 h-5 rounded-full cursor-pointer ${form.is_completed ? 'bg-black dark:bg-[var(--bg-base)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-[var(--bg-base)] shadow transition-transform duration-200 ${form.is_completed ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            <div className="flex items-center gap-2.5">
+              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-sub)]">Tasdiqlash talabi</span>
+              <button type="button" onClick={() => set('requires_approval', !form.requires_approval)}
+                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-200 ${form.requires_approval ? 'bg-[var(--accent-strong)] dark:bg-[#526ED3]' : 'bg-[#D0D5E2] dark:bg-[#30363D]'}`}>
+                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ${form.requires_approval ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
-            </div> */}
+            </div>
             <div className="flex items-center gap-3">
               <button onClick={handleClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
@@ -671,20 +648,30 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
   const [membersLoading, setMembersLoading] = useState(false)
 
   const loadProjectMembers = (projectId) => {
-    if (!projectId) { setProjectMembers([]); return }
     setMembersLoading(true)
-    axiosAPI.get(`/projects/${projectId}/`)
-      .then(res => {
-        const proj = res.data?.data ?? res.data
-        const emps = proj?.employees_info ?? []
-        const testers = proj?.testers_info ?? []
-        const manager = proj?.manager_info ? [proj.manager_info] : []
-        const all = [...emps, ...testers, ...manager]
-        const seen = new Set()
-        setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
-      })
-      .catch(() => setProjectMembers([]))
-      .finally(() => setMembersLoading(false))
+    if (projectId) {
+      axiosAPI.get(`/projects/${projectId}/`)
+        .then(res => {
+          const proj = res.data?.data ?? res.data
+          const emps = proj?.employees_info ?? []
+          const testers = proj?.testers_info ?? []
+          const manager = proj?.manager_info ? [proj.manager_info] : []
+          const all = [...emps, ...testers, ...manager]
+          const seen = new Set()
+          setProjectMembers(all.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }))
+        })
+        .catch(() => setProjectMembers([]))
+        .finally(() => setMembersLoading(false))
+    } else {
+      axiosAPI.get('/users/all/', { params: { page_size: 200 } })
+        .then(res => {
+          const list = res.data?.results ?? res.data?.data?.results ?? res.data?.data ?? res.data ?? []
+          const seen = new Set()
+          setProjectMembers(Array.isArray(list) ? list.filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true }) : [])
+        })
+        .catch(() => setProjectMembers([]))
+        .finally(() => setMembersLoading(false))
+    }
   }
 
   useEffect(() => {
@@ -693,7 +680,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
         const list = res.data?.data?.results ?? res.data?.results ?? res.data ?? []
         setProjects(Array.isArray(list) ? list : [])
       }).catch(() => { })
-    if (meeting.project) loadProjectMembers(meeting.project)
+    loadProjectMembers(meeting.project)
   }, [])
 
   const { date: initDate, time: initTime } = fromIso(meeting.start_time)
@@ -703,14 +690,14 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
     project: meeting.project ?? null,
     title: meeting.title ?? '',
     fine: meeting.penalty_percentage ? String(Math.abs(parseFloat(meeting.penalty_percentage))) : '',
-    link: meeting.link ?? '',
     description: meeting.description ?? '',
     date: initDate,
     time: initTime,
     durationVal: initDurVal,
     participants: meeting.participants_info ?? [],
     is_completed: meeting.is_completed ?? false,
-    attendances: meeting.attendances ?? []
+    attendances: meeting.attendances ?? [],
+    requires_approval: meeting.requires_approval ?? false,
   })
   const [errors, setErrors] = useState({})
 
@@ -735,7 +722,6 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
   const validate = () => {
     const e = {}
-    if (!form.project) e.project = true
     if (!form.title.trim()) e.title = true
     setErrors(e)
     return Object.keys(e).length === 0
@@ -750,12 +736,12 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
     setLoading(true)
     try {
       const body = {
-        project: form.project,
         title: form.title.trim(),
         participants: form.participants.map(u => u.id),
+        requires_approval: Boolean(form.requires_approval),
       }
+      if (form.project) body.project = form.project
       if (form.description.trim()) body.description = form.description.trim()
-      if (form.link.trim()) body.link = form.link.trim()
       const fineNum = parseFloat(form.fine)
       if (fineNum > 0) body.penalty_percentage = String(fineNum)
       const startIso = toIso(form.date, form.time)
@@ -840,50 +826,6 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
               </div>
             </div>
 
-            <div>
-              <label className={labelCls}>Havolasi</label>
-              {canEdit ? (
-                <div className='flex items-end relative'>
-                  <input value={form.link} onChange={e => set('link', e.target.value)}
-                    placeholder="URL manzil kiriting" className={inputCls(false) + ' pr-9'} />
-                  {form?.link?.trim() && (
-                    <button
-                      type="button"
-                      className="absolute top-2 right-1 p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
-                      onClick={() => { navigator.clipboard.writeText(form.link); setCopyLink(form.link); setTimeout(() => setCopyLink(null), 2000) }}
-                      title="Havolani nusxalash"
-                    >
-                      {copyLink ?
-                        <FaCheck size={14} className='text-green-500' />
-                        : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
-                      }
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className={`${inputCls(false)} flex items-center justify-between gap-2 overflow-hidden`}>
-                  <div className="flex-1 min-w-0">
-                    {form.link
-                      ? <a href={form.link} target="_blank" rel="noreferrer"
-                        className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all block">{form.link}</a>
-                      : <span className="text-[var(--text-soft)]">—</span>}
-                  </div>
-                  {form.link && (
-                    <button
-                      type="button"
-                      className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
-                      onClick={() => { navigator.clipboard.writeText(form.link); setCopyLink(form.link); setTimeout(() => setCopyLink(null), 2000) }}
-                      title="Havolani nusxalash"
-                    >
-                      {copyLink ?
-                        <FaCheck size={14} className='text-green-500' />
-                        : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
-                      }
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
 
             <div>
               <label className={labelCls}>Tavsifi</label>
@@ -943,26 +885,26 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
             <div>
               <label className={labelCls}>Yig'ilish qatnashchilari</label>
               <div
-                onClick={() => canEdit && form.project && !membersLoading ? setShowParticipants(true) : null}
+                onClick={() => canEdit && !membersLoading ? setShowParticipants(true) : null}
                 className={`w-full min-h-[100px] rounded-[24px] border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] p-3 flex flex-col transition-all
-                  ${canEdit && form.project && !membersLoading ? 'bg-[var(--bg-base)] cursor-pointer hover:border-[var(--accent-sub)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default'}
+                  ${canEdit && !membersLoading ? 'bg-[var(--bg-base)] cursor-pointer hover:border-[var(--accent-sub)]' : 'bg-[var(--bg-elevation-1)] dark:bg-[var(--bg-base)] cursor-default'}
                   ${form.participants.length === 0 ? 'items-center justify-center' : 'items-start justify-start'}`}
               >
                 {form.participants.length === 0 ? (
                   <>
                     <p className="text-sm text-[var(--text-sub)] dark:text-[var(--text-soft)] mb-4 text-center">
-                      {!canEdit ? "Qatnashchilar yo'q" : membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Avval loyiha tanlang' : "Quyidagi tugma orqali qidiring va tanlang"}
+                      {!canEdit ? "Qatnashchilar yo'q" : membersLoading ? 'Yuklanmoqda...' : "Quyidagi tugma orqali qidiring va tanlang"}
                     </p>
                     {canEdit && (
                       <div className={`inline-flex items-center gap-1 p-2 rounded-xl text-sm font-medium
-                        ${!form.project || membersLoading
+                        ${membersLoading
                           ? 'bg-[#F1F3F9] text-[#C2C8E0] dark:bg-[var(--bg-elevation-1)] dark:text-[#474848]'
                           : 'bg-[#dadff0] dark:bg-[#3a3b3b] text-black dark:text-[var(--accent-soft)] cursor-pointer'}`}>
                         {membersLoading
                           ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                           : <FaPlus size={15} />
                         }
-                        {membersLoading ? 'Yuklanmoqda...' : !form.project ? 'Loyiha tanlanmagan' : "Qatnashchilarni qo'shing"}
+                        {membersLoading ? 'Yuklanmoqda...' : "Qatnashchilarni qo'shing"}
                       </div>
                     )}
                   </>
@@ -1003,25 +945,31 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
             <div className="flex items-center gap-2.5">
-              {!meeting.is_completed && onFinish && (
-                <button
-                  type="button"
-                  onClick={() => { onClose(); onFinish(meeting.id) }}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer text-[#22c55e]  hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] transition-colors"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-                  Yakunlash
-                </button>
-              )}
+              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-sub)]">Tasdiqlash talabi</span>
+              <button
+                type="button"
+                onClick={() => canEdit && set('requires_approval', !form.requires_approval)}
+                disabled={!canEdit}
+                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-200 ${form.requires_approval ? 'bg-[var(--accent-strong)] dark:bg-[#526ED3]' : 'bg-[#D0D5E2] dark:bg-[#30363D]'}`}
+              >
+                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ${form.requires_approval ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              </button>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+              >
+                <FaVideo size={13} /> Yig'ilishga kirish
+              </button>
               <button onClick={handleClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium  cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
               </button>
               {canEdit && (
                 <button onClick={handleSubmit} disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold  cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
                   {loading
                     ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                     : <FaCheck size={13} />
@@ -1053,7 +1001,6 @@ function MeetingDetailModal({ meeting, onClose }) {
   const [project, setProject] = useState(null)
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
-  const [copyLink, setCopyLink] = useState(null)
 
   useEffect(() => {
     if (meeting.project) {
@@ -1116,30 +1063,6 @@ function MeetingDetailModal({ meeting, onClose }) {
             </div>
           </div>
 
-          {/* Havola */}
-          <div>
-            <label className={labelCls}>Havolasi</label>
-            <div className={`${fieldCls} flex items-center justify-between gap-2 overflow-hidden`}>
-              <div className="flex-1 min-w-0">
-                {meeting.link
-                  ? <a href={meeting.link} target="_blank" rel="noreferrer"
-                    className="text-[var(--accent-strong)] dark:text-[var(--accent-soft)] hover:underline break-all block">{meeting.link}</a>
-                  : <span className="text-[var(--text-soft)]">—</span>}
-              </div>
-              {meeting.link && (
-                <button
-                  className="p-1.5 rounded-lg hover:bg-[var(--bg-elevation-2)] transition-colors cursor-pointer shrink-0"
-                  onClick={() => { navigator.clipboard.writeText(meeting.link); setCopyLink(meeting.link); setTimeout(() => setCopyLink(null), 2000) }}
-                  title="Havolani nusxalash"
-                >
-                  {copyLink ?
-                    <FaCheck size={14} className='text-green-500' />
-                    : <PiCopyBold size={18} className='text-[var(--text-soft)]' />
-                  }
-                </button>
-              )}
-            </div>
-          </div>
 
           {/* Tavsif */}
           <div>
@@ -1194,6 +1117,14 @@ function MeetingDetailModal({ meeting, onClose }) {
           </div>
 
 
+          {/* Tasdiqlash talabi */}
+          <div>
+            <label className={labelCls}>Tasdiqlash talabi</label>
+            <div className={fieldCls}>
+              {meeting.requires_approval ? "Ha (kirish uchun mezbon tasdig'i talab qilinadi)" : "Yo'q (avtomatik kirish)"}
+            </div>
+          </div>
+
           <div>
             <label className={labelCls}>Yig'ilishga qatnashishlar</label>
             <div className="flex flex-col gap-2">
@@ -1205,7 +1136,7 @@ function MeetingDetailModal({ meeting, onClose }) {
 
         </div>
 
-        {/* Footer — Tugatildimi + Yopish */}
+        {/* Footer — Tugatildimi + Yig'ilishga kirish + Yopish */}
         <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] ">
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">Tugatildimi?</label>
@@ -1216,10 +1147,19 @@ function MeetingDetailModal({ meeting, onClose }) {
               {meeting.is_completed ? 'Ha' : "Yo'q"}
             </span>
           </div>
-          <button onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
-            <FaXmark size={13} /> Yopish
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+            >
+              <FaVideo size={13} /> Yig'ilishga kirish
+            </button>
+            <button onClick={onClose}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
+              <FaXmark size={13} /> Yopish
+            </button>
+          </div>
         </div>
       </div>
     </div>
