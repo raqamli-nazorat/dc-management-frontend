@@ -170,7 +170,7 @@ export default function Login() {
             className="mb-7 text-[var(--text-strong)] dark:text-[var(--text-strong)]"
             style={{ fontWeight: 800, fontSize: 28, fontFamily: '"Manrope", sans-serif' }}
           >
-            Kirish
+            Chiqish
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
