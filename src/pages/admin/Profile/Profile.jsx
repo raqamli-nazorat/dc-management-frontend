@@ -409,6 +409,24 @@ const formatCard = (val) => {
   return digits.match(/.{1,4}/g)?.join(' ') || digits;
 }
 
+const normalizeSocialLinks = (val) => {
+  if (Array.isArray(val)) return val;
+  if (!val) return [];
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === 'object') return Object.values(parsed);
+    } catch {
+      return val.trim() ? [val] : [];
+    }
+  }
+  if (typeof val === 'object') {
+    return Object.values(val);
+  }
+  return [];
+};
+
 /* ── Skeleton ── */
 function Skeleton() {
   const bar = 'h-9 rounded-xl bg-[#EEF1F7] dark:bg-[var(--bg-elevation-2)] animate-pulse'
@@ -558,8 +576,13 @@ export default function ProfilePage() {
   const getProfile = async () => {
     try {
       const { data } = await axiosAPI.get('/users/me/')
-      setProfile(data?.data ?? data)
-      setData(data?.data ?? data)
+      const resData = data?.data ?? data
+      const normalized = {
+        ...resData,
+        social_links: normalizeSocialLinks(resData?.social_links),
+      }
+      setProfile(normalized)
+      setData(normalized)
     } catch (error) {
       console.error(error)
       toast.error("Ma'lumotlarni yuklashda xatolik!", error?.response?.data?.error?.errorMsg)
@@ -601,20 +624,15 @@ export default function ProfilePage() {
   const fullName = data.full_name || data.username || authUser?.username || 'Foydalanuvchi'
   const role = (data.roles?.[0] || authUser?.roles?.[0] || 'admin')
 
-  let social = {}
-  // Social links — string yoki object bo'lishi mumkin
-  if (typeof data?.social_links === 'object' && data?.social_links) {
-    social = data?.social_links
-  } else if (typeof data.social_links === 'string' && data?.social_links) {
-    try { social = JSON.parse(data?.social_links) } catch { social = {} }
-  }
+  const socialLinks = normalizeSocialLinks(data?.social_links);
+  const initialSocialLinks = normalizeSocialLinks(profile?.social_links);
 
   const isAvatarChanged = data?.avatar instanceof File;
   const getSafePhone = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : '';
   const getSafeCard = (val) => (typeof val === 'string' || typeof val === 'number') ? String(val).replace(/\s/g, '') : '';
   const isPhoneChanged = getSafePhone(data?.phone_number) !== getSafePhone(profile?.phone_number);
   const isCardChanged = getSafeCard(data?.card_number) !== getSafeCard(profile?.card_number);
-  const isSocialChanged = JSON.stringify(data?.social_links || []) !== JSON.stringify(profile?.social_links || []);
+  const isSocialChanged = JSON.stringify(socialLinks) !== JSON.stringify(initialSocialLinks);
 
   const isChanged = isAvatarChanged || isPhoneChanged || isCardChanged || isSocialChanged;
 
@@ -644,11 +662,11 @@ export default function ProfilePage() {
       }
 
       // Social Links (JSON holatida solishtiramiz)
-      const currentLinks = JSON.stringify(data.social_links || [])
-      const initialLinks = JSON.stringify(profile.social_links || [])
-      if (currentLinks !== initialLinks) {
+      const currentLinks = normalizeSocialLinks(data.social_links).filter(l => typeof l === 'string' ? l.trim() : l)
+      const initialLinks = normalizeSocialLinks(profile?.social_links).filter(l => typeof l === 'string' ? l.trim() : l)
+      if (JSON.stringify(currentLinks) !== JSON.stringify(initialLinks)) {
         // Backend ijtimoiy tarmoqlarni JSON string ko'rinishida kutishi mumkin
-        formData.append('social_links', JSON.stringify(data.social_links))
+        formData.append('social_links', JSON.stringify(currentLinks))
         hasChanges = true
       }
 
@@ -819,8 +837,8 @@ export default function ProfilePage() {
       <div className={rowCls}>
         {/* Social Links */}
         <div className="col-span-1 flex flex-col gap-2">
-          {data.social_links?.map((link, index) => {
-            const isLast = index === data.social_links.length - 1;
+          {socialLinks.map((link, index) => {
+            const isLast = index === socialLinks.length - 1;
             return (
               <div key={index} className="flex items-end gap-2.5">
                 <div className="flex-1 relative">
@@ -830,14 +848,14 @@ export default function ProfilePage() {
                     placeholder="Havola yuklang"
                     value={link || ''}
                     onChange={e => {
-                      const newLinks = [...data.social_links];
+                      const newLinks = [...socialLinks];
                       newLinks[index] = e.target.value;
                       set('social_links', newLinks);
                     }}
                   />
                   <button
                     type="button"
-                    onClick={() => set('social_links', data.social_links.filter((_, i) => i !== index))}
+                    onClick={() => set('social_links', socialLinks.filter((_, i) => i !== index))}
                     className="absolute right-3 top-[34px] text-[#8F95A8] hover:text-red-500 cursor-pointer transition-colors"
                   >
                     <FaXmark size={14} />
@@ -846,7 +864,7 @@ export default function ProfilePage() {
                 {isLast && index < 4 && (
                   <button
                     type="button"
-                    onClick={() => set('social_links', [...data.social_links, ''])}
+                    onClick={() => set('social_links', [...socialLinks, ''])}
                     className="h-[42px] w-[42px] rounded-xl border border-[#E2E6F2] dark:border-[var(--stroke-soft)] flex items-center justify-center text-[#1A1D2E] dark:text-[var(--text-strong)] hover:bg-gray-50 dark:hover:bg-[var(--bg-elevation-2)] transition-colors shrink-0 cursor-pointer dark:bg-[#191a1a]"
                   >
                     <FiPlus size={20} />
@@ -855,7 +873,7 @@ export default function ProfilePage() {
               </div>
             )
           })}
-          {(!data.social_links || data.social_links.length === 0) && (
+          {socialLinks.length === 0 && (
             <button
               type="button"
               onClick={() => set('social_links', [''])}
