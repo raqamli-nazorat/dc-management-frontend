@@ -5,6 +5,7 @@ import { TbHandStop } from 'react-icons/tb'
 export default function ParticipantTile({
   participant,
   isLocal = false,
+  isScreenShare = false,
   isSpeaking = false,
   hasHandRaised = false,
   isHost = false,
@@ -23,8 +24,9 @@ export default function ParticipantTile({
     const el = videoRef.current
     if (!el) return
 
-    if (videoTrack && isCameraEnabled) {
+    if (videoTrack && (isCameraEnabled || isScreenShare)) {
       videoTrack.attach(el)
+      el.play?.().catch(() => {})
       return () => {
         try {
           videoTrack.detach(el)
@@ -33,15 +35,16 @@ export default function ParticipantTile({
         }
       }
     }
-  }, [videoTrack, isCameraEnabled])
+  }, [videoTrack, isCameraEnabled, isScreenShare])
 
   // Attach audio track for remote participants
   useEffect(() => {
     const el = audioRef.current
-    if (!el || isLocal) return
+    if (!el || isLocal || isScreenShare) return
 
     if (audioTrack) {
       audioTrack.attach(el)
+      el.play?.().catch(() => {})
       return () => {
         try {
           audioTrack.detach(el)
@@ -50,7 +53,7 @@ export default function ParticipantTile({
         }
       }
     }
-  }, [audioTrack, isLocal])
+  }, [audioTrack, isLocal, isScreenShare])
 
   const initials = displayName
     ? displayName.trim().split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
@@ -59,22 +62,30 @@ export default function ParticipantTile({
   return (
     <div
       className={`relative w-full h-full min-h-[160px] rounded-2xl overflow-hidden bg-[#1E2024] border transition-all duration-300 flex items-center justify-center select-none shadow-lg
-        ${isSpeaking
+        ${isScreenShare
+          ? 'border-blue-500/80 ring-2 ring-blue-500/40 shadow-[0_0_25px_rgba(59,130,246,0.3)] bg-black'
+          : isSpeaking
           ? 'border-emerald-500 ring-2 ring-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.35)]'
           : 'border-[#2D3139] hover:border-[#3E434E]'
         }`}
     >
       {/* Remote audio player (hidden) */}
-      {!isLocal && <audio ref={audioRef} autoPlay />}
+      {!isLocal && !isScreenShare && <audio ref={audioRef} autoPlay playsInline />}
 
       {/* Video element */}
-      {isCameraEnabled && videoTrack ? (
+      {(isCameraEnabled || isScreenShare) && videoTrack ? (
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted={isLocal}
-          className={`w-full h-full object-cover ${isLocal ? 'scale-x-[-1]' : ''}`}
+          className={`w-full h-full ${
+            isScreenShare
+              ? 'object-contain bg-black'
+              : isLocal
+              ? 'object-cover scale-x-[-1]'
+              : 'object-cover'
+          }`}
         />
       ) : (
         /* Avatar fallback when camera is off */
@@ -118,8 +129,8 @@ export default function ParticipantTile({
 
       {/* Top left badge: Host / Mezbon */}
       {isHost && (
-        <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-600/90 text-white backdrop-blur-md text-[11px] font-bold shadow-md z-10">
-          <FaCrown size={11} className="text-amber-300" />
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white backdrop-blur-md text-[11px] font-extrabold shadow-lg z-20 border border-amber-300/40">
+          <FaCrown size={12} className="text-yellow-200 drop-shadow-sm" />
           <span>Mezbon</span>
         </div>
       )}
@@ -127,18 +138,21 @@ export default function ParticipantTile({
       {/* Bottom overlay: Name & Mic Status */}
       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/65 backdrop-blur-md text-white text-xs font-medium max-w-[80%] shadow-md border border-white/10">
+          {isScreenShare && <span className="text-blue-400 font-bold">🖥️ Ekran</span>}
           <span className="truncate">{displayName} {isLocal && '(Siz)'}</span>
         </div>
 
-        <div
-          className={`flex items-center justify-center w-8 h-8 rounded-xl backdrop-blur-md border shadow-md transition-colors
-            ${isMicEnabled
-              ? 'bg-black/65 border-white/10 text-emerald-400'
-              : 'bg-red-500/85 border-red-400/30 text-white'
-            }`}
-        >
-          {isMicEnabled ? <FaMicrophone size={13} /> : <FaMicrophoneSlash size={13} />}
-        </div>
+        {!isScreenShare && (
+          <div
+            className={`flex items-center justify-center w-8 h-8 rounded-xl backdrop-blur-md border shadow-md transition-colors
+              ${isMicEnabled
+                ? 'bg-black/65 border-white/10 text-emerald-400'
+                : 'bg-red-500/85 border-red-400/30 text-white'
+              }`}
+          >
+            {isMicEnabled ? <FaMicrophone size={13} /> : <FaMicrophoneSlash size={13} />}
+          </div>
+        )}
       </div>
     </div>
   )

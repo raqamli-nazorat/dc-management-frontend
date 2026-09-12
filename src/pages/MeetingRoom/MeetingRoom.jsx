@@ -121,9 +121,8 @@ export default function MeetingRoom() {
         }
 
         // Formulate WebSocket URL
-        const rawBase = (import.meta.env.VITE_BASE_URL || window.location.origin).replace(/\/api\/?$/, '')
-        const baseUrl = rawBase.replace(/^http/, 'ws')
-        const wsUrl = `${baseUrl}/ws/meetings/${meetingId}/?ticket=${ticket}`
+        const rawBase = import.meta.env.VITE_BASE_URL
+        const wsUrl = `${rawBase}/ws/meetings/${meetingId}/?ticket=${ticket}`
 
         const ws = new WebSocket(wsUrl)
         wsRef.current = ws
@@ -262,6 +261,55 @@ export default function MeetingRoom() {
     }
   }, [waitingState, meetingState])
 
+  // Helper to determine if a participant is the host/organizer
+  const checkIsHost = useCallback((participantObj, identity, name) => {
+    // 1. LiveKit roomAdmin permission
+    if (participantObj?.permissions?.roomAdmin) return true
+
+    // 2. LiveKit metadata
+    if (participantObj?.metadata) {
+      try {
+        const meta = typeof participantObj.metadata === 'string'
+          ? JSON.parse(participantObj.metadata)
+          : participantObj.metadata
+        if (meta.is_host || meta.role === 'host' || meta.is_organizer || meta.isHost) return true
+        const organizerId = meetingDetails?.organizer ?? meetingState?.organizer_id ?? meetingState?.organizer
+        if (organizerId && String(meta.user_id || meta.id) === String(organizerId)) return true
+      } catch {}
+    }
+
+    // 3. Match against meetingDetails.organizer ID
+    const organizerId = meetingDetails?.organizer ?? meetingState?.organizer_id ?? meetingState?.organizer
+    if (organizerId !== undefined && organizerId !== null) {
+      const sOrgId = String(organizerId)
+      const sIdentity = String(identity || '')
+      if (sIdentity === sOrgId) return true
+      if (sIdentity.startsWith(sOrgId + '_') || sIdentity.endsWith('_' + sOrgId)) return true
+    }
+
+    // 4. Match against organizerUser details
+    const organizerUser = meetingDetails?.participants_info?.find(u => u.id === organizerId) || meetingDetails?.organizer_info
+    if (organizerUser) {
+      const sOrgUserId = String(organizerUser.id || '')
+      const sIdentity = String(identity || '')
+      if (sOrgUserId && (sIdentity === sOrgUserId || sIdentity.startsWith(sOrgUserId + '_'))) return true
+      if (organizerUser.username) {
+        if (sIdentity.toLowerCase() === organizerUser.username.toLowerCase()) return true
+        if (name && name.toLowerCase() === organizerUser.username.toLowerCase()) return true
+      }
+      const orgFullName = `${organizerUser.first_name || ''} ${organizerUser.last_name || ''}`.trim()
+      if (orgFullName && name && name.toLowerCase() === orgFullName.toLowerCase()) return true
+    }
+
+    // 5. Match against project manager
+    if (meetingDetails?.project_info?.manager) {
+      const sMgrId = String(meetingDetails.project_info.manager)
+      if (String(identity || '') === sMgrId) return true
+    }
+
+    return false
+  }, [meetingDetails, meetingState])
+
   // 3. LiveKit Connection
   const connectToLiveKit = async (serverUrl, token) => {
     try {
@@ -295,25 +343,84 @@ export default function MeetingRoom() {
       await room.connect(serverUrl, token)
       console.log("LiveKit xonaga ulandi:", room.name)
 
-      // Enable local mic & camera
-      if (isCameraEnabled || isMicEnabled) {
-        try {
-          await room.localParticipant.enableCameraAndMicrophone()
-        } catch (mediaErr) {
-          console.warn("Kamera yoki mikrofonni yoqishda xatolik:", mediaErr)
-        }
+      // Release preview stream from waiting room
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop())
+        setLocalStream(null)
       }
 
-      // Sync initial track states
+      // Enable local mic & camera respecting user choices
+      try {
+        if (isCameraEnabled) {
+          await room.localParticipant.setCameraEnabled(true)
+        }
+        if (isMicEnabled) {
+          await room.localParticipant.setMicrophoneEnabled(true)
+        }
+      } catch (mediaErr) {
+        console.warn("Kamera yoki mikrofonni yoqishda xatolik:", mediaErr)
+      }
+
+      const isLocalHost = Boolean(
+        meetingState?.is_host ||
+        checkIsHost(room.localParticipant, room.localParticipant.identity, currentUserName) ||
+        (user?.id && meetingDetails?.organizer && String(user.id) === String(meetingDetails.organizer))
+      )
+
+      // Sync local participant track
       updateParticipantTrack(room.localParticipant.identity, {
         videoTrack: room.localParticipant.getTrackPublication(Track.Source.Camera)?.videoTrack,
         audioTrack: null,
-        isCameraEnabled: room.localParticipant.isCameraEnabled,
-        isMicEnabled: room.localParticipant.isMicrophoneEnabled,
+        isCameraEnabled: isCameraEnabled,
+        isMicEnabled: isMicEnabled,
         name: room.localParticipant.name || currentUserName,
         isLocal: true,
-        isHost: !!meetingState?.is_host,
+        isHost: isLocalHost,
       })
+
+      // 1. Sync all ALREADY CONNECTED remote participants (for users who joined later!)
+      const initialRemotes = Array.from(room.remoteParticipants.values())
+      setRemoteParticipants(initialRemotes)
+
+      // 2. Sync all ALREADY SUBSCRIBED / PUBLISHED tracks for existing participants
+      const initialTracks = {}
+      initialRemotes.forEach(rp => {
+        const rpIsHost = checkIsHost(rp, rp.identity, rp.name)
+        const info = {
+          name: rp.name || rp.identity,
+          isLocal: false,
+          isHost: rpIsHost,
+          isCameraEnabled: rp.isCameraEnabled,
+          isMicEnabled: rp.isMicrophoneEnabled,
+          videoTrack: null,
+          audioTrack: null,
+          screenShareTrack: null,
+        }
+
+        rp.trackPublications.forEach(pub => {
+          if (pub.track) {
+            if (pub.kind === Track.Kind.Video) {
+              if (pub.source === Track.Source.ScreenShare) {
+                info.screenShareTrack = pub.track
+              } else {
+                info.videoTrack = pub.track
+                info.isCameraEnabled = !pub.isMuted
+              }
+            } else if (pub.kind === Track.Kind.Audio) {
+              info.audioTrack = pub.track
+              info.isMicEnabled = !pub.isMuted
+            }
+          }
+        })
+
+        initialTracks[rp.identity] = info
+      })
+      setParticipantTracks(prev => ({ ...prev, ...initialTracks }))
+
+      // 3. Audio playback permission check
+      if (room.canPlaybackAudio) {
+        room.startAudio().catch(() => {})
+      }
 
       setIsConnectedToLiveKit(true)
       setWaitingState('in_room')
@@ -325,9 +432,23 @@ export default function MeetingRoom() {
 
   // Setup LiveKit room event listeners
   const setupRoomListeners = (room) => {
-    // Participant connected
+    // Participant connected (fires when another participant joins later)
     room.on(RoomEvent.ParticipantConnected, (participant) => {
       setRemoteParticipants(Array.from(room.remoteParticipants.values()))
+      const pIsHost = checkIsHost(participant, participant.identity, participant.name)
+      setParticipantTracks(prev => ({
+        ...prev,
+        [participant.identity]: {
+          name: participant.name || participant.identity,
+          isLocal: false,
+          isHost: pIsHost,
+          isCameraEnabled: participant.isCameraEnabled,
+          isMicEnabled: participant.isMicrophoneEnabled,
+          videoTrack: null,
+          audioTrack: null,
+          screenShareTrack: null,
+        }
+      }))
     })
 
     // Participant disconnected
@@ -345,23 +466,39 @@ export default function MeetingRoom() {
       })
     })
 
-    // Track Subscribed (remote audio/video)
+    // Track Published (remote participant published camera / mic / screen)
+    room.on(RoomEvent.TrackPublished, (publication, participant) => {
+      setRemoteParticipants(Array.from(room.remoteParticipants.values()))
+    })
+
+    // Track Subscribed (remote audio/video track ready)
     room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      const pIsHost = checkIsHost(participant, participant.identity, participant.name)
       setParticipantTracks(prev => {
-        const cur = prev[participant.identity] || {
+        const cur = {
           name: participant.name || participant.identity,
           isLocal: false,
-          isHost: false,
+          isHost: pIsHost,
           isCameraEnabled: participant.isCameraEnabled,
           isMicEnabled: participant.isMicrophoneEnabled,
+          videoTrack: null,
+          audioTrack: null,
+          screenShareTrack: null,
+          ...(prev[participant.identity] || {}),
         }
-        if (track.kind === 'video') {
-          cur.videoTrack = track
-          cur.isCameraEnabled = true
-        } else if (track.kind === 'audio') {
+
+        if (track.kind === Track.Kind.Video) {
+          if (track.source === Track.Source.ScreenShare) {
+            cur.screenShareTrack = track
+          } else {
+            cur.videoTrack = track
+            cur.isCameraEnabled = true
+          }
+        } else if (track.kind === Track.Kind.Audio) {
           cur.audioTrack = track
           cur.isMicEnabled = true
         }
+
         return { ...prev, [participant.identity]: cur }
       })
     })
@@ -371,9 +508,42 @@ export default function MeetingRoom() {
       setParticipantTracks(prev => {
         const cur = prev[participant.identity]
         if (!cur) return prev
-        if (track.kind === 'video') cur.videoTrack = null
-        if (track.kind === 'audio') cur.audioTrack = null
-        return { ...prev, [participant.identity]: { ...cur } }
+        const next = { ...cur }
+
+        if (track.kind === Track.Kind.Video) {
+          if (track.source === Track.Source.ScreenShare) {
+            next.screenShareTrack = null
+          } else {
+            next.videoTrack = null
+            next.isCameraEnabled = false
+          }
+        } else if (track.kind === Track.Kind.Audio) {
+          next.audioTrack = null
+          next.isMicEnabled = false
+        }
+
+        return { ...prev, [participant.identity]: next }
+      })
+    })
+
+    // Track Unpublished
+    room.on(RoomEvent.TrackUnpublished, (publication, participant) => {
+      setParticipantTracks(prev => {
+        const cur = prev[participant.identity]
+        if (!cur) return prev
+        const next = { ...cur }
+
+        if (publication.source === Track.Source.ScreenShare) {
+          next.screenShareTrack = null
+        } else if (publication.kind === Track.Kind.Video) {
+          next.videoTrack = null
+          next.isCameraEnabled = false
+        } else if (publication.kind === Track.Kind.Audio) {
+          next.audioTrack = null
+          next.isMicEnabled = false
+        }
+
+        return { ...prev, [participant.identity]: next }
       })
     })
 
@@ -382,9 +552,17 @@ export default function MeetingRoom() {
       setParticipantTracks(prev => {
         const cur = prev[participant.identity]
         if (!cur) return prev
-        if (publication.kind === 'video') cur.isCameraEnabled = false
-        if (publication.kind === 'audio') cur.isMicEnabled = false
-        return { ...prev, [participant.identity]: { ...cur } }
+        const next = { ...cur }
+
+        if (publication.source === Track.Source.ScreenShare) {
+          next.screenShareTrack = null
+        } else if (publication.kind === Track.Kind.Video) {
+          next.isCameraEnabled = false
+        } else if (publication.kind === Track.Kind.Audio) {
+          next.isMicEnabled = false
+        }
+
+        return { ...prev, [participant.identity]: next }
       })
     })
 
@@ -393,15 +571,39 @@ export default function MeetingRoom() {
       setParticipantTracks(prev => {
         const cur = prev[participant.identity]
         if (!cur) return prev
-        if (publication.kind === 'video') cur.isCameraEnabled = true
-        if (publication.kind === 'audio') cur.isMicEnabled = true
-        return { ...prev, [participant.identity]: { ...cur } }
+        const next = { ...cur }
+
+        if (publication.source === Track.Source.ScreenShare) {
+          next.screenShareTrack = publication.track
+        } else if (publication.kind === Track.Kind.Video) {
+          next.isCameraEnabled = true
+          next.videoTrack = publication.track
+        } else if (publication.kind === Track.Kind.Audio) {
+          next.isMicEnabled = true
+          next.audioTrack = publication.track
+        }
+
+        return { ...prev, [participant.identity]: next }
       })
+    })
+
+    // Local screen share track ended via browser toolbar
+    room.on(RoomEvent.LocalTrackUnpublished, (publication) => {
+      if (publication.source === Track.Source.ScreenShare) {
+        setIsScreenSharing(false)
+      }
     })
 
     // Active speakers
     room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
       setActiveSpeakers(speakers.map(s => s.identity))
+    })
+
+    // Audio Playback Status Changed (detect browser autoplay policies)
+    room.on(RoomEvent.AudioPlaybackStatusChanged, () => {
+      if (!room.canPlaybackAudio) {
+        console.log("LiveKit: Audio autoplay blocked by browser, user click needed")
+      }
     })
 
     // In-meeting Chat & Raise Hand via WebRTC DataChannel
@@ -481,8 +683,14 @@ export default function MeetingRoom() {
     const next = !isScreenSharing
     try {
       if (roomRef.current?.localParticipant) {
-        await roomRef.current.localParticipant.setScreenShareEnabled(next)
+        const publication = await roomRef.current.localParticipant.setScreenShareEnabled(next)
         setIsScreenSharing(next)
+        if (next && publication?.track?.mediaStreamTrack) {
+          publication.track.mediaStreamTrack.onended = () => {
+            roomRef.current?.localParticipant?.setScreenShareEnabled(false)
+            setIsScreenSharing(false)
+          }
+        }
       }
     } catch (err) {
       console.warn("Ekran ulashish bekor qilindi yoki xato:", err)
@@ -595,6 +803,54 @@ export default function MeetingRoom() {
 
   // Combine participants for rendering
   const allParticipantItems = []
+
+  // 1. Local Screen Share (if sharing screen)
+  if (roomRef.current?.localParticipant && isScreenSharing) {
+    const localScreenTrack = roomRef.current.localParticipant.getTrackPublication(Track.Source.ScreenShare)?.videoTrack
+    if (localScreenTrack) {
+      allParticipantItems.push({
+        identity: `${roomRef.current.localParticipant.identity}-screen`,
+        name: `${currentUserName} (Ekran)`,
+        isLocal: true,
+        isScreenShare: true,
+        videoTrack: localScreenTrack,
+        audioTrack: null,
+        isCameraEnabled: true,
+        isMicEnabled: false,
+        isSpeaking: false,
+        hasHandRaised: false,
+        isHost: false,
+      })
+    }
+  }
+
+  // 2. Remote Screen Shares (if any remote participant shares screen)
+  remoteParticipants.forEach(rp => {
+    const rInfo = participantTracks[rp.identity] || {}
+    if (rInfo.screenShareTrack) {
+      allParticipantItems.push({
+        identity: `${rp.identity}-screen`,
+        name: `${rp.name || rp.identity} (Ekran)`,
+        isLocal: false,
+        isScreenShare: true,
+        videoTrack: rInfo.screenShareTrack,
+        audioTrack: null,
+        isCameraEnabled: true,
+        isMicEnabled: false,
+        isSpeaking: false,
+        hasHandRaised: false,
+        isHost: false,
+      })
+    }
+  })
+
+  const isLocalHost = Boolean(
+    meetingState?.is_host ||
+    (roomRef.current?.localParticipant && checkIsHost(roomRef.current.localParticipant, roomRef.current.localParticipant.identity, currentUserName)) ||
+    (user?.id && meetingDetails?.organizer && String(user.id) === String(meetingDetails.organizer))
+  )
+
+  // 3. Local Participant Camera tile
   if (roomRef.current?.localParticipant) {
     const localId = roomRef.current.localParticipant.identity
     const localInfo = participantTracks[localId] || {}
@@ -602,7 +858,8 @@ export default function MeetingRoom() {
       identity: localId,
       name: currentUserName,
       isLocal: true,
-      isHost: !!meetingState?.is_host,
+      isScreenShare: false,
+      isHost: isLocalHost,
       isSpeaking: activeSpeakers.includes(localId),
       hasHandRaised: !!handRaisedMap[localId] || isHandRaised,
       isCameraEnabled: isCameraEnabled,
@@ -612,13 +869,16 @@ export default function MeetingRoom() {
     })
   }
 
+  // 4. Remote Participants Camera tiles
   remoteParticipants.forEach(rp => {
     const rInfo = participantTracks[rp.identity] || {}
+    const rpIsHost = checkIsHost(rp, rp.identity, rp.name || rInfo.name)
     allParticipantItems.push({
       identity: rp.identity,
       name: rp.name || rp.identity,
       isLocal: false,
-      isHost: false,
+      isScreenShare: false,
+      isHost: rpIsHost,
       isSpeaking: activeSpeakers.includes(rp.identity),
       hasHandRaised: !!handRaisedMap[rp.identity],
       isCameraEnabled: rInfo.isCameraEnabled ?? rp.isCameraEnabled,
@@ -628,8 +888,13 @@ export default function MeetingRoom() {
     })
   })
 
+  const hasScreenShare = allParticipantItems.some(i => i.isScreenShare)
+
   // Dynamic grid column class based on participant count
   const getGridClass = (count) => {
+    if (hasScreenShare) {
+      return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-full'
+    }
     if (count <= 1) return 'grid-cols-1 max-w-4xl'
     if (count === 2) return 'grid-cols-1 md:grid-cols-2 max-w-5xl'
     if (count <= 4) return 'grid-cols-1 sm:grid-cols-2 max-w-6xl'
@@ -683,7 +948,14 @@ export default function MeetingRoom() {
 
   // Render Active In-Room Video Conference
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#0E1013] text-white overflow-hidden flex flex-col select-none z-50">
+    <div
+      onClick={() => {
+        if (roomRef.current && !roomRef.current.canPlaybackAudio) {
+          roomRef.current.startAudio().catch(() => {})
+        }
+      }}
+      className="fixed inset-0 w-full h-full bg-[#0E1013] text-white overflow-hidden flex flex-col select-none z-50"
+    >
       {/* Knock Request Banner for Host */}
       {meetingState?.is_host && (
         <KnockBanner
@@ -733,10 +1005,16 @@ export default function MeetingRoom() {
         <main className="flex-1 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
           <div className={`w-full h-full grid gap-3 sm:gap-4 items-center justify-center mx-auto ${getGridClass(allParticipantItems.length)}`}>
             {allParticipantItems.map((item) => (
-              <div key={item.identity} className="w-full h-full min-h-[200px] max-h-[75vh]">
+              <div
+                key={item.identity}
+                className={`w-full h-full min-h-[180px] max-h-[75vh] ${
+                  item.isScreenShare ? 'col-span-full md:col-span-2 row-span-2 min-h-[300px]' : ''
+                }`}
+              >
                 <ParticipantTile
                   participant={item}
                   isLocal={item.isLocal}
+                  isScreenShare={item.isScreenShare}
                   isSpeaking={item.isSpeaking}
                   hasHandRaised={item.hasHandRaised}
                   isHost={item.isHost}
@@ -765,9 +1043,9 @@ export default function MeetingRoom() {
         <ParticipantsDrawer
           isOpen={isParticipantsOpen}
           onClose={() => setIsParticipantsOpen(false)}
-          participants={allParticipantItems}
+          participants={allParticipantItems.filter(p => !p.isScreenShare)}
           knockRequests={knockRequests}
-          isHost={meetingState?.is_host}
+          isHost={isLocalHost}
           onAdmitUser={handleAdmitUser}
           onRejectUser={handleRejectUser}
           currentUserId={roomRef.current?.localParticipant?.identity}
@@ -793,10 +1071,10 @@ export default function MeetingRoom() {
           unreadChatCount={unreadChatCount}
           isParticipantsOpen={isParticipantsOpen}
           onToggleParticipants={() => setIsParticipantsOpen(p => !p)}
-          participantCount={allParticipantItems.length}
+          participantCount={allParticipantItems.filter(p => !p.isScreenShare).length}
           knockCount={knockRequests.length}
           onLeave={handleLeaveMeeting}
-          isHost={meetingState?.is_host}
+          isHost={isLocalHost}
           onEndMeetingForAll={handleEndMeetingForAll}
         />
       </footer>

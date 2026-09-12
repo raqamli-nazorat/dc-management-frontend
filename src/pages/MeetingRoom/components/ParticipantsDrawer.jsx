@@ -108,7 +108,7 @@ export default function ParticipantsDrawer({
                         {isMe && <span className="text-[11px] text-blue-400 font-medium">(Siz)</span>}
                       </div>
                       {p.isHost && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-amber-300 font-medium">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
                           <FaCrown size={9} /> Mezbon
                         </span>
                       )}
