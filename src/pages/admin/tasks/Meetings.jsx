@@ -640,6 +640,7 @@ function AttendanceItem({ attendance }) {
 
 /* -- EditMeetingModal -- */
 function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved }) {
+  const { user } = useAuth()
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copyLink, setCopyLink] = useState(null)
@@ -956,13 +957,24 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
-              >
-                <FaVideo size={13} /> Yig'ilishga kirish
-              </button>
+              {!meeting.is_completed && (() => {
+                const isParticipant = Boolean(
+                  user?.id && (
+                    String(meeting.organizer) === String(user.id) ||
+                    (Array.isArray(meeting.participants) && meeting.participants.map(String).includes(String(user.id))) ||
+                    (Array.isArray(meeting.participants_info) && meeting.participants_info.some(p => String(p.id) === String(user.id)))
+                  )
+                )
+                return isParticipant ? (
+                  <button
+                    type="button"
+                    onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+                  >
+                    <FaVideo size={13} /> Yig'ilishga kirish
+                  </button>
+                ) : null
+              })()}
               <button onClick={handleClose}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
                 <FaXmark size={13} /> Yopish
@@ -999,8 +1011,18 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 /* -- MeetingDetailModal -- */
 function MeetingDetailModal({ meeting, onClose }) {
   const [project, setProject] = useState(null)
+  const { user } = useAuth()
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
   const { date: startDate, time: startTime } = fromIso(meeting.start_time)
+
+  // Foydalanuvchi ishtirokchi yoki tashkilotchimi?
+  const isParticipant = Boolean(
+    user?.id && (
+      String(meeting.organizer) === String(user.id) ||
+      (Array.isArray(meeting.participants) && meeting.participants.map(String).includes(String(user.id))) ||
+      (Array.isArray(meeting.participants_info) && meeting.participants_info.some(p => String(p.id) === String(user.id)))
+    )
+  )
 
   useEffect(() => {
     if (meeting.project) {
@@ -1148,13 +1170,15 @@ function MeetingDetailModal({ meeting, onClose }) {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
-            >
-              <FaVideo size={13} /> Yig'ilishga kirish
-            </button>
+            {!meeting.is_completed && isParticipant && (
+              <button
+                type="button"
+                onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+              >
+                <FaVideo size={13} /> Yig'ilishga kirish
+              </button>
+            )}
             <button onClick={onClose}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
               <FaXmark size={13} /> Yopish
@@ -1467,13 +1491,6 @@ function RowMenu({ onDetail, onEdit, onDelete, onFinish, onDuplicate, isComplete
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:bg-[var(--bg-elevation-1)] dark:hover:bg-[var(--bg-elevation-2)] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               Takrorlash
-            </button>
-          )}
-          {!isCompleted && (
-            <button onClick={() => { onFinish(); setOpen(false) }}
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#22c55e] hover:bg-[#f0fdf4] dark:hover:bg-[#0f2a1a] cursor-pointer border-b border-[var(--stroke-soft)] dark:border-[var(--stroke-soft)]">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-              Yakunlash
             </button>
           )}
           <button onClick={() => { onDelete(); setOpen(false) }}

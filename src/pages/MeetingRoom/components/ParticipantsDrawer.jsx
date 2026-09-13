@@ -17,6 +17,10 @@ export default function ParticipantsDrawer({
   participants = [],
   knockRequests = [],
   isHost = false,
+  isLocalHost = false,
+  onMuteParticipant,
+  onMuteAll,
+  onAskUnmuteParticipant,
   onAdmitUser,
   onRejectUser,
   currentUserId,
@@ -45,6 +49,11 @@ export default function ParticipantsDrawer({
     const name = p.name || p.identity || ''
     return name.toLowerCase().includes(search.toLowerCase())
   })
+
+  // Boshqa qatnashchilardan kamida bittasining mikrofoni yoniq ekanligini aniqlash
+  const hasUnmutedGuests = participants.some(
+    (p) => !p.isLocal && String(p.identity) !== String(currentUserId) && p.isMicEnabled
+  )
 
   return (
     <>
@@ -177,6 +186,17 @@ export default function ParticipantsDrawer({
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Qo'ng'iroqda ({filteredParticipants.length})
                 </span>
+                {isLocalHost && hasUnmutedGuests && onMuteAll && (
+                  <button
+                    type="button"
+                    onClick={onMuteAll}
+                    title="Barcha ishtirokchilar mikrofonini o'chirish"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 text-[11px] font-bold cursor-pointer transition-all active:scale-95 shadow-sm"
+                  >
+                    <FaMicrophoneSlash size={11} />
+                    <span>Barchani o'chirish</span>
+                  </button>
+                )}
               </div>
 
               {filteredParticipants.length === 0 ? (
@@ -258,17 +278,39 @@ export default function ParticipantsDrawer({
                             </span>
                           )}
 
-                          {/* Mic indicator */}
-                          <span
-                            className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
-                              p.isMicEnabled
-                                ? 'bg-emerald-500/15 text-emerald-400'
-                                : 'bg-red-500/15 text-red-400'
-                            }`}
-                            title={p.isMicEnabled ? 'Mikrofon yoniq' : "Mikrofon o'chiq"}
-                          >
-                            {p.isMicEnabled ? <FaMicrophone size={11} /> : <FaMicrophoneSlash size={11} />}
-                          </span>
+                          {/* Mic indicator or Host Mute Control */}
+                          {isLocalHost && !isMe ? (
+                            p.isMicEnabled ? (
+                              <button
+                                type="button"
+                                onClick={() => onMuteParticipant && onMuteParticipant(p.identity)}
+                                title={`${p.name || 'Ishtirokchi'} ovozini o'chirish (Mute)`}
+                                className="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-600 text-red-400 hover:text-white transition-all cursor-pointer shadow-sm active:scale-90"
+                              >
+                                <FaMicrophoneSlash size={11} />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => onAskUnmuteParticipant && onAskUnmuteParticipant(p.identity)}
+                                title={`${p.name || 'Ishtirokchi'}dan mikrofonni yoqishni so'rash`}
+                                className="flex items-center justify-center w-7 h-7 rounded-full bg-white/5 hover:bg-emerald-600/30 text-slate-400 hover:text-emerald-400 transition-all cursor-pointer active:scale-90"
+                              >
+                                <FaMicrophoneSlash size={11} />
+                              </button>
+                            )
+                          ) : (
+                            <span
+                              className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
+                                p.isMicEnabled
+                                  ? 'bg-emerald-500/15 text-emerald-400'
+                                  : 'bg-red-500/15 text-red-400'
+                              }`}
+                              title={p.isMicEnabled ? 'Mikrofon yoniq' : "Mikrofon o'chiq"}
+                            >
+                              {p.isMicEnabled ? <FaMicrophone size={11} /> : <FaMicrophoneSlash size={11} />}
+                            </span>
+                          )}
 
                           {/* Camera indicator */}
                           <span

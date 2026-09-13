@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { flushSync } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Room, RoomEvent, VideoPresets, Track } from 'livekit-client'
+import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality } from 'livekit-client'
 import { useAuth } from '../../context/AuthContext'
 import { axiosAPI } from '../../service/axiosAPI'
 import { toast } from '../../Toast/ToastProvider'
@@ -22,7 +22,8 @@ import {
 } from './utils/meetingSounds'
 
 import { FaExpand, FaCompress } from 'react-icons/fa6'
-import { RiSignalWifiFill } from 'react-icons/ri'
+import { RiSignalWifiFill, RiSignalWifiOffFill, RiSignalWifi1Fill } from 'react-icons/ri'
+import { FaMicrophone } from 'react-icons/fa'
 
 const getViewTransitionName = (identity) => {
   if (!identity) return 'none'
@@ -89,6 +90,56 @@ const clearStoredChatMessages = (id) => {
   }
 }
 
+const getMeetingOrganizerId = (meetingDetails, meetingState) => {
+  const val = (
+    meetingDetails?.organizer?.id ??
+    meetingDetails?.organizer_info?.id ??
+    (typeof meetingDetails?.organizer === 'number' || typeof meetingDetails?.organizer === 'string' ? meetingDetails.organizer : null) ??
+    meetingDetails?.created_by?.id ??
+    (typeof meetingDetails?.created_by === 'number' || typeof meetingDetails?.created_by === 'string' ? meetingDetails.created_by : null) ??
+    meetingState?.organizer_id ??
+    meetingState?.organizer?.id ??
+    (typeof meetingState?.organizer === 'number' || typeof meetingState?.organizer === 'string' ? meetingState.organizer : null)
+  )
+  return val ? String(val) : null
+}
+
+const getMeetingOrganizerUser = (meetingDetails, organizerId) => {
+  if (meetingDetails?.organizer && typeof meetingDetails.organizer === 'object' && meetingDetails.organizer.id) {
+    return meetingDetails.organizer
+  }
+  if (meetingDetails?.organizer_info && typeof meetingDetails.organizer_info === 'object') {
+    return meetingDetails.organizer_info
+  }
+  if (meetingDetails?.created_by && typeof meetingDetails.created_by === 'object' && meetingDetails.created_by.id) {
+    return meetingDetails.created_by
+  }
+  if (organizerId && Array.isArray(meetingDetails?.participants_info)) {
+    return meetingDetails.participants_info.find(u => String(u.id) === String(organizerId))
+  }
+  return null
+}
+
+const isParticipantInRoom = (req, remotes) => {
+  if (!req || !remotes || remotes.length === 0) return false
+  return remotes.some(rp => {
+    const sId = String(rp.identity || '')
+    const sReqId = String(req.user_id || '')
+    const rpName = (rp.name || '').trim().toLowerCase()
+    const reqName = (req.username || '').trim().toLowerCase()
+
+    // 1. ID mosligi (masalan: "12", "12_abc", "user_12")
+    if (sReqId && (sId === sReqId || sId.startsWith(sReqId + '_') || sId.endsWith('_' + sReqId))) {
+      return true
+    }
+    // 2. Ism yoki username mosligi
+    if (reqName && rpName && (rpName === reqName || sId.toLowerCase() === reqName)) {
+      return true
+    }
+    return false
+  })
+}
+
 export default function MeetingRoom() {
   const { id: meetingId } = useParams()
   const navigate = useNavigate()
@@ -96,10 +147,23 @@ export default function MeetingRoom() {
 
   // Meeting & State Machine
   const [meetingDetails, setMeetingDetails] = useState(null)
+  const [projectData, setProjectData] = useState(null)
   const [meetingState, setMeetingState] = useState(null)
-  const [waitingState, setWaitingState] = useState('connecting') // 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected' | 'in_room' | 'ended'
+  const meetingStateRef = useRef(null)
+  const [waitingState, setWaitingState] = useState('lobby') // 'lobby' | 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected' | 'in_room' | 'ended'
+  const hasClickedJoinRef = useRef(false)
+  const [isJoining, setIsJoining] = useState(false)
   const [rejectedMessage, setRejectedMessage] = useState('')
   const [knockRequests, setKnockRequests] = useState([])
+  const canAdmitParticipantsRef = useRef(false)
+
+  // Network Quality & Connection Monitoring (Google Meet style)
+  const [networkStatus, setNetworkStatus] = useState('online') // 'online' | 'poor' | 'reconnecting' | 'offline'
+  const [showReconnectedBanner, setShowReconnectedBanner] = useState(false)
+
+  useEffect(() => {
+    meetingStateRef.current = meetingState
+  }, [meetingState])
 
   // LiveKit Connection
   const roomRef = useRef(null)
@@ -108,6 +172,8 @@ export default function MeetingRoom() {
   const [activeSpeakers, setActiveSpeakers] = useState([])
   const [participantTracks, setParticipantTracks] = useState({}) // { [identity]: { videoTrack, audioTrack, isCameraEnabled, isMicEnabled } }
   const [handRaisedMap, setHandRaisedMap] = useState({}) // { [identity]: boolean }
+  const [unmuteRequest, setUnmuteRequest] = useState(null)
+  const isLocalHostRef = useRef(false)
 
   // Local Media State
   const [isMicEnabled, setIsMicEnabled] = useState(true)
@@ -216,6 +282,141 @@ export default function MeetingRoom() {
     return () => clearInterval(timer)
   }, [waitingState])
 
+  // Browser internet connectivity monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      if (roomRef.current?.state === 'connected') {
+        setNetworkStatus('online')
+        setShowReconnectedBanner(true)
+        setTimeout(() => setShowReconnectedBanner(false), 3500)
+      }
+    }
+    const handleOffline = () => {
+      setNetworkStatus('offline')
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  // Disconnect any lingering LiveKit / WebSocket sessions on initial mount
+  useEffect(() => {
+    hasClickedJoinRef.current = false
+    if (roomRef.current) {
+      roomRef.current.disconnect().catch(() => {})
+      roomRef.current = null
+      setIsConnectedToLiveKit(false)
+    }
+    if (wsRef.current) {
+      wsRef.current.close()
+      wsRef.current = null
+    }
+  }, [])
+
+  // Immediately disconnect LiveKit and close WebSocket when tab is closed or refreshed
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (roomRef.current) {
+        roomRef.current.disconnect()
+      }
+      if (wsRef.current) {
+        wsRef.current.close()
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop())
+      }
+      if (previewStreamRef.current) {
+        previewStreamRef.current.getTracks().forEach(t => t.stop())
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [localStream])
+
+  // Complete hardware toggle for Camera in WaitingRoom (stops tracks / restarts getUserMedia)
+  const handleToggleLobbyCamera = useCallback(async () => {
+    if (isCameraEnabledRef.current) {
+      // 1. O'chirish: Barcha video tracklarni to'liq stop qilamiz (webcam apparat chirog'i darhol o'chadi)
+      if (localStream) {
+        localStream.getVideoTracks().forEach(t => {
+          t.stop()
+        })
+      }
+      if (previewStreamRef.current) {
+        previewStreamRef.current.getVideoTracks().forEach(t => {
+          t.stop()
+        })
+      }
+      const remainingAudioTracks = localStream ? localStream.getAudioTracks() : []
+      const newStream = new MediaStream(remainingAudioTracks)
+      previewStreamRef.current = newStream
+      setLocalStream(newStream)
+      setIsCameraEnabled(false)
+      isCameraEnabledRef.current = false
+    } else {
+      // 2. Yoqish: Yangi video track olib, mavjud streamga qo'shamiz (webcam apparat chirog'i yonadi)
+      try {
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true })
+        const newVideoTrack = videoStream.getVideoTracks()[0]
+        if (newVideoTrack) {
+          const currentAudioTracks = localStream ? localStream.getAudioTracks() : []
+          const combinedStream = new MediaStream([...currentAudioTracks, newVideoTrack])
+          previewStreamRef.current = combinedStream
+          setLocalStream(combinedStream)
+        }
+      } catch (err) {
+        console.warn("Kamerani yoqishda xatolik:", err)
+        toast.error("Xatolik", "Kameraga ulanib bo'lmadi")
+      }
+      setIsCameraEnabled(true)
+      isCameraEnabledRef.current = true
+    }
+  }, [localStream])
+
+  // Complete hardware toggle for Mic in WaitingRoom (stops tracks / restarts getUserMedia)
+  const handleToggleLobbyMic = useCallback(async () => {
+    if (isMicEnabledRef.current) {
+      // 1. O'chirish: Barcha audio tracklarni to'liq stop qilamiz (mikrofon apparat darajasida to'xtaydi)
+      if (localStream) {
+        localStream.getAudioTracks().forEach(t => {
+          t.stop()
+        })
+      }
+      if (previewStreamRef.current) {
+        previewStreamRef.current.getAudioTracks().forEach(t => {
+          t.stop()
+        })
+      }
+      const remainingVideoTracks = localStream ? localStream.getVideoTracks() : []
+      const newStream = new MediaStream(remainingVideoTracks)
+      previewStreamRef.current = newStream
+      setLocalStream(newStream)
+      setIsMicEnabled(false)
+      isMicEnabledRef.current = false
+    } else {
+      // 2. Yoqish: Yangi audio track olib, mavjud streamga qo'shamiz
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const newAudioTrack = audioStream.getAudioTracks()[0]
+        if (newAudioTrack) {
+          const currentVideoTracks = localStream ? localStream.getVideoTracks() : []
+          const combinedStream = new MediaStream([...currentVideoTracks, newAudioTrack])
+          previewStreamRef.current = combinedStream
+          setLocalStream(combinedStream)
+        }
+      } catch (err) {
+        console.warn("Mikrofonni yoqishda xatolik:", err)
+        toast.error("Xatolik", "Mikrofonga ulanib bo'lmadi")
+      }
+      setIsMicEnabled(true)
+      isMicEnabledRef.current = true
+    }
+  }, [localStream])
+
   // Format seconds to HH:MM:SS or MM:SS
   const formatDuration = (seconds) => {
     const hrs = Math.floor(seconds / 3600)
@@ -238,66 +439,27 @@ export default function MeetingRoom() {
       .catch(() => { })
   }, [meetingId])
 
-  // 2. WebSocket Connection & State Machine
+  // Load project details if meeting is associated with a project (for project manager detection)
   useEffect(() => {
-    let isSubscribed = true
-
-    const connectWs = async () => {
-      try {
-        // Step 1: Request ticket
-        const { data: ticketRes } = await axiosAPI.post('/notifications/tickets/')
-        const ticket = ticketRes?.data?.ticket || ticketRes?.ticket
-
-        if (!ticket) {
-          toast.error("Xatolik", "WebSocket uchun bilet olinmadi")
-          return
-        }
-
-        // Formulate WebSocket URL
-        const rawBase = import.meta.env.VITE_BASE_URL
-        const wsUrl = `${rawBase}/ws/meetings/${meetingId}/?ticket=${ticket}`
-
-        const ws = new WebSocket(wsUrl)
-        wsRef.current = ws
-
-        ws.onopen = () => {
-          console.log("WebSocket ulangan:", wsUrl)
-        }
-
-        ws.onmessage = (event) => {
-          if (!isSubscribed) return
-          let msg
-          try {
-            msg = JSON.parse(event.data)
-          } catch {
-            return
-          }
-
-          handleWsMessage(msg)
-        }
-
-        ws.onerror = (err) => {
-          console.error("WebSocket xatosi:", err)
-        }
-
-        ws.onclose = (evt) => {
-          console.log("WebSocket yopildi:", evt.code, evt.reason)
-        }
-      } catch (err) {
-        console.error("WebSocket ulanishda xato:", err)
-      }
+    const projId = (
+      meetingDetails?.project_info?.id ??
+      meetingDetails?.project?.id ??
+      (typeof meetingDetails?.project === 'number' || typeof meetingDetails?.project === 'string' ? meetingDetails.project : null)
+    )
+    if (!projId) {
+      setProjectData(null)
+      return
     }
-
-    connectWs()
-
-    return () => {
-      isSubscribed = false
-      if (wsRef.current) {
-        wsRef.current.close()
-        wsRef.current = null
-      }
+    if (meetingDetails?.project_info?.manager || meetingDetails?.project_info?.manager_info) {
+      setProjectData(meetingDetails.project_info)
     }
-  }, [meetingId])
+    axiosAPI.get(`/projects/${projId}/`)
+      .then(res => {
+        const p = res.data?.data ?? res.data
+        setProjectData(p)
+      })
+      .catch(() => {})
+  }, [meetingDetails])
 
   // Send message over WebSocket helper
   const sendWs = (payload) => {
@@ -314,6 +476,12 @@ export default function MeetingRoom() {
       case 'meeting_state': {
         setMeetingState(msg)
 
+        // Agar foydalanuvchi hali Lobby (tayyorgarlik) sahifasida bo'lsa va "Yig'ilishga kirish" tugmasini bosmagan bo'lsa,
+        // avtomatik token yoki ask_to_join so'rovini yubormaymiz!
+        if (!hasClickedJoinRef.current) {
+          return
+        }
+
         if (msg.is_host) {
           // Host immediately requests token
           sendWs({ action: 'get_token' })
@@ -321,11 +489,14 @@ export default function MeetingRoom() {
           // Guest flow
           if (!msg.organizer_joined) {
             setWaitingState('waiting_organizer')
+            setIsJoining(false)
           } else {
             if (msg.requires_approval && !msg.is_approved) {
               setWaitingState('waiting_approval')
               sendWs({ action: 'ask_to_join' })
+              setIsJoining(false)
             } else {
+              setWaitingState('connecting')
               sendWs({ action: 'get_token' })
             }
           }
@@ -335,12 +506,17 @@ export default function MeetingRoom() {
 
       case 'organizer_joined': {
         setMeetingState(prev => prev ? ({ ...prev, organizer_joined: true }) : prev)
+        if (!hasClickedJoinRef.current) {
+          return
+        }
         // If guest was waiting for organizer
         if (waitingState === 'waiting_organizer') {
           if (meetingState?.requires_approval && !meetingState?.is_approved) {
             setWaitingState('waiting_approval')
             sendWs({ action: 'ask_to_join' })
+            setIsJoining(false)
           } else {
+            setWaitingState('connecting')
             sendWs({ action: 'get_token' })
           }
         }
@@ -348,9 +524,11 @@ export default function MeetingRoom() {
       }
 
       case 'knock_request': {
-        // Host receives knock from guest
-        playKnockRequestSound()
-        triggerInRoomAlert('🔔', `${msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
+        // Faqat qabul qilish huquqiga ega bo'lganlar (host, admin, superadmin, loyiha menejeri) ga signal beriladi
+        if (canAdmitParticipantsRef.current) {
+          playKnockRequestSound()
+          triggerInRoomAlert('🔔', `${msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
+        }
         setKnockRequests(prev => {
           if (prev.some(k => k.user_id === msg.user_id)) return prev
           return [...prev, {
@@ -362,22 +540,42 @@ export default function MeetingRoom() {
         break
       }
 
-      case 'knock_response': {
+      case 'knock_response':
+      case 'knock_handled':
+      case 'knock_approved':
+      case 'knock_rejected': {
+        // Agar biror foydalanuvchi so'rovi qabul/rad qilingan bo'lsa, barcha admin/hostlarda ro'yxatdan o'chirish
+        const handledUserId = msg.user_id || msg.guest_id
+        if (handledUserId) {
+          setKnockRequests(prev => prev.filter(k => String(k.user_id) !== String(handledUserId)))
+        }
         if (msg.status === 'approved') {
+          setIsJoining(false)
+          if (!hasClickedJoinRef.current) {
+            return
+          }
           // Guest approved! Connect to LiveKit room
           if (msg.server_url && msg.token) {
             connectToLiveKit(msg.server_url, msg.token)
-          } else {
+          } else if (waitingState === 'waiting_approval') {
             sendWs({ action: 'get_token' })
           }
         } else if (msg.status === 'rejected') {
-          setWaitingState('rejected')
-          setRejectedMessage(msg.message || "Tashkilotchi yig'ilishga kirishingizni rad etdi.")
+          setIsJoining(false)
+          if (waitingState === 'waiting_approval') {
+            setWaitingState('rejected')
+            setRejectedMessage(msg.message || "Tashkilotchi yig'ilishga kirishingizni rad etdi.")
+          }
         }
         break
       }
 
       case 'token_response': {
+        setIsJoining(false)
+        if (!hasClickedJoinRef.current) {
+          console.warn("token_response keldi, lekin foydalanuvchi hali Lobby'da! Ulanish to'xtatildi.")
+          return
+        }
         if (msg.status === 'joined' && msg.server_url && msg.token) {
           connectToLiveKit(msg.server_url, msg.token)
         }
@@ -393,63 +591,177 @@ export default function MeetingRoom() {
         break
       }
 
+      case 'error': {
+        const code = msg.code
+        const message = msg.message || "Xatolik yuz berdi"
+        toast.error("Xatolik", message)
+        // 403, 404, 401 — orqaga qaytish
+        if (code === 403 || code === 404 || code === 401) {
+          setTimeout(() => navigate(-1), 1500)
+        }
+        break
+      }
+
       default:
         break
     }
   }, [waitingState, meetingState])
 
+  const handleWsMessageRef = useRef(null)
+  handleWsMessageRef.current = handleWsMessage
+
+  // 2. WebSocket Connection (Faqat foydalanuvchi yig'ilishga kirishni bosganda chaqiriladi!)
+  const connectWs = useCallback(async () => {
+    if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
+      return
+    }
+
+    try {
+      // Step 1: Request ticket
+      const { data: ticketRes } = await axiosAPI.post('/notifications/tickets/')
+      const ticket = ticketRes?.data?.ticket || ticketRes?.ticket
+
+      if (!ticket) {
+        toast.error("Xatolik", "WebSocket uchun bilet olinmadi")
+        setIsJoining(false)
+        setWaitingState('lobby')
+        return
+      }
+
+      // Formulate WebSocket URL
+      const rawBase = import.meta.env.VITE_BASE_URL
+      const wsUrl = `${rawBase}/ws/meetings/${meetingId}/?ticket=${ticket}`
+
+      const ws = new WebSocket(wsUrl)
+      wsRef.current = ws
+
+      ws.onopen = () => {
+        console.log("WebSocket ulangan:", wsUrl)
+      }
+
+      ws.onmessage = (event) => {
+        let msg
+        try {
+          msg = JSON.parse(event.data)
+        } catch {
+          return
+        }
+
+        handleWsMessageRef.current?.(msg)
+      }
+
+      ws.onerror = (err) => {
+        console.error("WebSocket xatosi:", err)
+      }
+
+      ws.onclose = (evt) => {
+        console.log("WebSocket yopildi:", evt.code, evt.reason)
+      }
+    } catch (err) {
+      console.error("WebSocket ulanishda xato:", err)
+      setIsJoining(false)
+      setWaitingState('lobby')
+      toast.error("Xatolik", "Server bilan ulanishda muammo yuz berdi")
+    }
+  }, [meetingId])
+
+  // Cleanup WebSocket on unmount
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+        wsRef.current = null
+      }
+    }
+  }, [])
+
   // Helper to determine if a participant is the host/organizer
   const checkIsHost = useCallback((participantObj, identity, name) => {
-    // 1. LiveKit roomAdmin permission
-    if (participantObj?.permissions?.roomAdmin) return true
+    // Faqat va faqat yig'ilish organizatori ID va ma'lumotlariga qarab aniqlaymiz
+    const organizerId = getMeetingOrganizerId(meetingDetails, meetingState)
+    if (!organizerId) return false
 
-    // 2. LiveKit metadata
-    if (participantObj?.metadata) {
-      try {
-        const meta = typeof participantObj.metadata === 'string'
-          ? JSON.parse(participantObj.metadata)
-          : participantObj.metadata
-        if (meta.is_host || meta.role === 'host' || meta.is_organizer || meta.isHost) return true
-        const organizerId = meetingDetails?.organizer ?? meetingState?.organizer_id ?? meetingState?.organizer
-        if (organizerId && String(meta.user_id || meta.id) === String(organizerId)) return true
-      } catch {}
+    const sOrgId = String(organizerId)
+    const sIdentity = String(identity || '')
+
+    // 1. Participant identity ID ga to'liq mos kelishi (masalan, "5", "5_abc", "user_5")
+    if (sIdentity === sOrgId || sIdentity.startsWith(sOrgId + '_') || sIdentity.endsWith('_' + sOrgId)) {
+      return true
     }
 
-    // 3. Match against meetingDetails.organizer ID
-    const organizerId = meetingDetails?.organizer ?? meetingState?.organizer_id ?? meetingState?.organizer
-    if (organizerId !== undefined && organizerId !== null) {
-      const sOrgId = String(organizerId)
-      const sIdentity = String(identity || '')
-      if (sIdentity === sOrgId) return true
-      if (sIdentity.startsWith(sOrgId + '_') || sIdentity.endsWith('_' + sOrgId)) return true
-    }
-
-    // 4. Match against organizerUser details
-    const organizerUser = meetingDetails?.participants_info?.find(u => u.id === organizerId) || meetingDetails?.organizer_info
+    // 2. Organizer ma'lumotlari (id, username, ism-familiya) bilan solishtirish
+    const organizerUser = getMeetingOrganizerUser(meetingDetails, organizerId)
     if (organizerUser) {
       const sOrgUserId = String(organizerUser.id || '')
-      const sIdentity = String(identity || '')
-      if (sOrgUserId && (sIdentity === sOrgUserId || sIdentity.startsWith(sOrgUserId + '_'))) return true
-      if (organizerUser.username) {
-        if (sIdentity.toLowerCase() === organizerUser.username.toLowerCase()) return true
-        if (name && name.toLowerCase() === organizerUser.username.toLowerCase()) return true
+      if (sOrgUserId && (sIdentity === sOrgUserId || sIdentity.startsWith(sOrgUserId + '_') || sIdentity.endsWith('_' + sOrgUserId))) {
+        return true
+      }
+      if (organizerUser.username && sIdentity.toLowerCase() === organizerUser.username.toLowerCase()) {
+        return true
       }
       const orgFullName = `${organizerUser.first_name || ''} ${organizerUser.last_name || ''}`.trim()
-      if (orgFullName && name && name.toLowerCase() === orgFullName.toLowerCase()) return true
-    }
-
-    // 5. Match against project manager
-    if (meetingDetails?.project_info?.manager) {
-      const sMgrId = String(meetingDetails.project_info.manager)
-      if (String(identity || '') === sMgrId) return true
+      if (orgFullName && name && name.trim().toLowerCase() === orgFullName.toLowerCase()) {
+        return true
+      }
     }
 
     return false
   }, [meetingDetails, meetingState])
 
+  // Lobby sahifasidan "Yig'ilishga kirish" tugmasi bosilganda
+  const handleJoinFromLobby = useCallback(() => {
+    hasClickedJoinRef.current = true
+    setIsJoining(true)
+    setWaitingState('connecting')
+
+    // Tugma bosilgandagina WebSocket ulanadi va so'rov yuboriladi!
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      connectWs()
+    } else {
+      const state = meetingStateRef.current || meetingState
+      if (!state) {
+        sendWs({ action: 'get_token' })
+      } else if (state.is_host) {
+        sendWs({ action: 'get_token' })
+      } else {
+        if (!state.organizer_joined) {
+          setWaitingState('waiting_organizer')
+          setIsJoining(false)
+        } else if (state.requires_approval && !state.is_approved) {
+          setWaitingState('waiting_approval')
+          sendWs({ action: 'ask_to_join' })
+          setIsJoining(false)
+        } else {
+          setWaitingState('connecting')
+          sendWs({ action: 'get_token' })
+        }
+      }
+    }
+  }, [connectWs, meetingState])
+
+  const handleCancelWait = useCallback(() => {
+    hasClickedJoinRef.current = false
+    setIsJoining(false)
+    setWaitingState('lobby')
+
+    if (wsRef.current) {
+      wsRef.current.close()
+      wsRef.current = null
+    }
+    if (roomRef.current) {
+      leaveLiveKit()
+    }
+  }, [])
+
   // 3. LiveKit Connection
   const connectToLiveKit = async (serverUrl, token) => {
     try {
+      // Agar foydalanuvchi hali Lobby'da bo'lsa yoki qo'shilishni tasdiqlamagan bo'lsa, xonaga kirmaymiz!
+      if (!hasClickedJoinRef.current) {
+        console.warn("connectToLiveKit chaqirildi, lekin hasClickedJoinRef hali false! LiveKit ulanishi bekor qilindi.")
+        return
+      }
+
       // If already connected, do not re-connect
       if (roomRef.current) {
         return
@@ -523,10 +835,12 @@ export default function MeetingRoom() {
       setIsCameraEnabled(initialCam)
       setIsMicEnabled(initialMic)
 
-      const isLocalHost = Boolean(
-        meetingState?.is_host ||
-        checkIsHost(room.localParticipant, room.localParticipant.identity, currentUserName) ||
-        (user?.id && meetingDetails?.organizer && String(user.id) === String(meetingDetails.organizer))
+      // Faqat yig'ilishni yaratgan user (organizer) host hisoblanadi
+      const initialOrgId = getMeetingOrganizerId(meetingDetails, meetingState)
+      const isInitialLocalHost = Boolean(
+        user?.id &&
+        initialOrgId &&
+        String(user.id) === String(initialOrgId)
       )
 
       // Sync local participant track with exact user choices
@@ -541,7 +855,7 @@ export default function MeetingRoom() {
         isMicEnabled: initialMic,
         name: room.localParticipant.name || currentUserName,
         isLocal: true,
-        isHost: isLocalHost,
+        isHost: isInitialLocalHost,
       })
 
       // 1. Sync all ALREADY CONNECTED remote participants (for users who joined later!)
@@ -604,6 +918,20 @@ export default function MeetingRoom() {
     // Participant connected (fires when another participant joins later)
     room.on(RoomEvent.ParticipantConnected, (participant) => {
       setRemoteParticipants(Array.from(room.remoteParticipants.values()))
+      // Xonaga kirgan ishtirokchini knock so'rovlaridan darhol olib tashlash
+      setKnockRequests(prev => prev.filter(req => {
+        const sId = String(participant.identity || '')
+        const sReqId = String(req.user_id || '')
+        const pName = (participant.name || '').trim().toLowerCase()
+        const reqName = (req.username || '').trim().toLowerCase()
+        if (sReqId && (sId === sReqId || sId.startsWith(sReqId + '_') || sId.endsWith('_' + sReqId))) {
+          return false
+        }
+        if (reqName && pName && (pName === reqName || sId.toLowerCase() === reqName)) {
+          return false
+        }
+        return true
+      }))
       const pIsHost = checkIsHost(participant, participant.identity, participant.name)
       playParticipantJoinedSound()
       const pName = participant.name || participant.identity || "Yangi ishtirokchi"
@@ -847,10 +1175,67 @@ export default function MeetingRoom() {
             playHandRaisedSound()
             triggerInRoomAlert('✋', `${decoded.sender || 'Ishtirokchi'} qo'l ko'tardi`, 'hand')
           }
+        } else if (decoded.type === 'mute_participant') {
+          const myIdentity = room.localParticipant?.identity
+          if (decoded.targetUserId === 'ALL' || decoded.targetUserId === myIdentity) {
+            // Agar target ALL bo'lsa va bu foydalanuvchi tashkilotchi bo'lsa, tashkilotchi o'zi o'chmaydi
+            if (decoded.targetUserId === 'ALL' && isLocalHostRef.current) {
+              return
+            }
+            if (isMicEnabledRef.current) {
+              if (room.localParticipant) {
+                const micPub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+                if (micPub?.track) {
+                  micPub.track.mediaStreamTrack?.stop()
+                  room.localParticipant.unpublishTrack(micPub.track, true).catch(() => {})
+                }
+                room.localParticipant.setMicrophoneEnabled(false).catch(() => {})
+                updateParticipantTrack(room.localParticipant.identity, { isMicEnabled: false })
+              }
+              setIsMicEnabled(false)
+              isMicEnabledRef.current = false
+              toast.warning("Mikrofon o'chirildi", "Tashkilotchi mikrofoningizni o'chirib qo'ydi")
+              triggerInRoomAlert('🔇', "Tashkilotchi mikrofoningizni o'chirdi", 'mute')
+            }
+          }
+        } else if (decoded.type === 'ask_unmute') {
+          const myIdentity = room.localParticipant?.identity
+          if (decoded.targetUserId === myIdentity) {
+            setUnmuteRequest({
+              sender: decoded.sender || 'Tashkilotchi',
+              timestamp: Date.now()
+            })
+            playKnockRequestSound()
+          }
         }
       } catch (err) {
         console.error("Data channel parslashda xato:", err)
       }
+    })
+
+    // Connection Quality Changed (Google Meet style network quality detection)
+    room.on(RoomEvent.ConnectionQualityChanged, (quality, participant) => {
+      if (participant.isLocal) {
+        if (quality === ConnectionQuality.Poor) {
+          setNetworkStatus('poor')
+        } else if (quality === ConnectionQuality.Lost) {
+          setNetworkStatus('reconnecting')
+        } else if (quality === ConnectionQuality.Good || quality === ConnectionQuality.Excellent) {
+          setNetworkStatus(prev => (prev === 'poor' ? 'online' : prev))
+        }
+      }
+    })
+
+    // Reconnecting to LiveKit Media Server
+    room.on(RoomEvent.Reconnecting, () => {
+      setNetworkStatus('reconnecting')
+    })
+
+    // Reconnected successfully
+    room.on(RoomEvent.Reconnected, () => {
+      setNetworkStatus('online')
+      setShowReconnectedBanner(true)
+      setTimeout(() => setShowReconnectedBanner(false), 3500)
     })
 
     // Room disconnected
@@ -1192,6 +1577,71 @@ export default function MeetingRoom() {
     toast.error("Rad etildi", "Foydalanuvchining kirish so'rovi rad etildi")
   }
 
+  // Tashkilotchi (Host) tomonidan ishtirokchi mikrofonini o'chirish (Mute)
+  const handleMuteParticipant = async (targetIdentity) => {
+    if (!isLocalHost) return
+    try {
+      const payload = new TextEncoder().encode(JSON.stringify({
+        type: 'mute_participant',
+        targetUserId: targetIdentity,
+        sender: currentUserName,
+      }))
+      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      toast.success("Ovoz o'chirildi", "Ishtirokchi mikrofoni o'chirildi")
+      setParticipantTracks(prev => {
+        if (!prev[targetIdentity]) return prev
+        return {
+          ...prev,
+          [targetIdentity]: { ...prev[targetIdentity], isMicEnabled: false }
+        }
+      })
+    } catch (err) {
+      console.error("Mute yuborishda xato:", err)
+      toast.error("Xatolik", "Ovozni o'chirishda muammo yuz berdi")
+    }
+  }
+
+  // Tashkilotchi tomonidan barcha ishtirokchilar mikrofonini o'chirish (Mute All)
+  const handleMuteAllParticipants = async () => {
+    if (!isLocalHost) return
+    try {
+      const payload = new TextEncoder().encode(JSON.stringify({
+        type: 'mute_participant',
+        targetUserId: 'ALL',
+        sender: currentUserName,
+      }))
+      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      toast.success("Barchasi o'chirildi", "Barcha ishtirokchilar mikrofoni o'chirildi")
+      setParticipantTracks(prev => {
+        const next = { ...prev }
+        Object.keys(next).forEach(k => {
+          if (!next[k].isLocal) {
+            next[k] = { ...next[k], isMicEnabled: false }
+          }
+        })
+        return next
+      })
+    } catch (err) {
+      console.error("Mute All yuborishda xato:", err)
+    }
+  }
+
+  // Tashkilotchi tomonidan mikrofonni yoqish so'rovini yuborish (Ask to Unmute)
+  const handleAskUnmuteParticipant = async (targetIdentity) => {
+    if (!isLocalHost) return
+    try {
+      const payload = new TextEncoder().encode(JSON.stringify({
+        type: 'ask_unmute',
+        targetUserId: targetIdentity,
+        sender: currentUserName,
+      }))
+      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      toast.info("So'rov yuborildi", "Ishtirokchiga mikrofonni yoqish taklifi yuborildi")
+    } catch (err) {
+      console.error("Ask to unmute yuborishda xato:", err)
+    }
+  }
+
   const handleEndMeetingForAll = async () => {
     try {
       await axiosAPI.post(`/meetings/${meetingId}/close/`)
@@ -1271,11 +1721,74 @@ export default function MeetingRoom() {
     }
   })
 
+  const meetingOrganizerId = getMeetingOrganizerId(meetingDetails, meetingState)
+  // Faqat va faqat yig'ilishni yaratgan foydalanuvchi (organizer) host bo'ladi.
+  // Role (admin, superadmin) dan qat'iy nazar, faqat user.id === organizerId bo'lgandagina true bo'ladi!
   const isLocalHost = Boolean(
-    meetingState?.is_host ||
-    (roomRef.current?.localParticipant && checkIsHost(roomRef.current.localParticipant, roomRef.current.localParticipant.identity, currentUserName)) ||
-    (user?.id && meetingDetails?.organizer && String(user.id) === String(meetingDetails.organizer))
+    user?.id &&
+    meetingOrganizerId &&
+    String(user.id) === String(meetingOrganizerId)
   )
+
+  useEffect(() => {
+    isLocalHostRef.current = isLocalHost
+  }, [isLocalHost])
+
+  // Loyiha menejeri ID si (agar yig'ilish loyihaga tegishli bo'lsa)
+  const projectManagerId = (
+    projectData?.manager?.id ??
+    projectData?.manager_info?.id ??
+    (typeof projectData?.manager === 'number' || typeof projectData?.manager === 'string' ? projectData.manager : null) ??
+    meetingDetails?.project_info?.manager?.id ??
+    meetingDetails?.project_info?.manager_info?.id ??
+    (typeof meetingDetails?.project_info?.manager === 'number' || typeof meetingDetails?.project_info?.manager === 'string' ? meetingDetails.project_info.manager : null) ??
+    meetingDetails?.project?.manager?.id ??
+    meetingDetails?.project?.manager_info?.id ??
+    (typeof meetingDetails?.project?.manager === 'number' || typeof meetingDetails?.project?.manager === 'string' ? meetingDetails.project.manager : null)
+  )
+
+  const isProjectManager = Boolean(
+    user?.id &&
+    projectManagerId &&
+    String(user.id) === String(projectManagerId)
+  )
+
+  const isAdminOrSuperadmin = Boolean(
+    user?.is_superuser ||
+    user?.is_staff ||
+    user?.role === 'admin' ||
+    user?.role === 'superadmin' ||
+    user?.active_role === 'admin' ||
+    user?.active_role === 'superadmin' ||
+    user?.roles?.includes?.('admin') ||
+    user?.roles?.includes?.('superadmin')
+  )
+
+  // Ishtirokchini qabul qilish / rad etish huquqi:
+  // 1) Yig'ilish tashkilotchisi (organizer)
+  // 2) Admin va Superadminlar
+  // 3) Loyiha menejeri (agar loyiha bo'yicha yig'ilish bo'lsa)
+  const canAdmitParticipants = Boolean(
+    isLocalHost ||
+    isAdminOrSuperadmin ||
+    isProjectManager
+  )
+
+  useEffect(() => {
+    canAdmitParticipantsRef.current = canAdmitParticipants
+  }, [canAdmitParticipants])
+
+  // Xonada allaqachon mavjud bo'lgan (boshqa admin qabul qilgan) foydalanuvchilarning knock so'rovlarini tozalash
+  useEffect(() => {
+    if (knockRequests.length === 0 || remoteParticipants.length === 0) return
+    setKnockRequests(prev => {
+      const filtered = prev.filter(req => !isParticipantInRoom(req, remoteParticipants))
+      return filtered.length !== prev.length ? filtered : prev
+    })
+  }, [remoteParticipants, knockRequests.length])
+
+  // Xonaga hali kirmagan faol knock so'rovlari (ekranda qolib ketmasligi uchun)
+  const activeKnockRequests = knockRequests.filter(req => !isParticipantInRoom(req, remoteParticipants))
 
   // 3. Local Participant Camera tile
   if (roomRef.current?.localParticipant) {
@@ -1353,42 +1866,32 @@ export default function MeetingRoom() {
     })
   }
 
-  // Render Waiting Room state
-  if (waitingState === 'connecting' || waitingState === 'waiting_organizer' || waitingState === 'waiting_approval' || waitingState === 'rejected') {
+  // Render Waiting Room / Google Meet Lobby state
+  if (
+    waitingState === 'lobby' ||
+    waitingState === 'connecting' ||
+    waitingState === 'waiting_organizer' ||
+    waitingState === 'waiting_approval' ||
+    waitingState === 'rejected'
+  ) {
     return (
       <WaitingRoom
         title={meetingDetails?.title || meetingState?.title || "Yig'ilish"}
+        meetingDetails={meetingDetails}
         meetingState={meetingState}
+        waitingState={waitingState}
         isRejected={waitingState === 'rejected'}
         rejectedMessage={rejectedMessage}
         localStream={localStream}
         isCameraEnabled={isCameraEnabled}
-        onToggleCamera={() => {
-          setIsCameraEnabled((prev) => {
-            const next = !prev
-            isCameraEnabledRef.current = next
-            if (localStream) {
-              localStream.getVideoTracks().forEach((t) => {
-                t.enabled = next
-              })
-            }
-            return next
-          })
-        }}
+        onToggleCamera={handleToggleLobbyCamera}
         isMicEnabled={isMicEnabled}
-        onToggleMic={() => {
-          setIsMicEnabled((prev) => {
-            const next = !prev
-            isMicEnabledRef.current = next
-            if (localStream) {
-              localStream.getAudioTracks().forEach((t) => {
-                t.enabled = next
-              })
-            }
-            return next
-          })
-        }}
+        onToggleMic={handleToggleLobbyMic}
+        onJoinMeeting={handleJoinFromLobby}
+        isJoining={isJoining}
+        onCancelWait={handleCancelWait}
         onLeave={() => navigate(-1)}
+        user={user}
       />
     )
   }
@@ -1432,10 +1935,43 @@ export default function MeetingRoom() {
       }}
       className="fixed inset-0 w-full h-full bg-[#202124] text-white overflow-hidden flex flex-col select-none z-50"
     >
-      {/* Knock Request Banner for Host */}
-      {meetingState?.is_host && (
+      {/* Google Meet style Network Status Alerts */}
+      {(networkStatus === 'reconnecting' || networkStatus === 'offline') && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-red-950/95 border border-red-500/50 text-red-200 text-xs sm:text-sm font-medium shadow-2xl shadow-red-950/80 backdrop-blur-xl">
+            <RiSignalWifiOffFill className="text-xl text-red-400 shrink-0 animate-pulse" />
+            <span>
+              {networkStatus === 'offline'
+                ? 'Siz tarmoqdan uzildingiz. Internet aloqasi mavjud emas.'
+                : 'Internet aloqasi uzildi. Qayta ulanmoqda...'}
+            </span>
+            <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin shrink-0" />
+          </div>
+        </div>
+      )}
+
+      {networkStatus === 'poor' && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-amber-950/90 border border-amber-500/40 text-amber-200 text-xs sm:text-sm font-medium shadow-xl backdrop-blur-xl">
+            <RiSignalWifi1Fill className="text-xl text-amber-400 shrink-0" />
+            <span>Internet aloqasi beqaror. Ovoz va video uzatishda uzilishlar bo'lishi mumkin.</span>
+          </div>
+        </div>
+      )}
+
+      {showReconnectedBanner && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-emerald-950/90 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-medium shadow-xl backdrop-blur-xl">
+            <RiSignalWifiFill className="text-xl text-emerald-400 shrink-0" />
+            <span>Internet aloqasi qayta tiklandi.</span>
+          </div>
+        </div>
+      )}
+
+      {/* Knock Request Banner for Host, Admin, Superadmin, Project Manager */}
+      {canAdmitParticipants && (
         <KnockBanner
-          requests={knockRequests}
+          requests={activeKnockRequests}
           onAdmit={handleAdmitUser}
           onReject={handleRejectUser}
         />
@@ -1480,6 +2016,41 @@ export default function MeetingRoom() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Network Quality Indicator */}
+          <div
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-medium transition-colors ${
+              networkStatus === 'reconnecting' || networkStatus === 'offline'
+                ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                : networkStatus === 'poor'
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                : 'bg-white/5 border-white/10 text-emerald-400'
+            }`}
+            title={
+              networkStatus === 'offline'
+                ? 'Tarmoqdan uzilgan'
+                : networkStatus === 'reconnecting'
+                ? 'Qayta ulanmoqda...'
+                : networkStatus === 'poor'
+                ? 'Aloqa sifati past'
+                : 'Aloqa sifati a\'lo'
+            }
+          >
+            {networkStatus === 'reconnecting' || networkStatus === 'offline' ? (
+              <RiSignalWifiOffFill className="text-sm animate-pulse" />
+            ) : networkStatus === 'poor' ? (
+              <RiSignalWifi1Fill className="text-sm" />
+            ) : (
+              <RiSignalWifiFill className="text-sm" />
+            )}
+            <span className="hidden md:inline text-[11px]">
+              {networkStatus === 'reconnecting' || networkStatus === 'offline'
+                ? 'Uzildi'
+                : networkStatus === 'poor'
+                ? 'Zaif'
+                : 'Barqaror'}
+            </span>
+          </div>
+
           {/* Duration Badge */}
           <div className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-300">
             {formatDuration(meetingDuration)}
@@ -1760,8 +2331,12 @@ export default function MeetingRoom() {
           isOpen={isParticipantsOpen}
           onClose={() => setIsParticipantsOpen(false)}
           participants={allParticipantItems.filter(p => !p.isScreenShare)}
-          knockRequests={knockRequests}
-          isHost={isLocalHost}
+          knockRequests={activeKnockRequests}
+          isHost={canAdmitParticipants}
+          isLocalHost={isLocalHost}
+          onMuteParticipant={handleMuteParticipant}
+          onMuteAll={handleMuteAllParticipants}
+          onAskUnmuteParticipant={handleAskUnmuteParticipant}
           onAdmitUser={handleAdmitUser}
           onRejectUser={handleRejectUser}
           currentUserId={roomRef.current?.localParticipant?.identity}
@@ -1806,12 +2381,50 @@ export default function MeetingRoom() {
             })
           }}
           participantCount={allParticipantItems.filter(p => !p.isScreenShare).length}
-          knockCount={knockRequests.length}
+          knockCount={canAdmitParticipants ? activeKnockRequests.length : 0}
           onLeave={handleLeaveMeeting}
           isHost={isLocalHost}
           onEndMeetingForAll={handleEndMeetingForAll}
         />
       </footer>
+
+      {/* Ask to Unmute Modal (received from Host) */}
+      {unmuteRequest && (
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#202124] border border-white/10 p-6 shadow-2xl text-center flex flex-col items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-2xl border border-blue-500/30 shadow-inner">
+              <FaMicrophone size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Mikrofonni yoqish so'rovi</h3>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
+                <span className="font-bold text-white">{unmuteRequest.sender}</span> mikrofoningizni yoqishingizni so'ramoqda.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 w-full mt-2">
+              <button
+                type="button"
+                onClick={() => setUnmuteRequest(null)}
+                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Hozir emas
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!isMicEnabled) {
+                    await handleToggleMic()
+                  }
+                  setUnmuteRequest(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-blue-600/30"
+              >
+                Mikrofonni yoqish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
