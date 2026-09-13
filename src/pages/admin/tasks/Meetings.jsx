@@ -1121,7 +1121,7 @@ function MeetingDetailModal({ meeting, onClose }) {
           <div>
             <label className={labelCls}>Tasdiqlash talabi</label>
             <div className={fieldCls}>
-              {meeting.requires_approval ? "Ha (kirish uchun mezbon tasdig'i talab qilinadi)" : "Yo'q (avtomatik kirish)"}
+              {meeting.requires_approval ? "Ha (kirish uchun tashkilotchi tasdig'i talab qilinadi)" : "Yo'q (avtomatik kirish)"}
             </div>
           </div>
 

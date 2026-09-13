@@ -6,7 +6,7 @@ export default function WaitingRoom({
   title = "Yig'ilish",
   meetingState,
   isRejected = false,
-  rejectedMessage = "Mezbon yig'ilishga kirishingizni rad etdi.",
+  rejectedMessage = "Tashkilotchi yig'ilishga kirishingizni rad etdi.",
   localStream = null,
   isCameraEnabled = true,
   onToggleCamera,
@@ -34,7 +34,7 @@ export default function WaitingRoom({
     statusDesc = "Tashkilotchi yig'ilishga kirmaguncha kuting. U kirishi bilanoq tizim avtomatik ulanadi."
   } else if (meetingState?.requires_approval && !meetingState?.is_approved) {
     statusTitle = "Tasdiqlash kutilmoqda"
-    statusDesc = "Kirish so'rovingiz mezbonga yuborildi. Mezbon tasdiqlashini kuting..."
+    statusDesc = "Kirish so'rovingiz tashkilotchiga yuborildi. Tashkilotchi tasdiqlashini kuting..."
   }
 
   return (
