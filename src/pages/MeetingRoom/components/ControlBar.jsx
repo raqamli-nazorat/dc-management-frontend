@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa6'
 import { MdScreenShare, MdStopScreenShare, MdSwapHoriz } from 'react-icons/md'
 import { TbHandStop } from 'react-icons/tb'
-import { RiShutDownLine } from 'react-icons/ri'
+import { RiShutDownLine, RiInformationLine } from 'react-icons/ri'
 
 export default function ControlBar({
   isMicEnabled,
@@ -33,6 +33,8 @@ export default function ControlBar({
   onToggleParticipants,
   participantCount = 1,
   knockCount = 0,
+  isDetailsOpen = false,
+  onToggleDetails = null,
   onLeave,
   isHost = false,
   onEndMeetingForAll,
@@ -233,6 +235,22 @@ export default function ControlBar({
               </span>
             )}
           </button>
+
+          {/* Meeting Details (Google Meet Style) */}
+          {onToggleDetails && (
+            <button
+              type="button"
+              onClick={onToggleDetails}
+              title="Yig'ilish tafsilotlari va havolasi"
+              className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
+                ${isDetailsOpen
+                  ? 'bg-[#8ab4f8] text-[#202124]'
+                  : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
+                }`}
+            >
+              <RiInformationLine size={18} />
+            </button>
+          )}
         </div>
 
         <div className="w-[1px] h-6 bg-[#3c4043] mx-0.5 hidden sm:block" />

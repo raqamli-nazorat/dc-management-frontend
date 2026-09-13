@@ -16,9 +16,20 @@ export default function KnockBanner({ requests = [], onAdmit, onReject }) {
   return (
     <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
       <div className="flex items-center gap-4 p-4 rounded-3xl bg-[#1C1F26]/95 backdrop-blur-xl border border-amber-500/50 text-white shadow-2xl shadow-amber-500/20 max-w-sm ring-1 ring-amber-400/30">
-        <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-amber-500/30">
-          {current.username ? current.username.slice(0, 2).toUpperCase() : <FaUserPlus size={18} />}
-          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-[10px] animate-bounce shadow-md">
+        <div className="relative w-11 h-11 rounded-2xl overflow-hidden bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-amber-500/30">
+          {current.avatar ? (
+            <img
+              src={current.avatar}
+              alt={current.username || ''}
+              className="w-full h-full object-cover rounded-2xl"
+              onError={(e) => { e.target.style.display = 'none' }}
+            />
+          ) : current.username ? (
+            current.username.slice(0, 2).toUpperCase()
+          ) : (
+            <FaUserPlus size={18} />
+          )}
+          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-[10px] animate-bounce shadow-md z-10">
             <FaBell size={10} />
           </span>
         </div>

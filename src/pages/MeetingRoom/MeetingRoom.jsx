@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { flushSync } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality } from 'livekit-client'
@@ -10,6 +10,7 @@ import ParticipantTile from './components/ParticipantTile'
 import ControlBar from './components/ControlBar'
 import ChatDrawer from './components/ChatDrawer'
 import ParticipantsDrawer from './components/ParticipantsDrawer'
+import MeetingDetailsDrawer from './components/MeetingDetailsDrawer'
 import WaitingRoom from './components/WaitingRoom'
 import KnockBanner from './components/KnockBanner'
 import {
@@ -20,10 +21,45 @@ import {
   playKnockRequestSound,
   playHandRaisedSound,
 } from './utils/meetingSounds'
+import { getMeetingCode, parseMeetingId, getFullMeetingUrl } from './utils/meetingCode'
 
-import { FaExpand, FaCompress } from 'react-icons/fa6'
-import { RiSignalWifiFill, RiSignalWifiOffFill, RiSignalWifi1Fill } from 'react-icons/ri'
-import { FaMicrophone } from 'react-icons/fa'
+import { FaExpand, FaCompress, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa6'
+import { RiSignalWifiFill, RiSignalWifiOffFill, RiSignalWifi1Fill, RiInformationLine } from 'react-icons/ri'
+import {
+  TbBellFilled,
+  TbUserPlus,
+  TbScreenShare,
+  TbScreenShareOff,
+  TbMessageCircle,
+  TbHandStop,
+  TbLink,
+  TbCopy,
+  TbCheck,
+} from 'react-icons/tb'
+
+const renderAlertIcon = (iconOrType, alertType) => {
+  const key = alertType || iconOrType
+  switch (key) {
+    case 'knock':
+    case 'bell':
+      return <TbBellFilled size={18} className="text-amber-400 shrink-0" />
+    case 'join':
+      return <TbUserPlus size={18} className="text-emerald-400 shrink-0" />
+    case 'screen':
+      return <TbScreenShare size={18} className="text-blue-400 shrink-0" />
+    case 'screen_stop':
+      return <TbScreenShareOff size={18} className="text-slate-300 shrink-0" />
+    case 'chat':
+      return <TbMessageCircle size={18} className="text-purple-400 shrink-0" />
+    case 'hand':
+      return <TbHandStop size={18} className="text-amber-400 shrink-0" />
+    case 'mute':
+      return <FaMicrophoneSlash size={18} className="text-red-400 shrink-0" />
+    default:
+      if (iconOrType && typeof iconOrType !== 'string') return iconOrType
+      return <RiInformationLine size={18} className="text-blue-400 shrink-0" />
+  }
+}
 
 const getViewTransitionName = (identity) => {
   if (!identity) return 'none'
@@ -140,8 +176,52 @@ const isParticipantInRoom = (req, remotes) => {
   })
 }
 
+const formatAvatarUrl = (url) => {
+  if (!url || typeof url !== 'string') return ''
+  const trimmed = url.trim()
+  if (!trimmed) return ''
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('data:')
+  ) {
+    return trimmed
+  }
+  const rawBase = import.meta.env.VITE_BASE_URL || ''
+  const cleanBase = rawBase.replace(/\/+$/, '')
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+  return cleanBase ? `${cleanBase}${cleanPath}` : cleanPath
+}
+
+const isUserMatch = (u, identity, pNameLower) => {
+  if (!u) return false
+  const sId = String(u.id || '').trim()
+  const sIdent = String(identity || '').trim().toLowerCase()
+  if (sId && (sIdent === sId || sIdent.startsWith(sId + '_') || sIdent.endsWith('_' + sId))) {
+    return true
+  }
+  if (u.username) {
+    const uName = String(u.username).trim().toLowerCase()
+    if (sIdent === uName || pNameLower === uName) {
+      return true
+    }
+  }
+  const fn = String(u.first_name || '').trim().toLowerCase()
+  const ln = String(u.last_name || '').trim().toLowerCase()
+  const name1 = `${fn} ${ln}`.trim()
+  const name2 = `${ln} ${fn}`.trim()
+  if (name1 && (pNameLower === name1 || sIdent === name1)) return true
+  if (name2 && (pNameLower === name2 || sIdent === name2)) return true
+
+  if (fn && ln && pNameLower.includes(fn) && pNameLower.includes(ln)) {
+    return true
+  }
+  return false
+}
+
 export default function MeetingRoom() {
-  const { id: meetingId } = useParams()
+  const { id: rawParamId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -150,6 +230,14 @@ export default function MeetingRoom() {
   const [projectData, setProjectData] = useState(null)
   const [meetingState, setMeetingState] = useState(null)
   const meetingStateRef = useRef(null)
+
+  const [directoryUsers, setDirectoryUsers] = useState([])
+  const [peerProfiles, setPeerProfiles] = useState({})
+
+  const [numericMeetingId, setNumericMeetingId] = useState(() => {
+    return parseMeetingId(rawParamId)
+  })
+  const meetingId = numericMeetingId || parseMeetingId(rawParamId) || (meetingDetails?.id ? String(meetingDetails.id) : null)
   const [waitingState, setWaitingState] = useState('lobby') // 'lobby' | 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected' | 'in_room' | 'ended'
   const hasClickedJoinRef = useRef(false)
   const [isJoining, setIsJoining] = useState(false)
@@ -203,6 +291,8 @@ export default function MeetingRoom() {
   // Drawers & UI
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(false)
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [copiedHeaderLink, setCopiedHeaderLink] = useState(false)
   const [chatMessages, setChatMessages] = useState(() => getStoredChatMessages(meetingId))
   const [unreadChatCount, setUnreadChatCount] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -237,8 +327,31 @@ export default function MeetingRoom() {
     setInRoomAlert({ icon, text, type, id: Date.now() })
     inRoomAlertTimerRef.current = setTimeout(() => {
       setInRoomAlert(null)
-    }, 3500)
+    }, 4000)
   }, [])
+
+  // Auto-sync address bar to /meetings/<id>
+  useEffect(() => {
+    const code = getMeetingCode(meetingId)
+    if (!code) return
+    const targetPath = `/meetings/${code}`
+    if (typeof window !== 'undefined' && decodeURIComponent(window.location.pathname) !== targetPath && window.location.pathname !== targetPath) {
+      window.history.replaceState(null, '', targetPath)
+    }
+  }, [meetingId])
+
+  const currentMeetingCode = getMeetingCode(meetingId)
+  const currentMeetingUrl = getFullMeetingUrl(meetingId)
+
+  const handleCopyMeetingLink = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(currentMeetingUrl).then(() => {
+        setCopiedHeaderLink(true)
+        toast.success('Nusxa olindi', 'Yig\'ilish havolasi nusxalandi')
+        setTimeout(() => setCopiedHeaderLink(false), 2000)
+      }).catch(() => {})
+    }
+  }
 
   // WebSocket reference
   const wsRef = useRef(null)
@@ -428,16 +541,66 @@ export default function MeetingRoom() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
-  // Load meeting metadata from REST API
+  // Load meeting metadata from REST API by extracting numeric ID from URL
   useEffect(() => {
-    if (!meetingId) return
-    axiosAPI.get(`/meetings/${meetingId}/`)
-      .then(res => {
+    // URL dan (masalan "12-54sa-asq4" dan) id ni ("12") kesib olamiz
+    const extractedId = parseMeetingId(rawParamId) || meetingId
+    const queryTarget = extractedId || rawParamId
+    if (!queryTarget) return
+
+    let isSubscribed = true
+
+    const fetchMeeting = async () => {
+      // 1. URL dan kesib olingan ID orqali to'g'ridan-to'g'ri /meetings/<extractedId>/ ga GET so'rov yuboramiz
+      if (extractedId && /^\d+$/.test(String(extractedId))) {
+        try {
+          const res = await axiosAPI.get(`/meetings/${extractedId}/`)
+          const d = res.data?.data ?? res.data
+          if (isSubscribed && d && d.id) {
+            setMeetingDetails(d)
+            setNumericMeetingId(String(d.id))
+            return
+          }
+        } catch (err) {
+          console.warn("Yig'ilish ma'lumotlarini ID orqali olishda xatolik:", err)
+        }
+      }
+
+      // 2. Agar ID orqali olinmasa yoki URL da faqat UID bo'lsa, to'g'ridan-to'g'ri yoki /meetings/?search= orqali qidiramiz
+      try {
+        const res = await axiosAPI.get(`/meetings/${encodeURIComponent(queryTarget)}/`)
         const d = res.data?.data ?? res.data
-        setMeetingDetails(d)
-      })
-      .catch(() => { })
-  }, [meetingId])
+        if (isSubscribed && d && d.id) {
+          setMeetingDetails(d)
+          setNumericMeetingId(String(d.id))
+          return
+        }
+      } catch (err) {
+        // Fallback search
+      }
+
+      try {
+        const searchTerm = rawParamId || queryTarget
+        const res = await axiosAPI.get('/meetings/', { params: { search: searchTerm } })
+        const results = res.data?.data?.results ?? res.data?.results ?? res.data
+        if (isSubscribed && Array.isArray(results) && results.length > 0) {
+          const match = results.find(m => String(m.uid).trim() === String(searchTerm).trim() || String(m.id) === String(extractedId)) || results[0]
+          if (match && match.id) {
+            setMeetingDetails(match)
+            setNumericMeetingId(String(match.id))
+          }
+        }
+      } catch (err) {
+        console.warn("Yig'ilishni qidirishda xato:", err)
+      }
+    }
+
+    fetchMeeting()
+
+    return () => {
+      isSubscribed = false
+    }
+  }, [rawParamId, meetingId])
 
   // Load project details if meeting is associated with a project (for project manager detection)
   useEffect(() => {
@@ -527,7 +690,7 @@ export default function MeetingRoom() {
         // Faqat qabul qilish huquqiga ega bo'lganlar (host, admin, superadmin, loyiha menejeri) ga signal beriladi
         if (canAdmitParticipantsRef.current) {
           playKnockRequestSound()
-          triggerInRoomAlert('🔔', `${msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
+          triggerInRoomAlert('bell', `${msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
         }
         setKnockRequests(prev => {
           if (prev.some(k => k.user_id === msg.user_id)) return prev
@@ -753,6 +916,107 @@ export default function MeetingRoom() {
     }
   }, [])
 
+  // Load all company users once to resolve any participant avatars
+  useEffect(() => {
+    let isSub = true
+    axiosAPI.get('/users/all/', { params: { page_size: 200 } })
+      .then(res => {
+        const list = res.data?.results ?? res.data?.data?.results ?? res.data?.data ?? res.data ?? []
+        if (isSub && Array.isArray(list)) {
+          setDirectoryUsers(list)
+        }
+      })
+      .catch(() => {})
+    return () => { isSub = false }
+  }, [])
+
+  // Broadcast current user's profile and avatar over LiveKit DataChannel
+  const broadcastMyProfile = useCallback((roomInstance, isRequest = true) => {
+    const targetRoom = roomInstance || roomRef.current
+    if (!targetRoom || !targetRoom.localParticipant) return
+    const myProfilePayload = {
+      type: 'user_profile',
+      identity: targetRoom.localParticipant.identity,
+      userId: user?.id,
+      username: user?.username,
+      name: currentUserName,
+      avatar: formatAvatarUrl(user?.avatar) || user?.avatar || '',
+      isRequest
+    }
+    const encoder = new TextEncoder()
+    const data = encoder.encode(JSON.stringify(myProfilePayload))
+    targetRoom.localParticipant.publishData(data, { reliable: true }).catch(() => {})
+  }, [user, currentUserName])
+
+  // Resolve avatar for any participant using all available data sources
+  const resolveParticipantAvatar = useCallback((participant, pInfo) => {
+    if (!participant) return ''
+    if (participant.isLocal) return formatAvatarUrl(user?.avatar) || user?.avatar || ''
+
+    const identity = String(participant.identity || '')
+    const pName = (participant.name || pInfo?.name || '').trim()
+    const pNameLower = pName.toLowerCase()
+
+    // 1. LiveKit metadata
+    if (participant.metadata) {
+      try {
+        const parsed = JSON.parse(participant.metadata)
+        if (parsed?.avatar) return formatAvatarUrl(parsed.avatar)
+      } catch {
+        if (typeof participant.metadata === 'string' && (participant.metadata.startsWith('http') || participant.metadata.startsWith('/media'))) {
+          return formatAvatarUrl(participant.metadata)
+        }
+      }
+    }
+
+    // 2. DataChannel orqali qabul qilingan peer profiles
+    if (peerProfiles[identity]?.avatar) return formatAvatarUrl(peerProfiles[identity].avatar)
+    if (pNameLower && peerProfiles[pNameLower]?.avatar) return formatAvatarUrl(peerProfiles[pNameLower].avatar)
+
+    // 3. meetingDetails - organizer
+    const orgId = getMeetingOrganizerId(meetingDetails, meetingState)
+    const orgUser = getMeetingOrganizerUser(meetingDetails, orgId)
+    if (orgUser?.avatar && isUserMatch(orgUser, identity, pNameLower)) {
+      return formatAvatarUrl(orgUser.avatar)
+    }
+
+    // 4. meetingDetails - participants_info
+    if (Array.isArray(meetingDetails?.participants_info)) {
+      const match = meetingDetails.participants_info.find(u => isUserMatch(u, identity, pNameLower))
+      if (match?.avatar) return formatAvatarUrl(match.avatar)
+    }
+
+    // 5. projectData (employees_info, testers_info, manager_info)
+    const allProjectMembers = [
+      ...(projectData?.employees_info || []),
+      ...(projectData?.testers_info || []),
+      ...(projectData?.manager_info ? [projectData.manager_info] : [])
+    ]
+    if (allProjectMembers.length > 0) {
+      const match = allProjectMembers.find(u => isUserMatch(u, identity, pNameLower))
+      if (match?.avatar) return formatAvatarUrl(match.avatar)
+    }
+
+    // 6. Directory users (/users/all/)
+    if (Array.isArray(directoryUsers) && directoryUsers.length > 0) {
+      const match = directoryUsers.find(u => isUserMatch(u, identity, pNameLower))
+      if (match?.avatar) return formatAvatarUrl(match.avatar)
+    }
+
+    // 7. knockRequests
+    if (Array.isArray(knockRequests) && knockRequests.length > 0) {
+      const match = knockRequests.find(k => {
+        const kId = String(k.user_id || '')
+        if (kId && (identity === kId || identity.startsWith(kId + '_') || identity.endsWith('_' + kId))) return true
+        if (k.username && (identity.toLowerCase() === k.username.toLowerCase() || pNameLower === k.username.toLowerCase())) return true
+        return false
+      })
+      if (match?.avatar) return formatAvatarUrl(match.avatar)
+    }
+
+    return ''
+  }, [meetingDetails, meetingState, projectData, directoryUsers, peerProfiles, knockRequests, user])
+
   // 3. LiveKit Connection
   const connectToLiveKit = async (serverUrl, token) => {
     try {
@@ -797,6 +1061,16 @@ export default function MeetingRoom() {
       // Connect to LiveKit Media Server
       await room.connect(serverUrl, token)
       console.log("LiveKit xonaga ulandi:", room.name)
+
+      // Profilimizni va avatarimizni boshqa qatnashchilarga tarqatamiz
+      broadcastMyProfile(room)
+      if (user?.avatar) {
+        room.localParticipant.setMetadata(JSON.stringify({
+          avatar: formatAvatarUrl(user.avatar) || user.avatar,
+          name: currentUserName,
+          userId: user.id
+        })).catch(() => {})
+      }
 
       // Release preview stream from waiting room immediately so camera/mic are freed
       if (previewStreamRef.current) {
@@ -935,7 +1209,7 @@ export default function MeetingRoom() {
       const pIsHost = checkIsHost(participant, participant.identity, participant.name)
       playParticipantJoinedSound()
       const pName = participant.name || participant.identity || "Yangi ishtirokchi"
-      triggerInRoomAlert('👋', `${pName} yig'ilishga qo'shildi`, 'join')
+      triggerInRoomAlert('join', `${pName} yig'ilishga qo'shildi`, 'join')
       setParticipantTracks(prev => ({
         ...prev,
         [participant.identity]: {
@@ -949,6 +1223,24 @@ export default function MeetingRoom() {
           screenShareTrack: null,
         }
       }))
+      // Yangi ishtirokchiga o'z profilimizni va avatarimizni yuboramiz
+      broadcastMyProfile(room)
+    })
+
+    // Participant metadata changed (LiveKit metadata orqali avatar yangilanishi)
+    room.on(RoomEvent.ParticipantMetadataChanged, (metadata, participant) => {
+      if (participant && metadata) {
+        try {
+          const parsed = JSON.parse(metadata)
+          if (parsed?.avatar) {
+            setPeerProfiles(prev => ({
+              ...prev,
+              [participant.identity]: parsed,
+              ...(parsed.userId ? { [String(parsed.userId)]: parsed } : {})
+            }))
+          }
+        } catch {}
+      }
     })
 
     // Participant disconnected
@@ -984,7 +1276,7 @@ export default function MeetingRoom() {
         screenShareTimesRef.current[participant.identity] = Date.now()
         playScreenShareStartSound()
         const pName = participant.name || participant.identity || "Ishtirokchi"
-        triggerInRoomAlert('🖥️', `${pName} ekranini ulashdi`, 'screen')
+        triggerInRoomAlert('screen', `${pName} ekranini ulashdi`, 'screen')
       }
 
       setParticipantTracks(prev => {
@@ -1163,7 +1455,7 @@ export default function MeetingRoom() {
           playChatMessageSound()
           if (!isChatOpen) {
             setUnreadChatCount(c => c + 1)
-            triggerInRoomAlert('💬', `${decoded.sender}: ${decoded.text?.slice(0, 40)}${decoded.text?.length > 40 ? '...' : ''}`, 'chat')
+            triggerInRoomAlert('chat', `${decoded.sender}: ${decoded.text?.slice(0, 40)}${decoded.text?.length > 40 ? '...' : ''}`, 'chat')
           }
         } else if (decoded.type === 'raise_hand') {
           const pIdentity = participant ? participant.identity : decoded.userId
@@ -1173,7 +1465,7 @@ export default function MeetingRoom() {
           }))
           if (decoded.isRaised) {
             playHandRaisedSound()
-            triggerInRoomAlert('✋', `${decoded.sender || 'Ishtirokchi'} qo'l ko'tardi`, 'hand')
+            triggerInRoomAlert('hand', `${decoded.sender || 'Ishtirokchi'} qo'l ko'tardi`, 'hand')
           }
         } else if (decoded.type === 'mute_participant') {
           const myIdentity = room.localParticipant?.identity
@@ -1195,7 +1487,7 @@ export default function MeetingRoom() {
               setIsMicEnabled(false)
               isMicEnabledRef.current = false
               toast.warning("Mikrofon o'chirildi", "Tashkilotchi mikrofoningizni o'chirib qo'ydi")
-              triggerInRoomAlert('🔇', "Tashkilotchi mikrofoningizni o'chirdi", 'mute')
+              triggerInRoomAlert('mute', "Tashkilotchi mikrofoningizni o'chirdi", 'mute')
             }
           }
         } else if (decoded.type === 'ask_unmute') {
@@ -1206,6 +1498,19 @@ export default function MeetingRoom() {
               timestamp: Date.now()
             })
             playKnockRequestSound()
+          }
+        } else if (decoded.type === 'user_profile') {
+          if (decoded.identity || decoded.userId) {
+            setPeerProfiles(prev => ({
+              ...prev,
+              [decoded.identity]: decoded,
+              ...(decoded.userId ? { [String(decoded.userId)]: decoded } : {}),
+              ...(decoded.username ? { [decoded.username.toLowerCase()]: decoded } : {}),
+              ...(decoded.name ? { [decoded.name.toLowerCase()]: decoded } : {})
+            }))
+          }
+          if (decoded.isRequest) {
+            broadcastMyProfile(room, false)
           }
         }
       } catch (err) {
@@ -1345,7 +1650,7 @@ export default function MeetingRoom() {
         setLocalScreenTrack(track)
         setIsScreenSharing(true)
         playScreenShareStartSound()
-        triggerInRoomAlert('🖥️', "Ekranni ulashish boshlandi", 'screen')
+        triggerInRoomAlert('screen', "Ekranni ulashish boshlandi", 'screen')
         if (track?.mediaStreamTrack) {
           track.mediaStreamTrack.onended = () => {
             if (!isChangingScreenShareRef.current) {
@@ -1385,7 +1690,7 @@ export default function MeetingRoom() {
       console.warn("Ekran ulashishni to'xtatishda xato:", err)
     } finally {
       playScreenShareStopSound()
-      triggerInRoomAlert('⏹️', "Ekran ulashuvi to'xtatildi", 'screen')
+      triggerInRoomAlert('screen_stop', "Ekran ulashuvi to'xtatildi", 'screen_stop')
       delete screenShareTimesRef.current['local-screen']
       setLocalScreenTrack(null)
       setIsScreenSharing(false)
@@ -1446,7 +1751,7 @@ export default function MeetingRoom() {
         setLocalScreenTrack(currentTrack)
         setIsScreenSharing(true)
         setScreenShareVersion(v => v + 1)
-        triggerInRoomAlert('🖥️', "Ekran muvaffaqiyatli almashtirildi", 'screen')
+        triggerInRoomAlert('screen', "Ekran muvaffaqiyatli almashtirildi", 'screen')
       } else {
         // Zaxira: replaceTrack bo'lmaganda
         if (oldMediaStreamTrack) {
@@ -1471,7 +1776,7 @@ export default function MeetingRoom() {
           }
         }
         setScreenShareVersion(v => v + 1)
-        triggerInRoomAlert('🖥️', "Ekran muvaffaqiyatli almashtirildi", 'screen')
+        triggerInRoomAlert('screen', "Ekran muvaffaqiyatli almashtirildi", 'screen')
       }
     } catch (err) {
       console.error("Ekranni almashtirishda xatolik:", err)
@@ -1499,7 +1804,7 @@ export default function MeetingRoom() {
     setIsHandRaised(next)
     if (next) {
       playHandRaisedSound()
-      triggerInRoomAlert('✋', "Siz qo'l ko'tardingiz", 'hand')
+      triggerInRoomAlert('hand', "Siz qo'l ko'tardingiz", 'hand')
     }
     if (roomRef.current?.localParticipant) {
       const data = {
@@ -1520,8 +1825,9 @@ export default function MeetingRoom() {
   const handleSendMessage = async (text) => {
     const messageData = {
       type: 'chat',
-      text: text,
+      text,
       sender: currentUserName,
+      avatar: formatAvatarUrl(user?.avatar) || user?.avatar || '',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
@@ -1797,6 +2103,7 @@ export default function MeetingRoom() {
     allParticipantItems.push({
       identity: localId,
       name: currentUserName,
+      avatar: formatAvatarUrl(user?.avatar) || user?.avatar || '',
       isLocal: true,
       isScreenShare: false,
       isHost: isLocalHost,
@@ -1815,9 +2122,11 @@ export default function MeetingRoom() {
     .forEach(rp => {
     const rInfo = participantTracks[rp.identity] || {}
     const rpIsHost = checkIsHost(rp, rp.identity, rp.name || rInfo.name)
+    const rpAvatar = formatAvatarUrl(resolveParticipantAvatar(rp, rInfo))
     allParticipantItems.push({
       identity: rp.identity,
       name: rp.name || rp.identity,
+      avatar: rpAvatar,
       isLocal: false,
       isScreenShare: false,
       isHost: rpIsHost,
@@ -1879,6 +2188,8 @@ export default function MeetingRoom() {
         title={meetingDetails?.title || meetingState?.title || "Yig'ilish"}
         meetingDetails={meetingDetails}
         meetingState={meetingState}
+        meetingId={meetingId}
+        projectData={projectData}
         waitingState={waitingState}
         isRejected={waitingState === 'rejected'}
         rejectedMessage={rejectedMessage}
@@ -1987,13 +2298,19 @@ export default function MeetingRoom() {
               ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200 shadow-emerald-500/20'
               : inRoomAlert.type === 'screen'
               ? 'bg-blue-950/90 border-blue-500/50 text-blue-200 shadow-blue-500/20'
+              : inRoomAlert.type === 'screen_stop'
+              ? 'bg-slate-900/95 border-slate-700 text-slate-200 shadow-black/50'
               : inRoomAlert.type === 'knock'
               ? 'bg-orange-950/90 border-orange-500/50 text-orange-200 shadow-orange-500/20'
               : inRoomAlert.type === 'chat'
               ? 'bg-purple-950/90 border-purple-500/50 text-purple-200 shadow-purple-500/20'
+              : inRoomAlert.type === 'mute'
+              ? 'bg-red-950/90 border-red-500/50 text-red-200 shadow-red-500/20'
               : 'bg-[#1C1F26]/95 border-white/15 text-white shadow-black/50'
           }`}>
-            <span className="text-base sm:text-lg">{inRoomAlert.icon}</span>
+            <span className="flex items-center justify-center shrink-0">
+              {renderAlertIcon(inRoomAlert.icon, inRoomAlert.type)}
+            </span>
             <span>{inRoomAlert.text}</span>
           </div>
         </div>
@@ -2008,14 +2325,37 @@ export default function MeetingRoom() {
               {meetingDetails?.title || meetingState?.title || "Yig'ilish"}
             </h2>
           </div>
+          
+          {/* Official UID Badge */}
           {meetingDetails?.uid && (
-            <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-slate-400">
-              {meetingDetails.uid}
+            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] font-mono text-blue-300">
+              UID: {meetingDetails.uid}
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Details toggle in header */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsDetailsOpen((prev) => {
+                const next = !prev
+                if (next) {
+                  setIsChatOpen(false)
+                  setIsParticipantsOpen(false)
+                }
+                return next
+              })
+            }}
+            title="Yig'ilish tafsilotlari"
+            className={`p-2 rounded-xl transition-all cursor-pointer ${
+              isDetailsOpen ? 'bg-[#8ab4f8] text-[#202124]' : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white'
+            }`}
+          >
+            <RiInformationLine size={16} />
+          </button>
+
           {/* Network Quality Indicator */}
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-medium transition-colors ${
@@ -2093,7 +2433,7 @@ export default function MeetingRoom() {
                     isCameraEnabled={mainStageItem.isCameraEnabled}
                     isMicEnabled={mainStageItem.isMicEnabled}
                     displayName={mainStageItem.name}
-                    avatar={mainStageItem.isLocal ? user?.avatar : ''}
+                    avatar={mainStageItem.avatar || (mainStageItem.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                     version={mainStageItem.version || 0}
                     isPinned={pinnedId === mainStageItem.identity}
                     onTogglePin={() => handleTogglePin(mainStageItem.identity)}
@@ -2129,7 +2469,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2161,7 +2501,7 @@ export default function MeetingRoom() {
                     isCameraEnabled={cameraItems[0]?.isCameraEnabled}
                     isMicEnabled={cameraItems[0]?.isMicEnabled}
                     displayName={cameraItems[0]?.name}
-                    avatar={cameraItems[0]?.isLocal ? user?.avatar : ''}
+                    avatar={cameraItems[0]?.avatar || (cameraItems[0]?.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                     version={cameraItems[0]?.version || 0}
                     isPinned={pinnedId === cameraItems[0]?.identity}
                     onTogglePin={() => handleTogglePin(cameraItems[0]?.identity)}
@@ -2188,7 +2528,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2217,7 +2557,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2246,7 +2586,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2275,7 +2615,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2304,7 +2644,7 @@ export default function MeetingRoom() {
                         isCameraEnabled={item.isCameraEnabled}
                         isMicEnabled={item.isMicEnabled}
                         displayName={item.name}
-                        avatar={item.isLocal ? user?.avatar : ''}
+                        avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
@@ -2343,6 +2683,16 @@ export default function MeetingRoom() {
           pinnedId={pinnedId}
           onTogglePin={handleTogglePin}
         />
+
+        {/* Meeting Details Drawer (Google Meet Style) */}
+        <MeetingDetailsDrawer
+          isOpen={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+          meetingDetails={meetingDetails}
+          meetingState={meetingState}
+          meetingId={meetingId}
+          projectData={projectData}
+        />
       </div>
 
       {/* Bottom Floating Control Bar */}
@@ -2364,6 +2714,7 @@ export default function MeetingRoom() {
               const next = !prev
               if (next) {
                 setIsParticipantsOpen(false)
+                setIsDetailsOpen(false)
                 setUnreadChatCount(0)
               }
               return next
@@ -2376,12 +2727,24 @@ export default function MeetingRoom() {
               const next = !prev
               if (next) {
                 setIsChatOpen(false)
+                setIsDetailsOpen(false)
               }
               return next
             })
           }}
           participantCount={allParticipantItems.filter(p => !p.isScreenShare).length}
           knockCount={canAdmitParticipants ? activeKnockRequests.length : 0}
+          isDetailsOpen={isDetailsOpen}
+          onToggleDetails={() => {
+            setIsDetailsOpen((prev) => {
+              const next = !prev
+              if (next) {
+                setIsChatOpen(false)
+                setIsParticipantsOpen(false)
+              }
+              return next
+            })
+          }}
           onLeave={handleLeaveMeeting}
           isHost={isLocalHost}
           onEndMeetingForAll={handleEndMeetingForAll}

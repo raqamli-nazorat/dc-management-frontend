@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip } from 'react-icons/fa6'
+import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPaperclip, FaTriangleExclamation } from 'react-icons/fa6'
 import { labelCls } from '../components/constants'
 import { axiosAPI } from '../../../../service/axiosAPI'
 import { toast } from '../../../../Toast/ToastProvider'
@@ -731,8 +731,9 @@ export default function EditTaskModal({ task, onClose, onSave, canEdit = true, o
                   <label className={labelCls}>Topshiruvchi</label>
                   {/* in_progress statusida topshiruvchi o'zgartirilmaydi */}
                   {form.status === 'in_progress' && !ro && (
-                    <p className="text-xs text-amber-500 dark:text-amber-400 mb-1.5">
-                      ⚠ Jarayondagi vazifada topshiruvchi o'zgartirilmaydi
+                    <p className="text-xs text-amber-500 dark:text-amber-400 mb-1.5 flex items-center gap-1">
+                      <FaTriangleExclamation size={12} className="shrink-0 text-amber-500" />
+                      <span>Jarayondagi vazifada topshiruvchi o'zgartirilmaydi</span>
                     </p>
                   )}
                   <button type="button"

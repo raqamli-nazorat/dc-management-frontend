@@ -11,6 +11,7 @@ import { MeetingAttendanceModal } from '../../../components/MeetingModals'
 import { PiCopyBold } from 'react-icons/pi'
 import DiscardModal from '../../../components/DiscardModal'
 import ResizableTextarea, { ResizableBox } from '../../../components/ResizableTextarea'
+import { getMeetingCode } from '../../MeetingRoom/utils/meetingCode'
 
 const labelCls = 'block text-xs font-medium text-[var(--text-sub)] dark:text-[var(--text-sub)] mb-1.5'
 const DURATION_UNITS = ['daqiqa']
@@ -968,7 +969,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
                 return isParticipant ? (
                   <button
                     type="button"
-                    onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+                    onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
                   >
                     <FaVideo size={13} /> Yig'ilishga kirish
@@ -1173,7 +1174,7 @@ function MeetingDetailModal({ meeting, onClose }) {
             {!meeting.is_completed && isParticipant && (
               <button
                 type="button"
-                onClick={() => window.open(`/meeting-room/${meeting.id}`, '_blank')}
+                onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
               >
                 <FaVideo size={13} /> Yig'ilishga kirish

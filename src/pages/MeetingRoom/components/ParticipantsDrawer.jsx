@@ -8,6 +8,7 @@ import {
   FaVideo,
   FaVideoSlash,
   FaMagnifyingGlass,
+  FaUsers,
 } from 'react-icons/fa6'
 import { TbHandStop, TbPin, TbPinnedOff } from 'react-icons/tb'
 
@@ -77,8 +78,8 @@ export default function ParticipantsDrawer({
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#3c4043] bg-[#202124] shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/20 shadow-sm">
-                👥
+              <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-sm">
+                <FaUsers size={16} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -147,8 +148,17 @@ export default function ParticipantsDrawer({
                       className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#202124] border border-white/10 shadow-sm"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">
-                          {req.username?.slice(0, 2).toUpperCase() || 'U'}
+                        <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">
+                          {req.avatar ? (
+                            <img
+                              src={req.avatar}
+                              alt={req.username || ''}
+                              className="w-full h-full object-cover rounded-full"
+                              onError={(e) => { e.target.style.display = 'none' }}
+                            />
+                          ) : (
+                            req.username?.slice(0, 2).toUpperCase() || 'U'
+                          )}
                         </div>
                         <span className="text-xs font-semibold text-white truncate">
                           {req.username || `Foydalanuvchi #${req.user_id}`}
@@ -220,7 +230,7 @@ export default function ParticipantsDrawer({
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Avatar with speaking ring indicator */}
                           <div
-                            className={`w-9 h-9 rounded-full ${getAvatarGradient(
+                            className={`w-9 h-9 rounded-full overflow-hidden ${getAvatarGradient(
                               p.name || ''
                             )} text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-md transition-all ${
                               p.isSpeaking
@@ -228,7 +238,16 @@ export default function ParticipantsDrawer({
                                 : ''
                             }`}
                           >
-                            {initials}
+                            {p.avatar ? (
+                              <img
+                                src={p.avatar}
+                                alt={p.name || ''}
+                                className="w-full h-full object-cover rounded-full"
+                                onError={(e) => { e.target.style.display = 'none' }}
+                              />
+                            ) : (
+                              initials
+                            )}
                           </div>
 
                           <div className="min-w-0">

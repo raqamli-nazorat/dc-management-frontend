@@ -71,8 +71,9 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/role" element={<ProtectedRoute><SelectRore /></ProtectedRoute>} />
-              <Route path="/meeting-room/:id" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
+              <Route path="/meetings/:id" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
               <Route path="/meetings/:id/room" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
+              <Route path="/meeting-room/:id" element={<ProtectedRoute><MeetingRoom /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" replace />} />
 
               {/* ── ADMIN ── */}

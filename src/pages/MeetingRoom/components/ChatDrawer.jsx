@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { FaXmark, FaPaperPlane } from 'react-icons/fa6'
 import { RiInformationLine } from 'react-icons/ri'
+import { TbMessageCircle } from 'react-icons/tb'
 
 export default function ChatDrawer({ isOpen, onClose, messages = [], onSendMessage, currentUserName = '' }) {
   const [text, setText] = useState('')
@@ -57,8 +58,8 @@ export default function ChatDrawer({ isOpen, onClose, messages = [], onSendMessa
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#3c4043] bg-[#202124] shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-[#8ab4f8] flex items-center justify-center font-bold text-base border border-blue-500/20 shadow-sm">
-                💬
+              <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-[#8ab4f8] flex items-center justify-center border border-blue-500/20 shadow-sm">
+                <TbMessageCircle size={18} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -120,11 +121,20 @@ export default function ChatDrawer({ isOpen, onClose, messages = [], onSendMessa
                     <div className="flex items-center gap-1.5 mb-1 px-1">
                       {!isMe && (
                         <div
-                          className={`w-4 h-4 rounded-full ${getAvatarGradient(
+                          className={`w-4 h-4 rounded-full overflow-hidden ${getAvatarGradient(
                             m.sender
-                          )} text-[9px] font-bold text-white flex items-center justify-center`}
+                          )} text-[9px] font-bold text-white flex items-center justify-center shrink-0`}
                         >
-                          {initials}
+                          {m.avatar ? (
+                            <img
+                              src={m.avatar}
+                              alt={m.sender || ''}
+                              className="w-full h-full object-cover rounded-full"
+                              onError={(e) => { e.target.style.display = 'none' }}
+                            />
+                          ) : (
+                            initials
+                          )}
                         </div>
                       )}
                       <span className="text-[11px] font-semibold text-slate-300">

@@ -86,7 +86,7 @@ export default function WaitingRoom({
       if (animId) cancelAnimationFrame(animId)
       if (source) source.disconnect()
       if (audioContext && audioContext.state !== 'closed') {
-        audioContext.close().catch(() => {})
+        audioContext.close().catch(() => { })
       }
     }
   }, [localStream, isMicEnabled])

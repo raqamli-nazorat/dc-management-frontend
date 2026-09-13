@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { FaMicrophone, FaMicrophoneSlash, FaCrown } from 'react-icons/fa6'
-import { TbHandStop, TbPin, TbPinFilled } from 'react-icons/tb'
+import { TbHandStop, TbPin, TbPinFilled, TbScreenShare } from 'react-icons/tb'
 
 export default function ParticipantTile({
   participant,
@@ -206,7 +206,8 @@ export default function ParticipantTile({
         )}
         {isScreenShare ? (
           <span className="text-blue-400 font-bold flex items-center gap-1.5 truncate">
-            🖥️ {displayName || 'Ekran'}
+            <TbScreenShare size={14} className="shrink-0" />
+            <span className="truncate">{displayName || 'Ekran'}</span>
           </span>
         ) : (
           <span className="truncate">{displayName} {isLocal && '(Siz)'}</span>
