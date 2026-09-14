@@ -83,6 +83,44 @@ const withViewTransition = (callback) => {
   callback()
 }
 
+// Persistent Remote Audio Player for playing remote participant audio
+// Decoupled from video tile UI to guarantee continuous audio during full-screen focus or tile re-renders
+function RemoteAudioPlayer({ audioTrack, isMicEnabled }) {
+  const audioRef = useRef(null)
+
+  useEffect(() => {
+    const el = audioRef.current
+    if (!el || !audioTrack) return
+
+    if (isMicEnabled) {
+      audioTrack.attach(el)
+      const playPromise = el.play?.()
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Audio autoplay issue:", err)
+        })
+      }
+      return () => {
+        try {
+          audioTrack.detach(el)
+        } catch (e) {}
+        if (el) {
+          el.srcObject = null
+        }
+      }
+    } else {
+      try {
+        audioTrack.detach(el)
+      } catch (e) {}
+      if (el) {
+        el.srcObject = null
+      }
+    }
+  }, [audioTrack, isMicEnabled])
+
+  return <audio ref={audioRef} autoPlay playsInline />
+}
+
 // Storage helpers for meeting chat persistence
 const CHAT_STORAGE_PREFIX = 'meeting_chat_'
 
@@ -286,6 +324,7 @@ export default function MeetingRoom() {
 
   // Client-side Pinning & Screen Share Order Tracking
   const [pinnedId, setPinnedId] = useState(null)
+  const [screenFocusId, setScreenFocusId] = useState(null)
   const screenShareTimesRef = useRef({})
 
   // Drawers & UI
@@ -319,6 +358,7 @@ export default function MeetingRoom() {
   // In-room dynamic alerts
   const [inRoomAlert, setInRoomAlert] = useState(null)
   const inRoomAlertTimerRef = useRef(null)
+  const leaveLiveKitRef = useRef(null)
 
   const triggerInRoomAlert = useCallback((icon, text, type = 'info') => {
     if (inRoomAlertTimerRef.current) {
@@ -782,6 +822,9 @@ export default function MeetingRoom() {
     try {
       // Step 1: Request ticket
       const { data: ticketRes } = await axiosAPI.post('/notifications/tickets/')
+      if (!hasClickedJoinRef.current) {
+        return
+      }
       const ticket = ticketRes?.data?.ticket || ticketRes?.ticket
 
       if (!ticket) {
@@ -795,10 +838,18 @@ export default function MeetingRoom() {
       const rawBase = import.meta.env.VITE_BASE_URL
       const wsUrl = `${rawBase}/ws/meetings/${meetingId}/?ticket=${ticket}`
 
+      if (!hasClickedJoinRef.current) {
+        return
+      }
+
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
 
       ws.onopen = () => {
+        if (!hasClickedJoinRef.current) {
+          try { ws.close() } catch {}
+          return
+        }
         console.log("WebSocket ulangan:", wsUrl)
       }
 
@@ -908,11 +959,16 @@ export default function MeetingRoom() {
     setWaitingState('lobby')
 
     if (wsRef.current) {
+      try {
+        if (wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({ action: 'cancel_join' }))
+        }
+      } catch {}
       wsRef.current.close()
       wsRef.current = null
     }
     if (roomRef.current) {
-      leaveLiveKit()
+      leaveLiveKitRef.current?.()
     }
   }, [])
 
@@ -1490,6 +1546,31 @@ export default function MeetingRoom() {
               triggerInRoomAlert('mute', "Tashkilotchi mikrofoningizni o'chirdi", 'mute')
             }
           }
+        } else if (decoded.type === 'turn_off_camera') {
+          const myIdentity = room.localParticipant?.identity
+          if (decoded.targetUserId === 'ALL' || decoded.targetUserId === myIdentity) {
+            if (decoded.targetUserId === 'ALL' && isLocalHostRef.current) {
+              return
+            }
+            if (isCameraEnabledRef.current) {
+              if (room.localParticipant) {
+                const camPub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+                if (camPub?.track) {
+                  camPub.track.mediaStreamTrack?.stop()
+                  room.localParticipant.unpublishTrack(camPub.track, true).catch(() => {})
+                }
+                room.localParticipant.setCameraEnabled(false).catch(() => {})
+                updateParticipantTrack(room.localParticipant.identity, {
+                  isCameraEnabled: false,
+                  videoTrack: null
+                })
+              }
+              setIsCameraEnabled(false)
+              isCameraEnabledRef.current = false
+              toast.warning("Kamera o'chirildi", "Tashkilotchi kamerangizni o'chirib qo'ydi")
+              triggerInRoomAlert('mute', "Tashkilotchi kamerangizni o'chirdi", 'mute')
+            }
+          }
         } else if (decoded.type === 'ask_unmute') {
           const myIdentity = room.localParticipant?.identity
           if (decoded.targetUserId === myIdentity) {
@@ -1584,6 +1665,7 @@ export default function MeetingRoom() {
       setIsConnectedToLiveKit(false)
     } catch { }
   }
+  leaveLiveKitRef.current = leaveLiveKit
 
   // 4. In-Room Collaboration Handlers
   const handleToggleMic = async () => {
@@ -1907,6 +1989,30 @@ export default function MeetingRoom() {
     }
   }
 
+  // Tashkilotchi (Host) tomonidan ishtirokchi kamerasini o'chirish
+  const handleTurnOffCamera = async (targetIdentity) => {
+    if (!isLocalHost) return
+    try {
+      const payload = new TextEncoder().encode(JSON.stringify({
+        type: 'turn_off_camera',
+        targetUserId: targetIdentity,
+        sender: currentUserName,
+      }))
+      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      toast.success("Kamera o'chirildi", "Ishtirokchi kamerasi o'chirildi")
+      setParticipantTracks(prev => {
+        if (!prev[targetIdentity]) return prev
+        return {
+          ...prev,
+          [targetIdentity]: { ...prev[targetIdentity], isCameraEnabled: false, videoTrack: null }
+        }
+      })
+    } catch (err) {
+      console.error("Kamerani o'chirishda xato:", err)
+      toast.error("Xatolik", "Kamerani o'chirishda muammo yuz berdi")
+    }
+  }
+
   // Tashkilotchi tomonidan barcha ishtirokchilar mikrofonini o'chirish (Mute All)
   const handleMuteAllParticipants = async () => {
     if (!isLocalHost) return
@@ -2146,25 +2252,62 @@ export default function MeetingRoom() {
   const sortedScreenShares = [...screenShareItems].sort((a, b) => (a.shareTime || 0) - (b.shareTime || 0))
   const latestScreenShare = sortedScreenShares.length > 0 ? sortedScreenShares[sortedScreenShares.length - 1] : null
 
+  // Screen Focus Mode (client-side only for current user)
+  const isScreenFocused = Boolean(
+    screenFocusId &&
+    allParticipantItems.some(p => p.identity === screenFocusId && p.isScreenShare)
+  )
+
+  // Auto-reset screen focus if that screen share stops
+  useEffect(() => {
+    if (screenFocusId) {
+      const stillActive = allParticipantItems.some(p => p.identity === screenFocusId && p.isScreenShare)
+      if (!stillActive) {
+        setScreenFocusId(null)
+      }
+    }
+  }, [screenFocusId, allParticipantItems])
+
+  // Escape key listener to exit full screen focus mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && screenFocusId) {
+        setScreenFocusId(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [screenFocusId])
+
+  const handleToggleScreenFocus = (identity) => {
+    withViewTransition(() => {
+      setScreenFocusId(prev => (prev === identity ? null : identity))
+    })
+  }
+
   // Pinned item (client-side only for current user)
   const pinnedItem = pinnedId ? allParticipantItems.find(p => p.identity === pinnedId) : null
 
   let mainStageItem = null
   let sideRailItems = []
 
-  if (pinnedItem) {
-    // 1. User pinned an item explicitly (client-side only)
+  if (isScreenFocused) {
+    // 1. Shared screen full screen focus mode (client-side only for current user)
+    mainStageItem = allParticipantItems.find(p => p.identity === screenFocusId && p.isScreenShare) || latestScreenShare
+    sideRailItems = []
+  } else if (pinnedItem) {
+    // 2. User pinned an item explicitly (client-side only)
     mainStageItem = pinnedItem
     const otherScreenShares = sortedScreenShares.filter(s => s.identity !== pinnedItem.identity)
     const otherCameras = cameraItems.filter(c => c.identity !== pinnedItem.identity)
     sideRailItems = [...otherScreenShares, ...otherCameras]
   } else if (latestScreenShare) {
-    // 2. Multiple or single screen shares active: main stage shows latest screen share
+    // 3. Multiple or single screen shares active: main stage shows latest screen share
     mainStageItem = latestScreenShare
     const otherScreenShares = sortedScreenShares.filter(s => s.identity !== latestScreenShare.identity)
     sideRailItems = [...otherScreenShares, ...cameraItems]
   } else {
-    // 3. No screen share and no pin -> pure balanced camera grid
+    // 4. No screen share and no pin -> pure balanced camera grid
     mainStageItem = null
     sideRailItems = []
   }
@@ -2316,109 +2459,158 @@ export default function MeetingRoom() {
         </div>
       )}
 
+      {/* Persistent Global Remote Audio Players (Uninterrupted audio playback regardless of full-screen focus or tile layout) */}
+      <div className="hidden pointer-events-none opacity-0 w-0 h-0" aria-hidden="true">
+        {remoteParticipants.map((rp) => {
+          const rInfo = participantTracks[rp.identity] || {}
+          const micTrack = rInfo.audioTrack || rp.getTrackPublication(Track.Source.Microphone)?.audioTrack
+          const isMicEnabled = rInfo.isMicEnabled ?? rp.isMicrophoneEnabled ?? true
+
+          const screenAudioPub = rp.getTrackPublication(Track.Source.ScreenShareAudio)
+          const screenAudioTrack = screenAudioPub?.audioTrack
+
+          return (
+            <div key={`remote-audio-wrapper-${rp.identity}`}>
+              <RemoteAudioPlayer
+                audioTrack={micTrack}
+                isMicEnabled={isMicEnabled}
+              />
+              {screenAudioTrack && (
+                <RemoteAudioPlayer
+                  audioTrack={screenAudioTrack}
+                  isMicEnabled={!screenAudioPub?.isMuted}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
+
       {/* Top Header Bar */}
-      <header className="h-16 px-6 flex items-center justify-between border-b border-[#3c4043] bg-[#202124] z-20 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <h2 className="text-base sm:text-lg font-bold text-white truncate max-w-[200px] sm:max-w-md">
-              {meetingDetails?.title || meetingState?.title || "Yig'ilish"}
-            </h2>
-          </div>
-          
-          {/* Official UID Badge */}
-          {meetingDetails?.uid && (
-            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] font-mono text-blue-300">
-              UID: {meetingDetails.uid}
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Details toggle in header */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsDetailsOpen((prev) => {
-                const next = !prev
-                if (next) {
-                  setIsChatOpen(false)
-                  setIsParticipantsOpen(false)
-                }
-                return next
-              })
-            }}
-            title="Yig'ilish tafsilotlari"
-            className={`p-2 rounded-xl transition-all cursor-pointer ${
-              isDetailsOpen ? 'bg-[#8ab4f8] text-[#202124]' : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white'
-            }`}
-          >
-            <RiInformationLine size={16} />
-          </button>
-
-          {/* Network Quality Indicator */}
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-medium transition-colors ${
-              networkStatus === 'reconnecting' || networkStatus === 'offline'
-                ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                : networkStatus === 'poor'
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                : 'bg-white/5 border-white/10 text-emerald-400'
-            }`}
-            title={
-              networkStatus === 'offline'
-                ? 'Tarmoqdan uzilgan'
-                : networkStatus === 'reconnecting'
-                ? 'Qayta ulanmoqda...'
-                : networkStatus === 'poor'
-                ? 'Aloqa sifati past'
-                : 'Aloqa sifati a\'lo'
-            }
-          >
-            {networkStatus === 'reconnecting' || networkStatus === 'offline' ? (
-              <RiSignalWifiOffFill className="text-sm animate-pulse" />
-            ) : networkStatus === 'poor' ? (
-              <RiSignalWifi1Fill className="text-sm" />
-            ) : (
-              <RiSignalWifiFill className="text-sm" />
+      {!isScreenFocused && (
+        <header className="h-16 px-6 flex items-center justify-between border-b border-[#3c4043] bg-[#202124] z-20 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <h2 className="text-base sm:text-lg font-bold text-white truncate max-w-[200px] sm:max-w-md">
+                {meetingDetails?.title || meetingState?.title || "Yig'ilish"}
+              </h2>
+            </div>
+            
+            {/* Official UID Badge */}
+            {meetingDetails?.uid && (
+              <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] font-mono text-blue-300">
+                UID: {meetingDetails.uid}
+              </span>
             )}
-            <span className="hidden md:inline text-[11px]">
-              {networkStatus === 'reconnecting' || networkStatus === 'offline'
-                ? 'Uzildi'
-                : networkStatus === 'poor'
-                ? 'Zaif'
-                : 'Barqaror'}
-            </span>
           </div>
 
-          {/* Duration Badge */}
-          <div className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-300">
-            {formatDuration(meetingDuration)}
-          </div>
+          <div className="flex items-center gap-3">
+            {/* Details toggle in header */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsDetailsOpen((prev) => {
+                  const next = !prev
+                  if (next) {
+                    setIsChatOpen(false)
+                    setIsParticipantsOpen(false)
+                  }
+                  return next
+                })
+              }}
+              title="Yig'ilish tafsilotlari"
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDetailsOpen ? 'bg-[#8ab4f8] text-[#202124]' : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white'
+              }`}
+            >
+              <RiInformationLine size={16} />
+            </button>
 
-          {/* Fullscreen button */}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer transition-colors"
-            title="To'liq ekran"
-          >
-            {isFullscreen ? <FaCompress size={14} /> : <FaExpand size={14} />}
-          </button>
-        </div>
-      </header>
+            {/* Network Quality Indicator */}
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-medium transition-colors ${
+                networkStatus === 'reconnecting' || networkStatus === 'offline'
+                  ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                  : networkStatus === 'poor'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                  : 'bg-white/5 border-white/10 text-emerald-400'
+              }`}
+              title={
+                networkStatus === 'offline'
+                  ? 'Tarmoqdan uzilgan'
+                  : networkStatus === 'reconnecting'
+                  ? 'Qayta ulanmoqda...'
+                  : networkStatus === 'poor'
+                  ? 'Aloqa sifati past'
+                  : 'Aloqa sifati a\'lo'
+              }
+            >
+              {networkStatus === 'reconnecting' || networkStatus === 'offline' ? (
+                <RiSignalWifiOffFill className="text-sm animate-pulse" />
+              ) : networkStatus === 'poor' ? (
+                <RiSignalWifi1Fill className="text-sm" />
+              ) : (
+                <RiSignalWifiFill className="text-sm" />
+              )}
+              <span className="hidden md:inline text-[11px]">
+                {networkStatus === 'reconnecting' || networkStatus === 'offline'
+                  ? 'Uzildi'
+                  : networkStatus === 'poor'
+                  ? 'Zaif'
+                  : 'Barqaror'}
+              </span>
+            </div>
+
+            {/* Duration Badge */}
+            <div className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-300">
+              {formatDuration(meetingDuration)}
+            </div>
+
+            {/* Fullscreen button */}
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer transition-colors"
+              title="To'liq ekran"
+            >
+              {isFullscreen ? <FaCompress size={14} /> : <FaExpand size={14} />}
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Conference Body */}
       <div className="flex-1 flex overflow-hidden relative">
+        {/* Floating exit full screen focus button */}
+        {isScreenFocused && (
+          <div className="absolute top-4 right-4 z-40 flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => handleToggleScreenFocus(screenFocusId)}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black text-white/90 hover:text-white border border-white/20 backdrop-blur-md shadow-2xl text-xs font-semibold cursor-pointer transition-all hover:scale-105 active:scale-95"
+              title="To'liq ekrandan chiqish (Esc)"
+            >
+              <FaCompress size={13} className="text-amber-400" />
+              <span>To'liq ekrandan chiqish</span>
+              <kbd className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white/10 text-slate-300 border border-white/10">Esc</kbd>
+            </button>
+          </div>
+        )}
+
         {/* Main Video Area: Google Meet Presentation Mode OR Pure Camera Grid */}
-        <main className="flex-1 flex overflow-hidden p-2 sm:p-3 md:p-4 transition-all duration-300">
+        <main className={`flex-1 flex overflow-hidden transition-all duration-300 ${isScreenFocused ? 'p-0' : 'p-2 sm:p-3 md:p-4'}`}>
           {mainStageItem ? (
             /* Google Meet Presentation Stage (Single Full View) + Right Sidebar Filmstrip */
             <div className="w-full h-full flex flex-col lg:flex-row gap-3 overflow-hidden">
               {/* Main Stage (Pinned Item OR Latest Shared Screen) */}
               <div
                 style={{ viewTransitionName: getViewTransitionName(mainStageItem.identity) }}
-                className="flex-1 h-full min-h-0 min-w-0 flex items-center justify-center relative rounded-3xl bg-[#121212] overflow-hidden border border-white/10 shadow-2xl"
+                className={`flex-1 h-full min-h-0 min-w-0 flex items-center justify-center relative overflow-hidden transition-all duration-300 ${
+                  isScreenFocused
+                    ? 'rounded-none bg-black border-0 shadow-none'
+                    : 'rounded-3xl bg-[#121212] border border-white/10 shadow-2xl'
+                }`}
               >
                 <div className="w-full h-full flex items-center justify-center">
                   <ParticipantTile
@@ -2437,12 +2629,14 @@ export default function MeetingRoom() {
                     version={mainStageItem.version || 0}
                     isPinned={pinnedId === mainStageItem.identity}
                     onTogglePin={() => handleTogglePin(mainStageItem.identity)}
+                    isFullScreenFocus={isScreenFocused && screenFocusId === mainStageItem.identity}
+                    onToggleFullScreenFocus={mainStageItem.isScreenShare ? () => handleToggleScreenFocus(mainStageItem.identity) : null}
                   />
                 </div>
               </div>
 
               {/* Right Sidebar Filmstrip: Other Screen Shares + Participant Webcams */}
-              {sideRailItems.length > 0 && (
+              {!isScreenFocused && sideRailItems.length > 0 && (
                 <div
                   className="w-full lg:w-72 xl:w-80 h-36 sm:h-44 lg:h-full shrink-0 flex flex-row lg:flex-col justify-start gap-3 overflow-x-auto lg:overflow-y-auto p-1"
                   style={{ scrollbarWidth: 'thin', scrollbarColor: '#3c4043 transparent' }}
@@ -2473,6 +2667,8 @@ export default function MeetingRoom() {
                         version={item.version || 0}
                         isPinned={pinnedId === item.identity}
                         onTogglePin={() => handleTogglePin(item.identity)}
+                        isFullScreenFocus={isScreenFocused && screenFocusId === item.identity}
+                        onToggleFullScreenFocus={item.isScreenShare ? () => handleToggleScreenFocus(item.identity) : null}
                       />
                     </div>
                   ))}
@@ -2659,7 +2855,7 @@ export default function MeetingRoom() {
 
         {/* In-Meeting Chat Drawer */}
         <ChatDrawer
-          isOpen={isChatOpen}
+          isOpen={!isScreenFocused && isChatOpen}
           onClose={() => setIsChatOpen(false)}
           messages={chatMessages}
           onSendMessage={handleSendMessage}
@@ -2668,7 +2864,7 @@ export default function MeetingRoom() {
 
         {/* Participants Drawer */}
         <ParticipantsDrawer
-          isOpen={isParticipantsOpen}
+          isOpen={!isScreenFocused && isParticipantsOpen}
           onClose={() => setIsParticipantsOpen(false)}
           participants={allParticipantItems.filter(p => !p.isScreenShare)}
           knockRequests={activeKnockRequests}
@@ -2677,6 +2873,7 @@ export default function MeetingRoom() {
           onMuteParticipant={handleMuteParticipant}
           onMuteAll={handleMuteAllParticipants}
           onAskUnmuteParticipant={handleAskUnmuteParticipant}
+          onTurnOffCamera={handleTurnOffCamera}
           onAdmitUser={handleAdmitUser}
           onRejectUser={handleRejectUser}
           currentUserId={roomRef.current?.localParticipant?.identity}
@@ -2686,7 +2883,7 @@ export default function MeetingRoom() {
 
         {/* Meeting Details Drawer (Google Meet Style) */}
         <MeetingDetailsDrawer
-          isOpen={isDetailsOpen}
+          isOpen={!isScreenFocused && isDetailsOpen}
           onClose={() => setIsDetailsOpen(false)}
           meetingDetails={meetingDetails}
           meetingState={meetingState}
@@ -2710,6 +2907,7 @@ export default function MeetingRoom() {
           onToggleHandRaise={handleToggleHandRaise}
           isChatOpen={isChatOpen}
           onToggleChat={() => {
+            if (isScreenFocused) setScreenFocusId(null)
             setIsChatOpen((prev) => {
               const next = !prev
               if (next) {
@@ -2723,6 +2921,7 @@ export default function MeetingRoom() {
           unreadChatCount={unreadChatCount}
           isParticipantsOpen={isParticipantsOpen}
           onToggleParticipants={() => {
+            if (isScreenFocused) setScreenFocusId(null)
             setIsParticipantsOpen((prev) => {
               const next = !prev
               if (next) {
@@ -2736,6 +2935,7 @@ export default function MeetingRoom() {
           knockCount={canAdmitParticipants ? activeKnockRequests.length : 0}
           isDetailsOpen={isDetailsOpen}
           onToggleDetails={() => {
+            if (isScreenFocused) setScreenFocusId(null)
             setIsDetailsOpen((prev) => {
               const next = !prev
               if (next) {

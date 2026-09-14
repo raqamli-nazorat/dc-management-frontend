@@ -1,3 +1,5 @@
+import { ComputerVideoCallIcon, Copy01Icon, Mic01Icon, Video01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useRef, useEffect, useState } from 'react'
 import {
   FaMicrophone,
@@ -5,15 +7,17 @@ import {
   FaVideo,
   FaVideoSlash,
   FaArrowLeft,
+  FaXmark,
   FaCheck,
   FaCircleXmark,
 } from 'react-icons/fa6'
-import { TbClockHour4, TbVideo } from 'react-icons/tb'
+import { IoCopyOutline } from 'react-icons/io5'
 
 export default function WaitingRoom({
   title = "Yig'ilish",
   meetingDetails,
   meetingState,
+  meetingId,
   isRejected = false,
   rejectedMessage = "Tashkilotchi yig'ilishga kirishingizni rad etdi.",
   waitingState = 'lobby', // 'lobby' | 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected'
@@ -30,6 +34,7 @@ export default function WaitingRoom({
 }) {
   const videoRef = useRef(null)
   const [audioLevel, setAudioLevel] = useState(0)
+  const [copied, setCopied] = useState(false)
 
   // Attach local camera stream to video element
   useEffect(() => {
@@ -99,9 +104,18 @@ export default function WaitingRoom({
     ? displayName.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
     : 'U'
 
+  const meetingUid = meetingDetails?.uid || meetingId || meetingState?.uid || ''
+
+  const handleCopyUid = () => {
+    if (!meetingUid) return
+    navigator.clipboard?.writeText(meetingUid)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   // Determine status message when in waiting states
-  let statusTitle = "Kutish zali"
-  let statusDesc = "Yig'ilishga ulanish kutilmoqda..."
+  let statusTitle = "Ruxsat kutilmoqda"
+  let statusDesc = "So'rov tashkilotchiga yuborildi. U tasdiqlagach siz avtomatik qo'shilasiz."
 
   if (isRejected || waitingState === 'rejected') {
     statusTitle = "Kirish rad etildi"
@@ -110,8 +124,8 @@ export default function WaitingRoom({
     statusTitle = "Tashkilotchi kutilmoqda"
     statusDesc = "Tashkilotchi hali yig'ilishga kirmagan. U kirishi bilanoq tizim avtomatik ulaydi."
   } else if (waitingState === 'waiting_approval' || (meetingState?.requires_approval && !meetingState?.is_approved && waitingState !== 'lobby')) {
-    statusTitle = "Tasdiqlash kutilmoqda"
-    statusDesc = "Kirish so'rovingiz tashkilotchiga yuborildi. Tashkilotchi qabul qilishini kuting..."
+    statusTitle = "Ruxsat kutilmoqda"
+    statusDesc = "So'rov tashkilotchiga yuborildi. U tasdiqlagach siz avtomatik qo'shilasiz."
   } else if (waitingState === 'connecting' || isJoining) {
     statusTitle = "Ulanmoqda..."
     statusDesc = "Yig'ilish xonasiga ulanish o'rnatilmoqda..."
@@ -120,227 +134,181 @@ export default function WaitingRoom({
   const isWaitingPhase = waitingState !== 'lobby'
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#111317] text-white flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto select-none z-50">
-      {/* Google Meet inspired dark ambient lighting */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-5xl flex flex-col items-center my-auto">
-        {/* Top Meeting Title Badge */}
-        <div className="mb-6 sm:mb-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300 mb-2.5 shadow-sm">
-            <TbClockHour4 size={15} className="text-blue-400" />
-            <span>Onlayn Yig'ilish</span>
-            {meetingDetails?.uid && (
-              <>
-                <span className="w-1 h-1 rounded-full bg-slate-500" />
-                <span className="font-mono text-slate-400">{meetingDetails.uid}</span>
-              </>
-            )}
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            {meetingDetails?.title || meetingState?.title || title}
-          </h1>
-        </div>
-
-        {/* Main Grid: Left is Video Preview, Right is Action / Status Panel */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          {/* Left Column: Camera Preview Box */}
-          <div className="lg:col-span-7 flex flex-col items-center">
-            <div className="relative w-full h-[380px]! aspect-video rounded-3xl overflow-hidden bg-[#1C1F26] border border-white/10 shadow-2xl flex items-center justify-center ring-1 ring-white/5 group">
-              {isCameraEnabled && localStream && localStream.getVideoTracks().length > 0 ? (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover scale-x-[-1]"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-slate-400 gap-3">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl">
-                    {user?.avatar ? (
-                      <img src={user.avatar} alt={displayName} className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      initials
-                    )}
-                  </div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-400">Kamera o'chirilgan</p>
-                </div>
-              )}
-
-              {/* Audio activity visualizer pill (top left) */}
-              <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-xs">
-                {isMicEnabled ? (
-                  <>
-                    <div className="flex items-center gap-0.5 h-3">
-                      <span
-                        className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                        style={{ height: `${Math.max(4, audioLevel * 0.25)}px` }}
-                      />
-                      <span
-                        className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                        style={{ height: `${Math.max(4, audioLevel * 0.4)}px` }}
-                      />
-                      <span
-                        className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                        style={{ height: `${Math.max(4, audioLevel * 0.2)}px` }}
-                      />
-                    </div>
-                    <span className="text-emerald-400 font-medium text-[11px]">Mikrofon tayyor</span>
-                  </>
+    <div className="fixed inset-0 w-full h-full bg-white dark:bg-[#11141A] text-slate-800 dark:text-white flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-y-auto select-none z-50">
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-10 lg:gap-16 my-auto">
+        {/* Left Column: Camera Preview Box */}
+        <div className="w-[740px] aspect-[16/10] bg-[#181A24] dark:bg-[#E8EDF2] rounded-[28px] overflow-hidden relative flex flex-col items-center justify-center shadow-xl shrink-0">
+          {isCameraEnabled && localStream && localStream.getVideoTracks().length > 0 ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover scale-x-[-1]"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 dark:from-slate-300 dark:to-slate-400 border border-white/10 dark:border-black/5 flex items-center justify-center text-white dark:text-slate-800 text-2xl font-bold overflow-hidden shadow-lg">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-red-400 font-medium text-[11px] flex items-center gap-1.5">
-                    <FaMicrophoneSlash size={11} /> Mikrofon o'chiq
-                  </span>
+                  initials
                 )}
               </div>
+              <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-600 font-normal mt-1">
+                Kamera o'chirilgan
+              </p>
+            </div>
+          )}
 
-              {/* Video Controls Overlay (Bottom Center) */}
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3.5 px-5 py-2.5 rounded-2xl bg-[#202124]/85 backdrop-blur-xl border border-white/15 shadow-2xl">
+          {/* Audio Activity Visualizer (Microphone indicator) */}
+          {isMicEnabled && audioLevel > 5 && (
+            <div className="absolute top-4 left-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
+              <span
+                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
+                style={{ height: `${Math.max(4, audioLevel * 0.2)}px` }}
+              />
+              <span
+                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
+                style={{ height: `${Math.max(4, audioLevel * 0.35)}px` }}
+              />
+              <span
+                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
+                style={{ height: `${Math.max(4, audioLevel * 0.2)}px` }}
+              />
+            </div>
+          )}
+
+          {/* Bottom Center Media Controls */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3.5 z-20">
+            {/* Mic Toggle Button */}
+            <button
+              type="button"
+              onClick={onToggleMic}
+              title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
+              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95 ${
+                isMicEnabled
+                  ? 'bg-white text-slate-800 dark:bg-black dark:text-white hover:bg-slate-100 dark:hover:bg-neutral-900'
+                  : 'bg-[#E02D2D] text-white hover:bg-red-600'
+              }`}
+            >
+              <HugeiconsIcon icon={Mic01Icon} strokeWidth={2.5} size={18} />
+            </button>
+
+            {/* Camera Toggle Button */}
+            <button
+              type="button"
+              onClick={onToggleCamera}
+              title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
+              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95 ${
+                isCameraEnabled
+                  ? 'bg-white text-slate-800 dark:bg-black dark:text-white hover:bg-slate-100 dark:hover:bg-neutral-900'
+                  : 'bg-[#E02D2D] text-white hover:bg-red-600'
+              }`}
+            >
+              <HugeiconsIcon icon={Video01Icon} strokeWidth={2.5} size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Right Column: Information & Actions */}
+        <div className="w-full max-w-[340px] flex flex-col items-start text-left">
+          {!isWaitingPhase ? (
+            /* 1. Lobby: "Ready to join" screen */
+            <div className="w-full flex flex-col items-start">
+              <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+                Uchrashuvga qo'shilish
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 line-clamp-2">
+                {meetingDetails?.title || meetingState?.title || title}
+              </p>
+
+              {/* Meeting UID badge with copy */}
+              {meetingUid && (
                 <button
                   type="button"
-                  onClick={onToggleMic}
-                  title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
-                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95
-                    ${isMicEnabled
-                      ? 'bg-white/15 hover:bg-white/25 text-white'
-                      : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/30'
-                    }`}
+                  onClick={handleCopyUid}
+                  className="mt-4 px-3 py-1.5 rounded-lg bg-[#F1F3F7] dark:bg-[#181C24] hover:bg-slate-200/80 dark:hover:bg-[#202530] text-slate-700 dark:text-slate-300 border border-transparent dark:border-white/5 text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
+                  title="UID nusxalash"
                 >
-                  {isMicEnabled ? <FaMicrophone size={16} /> : <FaMicrophoneSlash size={16} />}
+                  {copied ? (
+                    <FaCheck size={12} className="text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <HugeiconsIcon icon={Copy01Icon} size={14} className="text-slate-400 dark:text-[#8E95B5]" />
+                  )}
+                  <span className="test-[13px] text-[#1A1D2E] dark:text-[#E6EDF3]">{meetingUid}</span>
+                  {copied && <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-sans">Nusxalandi</span>}
                 </button>
+              )}
 
-                <button
-                  type="button"
-                  onClick={onToggleCamera}
-                  title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
-                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95
-                    ${isCameraEnabled
-                      ? 'bg-white/15 hover:bg-white/25 text-white'
-                      : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/30'
-                    }`}
-                >
-                  {isCameraEnabled ? <FaVideo size={16} /> : <FaVideoSlash size={16} />}
-                </button>
+              {/* Join Button */}
+              <button
+                type="button"
+                onClick={onJoinMeeting}
+                disabled={isJoining}
+                className="w-full mt-6 py-3 px-5 rounded-xl bg-[#3956B7] dark:bg-[#2A344A] hover:bg-[#314AA0] dark:hover:bg-[#34405C] active:scale-[0.99] disabled:opacity-60 text-white font-semibold text-sm sm:text-base shadow-sm hover:shadow transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+              >
+                {isJoining ? (
+                  <>
+                    <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    <span>Ulanmoqda...</span>
+                  </>
+                ) : (
+                  <>
+                    {/* Badge / Video icon from design */}
+                    <HugeiconsIcon icon={ComputerVideoCallIcon} size={18} strokeWidth={2.5} />
+                    <span>Qo'shilish</span>
+                  </>
+                )}
+              </button>
+
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-4 leading-relaxed">
+                Tashkilotchi ruxsat bergach uchrashuvga kirasiz.
+              </p>
+            </div>
+          ) : (
+            /* 2. Waiting Room State (Connecting / Waiting Approval / Rejected) */
+            <div className="w-full flex flex-col items-start">
+              {isRejected || waitingState === 'rejected' ? (
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 flex items-center justify-center mb-3">
+                  <FaCircleXmark size={22} />
+                </div>
+              ) : null}
+
+              <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+                {statusTitle}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 leading-relaxed">
+                {statusDesc}
+              </p>
+
+              {/* Waiting Actions */}
+              <div className="w-full mt-6 flex flex-col gap-2.5">
+                {isRejected || waitingState === 'rejected' ? (
+                  <button
+                    type="button"
+                    onClick={onLeave}
+                    className="w-full py-3 px-5 rounded-xl border border-gray-200 dark:border-transparent hover:border-gray-300 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]"
+                  >
+                    <FaArrowLeft size={12} />
+                    <span>Orqaga qaytish</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onCancelWait || onLeave}
+                    className="w-full py-3 px-5 rounded-xl border border-gray-200 dark:border-transparent hover:border-gray-300 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]"
+                  >
+                    <FaXmark size={14} />
+                    <span>Bekor qilish</span>
+                  </button>
+                )}
               </div>
             </div>
-
-            <p className="text-xs text-slate-400 mt-3 text-center">
-              Kirishdan oldin mikrofon va kamerangizni sozlab oling
-            </p>
-          </div>
-
-          {/* Right Column: Google Meet Style Action / Waiting Card */}
-          <div className="col-span-5 flex flex-col justify-center">
-            <div className="w-full p-6 sm:p-8 rounded-3xl bg-[#1C1F26]/90 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col">
-              {!isWaitingPhase ? (
-                /* 1. Lobby: "Ready to join" screen */
-                <div className="flex flex-col gap-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      Qo'shilishga tayyormisiz?
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                      Kamerangiz va mikrofoningiz sozlanganidan so'ng yig'ilishga kiring
-                    </p>
-                  </div>
-
-                  {/* Logged in User Pill */}
-                  <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt={displayName} className="w-full h-full rounded-full object-cover" />
-                      ) : (
-                        initials
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1 text-left">
-                      <p className="text-sm font-bold text-white truncate">{displayName}</p>
-                      <p className="text-[11px] text-slate-400 truncate">
-                        {user?.position || user?.roles?.[0] || 'Qatnashuvchi'} sifatida
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={onJoinMeeting}
-                      disabled={isJoining}
-                      className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold text-base shadow-xl shadow-blue-600/30 hover:shadow-blue-500/50 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
-                    >
-                      {isJoining ? (
-                        <>
-                          <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                          <span>Ulanmoqda...</span>
-                        </>
-                      ) : (
-                        <>
-                          <TbVideo size={20} />
-                          <span>Yig'ilishga kirish</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={onLeave}
-                      className="w-full py-3.5 px-6 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/5"
-                    >
-                      <FaArrowLeft size={13} />
-                      <span>Orqaga qaytish</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                /* 2. Waiting Room State (Connecting / Waiting Approval / Rejected) */
-                <div className="flex flex-col items-center text-center py-2">
-                  {!isRejected && waitingState !== 'rejected' ? (
-                    <div className="relative mb-5">
-                      <div className="w-14 h-14 rounded-full border-3 border-blue-500/20 border-t-blue-500 animate-spin flex items-center justify-center" />
-                      <div className="absolute inset-0 rounded-full bg-blue-500/10 animate-ping" />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mb-5">
-                      <FaCircleXmark size={28} />
-                    </div>
-                  )}
-
-                  <h3 className="text-xl font-extrabold text-white">{statusTitle}</h3>
-                  <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-sm leading-relaxed">
-                    {statusDesc}
-                  </p>
-
-                  <div className="mt-8 w-full flex flex-col gap-2.5">
-                    {/* If waiting for approval or organizer, user can cancel back to lobby */}
-                    {(waitingState === 'waiting_approval' || waitingState === 'waiting_organizer') && onCancelWait && (
-                      <button
-                        type="button"
-                        onClick={onCancelWait}
-                        className="w-full py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm transition-colors cursor-pointer"
-                      >
-                        Kutishni bekor qilish
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={onLeave}
-                      className="w-full py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
-                    >
-                      {isRejected || waitingState === 'rejected' ? "Orqaga qaytish" : "Chiqish"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
+

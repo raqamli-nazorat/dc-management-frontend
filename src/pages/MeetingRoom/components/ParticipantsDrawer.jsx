@@ -22,6 +22,7 @@ export default function ParticipantsDrawer({
   onMuteParticipant,
   onMuteAll,
   onAskUnmuteParticipant,
+  onTurnOffCamera,
   onAdmitUser,
   onRejectUser,
   currentUserId,
@@ -331,17 +332,28 @@ export default function ParticipantsDrawer({
                             </span>
                           )}
 
-                          {/* Camera indicator */}
-                          <span
-                            className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
-                              p.isCameraEnabled
-                                ? 'bg-emerald-500/15 text-emerald-400'
-                                : 'bg-white/5 text-slate-500'
-                            }`}
-                            title={p.isCameraEnabled ? 'Kamera yoniq' : "Kamera o'chiq"}
-                          >
-                            {p.isCameraEnabled ? <FaVideo size={11} /> : <FaVideoSlash size={11} />}
-                          </span>
+                          {/* Camera indicator or Host Turn Off Control */}
+                          {isLocalHost && !isMe && p.isCameraEnabled ? (
+                            <button
+                              type="button"
+                              onClick={() => onTurnOffCamera && onTurnOffCamera(p.identity)}
+                              title={`${p.name || 'Ishtirokchi'} kamerasini o'chirish`}
+                              className="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-600 text-red-400 hover:text-white transition-all cursor-pointer shadow-sm active:scale-90"
+                            >
+                              <FaVideoSlash size={11} />
+                            </button>
+                          ) : (
+                            <span
+                              className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
+                                p.isCameraEnabled
+                                  ? 'bg-emerald-500/15 text-emerald-400'
+                                  : 'bg-white/5 text-slate-500'
+                              }`}
+                              title={p.isCameraEnabled ? 'Kamera yoniq' : "Kamera o'chiq"}
+                            >
+                              {p.isCameraEnabled ? <FaVideo size={11} /> : <FaVideoSlash size={11} />}
+                            </span>
+                          )}
                         </div>
                       </div>
                     )

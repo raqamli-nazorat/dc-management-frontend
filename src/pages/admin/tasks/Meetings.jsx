@@ -433,6 +433,33 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
               </div>
             </div>
 
+            {/* Tasdiqlash talabi card */}
+            <div className="rounded-xl p-3 bg-[#F1F3F9] dark:bg-[#1E222D] border border-slate-200/60 dark:border-white/5 flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 pr-2">
+                <span className="text-[13px]! font-bold text-[var(--text-strong)] dark:text-white">
+                  Tasdiqlash talabi
+                </span>
+                <p className="text-[11px] text-[var(--text-soft)] dark:text-slate-400 leading-[16px]">
+                  Yoqilsa, yig'ilishga qo'shilmoqchi bo'lgan har bir ishtirokchini yig'ilish yaratuvchisi, loyiha menejeri yoki administrator tasdiqlaydi.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set('requires_approval', !form.requires_approval)}
+                className={`relative shrink-0 w-10 h-5! rounded-full cursor-pointer transition-colors duration-200 p-0.5 focus:outline-none ${
+                  form.requires_approval
+                    ? 'bg-[#3b5998] dark:bg-[#4f6fbd]'
+                    : 'bg-[#D0D5E2] dark:bg-[#3A3F4D]'
+                }`}
+              >
+                <span
+                  className={`block w-3.5! h-3.5! rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    form.requires_approval ? 'translate-x-5.5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
             <div>
               <label className={labelCls}>Tavsifi</label>
               <ResizableTextarea value={form.description} onChange={e => set('description', e.target.value)}
@@ -538,26 +565,27 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
 
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
-
-            <div className="flex items-center gap-2.5">
-              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-sub)]">Tasdiqlash talabi</span>
-              <button type="button" onClick={() => set('requires_approval', !form.requires_approval)}
-                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-200 ${form.requires_approval ? 'bg-[var(--accent-strong)] dark:bg-[#526ED3]' : 'bg-[#D0D5E2] dark:bg-[#30363D]'}`}>
-                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ${form.requires_approval ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-[#3b66d1] hover:text-[#2d4fa3] dark:text-[#688bf0] hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer"
+            >
+              <FaXmark size={14} />
+              <span>Yopish</span>
+            </button>
             <div className="flex items-center gap-3">
-              <button onClick={handleClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
-                <FaXmark size={13} /> Yopish
-              </button>
-              <button onClick={handleSubmit} disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
-                {loading
-                  ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                  : <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                }
-                Qo'shish
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[#3b5998] hover:bg-[#314a80] text-white disabled:opacity-60 transition-all shadow-sm"
+              >
+                {loading ? (
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                ) : (
+                  <FaCheck size={13} />
+                )}
+                <span>Qo'shish</span>
               </button>
             </div>
           </div>
@@ -801,11 +829,11 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
             <div className="flex items-center gap-3 mb-1">
               <button onClick={handleClose} className="text-[var(--text-strong)] dark:text-[var(--text-strong)] hover:opacity-60 cursor-pointer shrink-0"><FaArrowLeft size={17} /></button>
               <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-                {canEdit ? "Yig'ilishni tahrirlash" : "Yig'ilish ma'lumotlari"}
+                Yig'ilish ma'lumotlari
               </h2>
             </div>
-            <p className="text-sm text-[var(--text-soft)] ">
-              {canEdit ? "Yig'ilish ma'lumotlarini yangilang" : "Yig'ilish haqida to'liq ma'lumot"}
+            <p className="text-sm text-[var(--text-soft)]">
+              Yig'ilish ma'lumotlarini ko'ring, kerak bo'lsa tahrirlang
             </p>
           </div>
 
@@ -828,6 +856,35 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
               </div>
             </div>
 
+            {/* Tasdiqlash talabi card */}
+            <div className="rounded-xl p-3 bg-[#F1F3F9] dark:bg-[#1E222D] border border-slate-200/60 dark:border-white/5 flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 pr-2">
+                <span className="text-[13px]! font-bold text-[var(--text-strong)] dark:text-white">
+                  Tasdiqlash talabi
+                </span>
+                <p className="text-[11px] text-[var(--text-soft)] dark:text-slate-400 leading-[16px]">
+                  Yoqilsa, yig'ilishga qo'shilmoqchi bo'lgan har bir ishtirokchini yig'ilish yaratuvchisi, loyiha menejeri yoki administrator tasdiqlaydi.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => canEdit && set('requires_approval', !form.requires_approval)}
+                disabled={!canEdit}
+                className={`relative shrink-0 w-10 h-5! rounded-full transition-colors duration-200 p-0.5 focus:outline-none ${
+                  canEdit ? 'cursor-pointer' : 'cursor-default opacity-80'
+                } ${
+                  form.requires_approval
+                    ? 'bg-[#3b5998] dark:bg-[#4f6fbd]'
+                    : 'bg-[#D0D5E2] dark:bg-[#3A3F4D]'
+                }`}
+              >
+                <span
+                  className={`block w-3.5! h-3.5! rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    form.requires_approval ? 'translate-x-5.5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
 
             <div>
               <label className={labelCls}>Tavsifi</label>
@@ -946,18 +1003,31 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
           {/* -- Footer (qotgan) -- */}
           <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
-            <div className="flex items-center gap-2.5">
-              <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-sub)]">Tasdiqlash talabi</span>
-              <button
-                type="button"
-                onClick={() => canEdit && set('requires_approval', !form.requires_approval)}
-                disabled={!canEdit}
-                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-200 ${form.requires_approval ? 'bg-[var(--accent-strong)] dark:bg-[#526ED3]' : 'bg-[#D0D5E2] dark:bg-[#30363D]'}`}
-              >
-                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ${form.requires_approval ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-[#3b66d1] hover:text-[#2d4fa3] dark:text-[#688bf0] hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer"
+            >
+              <FaXmark size={14} />
+              <span>Yopish</span>
+            </button>
+
             <div className="flex items-center gap-3">
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold cursor-pointer border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-900 dark:text-white shadow-xs transition-colors"
+                >
+                  {loading ? (
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                  ) : (
+                    <FaCheck size={13} />
+                  )}
+                  <span>Saqlash</span>
+                </button>
+              )}
               {!meeting.is_completed && (() => {
                 const isParticipant = Boolean(
                   user?.id && (
@@ -970,26 +1040,13 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
                   <button
                     type="button"
                     onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold cursor-pointer bg-[#3b5998] hover:bg-[#314a80] text-white shadow-sm transition-all"
                   >
-                    <FaVideo size={13} /> Yig'ilishga kirish
+                    <FaVideo size={13} />
+                    <span>Yig'ilishga kirish</span>
                   </button>
                 ) : null
               })()}
-              <button onClick={handleClose}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
-                <FaXmark size={13} /> Yopish
-              </button>
-              {canEdit && (
-                <button onClick={handleSubmit} disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] disabled:opacity-60">
-                  {loading
-                    ? <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                    : <FaCheck size={13} />
-                  }
-                  Saqlash
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -1058,7 +1115,7 @@ function MeetingDetailModal({ meeting, onClose }) {
             </button>
             <h2 className="text-[20px] font-extrabold text-[var(--text-strong)] dark:text-[var(--text-strong)]">Yig'ilish ma'lumotlari</h2>
           </div>
-          <p className="text-sm text-[var(--text-soft)] ">Yig'ilish haqida to'liq ma'lumot</p>
+          <p className="text-sm text-[var(--text-soft)]">Yig'ilish ma'lumotlarini ko'ring, kerak bo'lsa tahrirlang</p>
         </div>
 
         {/* Scrollable content */}
@@ -1086,6 +1143,30 @@ function MeetingDetailModal({ meeting, onClose }) {
             </div>
           </div>
 
+          {/* Tasdiqlash talabi card */}
+          <div className="rounded-xl p-3 bg-[#F1F3F9] dark:bg-[#1E222D] border border-slate-200/60 dark:border-white/5 flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1 pr-2">
+              <span className="text-sm font-bold text-[var(--text-strong)] dark:text-white">
+                Tasdiqlash talabi
+              </span>
+              <p className="text-xs text-[var(--text-soft)] dark:text-slate-400 leading-relaxed">
+                Yoqilsa, yig'ilishga qo'shilmoqchi bo'lgan har bir ishtirokchini yig'ilish yaratuvchisi, loyiha menejeri yoki administrator tasdiqlaydi.
+              </p>
+            </div>
+            <div
+              className={`relative shrink-0 w-10 h-5 rounded-full p-0.5 transition-colors duration-200 pointer-events-none ${
+                meeting.requires_approval
+                  ? 'bg-[#3b5998] dark:bg-[#4f6fbd]'
+                  : 'bg-[#D0D5E2] dark:bg-[#3A3F4D]'
+              }`}
+            >
+              <span
+                className={`block w-3.5! h-3.5! rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                  meeting.requires_approval ? 'translate-x-5.5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </div>
 
           {/* Tavsif */}
           <div>
@@ -1140,14 +1221,6 @@ function MeetingDetailModal({ meeting, onClose }) {
           </div>
 
 
-          {/* Tasdiqlash talabi */}
-          <div>
-            <label className={labelCls}>Tasdiqlash talabi</label>
-            <div className={fieldCls}>
-              {meeting.requires_approval ? "Ha (kirish uchun tashkilotchi tasdig'i talab qilinadi)" : "Yo'q (avtomatik kirish)"}
-            </div>
-          </div>
-
           <div>
             <label className={labelCls}>Yig'ilishga qatnashishlar</label>
             <div className="flex flex-col gap-2">
@@ -1159,31 +1232,28 @@ function MeetingDetailModal({ meeting, onClose }) {
 
         </div>
 
-        {/* Footer — Tugatildimi + Yig'ilishga kirish + Yopish */}
-        <div className="px-7 py-4 flex items-center justify-between shrink-0 bg-[var(--bg-base)] ">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-[var(--text-sub)] dark:text-[var(--text-soft)]">Tugatildimi?</label>
-            <div className={`relative w-10 h-5 rounded-full ${meeting.is_completed ? 'bg-[var(--accent-strong)]' : 'bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)]'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${meeting.is_completed ? 'translate-x-5 left-0.5' : 'translate-x-0.5 left-0'}`} />
-            </div>
-            <span className="text-sm font-medium text-[var(--text-strong)] dark:text-[var(--text-strong)]">
-              {meeting.is_completed ? 'Ha' : "Yo'q"}
-            </span>
-          </div>
+        {/* -- Footer (qotgan) -- */}
+        <div className="px-7 py-5 flex items-center justify-between gap-3 shrink-0 bg-[var(--bg-base)]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-[#3b66d1] hover:text-[#2d4fa3] dark:text-[#688bf0] hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer"
+          >
+            <FaXmark size={14} />
+            <span>Yopish</span>
+          </button>
+
           <div className="flex items-center gap-3">
             {!meeting.is_completed && isParticipant && (
               <button
                 type="button"
                 onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold cursor-pointer bg-[var(--accent-strong)] text-white hover:bg-[var(--accent-sub)] shadow-sm transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold cursor-pointer bg-[#3b5998] hover:bg-[#314a80] text-white shadow-sm transition-all"
               >
-                <FaVideo size={13} /> Yig'ilishga kirish
+                <FaVideo size={13} />
+                <span>Yig'ilishga kirish</span>
               </button>
             )}
-            <button onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer text-[var(--text-sub)] hover:bg-[var(--bg-elevation-1)] dark:text-[var(--text-soft)] dark:hover:bg-[var(--bg-elevation-1)]">
-              <FaXmark size={13} /> Yopish
-            </button>
           </div>
         </div>
       </div>

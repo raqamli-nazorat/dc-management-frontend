@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { FaMicrophone, FaMicrophoneSlash, FaCrown } from 'react-icons/fa6'
+import { FaMicrophone, FaMicrophoneSlash, FaCrown, FaExpand, FaCompress } from 'react-icons/fa6'
 import { TbHandStop, TbPin, TbPinFilled, TbScreenShare } from 'react-icons/tb'
 
 export default function ParticipantTile({
@@ -18,9 +18,10 @@ export default function ParticipantTile({
   version = 0,
   isPinned = false,
   onTogglePin = null,
+  isFullScreenFocus = false,
+  onToggleFullScreenFocus = null,
 }) {
   const videoRef = useRef(null)
-  const audioRef = useRef(null)
 
   // Attach video track to <video> element
   useEffect(() => {
@@ -47,32 +48,6 @@ export default function ParticipantTile({
     }
   }, [videoTrack, isCameraEnabled, isScreenShare, version])
 
-  // Attach audio track for remote participants
-  useEffect(() => {
-    const el = audioRef.current
-    if (!el || isLocal || isScreenShare) return
-
-    if (audioTrack && isMicEnabled) {
-      audioTrack.attach(el)
-      el.play?.().catch(() => {})
-      return () => {
-        try {
-          audioTrack.detach(el)
-        } catch (e) {}
-        if (el) {
-          el.srcObject = null
-        }
-      }
-    } else {
-      if (el) {
-        try {
-          audioTrack?.detach(el)
-        } catch (e) {}
-        el.srcObject = null
-      }
-    }
-  }, [audioTrack, isLocal, isScreenShare, isMicEnabled])
-
   const initials = displayName
     ? displayName.trim().split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
     : 'U'
@@ -96,8 +71,18 @@ export default function ParticipantTile({
 
   return (
     <div
-      onDoubleClick={() => onTogglePin?.()}
-      className={`relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#3c4043] transition-all duration-300 ease-out flex items-center justify-center select-none shadow-lg group
+      onDoubleClick={() => {
+        if (isScreenShare && onToggleFullScreenFocus) {
+          onToggleFullScreenFocus()
+        } else {
+          onTogglePin?.()
+        }
+      }}
+      className={`relative w-full h-full ${
+        isFullScreenFocus
+          ? 'rounded-none bg-black border-0'
+          : 'rounded-2xl sm:rounded-3xl shadow-lg'
+      } overflow-hidden bg-[#3c4043] transition-all duration-300 ease-out flex items-center justify-center select-none group
         ${hasHandRaised
           ? 'ring-[3px] ring-[#fdd663] shadow-[0_0_25px_rgba(253,214,99,0.35)]'
           : isSpeaking
@@ -105,13 +90,10 @@ export default function ParticipantTile({
           : isPinned
           ? 'ring-2 ring-[#8ab4f8] shadow-[0_0_20px_rgba(138,180,248,0.3)]'
           : isScreenShare
-          ? 'bg-[#121212] border border-white/10'
+          ? isFullScreenFocus ? 'bg-black' : 'bg-[#121212] border border-white/10'
           : 'border border-white/5'
         }`}
     >
-      {/* Remote audio player (hidden) */}
-      {!isLocal && !isScreenShare && <audio ref={audioRef} autoPlay playsInline />}
-
       {/* Video element (always muted to prevent acoustic echo & conflict with audio element) */}
       {(isCameraEnabled || isScreenShare) && videoTrack ? (
         <video
@@ -167,6 +149,28 @@ export default function ParticipantTile({
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="hidden sm:inline">Jonli Taqdimot</span>
           </div>
+        )}
+
+        {/* Full Screen Focus Mode toggle for Screen Share */}
+        {isScreenShare && onToggleFullScreenFocus && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleFullScreenFocus()
+            }}
+            title={isFullScreenFocus ? "Kichiklashtirish (Full screendan chiqish)" : "To'liq ekran (Full screen focus)"}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer shadow-md active:scale-95 text-xs font-semibold
+              ${isFullScreenFocus
+                ? 'bg-amber-400 text-slate-950 hover:bg-amber-300 ring-2 ring-amber-300 shadow-amber-400/40'
+                : 'bg-black/60 hover:bg-blue-600 text-white/90 hover:text-white border border-white/20 hover:border-blue-400/50 backdrop-blur-md hover:scale-105'
+              }`}
+          >
+            {isFullScreenFocus ? <FaCompress size={12} /> : <FaExpand size={12} />}
+            <span className="hidden sm:inline">
+              {isFullScreenFocus ? 'Kichiklashtirish' : "To'liq ekran"}
+            </span>
+          </button>
         )}
 
         {/* Pin / Unpin Button (Client-side toggle) */}
