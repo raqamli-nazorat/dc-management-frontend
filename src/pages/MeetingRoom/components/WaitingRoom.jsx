@@ -297,7 +297,7 @@ export default function WaitingRoom({
                   <button
                     type="button"
                     onClick={onCancelWait || onLeave}
-                    className="w-full py-3 px-5 rounded-xl border border-gray-200 dark:border-transparent hover:border-gray-300 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]"
+                    className="w-full py-3 px-5 rounded-xl border border-gray-200 dark:border-transparent! hover:border-gray-300 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white dark:hover:border-transparent! font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]"
                   >
                     <FaXmark size={14} />
                     <span>Bekor qilish</span>
