@@ -270,6 +270,35 @@ const isUserMatch = (u, identity, pNameLower) => {
   return false
 }
 
+const parseMeetingStartTimeMs = (startTime) => {
+  if (!startTime) return null
+  if (typeof startTime === 'number') return startTime
+  if (typeof startTime === 'string') {
+    const normalized = startTime.includes(' ') && !startTime.includes('T')
+      ? startTime.replace(' ', 'T')
+      : startTime
+    const t = new Date(normalized).getTime()
+    return isNaN(t) ? null : t
+  }
+  return null
+}
+
+const formatMeetingDuration = (totalSeconds) => {
+  if (typeof totalSeconds !== 'number' || isNaN(totalSeconds) || totalSeconds < 0) {
+    return '00:00'
+  }
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = Math.floor(totalSeconds % 60)
+
+  const pad = (n) => String(n).padStart(2, '0')
+  if (hours > 0) {
+    return `${pad(hours)}:${pad(minutes)}`
+  }
+  return `${pad(minutes)}:${pad(seconds)}`
+}
+
+
 export default function MeetingRoom() {
   const { id: rawParamId } = useParams()
   const navigate = useNavigate()
@@ -350,19 +379,32 @@ export default function MeetingRoom() {
   const [meetingDuration, setMeetingDuration] = useState(0)
   const [endedReason, setEndedReason] = useState("Yig'ilish yakunlandi")
 
-  // Live clock display (e.g. "21:15") matching Figma header
+  // Live meeting duration counter (calculates elapsed time since start_time from API)
+  const rawStartTime = meetingDetails?.start_time || meetingState?.start_time || meetingDetails?.started_at
   const [currentTime, setCurrentTime] = useState(() => {
-    const now = new Date()
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+    const startMs = parseMeetingStartTimeMs(rawStartTime)
+    if (startMs) {
+      const diffSeconds = Math.max(0, Math.floor((Date.now() - startMs) / 1000))
+      return formatMeetingDuration(diffSeconds)
+    }
+    return '00:00'
   })
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date()
-      setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))
-    }, 10000)
+    const updateElapsed = () => {
+      const startMs = parseMeetingStartTimeMs(rawStartTime)
+      if (startMs) {
+        const diffSeconds = Math.max(0, Math.floor((Date.now() - startMs) / 1000))
+        setCurrentTime(formatMeetingDuration(diffSeconds))
+      } else {
+        setCurrentTime(formatMeetingDuration(meetingDuration))
+      }
+    }
+
+    updateElapsed()
+    const timer = setInterval(updateElapsed, 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [rawStartTime, meetingDuration])
 
   // Auto-sync chat messages to localStorage
   useEffect(() => {
@@ -2590,8 +2632,8 @@ export default function MeetingRoom() {
       {!isScreenFocused && (
         <header className="relative h-14 px-4 sm:px-6 flex items-center justify-between bg-transparent z-20 shrink-0 select-none">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Realtime Clock (e.g. 21:15) */}
-            <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 select-none">
+            {/* Realtime Elapsed Meeting Duration (e.g. 05:23 or 01:15:30) */}
+            <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 select-none tabular-nums font-mono">
               {currentTime}
             </span>
 
@@ -2774,11 +2816,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className={`w-48 sm:w-56 lg:w-full aspect-video shrink-0 rounded-2xl overflow-hidden shadow-md transition-shadow hover:shadow-xl ${
-                        item.isScreenShare
-                          ? 'bg-[#121212] border-2 border-blue-500/60 hover:border-blue-400'
-                          : 'bg-[#1D2230] dark:bg-[#DEE5ED] border border-black/5 dark:border-white/5'
-                      }`}
+                      className="w-48 sm:w-56 lg:w-full aspect-video shrink-0 rounded-2xl sm:rounded-3xl flex flex-col items-stretch transition-shadow hover:shadow-xl"
                     >
                       <ParticipantTile
                         participant={item}
@@ -2839,7 +2877,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl"
+                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}
@@ -2868,7 +2906,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl"
+                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}
@@ -2903,7 +2941,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl"
+                      className="w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}

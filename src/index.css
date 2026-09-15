@@ -37,6 +37,46 @@
   animation: spin 1s linear infinite;
 }
 
+/* Voice wave animations for speaking participant */
+@keyframes voiceWave1 {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+@keyframes voiceWave2 {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 18px;
+  }
+}
+
+@keyframes voiceWave3 {
+  0%, 100% {
+    height: 3px;
+  }
+  50% {
+    height: 12px;
+  }
+}
+
+.animate-voice-wave-1 {
+  animation: voiceWave1 0.6s ease-in-out infinite alternate;
+}
+
+.animate-voice-wave-2 {
+  animation: voiceWave2 0.42s ease-in-out infinite alternate;
+}
+
+.animate-voice-wave-3 {
+  animation: voiceWave3 0.7s ease-in-out infinite alternate;
+}
+
 /* Custom scrollbar — global */
 * {
   scrollbar-width: thin;

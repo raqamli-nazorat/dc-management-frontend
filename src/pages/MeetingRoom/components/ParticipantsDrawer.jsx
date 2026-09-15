@@ -197,9 +197,7 @@ export default function ParticipantsDrawer({
                     <div
                       className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ${getAvatarGradient(
                         p.name || ''
-                      )} text-white font-bold flex items-center justify-center text-sm shadow-xs ${
-                        p.isSpeaking ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-[#0B0D11]' : ''
-                      }`}
+                      )} text-white font-bold flex items-center justify-center text-sm shadow-xs`}
                     >
                       {p.avatar ? (
                         <img

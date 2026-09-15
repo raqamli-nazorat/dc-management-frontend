@@ -94,7 +94,7 @@ export default function ParticipantTile({
           ? isFullScreenFocus
             ? 'bg-black border-0'
             : 'bg-[#121212] border border-slate-700/60 dark:border-white/10 shadow-2xl'
-          : `bg-[#1D2230] dark:bg-[#DEE5ED] ${
+          : `bg-[#DEE5ED] dark:bg-[#1D2230] ${
               hasHandRaised
                 ? 'border-2 border-[#FDD663] shadow-[0_0_25px_rgba(253,214,99,0.35)]'
                 : isSpeaking
@@ -215,10 +215,10 @@ export default function ParticipantTile({
             {isMicEnabled ? (
               isSpeaking ? (
                 /* Animated voice wave bars when speaking */
-                <span className="flex items-center gap-0.5 ml-1" title="Gapirmoqda">
-                  <span className="w-1 h-3 bg-blue-400 rounded-full animate-pulse" />
-                  <span className="w-1 h-4 bg-blue-400 rounded-full animate-pulse delay-75" />
-                  <span className="w-1 h-2.5 bg-blue-400 rounded-full animate-pulse delay-150" />
+                <span className="flex items-center gap-0.5 ml-1 h-4.5" title="Gapirmoqda">
+                  <span className="w-1 bg-blue-400 rounded-full animate-voice-wave-1 min-h-[4px]" />
+                  <span className="w-1 bg-blue-400 rounded-full animate-voice-wave-2 min-h-[4px]" />
+                  <span className="w-1 bg-blue-400 rounded-full animate-voice-wave-3 min-h-[4px]" />
                 </span>
               ) : null
             ) : (
