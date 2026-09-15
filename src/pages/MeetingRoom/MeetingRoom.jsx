@@ -3065,7 +3065,7 @@ export default function MeetingRoom() {
                 type="button"
                 onClick={() => setShowEndModal(true)}
                 title="Yig'ilishni hamma uchun yakunlash"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shadow-xs"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/50 flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shadow-xs"
               >
                 <HugeiconsIcon icon={ShutDownIcon} size={16} strokeWidth={2.2} />
               </button>

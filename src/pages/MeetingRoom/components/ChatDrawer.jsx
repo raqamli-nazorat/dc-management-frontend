@@ -104,11 +104,10 @@ export default function ChatDrawer({
               Chat
             </h3>
             <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-              <HugeiconsIcon icon={Message01Icon} size={20} strokeWidth={2} />
               <button
                 type="button"
                 onClick={onClose}
-                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer transition-colors sm:hidden"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer transition-colors"
                 title="Yopish"
               >
                 <FaXmark size={14} />
