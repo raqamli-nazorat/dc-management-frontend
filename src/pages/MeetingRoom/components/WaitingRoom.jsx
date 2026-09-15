@@ -22,9 +22,9 @@ export default function WaitingRoom({
   rejectedMessage = "Tashkilotchi yig'ilishga kirishingizni rad etdi.",
   waitingState = 'lobby', // 'lobby' | 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected'
   localStream = null,
-  isCameraEnabled = true,
+  isCameraEnabled = false,
   onToggleCamera,
-  isMicEnabled = true,
+  isMicEnabled = false,
   onToggleMic,
   onJoinMeeting,
   isJoining = false,

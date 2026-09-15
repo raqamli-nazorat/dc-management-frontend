@@ -345,11 +345,11 @@ export default function MeetingRoom() {
   const [turnOnCameraRequest, setTurnOnCameraRequest] = useState(null)
   const isLocalHostRef = useRef(false)
 
-  // Local Media State
-  const [isMicEnabled, setIsMicEnabled] = useState(true)
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true)
-  const isMicEnabledRef = useRef(true)
-  const isCameraEnabledRef = useRef(true)
+  // Local Media State (Default is muted / off)
+  const [isMicEnabled, setIsMicEnabled] = useState(false)
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false)
+  const isMicEnabledRef = useRef(false)
+  const isCameraEnabledRef = useRef(false)
 
   useEffect(() => {
     isMicEnabledRef.current = isMicEnabled
@@ -479,27 +479,9 @@ export default function MeetingRoom() {
   const previewStreamRef = useRef(null)
   const currentUserName = user?.username || user?.first_name || 'Foydalanuvchi'
 
-  // 1. Initial Local Camera / Mic Preview for Waiting Room
+  // 1. Initial Local Camera / Mic Preview Cleanup for Waiting Room
   useEffect(() => {
-    let stream = null
-    navigator.mediaDevices?.getUserMedia({ video: true, audio: true })
-      .then((s) => {
-        if (waitingState === 'in_room' || roomRef.current) {
-          s.getTracks().forEach(t => t.stop())
-          return
-        }
-        stream = s
-        previewStreamRef.current = s
-        setLocalStream(s)
-      })
-      .catch((err) => {
-        console.warn("Media devices not accessible or permission denied:", err)
-      })
-
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(t => t.stop())
-      }
       if (previewStreamRef.current) {
         previewStreamRef.current.getTracks().forEach(t => t.stop())
         previewStreamRef.current = null

@@ -128,7 +128,7 @@ export default function ChatDrawer({
             className="flex-1 overflow-y-auto min-h-0 flex flex-col pr-1 select-text"
             style={{ scrollbarWidth: 'thin', scrollbarColor: '#94A3B8 transparent' }}
           >
-            {messages.length === 0 ? (
+            {messages.length === 0 && (!typingUsers || typingUsers.length === 0) ? (
               /* Empty State matching Figma */
               <div className="flex-1 flex flex-col items-center justify-center text-center p-4 my-auto select-none">
                 <div className="text-slate-400 dark:text-slate-500 mb-2">
@@ -176,28 +176,36 @@ export default function ChatDrawer({
                     </div>
                   )
                 })}
+
+                {/* Instagram Direct Style Typing Bubble */}
+                {typingUsers && typingUsers.length > 0 && (
+                  <div className="flex flex-col items-start space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex items-center gap-1.5 px-1">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                        {typingUsers.length === 1
+                          ? typingUsers[0]
+                          : typingUsers.length === 2
+                          ? `${typingUsers[0]}, ${typingUsers[1]}`
+                          : `${typingUsers.length} ishtirokchi`}
+                      </span>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-normal italic">
+                        yozmoqda...
+                      </span>
+                    </div>
+
+                    {/* Instagram-style 3 bouncing dots message bubble */}
+                    <div className="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl rounded-tl-xs bg-[#F0F3F7] dark:bg-[#181C24] border border-slate-200/50 dark:border-white/5 shadow-xs">
+                      <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-300 animate-[bounce_1.2s_infinite_ease-in-out_0s]" />
+                      <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-300 animate-[bounce_1.2s_infinite_ease-in-out_0.2s]" />
+                      <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-300 animate-[bounce_1.2s_infinite_ease-in-out_0.4s]" />
+                    </div>
+                  </div>
+                )}
+
                 <div ref={messagesEndRef} />
               </div>
             )}
           </div>
-
-          {/* Typing Indicator (Google Meet style) */}
-          {typingUsers && typingUsers.length > 0 && (
-            <div className="flex items-center gap-2 px-2 pt-2 text-xs text-slate-500 dark:text-slate-400 animate-in fade-in slide-in-from-bottom-1 duration-200 select-none shrink-0">
-              <div className="flex items-center gap-1 bg-[#F0F3F7] dark:bg-[#1C212D] px-2.5 py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce" />
-              </div>
-              <span className="truncate font-medium italic">
-                {typingUsers.length === 1
-                  ? `${typingUsers[0]} yozmoqda...`
-                  : typingUsers.length === 2
-                  ? `${typingUsers[0]} va ${typingUsers[1]} yozmoqdalar...`
-                  : `${typingUsers.length} kishi yozmoqda...`}
-              </span>
-            </div>
-          )}
 
           {/* Message Input matching Figma capsule */}
           <form onSubmit={handleSend} className="pt-2 mt-auto shrink-0">
