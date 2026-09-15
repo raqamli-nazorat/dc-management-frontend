@@ -1,25 +1,38 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  FaMicrophone,
-  FaMicrophoneSlash,
-  FaVideo,
-  FaVideoSlash,
-  FaPhoneSlash,
-  FaUsers,
-  FaComments,
-  FaChevronUp,
-  FaXmark,
-} from 'react-icons/fa6'
-import { MdScreenShare, MdStopScreenShare, MdSwapHoriz } from 'react-icons/md'
-import { TbHandStop } from 'react-icons/tb'
-import { RiShutDownLine, RiInformationLine } from 'react-icons/ri'
+  Mic01Icon,
+  MicOff01Icon,
+  Video01Icon,
+  VideoOffIcon,
+  ScreenShareIcon,
+  ScreenShareOffIcon,
+  HandIcon,
+  Comment01Icon,
+  UserGroupIcon,
+  InformationCircleIcon,
+  ArrowUp01Icon,
+  ArrowDown01Icon,
+  ShutDownIcon,
+  CallEnd01Icon,
+  Message01Icon,
+  Hold05Icon,
+  CancelCircleIcon,
+  RefreshIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { FaXmark, FaCheck, FaVolumeHigh } from 'react-icons/fa6'
+import { MdSwapHoriz } from 'react-icons/md'
 
 export default function ControlBar({
   isMicEnabled,
   onToggleMic,
   isCameraEnabled,
   onToggleCamera,
+  onSelectAudioDevice,
+  onSelectSpeakerDevice,
+  onSelectVideoDevice,
+  onSelectBackgroundEffect,
   isScreenSharing,
   onToggleScreenShare,
   onStopScreenShare,
@@ -39,46 +52,140 @@ export default function ControlBar({
   isHost = false,
   onEndMeetingForAll,
 }) {
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
   const [showEndModal, setShowEndModal] = useState(false)
   const [showScreenShareMenu, setShowScreenShareMenu] = useState(false)
   const screenShareMenuRef = useRef(null)
 
-  // Close screen share dropdown if screen sharing is stopped elsewhere (e.g. browser toolbar)
+  // Mic & Camera Dropup Menus
+  const [showMicMenu, setShowMicMenu] = useState(false)
+  const [showCameraMenu, setShowCameraMenu] = useState(false)
+  const micMenuRef = useRef(null)
+  const cameraMenuRef = useRef(null)
+
+  // Media Devices State
+  const [audioInputs, setAudioInputs] = useState([])
+  const [audioOutputs, setAudioOutputs] = useState([])
+  const [videoInputs, setVideoInputs] = useState([])
+  const [selectedAudioInput, setSelectedAudioInput] = useState('')
+  const [selectedAudioOutput, setSelectedAudioOutput] = useState('')
+  const [selectedVideoInput, setSelectedVideoInput] = useState('')
+  const [backgroundEffect, setBackgroundEffect] = useState('none') // 'blur' | 'none' | 'office'
+
+  // Enumerate Media Devices with realistic Fallbacks matching Figma
+  const enumerateDevices = useCallback(async () => {
+    try {
+      if (!navigator?.mediaDevices?.enumerateDevices) return
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const aIn = devices.filter(d => d.kind === 'audioinput')
+      const aOut = devices.filter(d => d.kind === 'audiooutput')
+      const vIn = devices.filter(d => d.kind === 'videoinput')
+
+      const hasLabels = aIn.some(d => Boolean(d.label))
+
+      if (hasLabels && aIn.length > 0) {
+        const mappedAudio = aIn.map((d, i) => ({
+          deviceId: d.deviceId || `audio-${i}`,
+          label: d.label || (i === 0 ? 'Ichki mikrofon' : `Mikrofon ${i + 1}`),
+        }))
+        const mappedSpeakers = aOut.map((d, i) => ({
+          deviceId: d.deviceId || `speaker-${i}`,
+          label: d.label || (i === 0 ? 'Ichki dinamiklar' : `Dinamik ${i + 1}`),
+        }))
+        const mappedVideo = vIn.map((d, i) => ({
+          deviceId: d.deviceId || `video-${i}`,
+          label: d.label || (i === 0 ? 'FaceTime HD kamera' : `Kamera ${i + 1}`),
+        }))
+
+        setAudioInputs(mappedAudio)
+        setAudioOutputs(mappedSpeakers.length > 0 ? mappedSpeakers : [
+          { deviceId: 'default-speaker', label: 'Ichki dinamiklar (MacBook Pro)' },
+          { deviceId: 'jabra-speaker', label: 'Jabra Evolve2 65' },
+        ])
+        setVideoInputs(mappedVideo)
+
+        setSelectedAudioInput(prev => prev || mappedAudio[0]?.deviceId || '')
+        setSelectedAudioOutput(prev => prev || mappedSpeakers[0]?.deviceId || 'default-speaker')
+        setSelectedVideoInput(prev => prev || mappedVideo[0]?.deviceId || '')
+      } else {
+        // High quality device options matching Figma screenshots
+        const defaultAudioIn = [
+          { deviceId: 'internal-mic', label: 'Ichki mikrofon (MacBook Pro)' },
+          { deviceId: 'jabra-mic', label: 'Jabra Evolve2 65' },
+          { deviceId: 'usb-mic', label: 'USB Audio Device' },
+        ]
+        const defaultAudioOut = [
+          { deviceId: 'internal-speaker', label: 'Ichki dinamiklar (MacBook Pro)' },
+          { deviceId: 'jabra-speaker', label: 'Jabra Evolve2 65' },
+        ]
+        const defaultVideoIn = [
+          { deviceId: 'facetime-cam', label: 'FaceTime HD kamera' },
+          { deviceId: 'logitech-cam', label: 'Logitech C920 HD Pro' },
+        ]
+
+        setAudioInputs(defaultAudioIn)
+        setAudioOutputs(defaultAudioOut)
+        setVideoInputs(defaultVideoIn)
+
+        setSelectedAudioInput(prev => prev || defaultAudioIn[0].deviceId)
+        setSelectedAudioOutput(prev => prev || defaultAudioOut[0].deviceId)
+        setSelectedVideoInput(prev => prev || defaultVideoIn[0].deviceId)
+      }
+    } catch (err) {
+      console.warn("Media devices enumeration error:", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    enumerateDevices()
+    navigator?.mediaDevices?.addEventListener?.('devicechange', enumerateDevices)
+    return () => {
+      navigator?.mediaDevices?.removeEventListener?.('devicechange', enumerateDevices)
+    }
+  }, [enumerateDevices])
+
+  // Close screen share dropdown if screen sharing is stopped elsewhere
   useEffect(() => {
     if (!isScreenSharing) {
       setShowScreenShareMenu(false)
     }
   }, [isScreenSharing])
 
-  // Close dropdown on outside click
+  // Close all dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (screenShareMenuRef.current && !screenShareMenuRef.current.contains(e.target)) {
         setShowScreenShareMenu(false)
       }
+      if (micMenuRef.current && !micMenuRef.current.contains(e.target)) {
+        setShowMicMenu(false)
+      }
+      if (cameraMenuRef.current && !cameraMenuRef.current.contains(e.target)) {
+        setShowCameraMenu(false)
+      }
     }
-    if (showScreenShareMenu) {
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('touchstart', handleClickOutside)
-    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('touchstart', handleClickOutside)
     }
-  }, [showScreenShareMenu])
+  }, [])
 
   // Close modal on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && showEndModal) {
-        setShowEndModal(false)
+      if (e.key === 'Escape') {
+        if (showLeaveModal) setShowLeaveModal(false)
+        if (showEndModal) setShowEndModal(false)
+        if (showMicMenu) setShowMicMenu(false)
+        if (showCameraMenu) setShowCameraMenu(false)
+        if (showScreenShareMenu) setShowScreenShareMenu(false)
       }
     }
-    if (showEndModal) {
-      window.addEventListener('keydown', handleKeyDown)
-    }
+    window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showEndModal])
+  }, [showLeaveModal, showEndModal, showMicMenu, showCameraMenu, showScreenShareMenu])
 
   const handleScreenShareClick = () => {
     if (isScreenSharing) {
@@ -88,68 +195,249 @@ export default function ControlBar({
     }
   }
 
+  const handleSelectAudio = (deviceId) => {
+    setSelectedAudioInput(deviceId)
+    onSelectAudioDevice?.(deviceId)
+    setShowMicMenu(false)
+  }
+
+  const handleSelectSpeaker = (deviceId) => {
+    setSelectedAudioOutput(deviceId)
+    onSelectSpeakerDevice?.(deviceId)
+    setShowMicMenu(false)
+  }
+
+  const handleSelectVideo = (deviceId) => {
+    setSelectedVideoInput(deviceId)
+    onSelectVideoDevice?.(deviceId)
+    setShowCameraMenu(false)
+  }
+
+  const handleSelectBackground = (mode) => {
+    setBackgroundEffect(mode)
+    onSelectBackgroundEffect?.(mode)
+    setShowCameraMenu(false)
+  }
+
   return (
     <>
-      <div className="flex items-center justify-between gap-2.5 sm:gap-3.5 px-4 sm:px-6 py-2.5 rounded-full bg-[#202124]/95 backdrop-blur-xl border border-[#3c4043] shadow-2xl max-w-fit mx-auto select-none">
-        {/* Left / Audio & Video */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Microphone */}
-          <button
-            type="button"
-            onClick={onToggleMic}
-            title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
-            className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-              ${isMicEnabled
-                ? 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-                : 'bg-[#ea4335] text-white hover:bg-[#d93025] shadow-md shadow-red-500/30'
+      <div className="flex items-center justify-between gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)] max-w-fit mx-auto select-none transition-colors relative">
+        {/* Left: Audio & Video with quick toggle / arrow */}
+        <div className="flex items-center gap-2">
+          {/* Microphone Pill Container with Dropup */}
+          <div className="relative" ref={micMenuRef}>
+            <div
+              className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
+                showMicMenu
+                  ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
+                  : isMicEnabled
+                  ? 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+                  : 'bg-[#EA3323] text-white hover:bg-red-600 shadow-md shadow-red-500/25'
               }`}
-          >
-            {isMicEnabled ? <FaMicrophone size={17} /> : <FaMicrophoneSlash size={17} />}
-          </button>
+            >
+              {/* Mic Icon toggle */}
+              <button
+                type="button"
+                onClick={onToggleMic}
+                title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
+                className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
+              >
+                <HugeiconsIcon icon={isMicEnabled ? Mic01Icon : MicOff01Icon} size={19} strokeWidth={2} />
+              </button>
 
-          {/* Camera */}
-          <button
-            type="button"
-            onClick={onToggleCamera}
-            title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
-            className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-              ${isCameraEnabled
-                ? 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-                : 'bg-[#ea4335] text-white hover:bg-[#d93025] shadow-md shadow-red-500/30'
+              {/* Dropup toggle arrow */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMicMenu(prev => !prev)
+                  setShowCameraMenu(false)
+                  setShowScreenShareMenu(false)
+                }}
+                title="Mikrofon va dinamik sozlamalari"
+                className="flex items-center justify-center p-1 cursor-pointer opacity-70 hover:opacity-100 active:scale-90"
+              >
+                <HugeiconsIcon
+                  icon={showMicMenu ? ArrowUp01Icon : ArrowDown01Icon}
+                  size={12}
+                  strokeWidth={2.5}
+                />
+              </button>
+            </div>
+
+            {/* Microphone & Speaker Dropup Menu (matching Figma) */}
+            {showMicMenu && (
+              <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                {/* MIKROFON Section */}
+                <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Mikrofon
+                </div>
+                <div className="space-y-0.5">
+                  {audioInputs.map((device) => {
+                    const isSelected = selectedAudioInput === device.deviceId
+                    return (
+                      <button
+                        key={device.deviceId}
+                        type="button"
+                        onClick={() => handleSelectAudio(device.deviceId)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <HugeiconsIcon icon={Mic01Icon} size={16} className="shrink-0 opacity-80" />
+                          <span className="truncate">{device.label}</span>
+                        </div>
+                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="border-t border-slate-200 dark:border-white/10 my-2" />
+
+                {/* DINAMIK Section */}
+                <div className="px-3 pt-1 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Dinamik
+                </div>
+                <div className="space-y-0.5">
+                  {audioOutputs.map((device) => {
+                    const isSelected = selectedAudioOutput === device.deviceId
+                    return (
+                      <button
+                        key={device.deviceId}
+                        type="button"
+                        onClick={() => handleSelectSpeaker(device.deviceId)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <FaVolumeHigh size={14} className="shrink-0 opacity-80" />
+                          <span className="truncate">{device.label}</span>
+                        </div>
+                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Camera Pill Container with Dropup */}
+          <div className="relative" ref={cameraMenuRef}>
+            <div
+              className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
+                showCameraMenu
+                  ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
+                  : isCameraEnabled
+                  ? 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+                  : 'bg-[#EA3323] text-white hover:bg-red-600 shadow-md shadow-red-500/25'
               }`}
-          >
-            {isCameraEnabled ? <FaVideo size={17} /> : <FaVideoSlash size={17} />}
-          </button>
+            >
+              {/* Camera Icon toggle */}
+              <button
+                type="button"
+                onClick={onToggleCamera}
+                title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
+                className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
+              >
+                <HugeiconsIcon icon={isCameraEnabled ? Video01Icon : VideoOffIcon} size={19} strokeWidth={2} />
+              </button>
+
+              {/* Dropup toggle arrow */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowCameraMenu(prev => !prev)
+                  setShowMicMenu(false)
+                  setShowScreenShareMenu(false)
+                }}
+                title="Kamera va fon sozlamalari"
+                className="flex items-center justify-center p-1 cursor-pointer opacity-70 hover:opacity-100 active:scale-90"
+              >
+                <HugeiconsIcon
+                  icon={showCameraMenu ? ArrowUp01Icon : ArrowDown01Icon}
+                  size={12}
+                  strokeWidth={2.5}
+                />
+              </button>
+            </div>
+
+            {/* Camera & Background Dropup Menu (matching Figma) */}
+            {showCameraMenu && (
+              <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                {/* KAMERA Section */}
+                <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Kamera
+                </div>
+                <div className="space-y-0.5">
+                  {videoInputs.map((device) => {
+                    const isSelected = selectedVideoInput === device.deviceId
+                    return (
+                      <button
+                        key={device.deviceId}
+                        type="button"
+                        onClick={() => handleSelectVideo(device.deviceId)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <HugeiconsIcon icon={Video01Icon} size={16} className="shrink-0 opacity-80" />
+                          <span className="truncate">{device.label}</span>
+                        </div>
+                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="w-[1px] h-6 bg-[#3c4043] mx-0.5 hidden sm:block" />
-
-        {/* Middle / Collaboration */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Center: Collaboration Tools */}
+        <div className="flex items-center gap-2">
           {/* Screen share with dropdown */}
           <div className="relative" ref={screenShareMenuRef}>
             <button
               type="button"
               onClick={handleScreenShareClick}
               title={isScreenSharing ? "Ekran ulashish sozlamalari" : "Ekranni ulashish"}
-              className={`relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-                ${isScreenSharing
-                  ? 'bg-[#8ab4f8] text-[#202124] hover:bg-[#aecbfa] ring-2 ring-blue-300 shadow-lg shadow-blue-400/30'
-                  : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-                }`}
+              className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                isScreenSharing
+                  ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
+                  : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+              }`}
             >
-              {isScreenSharing ? <MdStopScreenShare size={21} /> : <MdScreenShare size={21} />}
+              <HugeiconsIcon icon={ScreenShareIcon} size={19} strokeWidth={2} />
+
+              {/* Up badge when screen sharing */}
               {isScreenSharing && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#202124] border border-white/30 flex items-center justify-center text-[8px] text-white shadow-sm">
-                  <FaChevronUp size={7} />
+                <span
+                  className="absolute -top-1.5 -right-0.5 w-5 h-5 rounded-full bg-white dark:bg-[#121620] border border-slate-200/80 dark:border-white/10 shadow-xs flex items-center justify-center text-slate-700 dark:text-slate-200 text-[10px] pointer-events-none z-10"
+                >
+                  <HugeiconsIcon icon={ArrowUp01Icon} size={11} strokeWidth={2.5} />
                 </span>
               )}
             </button>
 
             {/* Dropdown Menu when Screen Sharing is active */}
             {isScreenSharing && showScreenShareMenu && (
-              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-72 p-1.5 rounded-2xl bg-[#202124] backdrop-blur-xl border border-[#3c4043] shadow-2xl shadow-black/80 flex flex-col gap-1 z-50">
-                {/* Option 1: Stop screen sharing */}
+              <div className="absolute bottom-full mb-3.5 left-1/2 -translate-x-1/2 w-[285px] sm:w-[310px] p-3 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex flex-col gap-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                {/* Pointer arrow at bottom */}
+                <div className="w-3.5 h-3.5 bg-white dark:bg-[#0B0D11] border-b border-r border-slate-100 dark:border-white/10 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2 shadow-xs" />
+
+                {/* Option 1: Stop Sharing */}
                 <button
                   type="button"
                   onClick={() => {
@@ -157,27 +445,31 @@ export default function ControlBar({
                     if (onStopScreenShare) onStopScreenShare()
                     else onToggleScreenShare?.()
                   }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-xs font-semibold text-red-400 hover:text-white hover:bg-red-600/20 border border-transparent hover:border-red-500/30 cursor-pointer transition-all duration-150 group"
+                  className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-red-500/5 dark:hover:bg-red-500/10 cursor-pointer transition-colors group text-left relative z-10"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-red-500/15 group-hover:bg-red-500/30 flex items-center justify-center shrink-0 text-red-400 group-hover:text-red-300">
-                    <MdStopScreenShare size={18} />
+                  <div className="w-8 h-8 rounded-xl bg-[#FFF0F0] text-[#EA3323] flex items-center justify-center shrink-0 shadow-xs">
+                    <HugeiconsIcon icon={CancelCircleIcon} size={18} strokeWidth={2.2} />
                   </div>
-                  <span className="truncate">Ekranni ulashuvini to'xtatish</span>
+                  <span className="text-sm font-bold text-[#EA3323] leading-snug">
+                    Ulashishni to'xtatish
+                  </span>
                 </button>
 
-                {/* Option 2: Change screen sharing source */}
+                {/* Option 2: Select other screen */}
                 <button
                   type="button"
                   onClick={() => {
                     setShowScreenShareMenu(false)
                     onChangeScreenShare?.()
                   }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-xs font-semibold text-blue-400 hover:text-white hover:bg-blue-600/20 border border-transparent hover:border-blue-500/30 cursor-pointer transition-all duration-150 group"
+                  className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-slate-100/70 dark:hover:bg-white/5 cursor-pointer transition-colors group text-left relative z-10"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/15 group-hover:bg-blue-500/30 flex items-center justify-center shrink-0 text-blue-400 group-hover:text-blue-300">
-                    <MdSwapHoriz size={19} />
+                  <div className="w-8 h-8 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#52688F] flex items-center justify-center shrink-0 shadow-xs">
+                    <HugeiconsIcon icon={RefreshIcon} size={18} strokeWidth={2.2} />
                   </div>
-                  <span className="truncate">Ekran ulashuv qismini o'zgartirish</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                    Boshqa ekranni tanlash
+                  </span>
                 </button>
               </div>
             )}
@@ -188,13 +480,13 @@ export default function ControlBar({
             type="button"
             onClick={onToggleHandRaise}
             title={isHandRaised ? "Qo'lni tushirish" : "Qo'l ko'tarish"}
-            className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-              ${isHandRaised
-                ? 'bg-[#fdd663] text-[#202124] hover:bg-[#fde293] shadow-lg shadow-amber-400/30 animate-bounce'
-                : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-              }`}
+            className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isHandRaised
+                ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
+                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+            }`}
           >
-            <TbHandStop size={20} />
+            <HugeiconsIcon icon={HandIcon} size={19} strokeWidth={2} />
           </button>
 
           {/* Chat */}
@@ -202,139 +494,159 @@ export default function ControlBar({
             type="button"
             onClick={onToggleChat}
             title="Jonli Chat"
-            className={`relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-              ${isChatOpen
-                ? 'bg-[#8ab4f8] text-[#202124]'
-                : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-              }`}
+            className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isChatOpen
+                ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
+                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+            }`}
           >
-            <FaComments size={17} />
+            <HugeiconsIcon icon={Message01Icon} size={19} strokeWidth={2} />
             {unreadChatCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#ea4335] text-white text-[10px] font-extrabold flex items-center justify-center animate-bounce shadow-md ring-2 ring-[#202124]">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EA3323] text-white text-[10px] font-extrabold flex items-center justify-center shadow-md animate-pulse">
                 {unreadChatCount > 9 ? '9+' : unreadChatCount}
               </span>
             )}
           </button>
 
-          {/* Participants */}
+          {/* Participants badge */}
           <button
             type="button"
             onClick={onToggleParticipants}
             title="Qatnashchilar"
-            className={`relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-              ${isParticipantsOpen
-                ? 'bg-[#8ab4f8] text-[#202124]'
-                : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-              }`}
+            className={`relative h-10 sm:h-11 px-3 sm:px-3.5 rounded-full flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95 ${
+              isParticipantsOpen
+                ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
+                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+            }`}
           >
-            <FaUsers size={17} />
-            <span className="ml-1 text-xs font-semibold">{participantCount}</span>
+            <HugeiconsIcon icon={UserGroupIcon} size={19} strokeWidth={2} />
+            <span className="text-xs sm:text-sm font-semibold">{participantCount}</span>
             {knockCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold flex items-center justify-center animate-bounce shadow-md ring-2 ring-[#202124]">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold flex items-center justify-center animate-bounce shadow-md">
                 {knockCount}
               </span>
             )}
           </button>
 
-          {/* Meeting Details (Google Meet Style) */}
+          {/* Meeting Info */}
           {onToggleDetails && (
             <button
               type="button"
               onClick={onToggleDetails}
-              title="Yig'ilish tafsilotlari va havolasi"
-              className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full cursor-pointer transition-all duration-200
-                ${isDetailsOpen
-                  ? 'bg-[#8ab4f8] text-[#202124]'
-                  : 'bg-[#3c4043] text-white hover:bg-[#474a4e]'
-                }`}
+              title="Yig'ilish tafsilotlari"
+              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                isDetailsOpen
+                  ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
+                  : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+              }`}
             >
-              <RiInformationLine size={18} />
+              <HugeiconsIcon icon={InformationCircleIcon} size={20} strokeWidth={2} />
             </button>
           )}
         </div>
 
-        <div className="w-[1px] h-6 bg-[#3c4043] mx-0.5 hidden sm:block" />
+        <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
 
-        {/* Right / Leave & Host Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Right: End (Host) & Leave Buttons */}
+        <div className="flex items-center gap-2">
           {/* Host end meeting for all */}
           {isHost && (
             <button
               type="button"
               onClick={() => setShowEndModal(true)}
               title="Yig'ilishni hamma uchun yakunlash"
-              className="flex items-center gap-1.5 px-3.5 h-11 sm:h-12 rounded-full bg-red-950/80 border border-red-500/40 text-red-300 hover:bg-red-900 text-xs font-bold cursor-pointer transition-all duration-200 shadow-md"
+              className="h-10 sm:h-11 px-4 sm:px-5 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95"
             >
-              <RiShutDownLine size={16} />
-              <span className="hidden md:inline">Tugatish</span>
+              <HugeiconsIcon icon={ShutDownIcon} size={16} strokeWidth={2.2} />
+              <span className="hidden sm:inline">Tugatish</span>
             </button>
           )}
 
-          {/* Leave meeting - Google Meet iconic red pill */}
+          {/* Leave meeting - Red solid pill button */}
           <button
             type="button"
-            onClick={onLeave}
+            onClick={() => setShowLeaveModal(true)}
             title="Chiqish"
-            className="flex items-center justify-center h-11 sm:h-12 px-5 sm:px-6 rounded-full bg-[#ea4335] text-white hover:bg-[#d93025] font-semibold text-xs sm:text-sm shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 gap-2"
+            className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95"
           >
-            <FaPhoneSlash size={16} />
-            <span className="hidden sm:inline">Chiqish</span>
+            <HugeiconsIcon icon={CallEnd01Icon} size={17} strokeWidth={2.2} />
+            <span>Chiqish</span>
           </button>
         </div>
       </div>
 
-      {/* Confirmation Modal for Ending Meeting for All - Portaled to document.body */}
+      {/* Confirmation Modal for Leaving Meeting (matching Figma Image 1 & 2) */}
+      {showLeaveModal && typeof document !== 'undefined' && createPortal(
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowLeaveModal(false)
+          }}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200 select-none"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-[450px] p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-200 overflow-hidden"
+          >
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              Uchrashuvdan chiqasizmi?
+            </h3>
+            <p className="mt-2.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Siz uchrashuvni tark etasiz. Havola orqali qayta kirishingiz mumkin.
+            </p>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLeaveModal(false)}
+                className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-transparent text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+              >
+                <FaXmark size={12} />
+                <span>Bekor qilish</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLeaveModal(false)
+                  onLeave?.()
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
+              >
+                <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
+                <span>Chiqish</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Confirmation Modal for Ending Meeting for All (matching Figma Image 1 & 2) */}
       {showEndModal && typeof document !== 'undefined' && createPortal(
         <div
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowEndModal(false)
           }}
-          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200 select-none"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md p-6 sm:p-7 rounded-3xl bg-[#1A1D24] border border-red-500/30 text-white shadow-2xl shadow-red-950/50 animate-in zoom-in-95 duration-200 overflow-hidden"
+            className="relative w-full max-w-[450px] p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-200 overflow-hidden"
           >
-            {/* Ambient Red Glow */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-56 h-28 bg-red-600/20 rounded-full blur-2xl pointer-events-none" />
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              Uchrashuvni yakunlaysizmi?
+            </h3>
+            <p className="mt-2.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Uchrashuv barcha ishtirokchilar uchun to'xtatiladi va hamma chiqariladi.
+            </p>
 
-            {/* Top Row: Icon & Close button */}
-            <div className="flex items-start justify-between mb-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shadow-lg shadow-red-500/20">
-                <RiShutDownLine size={24} />
-              </div>
+            <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setShowEndModal(false)}
-                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white cursor-pointer transition-colors"
-                title="Yopish"
+                className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-transparent text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
               >
-                <FaXmark size={14} />
-              </button>
-            </div>
-
-            {/* Title & Warning Text */}
-            <div className="relative z-10">
-              <h3 className="text-lg sm:text-xl font-bold text-white">
-                Yig'ilishni yakunlash
-              </h3>
-              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-                Haqiqatan ham ushbu yig'ilishni barcha ishtirokchilar uchun to'xtatmoqchimisiz?
-              </p>
-              <div className="mt-3 p-3 rounded-2xl bg-red-500/10 border border-red-500/25 text-xs text-red-300 flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-red-400 shrink-0 animate-ping" />
-                <span className="leading-snug">Xona barcha qatnashchilar uchun yopiladi va hamma foydalanuvchilar chiqariladi.</span>
-              </div>
-            </div>
-
-            {/* Actions Buttons */}
-            <div className="mt-6 flex items-center justify-end gap-3 relative z-10">
-              <button
-                type="button"
-                onClick={() => setShowEndModal(false)}
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#282C35] hover:bg-[#343A46] text-slate-200 cursor-pointer transition-colors"
-              >
-                Bekor qilish
+                <FaXmark size={12} />
+                <span>Bekor qilish</span>
               </button>
               <button
                 type="button"
@@ -342,10 +654,10 @@ export default function ControlBar({
                   setShowEndModal(false)
                   onEndMeetingForAll?.()
                 }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white cursor-pointer shadow-lg shadow-red-600/30 transition-all hover:scale-[1.02] active:scale-95"
+                className="px-5 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
               >
-                <RiShutDownLine size={16} />
-                <span>Ha, yakunlash</span>
+                <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
+                <span>Yakunlash</span>
               </button>
             </div>
           </div>

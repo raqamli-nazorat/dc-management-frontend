@@ -36,14 +36,39 @@ export default function WaitingRoom({
   const [audioLevel, setAudioLevel] = useState(0)
   const [copied, setCopied] = useState(false)
 
-  // Attach local camera stream to video element
+  // Attach or cleanly detach local camera stream from video element
   useEffect(() => {
-    if (videoRef.current && localStream && isCameraEnabled && localStream.getVideoTracks().length > 0) {
-      videoRef.current.srcObject = localStream
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null
+    const videoEl = videoRef.current
+    if (!videoEl) return
+
+    const videoTrack = localStream?.getVideoTracks()?.[0]
+    const hasLiveVideoTrack = Boolean(videoTrack && videoTrack.readyState === 'live')
+
+    if (isCameraEnabled && hasLiveVideoTrack) {
+      if (videoEl.srcObject !== localStream) {
+        videoEl.srcObject = localStream
+      }
+      videoEl.play().catch(() => {})
+    } else {
+      try {
+        videoEl.pause()
+        videoEl.srcObject = null
+      } catch (e) {}
     }
   }, [localStream, isCameraEnabled])
+
+  // Cleanly detach video stream on unmount
+  useEffect(() => {
+    return () => {
+      const videoEl = videoRef.current
+      if (videoEl) {
+        try {
+          videoEl.pause()
+          videoEl.srcObject = null
+        } catch (e) {}
+      }
+    }
+  }, [])
 
   // Simple mic activity detection for preview visualizer
   useEffect(() => {
@@ -133,20 +158,62 @@ export default function WaitingRoom({
 
   const isWaitingPhase = waitingState !== 'lobby'
 
+  // Hardware toggle helper to immediately stop tracks and sever video element
+  const handleToggleCamera = () => {
+    if (isCameraEnabled) {
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause()
+          videoRef.current.srcObject = null
+        } catch (e) {}
+      }
+      if (localStream) {
+        localStream.getVideoTracks().forEach((track) => {
+          try {
+            track.stop()
+            track.enabled = false
+          } catch (e) {}
+        })
+      }
+    }
+    onToggleCamera?.()
+  }
+
+  const handleToggleMic = () => {
+    if (isMicEnabled && localStream) {
+      localStream.getAudioTracks().forEach((track) => {
+        try {
+          track.stop()
+          track.enabled = false
+        } catch (e) {}
+      })
+    }
+    onToggleMic?.()
+  }
+
+  const hasLiveVideo = Boolean(
+    isCameraEnabled &&
+    localStream &&
+    localStream.getVideoTracks().some(t => t.readyState === 'live')
+  )
+
   return (
     <div className="fixed inset-0 w-full h-full bg-white dark:bg-[#11141A] text-slate-800 dark:text-white flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-y-auto select-none z-50">
       <div className="w-full flex flex-col md:flex-row items-center justify-center gap-10 lg:gap-16 my-auto">
         {/* Left Column: Camera Preview Box */}
         <div className="w-[740px] aspect-[16/10] bg-[#181A24] dark:bg-[#E8EDF2] rounded-[28px] overflow-hidden relative flex flex-col items-center justify-center shadow-xl shrink-0">
-          {isCameraEnabled && localStream && localStream.getVideoTracks().length > 0 ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover scale-x-[-1]"
-            />
-          ) : (
+          {/* Always maintain video element in DOM so srcObject can be cleanly attached/detached without unmount leaks */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`w-full h-full object-cover scale-x-[-1] transition-opacity duration-200 ${
+              hasLiveVideo ? 'block opacity-100' : 'hidden opacity-0 pointer-events-none'
+            }`}
+          />
+
+          {!hasLiveVideo && (
             <div className="flex flex-col items-center justify-center gap-2">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 dark:from-slate-300 dark:to-slate-400 border border-white/10 dark:border-black/5 flex items-center justify-center text-white dark:text-slate-800 text-2xl font-bold overflow-hidden shadow-lg">
                 {user?.avatar ? (
@@ -161,30 +228,12 @@ export default function WaitingRoom({
             </div>
           )}
 
-          {/* Audio Activity Visualizer (Microphone indicator) */}
-          {isMicEnabled && audioLevel > 5 && (
-            <div className="absolute top-4 left-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
-              <span
-                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                style={{ height: `${Math.max(4, audioLevel * 0.2)}px` }}
-              />
-              <span
-                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                style={{ height: `${Math.max(4, audioLevel * 0.35)}px` }}
-              />
-              <span
-                className="w-1 bg-emerald-400 rounded-full transition-all duration-75"
-                style={{ height: `${Math.max(4, audioLevel * 0.2)}px` }}
-              />
-            </div>
-          )}
-
           {/* Bottom Center Media Controls */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3.5 z-20">
             {/* Mic Toggle Button */}
             <button
               type="button"
-              onClick={onToggleMic}
+              onClick={handleToggleMic}
               title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
               className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95 ${
                 isMicEnabled
@@ -198,7 +247,7 @@ export default function WaitingRoom({
             {/* Camera Toggle Button */}
             <button
               type="button"
-              onClick={onToggleCamera}
+              onClick={handleToggleCamera}
               title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
               className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md active:scale-95 ${
                 isCameraEnabled

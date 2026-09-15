@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react'
-import { FaMicrophone, FaMicrophoneSlash, FaCrown, FaExpand, FaCompress } from 'react-icons/fa6'
-import { TbHandStop, TbPin, TbPinFilled, TbScreenShare } from 'react-icons/tb'
+import {
+  MicOff01Icon,
+  HandIcon,
+  PinIcon,
+  CrownIcon,
+  Minimize01Icon,
+  ScreenShareIcon,
+  ArrowExpandDiagonal01Icon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 
 export default function ParticipantTile({
   participant,
@@ -52,17 +60,16 @@ export default function ParticipantTile({
     ? displayName.trim().split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
     : 'U'
 
-  // Google Meet signature material avatar colors
   const getAvatarGradient = (name = '') => {
     const gradients = [
-      'bg-[#1a73e8]', // Google Blue
-      'bg-[#1e8e3e]', // Google Green
-      'bg-[#9334e6]', // Google Purple
-      'bg-[#007b83]', // Google Teal
-      'bg-[#e37400]', // Google Orange
-      'bg-[#d93025]', // Google Red
-      'bg-[#d01884]', // Google Magenta
-      'bg-[#3949ab]', // Google Indigo
+      'bg-[#1a73e8]',
+      'bg-[#1e8e3e]',
+      'bg-[#9334e6]',
+      'bg-[#007b83]',
+      'bg-[#e37400]',
+      'bg-[#d93025]',
+      'bg-[#d01884]',
+      'bg-[#3949ab]',
     ]
     let hash = 0
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -81,20 +88,24 @@ export default function ParticipantTile({
       className={`relative w-full h-full ${
         isFullScreenFocus
           ? 'rounded-none bg-black border-0'
-          : 'rounded-2xl sm:rounded-3xl shadow-lg'
-      } overflow-hidden bg-[#3c4043] transition-all duration-300 ease-out flex items-center justify-center select-none group
-        ${hasHandRaised
-          ? 'ring-[3px] ring-[#fdd663] shadow-[0_0_25px_rgba(253,214,99,0.35)]'
-          : isSpeaking
-          ? 'ring-[3px] ring-[#8ab4f8] shadow-[0_0_25px_rgba(138,180,248,0.35)]'
-          : isPinned
-          ? 'ring-2 ring-[#8ab4f8] shadow-[0_0_20px_rgba(138,180,248,0.3)]'
-          : isScreenShare
-          ? isFullScreenFocus ? 'bg-black' : 'bg-[#121212] border border-white/10'
-          : 'border border-white/5'
-        }`}
+          : 'rounded-2xl sm:rounded-3xl shadow-md'
+      } overflow-hidden ${
+        isScreenShare
+          ? isFullScreenFocus
+            ? 'bg-black border-0'
+            : 'bg-[#121212] border border-slate-700/60 dark:border-white/10 shadow-2xl'
+          : `bg-[#1D2230] dark:bg-[#DEE5ED] ${
+              hasHandRaised
+                ? 'border-2 border-[#FDD663] shadow-[0_0_25px_rgba(253,214,99,0.35)]'
+                : isSpeaking
+                ? 'border-2 border-[#5B7BF0] shadow-[0_0_25px_rgba(91,123,240,0.35)]'
+                : isPinned
+                ? 'border-2 border-[#5B7BF0] shadow-[0_0_20px_rgba(91,123,240,0.25)]'
+                : 'border border-black/5 dark:border-white/5'
+            }`
+      } transition-all duration-300 ease-out flex items-center justify-center select-none group`}
     >
-      {/* Video element (always muted to prevent acoustic echo & conflict with audio element) */}
+      {/* Video element */}
       {(isCameraEnabled || isScreenShare) && videoTrack ? (
         <video
           ref={videoRef}
@@ -110,11 +121,16 @@ export default function ParticipantTile({
           }`}
         />
       ) : (
-        /* Google Meet Avatar fallback */
-        <div className="flex items-center justify-center w-full h-full p-4">
+        /* Circular Avatar View */
+        <div className="flex items-center justify-center w-full h-full p-4 relative">
+          {/* Active Speaking Halo Glow */}
+          {isSpeaking && (
+            <div className="absolute w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-blue-500/25 dark:bg-blue-500/35 blur-2xl pointer-events-none -z-0 animate-pulse" />
+          )}
+
           <div
-            className={`relative flex items-center justify-center rounded-full transition-all duration-300 shadow-xl select-none
-              ${isSpeaking ? 'ring-4 ring-[#8ab4f8]/50 ring-offset-4 ring-offset-[#3c4043] scale-105' : ''}
+            className={`relative flex items-center justify-center rounded-full transition-all duration-300 shadow-xl select-none z-10
+              ${isSpeaking ? 'ring-4 ring-[#5B7BF0]/60 scale-105' : 'ring-2 ring-white/20'}
               w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 ${getAvatarGradient(displayName)} text-white`}
           >
             {avatar ? (
@@ -127,11 +143,6 @@ export default function ParticipantTile({
             ) : (
               <span className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider">{initials}</span>
             )}
-
-            {/* Speaking animated ripple */}
-            {isSpeaking && (
-              <span className="absolute -inset-2 rounded-full border-2 border-[#8ab4f8] animate-ping opacity-60 pointer-events-none" />
-            )}
           </div>
         </div>
       )}
@@ -139,9 +150,11 @@ export default function ParticipantTile({
       {/* Top right badges: Hand Raised / Live Screen / Pin Button */}
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1.5 sm:gap-2 z-20">
         {hasHandRaised && (
-          <div className="flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#fdd663] text-[#202124] shadow-lg animate-bounce text-xs font-bold">
-            <TbHandStop size={15} />
-            <span className="hidden sm:inline">Qo'l ko'tardi</span>
+          <div
+            className="w-8 h-8 rounded-full bg-[#3B59BA] dark:bg-[#344879] text-white flex items-center justify-center shadow-md animate-in fade-in zoom-in-90 duration-200"
+            title="Qo'l ko'tardi"
+          >
+            <HugeiconsIcon icon={HandIcon} size={16} strokeWidth={2} />
           </div>
         )}
         {isScreenShare && !hasHandRaised && (
@@ -151,29 +164,7 @@ export default function ParticipantTile({
           </div>
         )}
 
-        {/* Full Screen Focus Mode toggle for Screen Share */}
-        {isScreenShare && onToggleFullScreenFocus && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleFullScreenFocus()
-            }}
-            title={isFullScreenFocus ? "Kichiklashtirish (Full screendan chiqish)" : "To'liq ekran (Full screen focus)"}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer shadow-md active:scale-95 text-xs font-semibold
-              ${isFullScreenFocus
-                ? 'bg-amber-400 text-slate-950 hover:bg-amber-300 ring-2 ring-amber-300 shadow-amber-400/40'
-                : 'bg-black/60 hover:bg-blue-600 text-white/90 hover:text-white border border-white/20 hover:border-blue-400/50 backdrop-blur-md hover:scale-105'
-              }`}
-          >
-            {isFullScreenFocus ? <FaCompress size={12} /> : <FaExpand size={12} />}
-            <span className="hidden sm:inline">
-              {isFullScreenFocus ? 'Kichiklashtirish' : "To'liq ekran"}
-            </span>
-          </button>
-        )}
-
-        {/* Pin / Unpin Button (Client-side toggle) */}
+        {/* Pin / Unpin Button */}
         {onTogglePin && (
           <button
             type="button"
@@ -181,40 +172,42 @@ export default function ParticipantTile({
               e.stopPropagation()
               onTogglePin()
             }}
-            title={isPinned ? "Qadashni bekor qilish (Unpin)" : "Asosiy oynaga qadash (Pin)"}
+            title={isPinned ? "Qadashni bekor qilish" : "Asosiy oynaga qadash"}
             className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 cursor-pointer shadow-md active:scale-90
               ${isPinned
-                ? 'bg-[#8ab4f8] text-[#202124] hover:bg-[#aecbfa] ring-2 ring-blue-300 shadow-blue-400/40 scale-105'
-                : 'bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/15 opacity-80 group-hover:opacity-100 hover:scale-105'
+                ? 'bg-[#5B7BF0] text-white shadow-md shadow-blue-500/30 scale-105'
+                : 'bg-black/40 hover:bg-black/70 text-white/80 hover:text-white border border-white/10 opacity-70 group-hover:opacity-100 hover:scale-105'
               }`}
           >
-            {isPinned ? <TbPinFilled size={15} /> : <TbPin size={15} />}
+            <HugeiconsIcon icon={PinIcon} size={15} strokeWidth={2} />
           </button>
         )}
       </div>
 
       {/* Top left badge: Host / Mezbon */}
       {isHost && (
-        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#fdd663] text-xs font-semibold shadow-md z-10 border border-white/10">
-          <FaCrown size={12} className="text-yellow-300" />
+        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#FDD663] text-xs font-semibold shadow-md z-10 border border-white/10">
+          <HugeiconsIcon icon={CrownIcon} size={13} strokeWidth={2.2} />
           <span>Tashkilotchi</span>
         </div>
       )}
 
-      {/* Bottom Left Pill: Google Meet Signature Name Tag + Mic Indicator + Pin Indicator */}
-      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl sm:rounded-2xl bg-[#202124]/85 backdrop-blur-md text-white text-xs sm:text-sm font-medium max-w-[85%] shadow-lg border border-white/10 pointer-events-none z-10">
+      {/* Bottom Left Pill: Signature Name Tag + Speaking Voice Wave or Muted Mic */}
+      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#202530]/85 dark:bg-black/65 backdrop-blur-md text-white text-xs sm:text-sm font-medium max-w-[85%] shadow-lg border border-white/10 pointer-events-none z-10">
         {isPinned && (
-          <span className="text-[#8ab4f8] shrink-0" title="Asosiy ekranga qadalgan">
-            <TbPinFilled size={12} />
+          <span className="text-blue-400 shrink-0" title="Qadalgan">
+            <HugeiconsIcon icon={PinIcon} size={12} strokeWidth={2.2} />
           </span>
         )}
         {isScreenShare ? (
           <span className="text-blue-400 font-bold flex items-center gap-1.5 truncate">
-            <TbScreenShare size={14} className="shrink-0" />
+            <HugeiconsIcon icon={ScreenShareIcon} size={14} strokeWidth={2} className="shrink-0" />
             <span className="truncate">{displayName || 'Ekran'}</span>
           </span>
         ) : (
-          <span className="truncate">{displayName} {isLocal && '(Siz)'}</span>
+          <span className="truncate">
+            {displayName} {isLocal && '(siz)'}
+          </span>
         )}
 
         {!isScreenShare && (
@@ -222,24 +215,40 @@ export default function ParticipantTile({
             {isMicEnabled ? (
               isSpeaking ? (
                 /* Animated voice wave bars when speaking */
-                <span className="flex items-center gap-0.5 ml-0.5" title="Gapirmoqda">
-                  <span className="w-1 h-3 bg-[#8ab4f8] rounded-full animate-pulse" />
-                  <span className="w-1 h-4 bg-[#8ab4f8] rounded-full animate-pulse delay-75" />
-                  <span className="w-1 h-2.5 bg-[#8ab4f8] rounded-full animate-pulse delay-150" />
+                <span className="flex items-center gap-0.5 ml-1" title="Gapirmoqda">
+                  <span className="w-1 h-3 bg-blue-400 rounded-full animate-pulse" />
+                  <span className="w-1 h-4 bg-blue-400 rounded-full animate-pulse delay-75" />
+                  <span className="w-1 h-2.5 bg-blue-400 rounded-full animate-pulse delay-150" />
                 </span>
-              ) : (
-                <span className="text-white/70 ml-0.5" title="Mikrofon yoniq">
-                  <FaMicrophone size={11} />
-                </span>
-              )
+              ) : null
             ) : (
-              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#ea4335] text-white flex items-center justify-center text-[8px] sm:text-[9px] shadow-sm ml-0.5" title="Mikrofon o'chiq">
-                <FaMicrophoneSlash size={9} />
+              /* Red mic icon when muted */
+              <span className="text-[#EA3323] ml-1 flex items-center" title="Mikrofon o'chiq">
+                <HugeiconsIcon icon={MicOff01Icon} size={14} strokeWidth={2.2} />
               </span>
             )}
           </div>
         )}
       </div>
+
+      {/* Bottom Right: Full Screen Focus Mode toggle for Screen Share (matching screenshot) */}
+      {isScreenShare && onToggleFullScreenFocus && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleFullScreenFocus()
+          }}
+          title={isFullScreenFocus ? "Kichiklashtirish" : "To'liq ekran"}
+          className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#181a20]/80 hover:bg-[#181a20] text-white border border-white/15 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg transition-all duration-200 active:scale-90 hover:scale-105 z-20"
+        >
+          <HugeiconsIcon
+            icon={isFullScreenFocus ? Minimize01Icon : ArrowExpandDiagonal01Icon}
+            size={18}
+            strokeWidth={2.2}
+          />
+        </button>
+      )}
     </div>
   )
 }

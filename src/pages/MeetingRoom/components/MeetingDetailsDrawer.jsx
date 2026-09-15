@@ -1,19 +1,16 @@
 import { useState } from 'react'
 import { FaXmark } from 'react-icons/fa6'
-import { RiInformationLine } from 'react-icons/ri'
 import {
-  TbLink,
-  TbCopy,
-  TbCheck,
-  TbCalendarEvent,
-  TbClock,
-  TbUser,
-  TbFolder,
-  TbShieldCheck,
-  TbId,
-} from 'react-icons/tb'
+  InformationCircleIcon,
+  Copy01Icon,
+  CheckmarkCircle01Icon,
+  PencilEdit02Icon,
+  Calendar03Icon,
+  LockIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from '../../../Toast/ToastProvider'
-import { getMeetingCode, getFullMeetingUrl } from '../utils/meetingCode'
+import { getFullMeetingUrl } from '../utils/meetingCode'
 
 export default function MeetingDetailsDrawer({
   isOpen,
@@ -26,33 +23,17 @@ export default function MeetingDetailsDrawer({
   const [copiedLink, setCopiedLink] = useState(false)
   const [copiedUid, setCopiedUid] = useState(false)
 
-  const code = getMeetingCode(meetingId)
   const fullUrl = getFullMeetingUrl(meetingId)
+  const displayUrl = fullUrl ? fullUrl.replace(/^https?:\/\//, '') : `raqamli-boshqaruv.uz/meetings/${meetingId}`
 
-  const uid = meetingDetails?.uid || (meetingId ? `MTG-${meetingId}` : '')
-  const title = meetingDetails?.title || meetingState?.title || "Yig'ilish"
-
-  const projectName = (
-    meetingDetails?.project_info?.title ||
-    meetingDetails?.project_title ||
-    projectData?.title ||
-    ''
-  )
-
-  const organizerName = (
-    meetingDetails?.organizer_info?.username ||
-    meetingDetails?.organizer_info?.first_name ||
-    meetingDetails?.organizer?.username ||
-    (typeof meetingDetails?.organizer === 'string' ? meetingDetails.organizer : null) ||
-    meetingState?.organizer_name ||
-    'Tashkilotchi'
-  )
+  const uid = meetingDetails?.uid || (meetingId ? `MT-${String(meetingId).padStart(4, '0')}` : 'MT-0005')
+  const title = meetingDetails?.title || meetingState?.title || projectData?.title || "Yig'ilish"
 
   const handleCopyLink = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(fullUrl).then(() => {
         setCopiedLink(true)
-        toast.success('Nusxa olindi', 'Yig\'ilish havolasi nusxalandi')
+        toast.success('Nusxa olindi', "Yig'ilish havolasi nusxalandi")
         setTimeout(() => setCopiedLink(false), 2000)
       }).catch(() => {
         toast.error('Xatolik', 'Havolani nusxalashda xatolik yuz berdi')
@@ -70,20 +51,36 @@ export default function MeetingDetailsDrawer({
     }
   }
 
-  const formatStartTime = (iso) => {
-    if (!iso) return 'Rejalashtirilgan'
-    try {
-      const d = new Date(iso)
-      if (isNaN(d.getTime())) return iso
-      const day = String(d.getDate()).padStart(2, '0')
-      const month = String(d.getMonth() + 1).padStart(2, '0')
-      const year = d.getFullYear()
-      const hours = String(d.getHours()).padStart(2, '0')
-      const mins = String(d.getMinutes()).padStart(2, '0')
-      return `${day}.${month}.${year} ${hours}:${mins}`
-    } catch {
-      return iso
+  const formatStartTime = (iso, duration) => {
+    let dateStr = 'Rejalashtirilgan'
+    if (iso) {
+      try {
+        const d = new Date(iso)
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, '0')
+          const month = String(d.getMonth() + 1).padStart(2, '0')
+          const year = d.getFullYear()
+          const hours = String(d.getHours()).padStart(2, '0')
+          const mins = String(d.getMinutes()).padStart(2, '0')
+          dateStr = `${day}.${month}.${year} ${hours}:${mins}`
+        }
+      } catch {
+        dateStr = iso
+      }
+    } else {
+      const now = new Date()
+      const day = String(now.getDate()).padStart(2, '0')
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const year = now.getFullYear()
+      const hours = String(now.getHours()).padStart(2, '0')
+      const mins = String(now.getMinutes()).padStart(2, '0')
+      dateStr = `${day}.${month}.${year} ${hours}:${mins}`
     }
+
+    if (duration) {
+      return `${dateStr}, ${duration} daqiqa`
+    }
+    return dateStr
   }
 
   return (
@@ -91,35 +88,39 @@ export default function MeetingDetailsDrawer({
       {/* Mobile backdrop */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/60 backdrop-blur-xs z-30 sm:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/50 backdrop-blur-xs z-30 sm:hidden transition-opacity duration-300 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />
 
-      {/* Drawer Panel */}
+      {/* Meeting Details Drawer Panel matching Figma screenshots */}
       <div
-        className={`fixed sm:relative top-0 right-0 bottom-0 h-full flex flex-col bg-[#202124] shadow-2xl z-40 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.2,0.9,0.3,1)] ${
+        className={`fixed sm:relative top-0 right-0 bottom-0 sm:top-auto sm:right-auto sm:bottom-auto h-full rounded-none sm:rounded-3xl bg-white dark:bg-[#0B0D11] shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)] flex flex-col shrink-0 z-40 sm:z-auto overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.2,0.9,0.3,1)] ${
           isOpen
-            ? 'w-full sm:w-[380px] translate-x-0 opacity-100 pointer-events-auto border-l border-[#3c4043]'
-            : 'w-0 translate-x-full sm:translate-x-0 sm:w-0 opacity-0 pointer-events-none border-l-0'
+            ? 'w-full sm:w-[340px] md:w-[360px] opacity-100 pointer-events-auto sm:ml-3 md:ml-4 p-4 sm:p-5 translate-x-0 border-l sm:border border-slate-200/90 dark:border-white/10'
+            : 'w-0 opacity-0 pointer-events-none sm:ml-0 p-0 translate-x-full sm:translate-x-0 border-0'
         }`}
       >
-        <div className="w-full sm:w-[380px] h-full flex flex-col shrink-0">
+        <div className="w-full sm:w-[308px] md:w-[320px] h-full flex flex-col shrink-0">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#3c4043] bg-[#202124] shrink-0">
+          <div className="flex items-center justify-between shrink-0 pb-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-[#8ab4f8] flex items-center justify-center border border-blue-500/20 shadow-sm">
-                <RiInformationLine size={18} />
+              <div className="w-10 h-10 rounded-full bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#8E9DB7] flex items-center justify-center shrink-0">
+                <HugeiconsIcon icon={InformationCircleIcon} size={22} strokeWidth={2} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white leading-tight">Yig'ilish tafsilotlari</h3>
-                <p className="text-[11px] text-slate-400">Havola va rasmiy ma'lumotlar</p>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight select-none">
+                  Yig'ilish tafsilotlari
+                </h3>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 select-none">
+                  Havola va rasmiy ma'lumotlar
+                </p>
               </div>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer transition-all active:scale-90"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1E232D] hover:bg-slate-200 dark:hover:bg-[#282F3D] text-slate-500 dark:text-slate-300 flex items-center justify-center cursor-pointer transition-colors active:scale-90"
               title="Yopish"
             >
               <FaXmark size={14} />
@@ -128,136 +129,132 @@ export default function MeetingDetailsDrawer({
 
           {/* Body */}
           <div
-            className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#18191c]/50 text-xs"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: '#3c4043 transparent' }}
+            className="flex-1 overflow-y-auto pr-1 min-h-0 space-y-3.5 mt-3.5"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: '#94A3B8 transparent' }}
           >
-            {/* Google Meet Signature Joining Info Card */}
-            <div className="p-4 rounded-2xl bg-[#282a2d] border border-white/10 shadow-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Qo'shilish ma'lumotlari
+            {/* Card 1: Qo'shilish ma'lumotlari */}
+            <div className="p-3.5 sm:p-4 rounded-3xl border border-slate-200/70 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#12161F]">
+              {/* Card 1 Header */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase select-none">
+                  QO'SHILISH MA'LUMOTLARI
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-[#8ab4f8]/15 text-[#8ab4f8] text-[10px] font-bold border border-[#8ab4f8]/25">
-                  Meet Havolasi
+                <span className="px-2.5 py-0.5 rounded-full bg-[#EAEFF7] dark:bg-[#1E2634] text-[11px] font-semibold text-slate-700 dark:text-slate-300 select-none">
+                  Yig'ilish havolasi
                 </span>
               </div>
 
-              {/* Link Box */}
-              <div className="p-3 rounded-xl bg-[#1f2023] border border-white/5 space-y-2">
-                <div className="flex items-center gap-2 text-slate-300 font-mono text-xs break-all">
-                  <TbLink size={15} className="text-[#8ab4f8] shrink-0" />
-                  <span className="text-[#8ab4f8] select-all font-semibold leading-relaxed">
-                    {fullUrl}
-                  </span>
-                </div>
-
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Kod: <strong className="text-white">{code}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleCopyLink}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold cursor-pointer transition-all active:scale-95 shadow-md shadow-blue-600/30 text-xs"
-                  >
-                    {copiedLink ? <TbCheck size={13} /> : <TbCopy size={13} />}
-                    <span>{copiedLink ? 'Nusxalandi' : 'Nusxa olish'}</span>
-                  </button>
-                </div>
+              {/* URL Box */}
+              <div className="mt-3 p-3 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/80 dark:border-white/5 flex items-start gap-2.5 shadow-xs">
+                <HugeiconsIcon icon={Copy01Icon} size={17} strokeWidth={2} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-[13px] font-bold text-[#2D56B3] dark:text-[#3E6EC6] break-all leading-snug select-all">
+                  {displayUrl}
+                </span>
               </div>
 
-              <p className="text-[11px] text-slate-400 leading-snug">
-                Ushbu havolani boshqa ishtirokchilarga yuborib, ularni yig'ilishga taklif qilishingiz mumkin.
-              </p>
+              {/* Nusxa olish button (kod qismi olib tashlangan) */}
+              <div className="mt-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="px-4 py-2.5 rounded-2xl bg-[#3E5CBA] hover:bg-[#344F9F] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+                >
+                  <HugeiconsIcon icon={copiedLink ? CheckmarkCircle01Icon : Copy01Icon} size={16} strokeWidth={2} />
+                  <span>{copiedLink ? 'Nusxalandi' : 'Nusxa olish'}</span>
+                </button>
+              </div>
             </div>
 
-            {/* Official Meeting Details Card */}
-            <div className="p-4 rounded-2xl bg-[#282a2d] border border-white/10 shadow-lg space-y-3">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Yig'ilish parametrlari
+            {/* Helper Text under Card 1 */}
+            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed px-1 select-none">
+              Havolani boshqa ishtirokchilarga yuborib, ularni yig'ilishga taklif qilishingiz mumkin.
+            </p>
+
+            {/* Card 2: Yig'ilish parametrlari */}
+            <div className="p-3.5 sm:p-4 rounded-3xl border border-slate-200/70 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#12161F] space-y-2.5">
+              <span className="text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase block px-1 select-none">
+                YIG'ILISH PARAMETRLARI
               </span>
 
-              <div className="space-y-2.5">
-                {/* UID Badge with quick copy */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1f2023] border border-white/5">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <TbId size={16} className="text-amber-400 shrink-0" />
-                    <div>
-                      <div className="text-[10px] text-slate-400">Rasmiy UID</div>
-                      <div className="font-mono font-bold text-white text-xs">{uid}</div>
-                    </div>
+              {/* Row 1: Rasmiy UID */}
+              <div className="bg-white dark:bg-[#0B0D11] border border-slate-200/60 dark:border-white/5 p-2.5 sm:p-3 rounded-2xl flex items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#8E9DB7] flex items-center justify-center shrink-0">
+                    <HugeiconsIcon icon={InformationCircleIcon} size={18} strokeWidth={2} />
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyUid}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer transition-all"
-                    title="UID dan nusxa olish"
-                  >
-                    {copiedUid ? <TbCheck size={13} className="text-emerald-400" /> : <TbCopy size={13} />}
-                  </button>
-                </div>
-
-                {/* Title */}
-                <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#1f2023] border border-white/5">
-                  <TbCalendarEvent size={16} className="text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="text-[10px] text-slate-400">Yig'ilish mavzusi</div>
-                    <div className="font-bold text-white text-xs leading-snug">{title}</div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
+                      Rasmiy UID
+                    </div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate font-mono">
+                      {uid}
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleCopyUid}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer transition-colors"
+                  title="UID nusxalash"
+                >
+                  <HugeiconsIcon icon={copiedUid ? CheckmarkCircle01Icon : Copy01Icon} size={16} strokeWidth={2} />
+                </button>
+              </div>
 
-                {/* Project (if linked) */}
-                {projectName && (
-                  <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1f2023] border border-white/5">
-                    <TbFolder size={16} className="text-blue-400 shrink-0" />
-                    <div>
-                      <div className="text-[10px] text-slate-400">Tegishli loyiha</div>
-                      <div className="font-semibold text-white text-xs truncate max-w-[240px]">
-                        {projectName}
-                      </div>
-                    </div>
+              {/* Row 2: Yig'ilish mavzusi */}
+              <div className="bg-white dark:bg-[#0B0D11] border border-slate-200/60 dark:border-white/5 p-2.5 sm:p-3 rounded-2xl flex items-center gap-2.5 shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#8E9DB7] flex items-center justify-center shrink-0">
+                  <HugeiconsIcon icon={PencilEdit02Icon} size={18} strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
+                    Yig'ilish mavzusi
                   </div>
-                )}
-
-                {/* Start time & duration */}
-                {meetingDetails?.start_time && (
-                  <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1f2023] border border-white/5">
-                    <TbClock size={16} className="text-teal-400 shrink-0" />
-                    <div>
-                      <div className="text-[10px] text-slate-400">Boshlanish vaqti</div>
-                      <div className="font-semibold text-white text-xs">
-                        {formatStartTime(meetingDetails.start_time)}
-                        {meetingDetails?.duration_minutes && (
-                          <span className="text-slate-400 ml-1.5 font-normal">
-                            ({meetingDetails.duration_minutes} daqiqa)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Admission Policy */}
-                <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1f2023] border border-white/5">
-                  <TbShieldCheck size={16} className="text-orange-400 shrink-0" />
-                  <div>
-                    <div className="text-[10px] text-slate-400">Xavfsizlik & Kirish</div>
-                    <div className="font-semibold text-white text-xs">
-                      {meetingDetails?.requires_approval
-                        ? "Kutish xonasi (Tashkilotchi tasdiqlaydi)"
-                        : "To'g'ridan-to'g'ri ulanish"}
-                    </div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {title}
                   </div>
                 </div>
               </div>
 
-              {/* Description if present */}
+              {/* Row 3: Boshlanish vaqti */}
+              <div className="bg-white dark:bg-[#0B0D11] border border-slate-200/60 dark:border-white/5 p-2.5 sm:p-3 rounded-2xl flex items-center gap-2.5 shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#8E9DB7] flex items-center justify-center shrink-0">
+                  <HugeiconsIcon icon={Calendar03Icon} size={18} strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
+                    Boshlanish vaqti
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {formatStartTime(meetingDetails?.start_time, meetingDetails?.duration_minutes)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 4: Xavfsizlik va kirish */}
+              <div className="bg-white dark:bg-[#0B0D11] border border-slate-200/60 dark:border-white/5 p-2.5 sm:p-3 rounded-2xl flex items-center gap-2.5 shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#8E9DB7] flex items-center justify-center shrink-0">
+                  <HugeiconsIcon icon={LockIcon} size={18} strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
+                    Xavfsizlik va kirish
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {meetingDetails?.requires_approval
+                      ? "Tashkilotchi tasdig'i bilan"
+                      : "To'g'ridan-to'g'ri ulanish"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 5: Tavsif (agar mavjud bo'lsa) */}
               {meetingDetails?.description && (
-                <div className="p-3 rounded-xl bg-[#1f2023] border border-white/5 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
-                    Kun tartibi / Tavsif
-                  </span>
-                  <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-wrap">
+                <div className="bg-white dark:bg-[#0B0D11] border border-slate-200/60 dark:border-white/5 p-2.5 sm:p-3 rounded-2xl shadow-xs space-y-1">
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
+                    Tavsif
+                  </div>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
                     {meetingDetails.description}
                   </p>
                 </div>
