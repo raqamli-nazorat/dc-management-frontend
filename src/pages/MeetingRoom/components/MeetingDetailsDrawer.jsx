@@ -146,22 +146,10 @@ export default function MeetingDetailsDrawer({
 
               {/* URL Box */}
               <div className="mt-3 p-3 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/80 dark:border-white/5 flex items-start gap-2.5 shadow-xs">
-                <HugeiconsIcon icon={Copy01Icon} size={17} strokeWidth={2} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
+                <HugeiconsIcon icon={Copy01Icon} size={17} onClick={handleCopyLink} strokeWidth={2} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5 cursor-pointer hover:scale-110" />
                 <span className="text-xs sm:text-[13px] font-bold text-[#2D56B3] dark:text-[#3E6EC6] break-all leading-snug select-all">
                   {displayUrl}
                 </span>
-              </div>
-
-              {/* Nusxa olish button (kod qismi olib tashlangan) */}
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="px-4 py-2.5 rounded-2xl bg-[#3E5CBA] hover:bg-[#344F9F] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
-                >
-                  <HugeiconsIcon icon={copiedLink ? CheckmarkCircle01Icon : Copy01Icon} size={16} strokeWidth={2} />
-                  <span>{copiedLink ? 'Nusxalandi' : 'Nusxa olish'}</span>
-                </button>
               </div>
             </div>
 
