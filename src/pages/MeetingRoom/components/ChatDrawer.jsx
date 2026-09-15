@@ -188,9 +188,6 @@ export default function ChatDrawer({
                           ? `${typingUsers[0]}, ${typingUsers[1]}`
                           : `${typingUsers.length} ishtirokchi`}
                       </span>
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-normal italic">
-                        yozmoqda...
-                      </span>
                     </div>
 
                     {/* Instagram-style 3 bouncing dots message bubble */}

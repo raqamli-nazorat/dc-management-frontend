@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { flushSync } from 'react-dom'
+import { flushSync, createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality, setLogLevel, LogLevel } from 'livekit-client'
 import { useAuth } from '../../context/AuthContext'
@@ -37,10 +37,12 @@ import {
   Refresh01Icon,
   Refresh04Icon,
   Home04Icon,
+  ShutDownIcon,
+  CallEnd01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-import { FaExpand, FaCompress, FaMicrophone, FaMicrophoneSlash, FaVideo } from 'react-icons/fa6'
+import { FaExpand, FaCompress, FaMicrophone, FaMicrophoneSlash, FaVideo, FaXmark } from 'react-icons/fa6'
 import { RiSignalWifiFill, RiSignalWifiOffFill, RiSignalWifi1Fill, RiInformationLine } from 'react-icons/ri'
 import {
   TbBellFilled,
@@ -368,6 +370,7 @@ export default function MeetingRoom() {
 
   // Client-side Pinning & Screen Share Order Tracking
   const [pinnedId, setPinnedId] = useState(null)
+  const [showEndModal, setShowEndModal] = useState(false)
   const [screenFocusId, setScreenFocusId] = useState(null)
   const screenShareTimesRef = useRef({})
 
@@ -3055,7 +3058,19 @@ export default function MeetingRoom() {
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Top Right: Host End Meeting Button (Icon only) */}
+            {isLocalHost && (
+              <button
+                type="button"
+                onClick={() => setShowEndModal(true)}
+                title="Yig'ilishni hamma uchun yakunlash"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shadow-xs"
+              >
+                <HugeiconsIcon icon={ShutDownIcon} size={16} strokeWidth={2.2} />
+              </button>
+            )}
+
             {/* Top Right: Participants Badge pill */}
             <button
               type="button"
@@ -3459,8 +3474,6 @@ export default function MeetingRoom() {
             })
           }}
           onLeave={handleLeaveMeeting}
-          isHost={isLocalHost}
-          onEndMeetingForAll={handleEndMeetingForAll}
           isFullScreenFocus={isScreenFocused}
         />
       </footer>
@@ -3539,6 +3552,51 @@ export default function MeetingRoom() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Confirmation Modal for Ending Meeting for All (Host) */}
+      {showEndModal && typeof document !== 'undefined' && createPortal(
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowEndModal(false)
+          }}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200 select-none"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-[450px] p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-200 overflow-hidden"
+          >
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              Uchrashuvni yakunlaysizmi?
+            </h3>
+            <p className="mt-2.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Uchrashuv barcha ishtirokchilar uchun to'xtatiladi va hamma chiqariladi.
+            </p>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowEndModal(false)}
+                className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-transparent text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+              >
+                <FaXmark size={12} />
+                <span>Bekor qilish</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEndModal(false)
+                  handleEndMeetingForAll()
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
+              >
+                <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
+                <span>Yakunlash</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   )

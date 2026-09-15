@@ -13,7 +13,6 @@ import {
   InformationCircleIcon,
   ArrowUp01Icon,
   ArrowDown01Icon,
-  ShutDownIcon,
   CallEnd01Icon,
   Message01Icon,
   Hold05Icon,
@@ -49,12 +48,9 @@ export default function ControlBar({
   isDetailsOpen = false,
   onToggleDetails = null,
   onLeave,
-  isHost = false,
-  onEndMeetingForAll,
   isFullScreenFocus = false,
 }) {
   const [showLeaveModal, setShowLeaveModal] = useState(false)
-  const [showEndModal, setShowEndModal] = useState(false)
   const [showScreenShareMenu, setShowScreenShareMenu] = useState(false)
   const screenShareMenuRef = useRef(null)
 
@@ -178,7 +174,6 @@ export default function ControlBar({
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         if (showLeaveModal) setShowLeaveModal(false)
-        if (showEndModal) setShowEndModal(false)
         if (showMicMenu) setShowMicMenu(false)
         if (showCameraMenu) setShowCameraMenu(false)
         if (showScreenShareMenu) setShowScreenShareMenu(false)
@@ -186,7 +181,7 @@ export default function ControlBar({
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showLeaveModal, showEndModal, showMicMenu, showCameraMenu, showScreenShareMenu])
+  }, [showLeaveModal, showMicMenu, showCameraMenu, showScreenShareMenu])
 
   const handleScreenShareClick = () => {
     if (isScreenSharing) {
@@ -565,34 +560,18 @@ export default function ControlBar({
           <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
         )}
 
-        {/* Right: End (Host) & Leave Buttons */}
+        {/* Right: Leave Button */}
         <div className="flex items-center gap-2">
-          {/* Host end meeting for all */}
-          {isHost && (
-            <button
-              type="button"
-              onClick={() => setShowEndModal(true)}
-              title="Yig'ilishni hamma uchun yakunlash"
-              className={`h-10 sm:h-11 px-4 sm:px-5 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95 ${
-                isFullScreenFocus ? 'bg-black/60 shadow-lg shadow-black/40 backdrop-blur-md' : ''
-              }`}
-            >
-              <HugeiconsIcon icon={ShutDownIcon} size={16} strokeWidth={2.2} />
-              <span className="hidden sm:inline">Tugatish</span>
-            </button>
-          )}
-
           {/* Leave meeting - Red solid pill button */}
           <button
             type="button"
             onClick={() => setShowLeaveModal(true)}
             title="Chiqish"
-            className={`h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95 ${
+            className={`h-10 sm:h-11 px-4 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95 ${
               isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md' : ''
             }`}
           >
             <HugeiconsIcon icon={CallEnd01Icon} size={17} strokeWidth={2.2} />
-            <span>Chiqish</span>
           </button>
         </div>
       </div>
@@ -635,51 +614,6 @@ export default function ControlBar({
               >
                 <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
                 <span>Chiqish</span>
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Confirmation Modal for Ending Meeting for All (matching Figma Image 1 & 2) */}
-      {showEndModal && typeof document !== 'undefined' && createPortal(
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowEndModal(false)
-          }}
-          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200 select-none"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[450px] p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-200 overflow-hidden"
-          >
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
-              Uchrashuvni yakunlaysizmi?
-            </h3>
-            <p className="mt-2.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Uchrashuv barcha ishtirokchilar uchun to'xtatiladi va hamma chiqariladi.
-            </p>
-
-            <div className="mt-6 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setShowEndModal(false)}
-                className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-transparent text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
-              >
-                <FaXmark size={12} />
-                <span>Bekor qilish</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowEndModal(false)
-                  onEndMeetingForAll?.()
-                }}
-                className="px-5 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
-              >
-                <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
-                <span>Yakunlash</span>
               </button>
             </div>
           </div>
