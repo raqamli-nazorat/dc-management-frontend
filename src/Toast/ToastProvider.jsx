@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { FaTimes, FaCheckCircle, FaExclamationCircle, FaTrash, FaInfoCircle } from "react-icons/fa";
 
@@ -22,7 +22,9 @@ export const toast = {
     success: (a, b) => toastListener?.({ type: 'success', ...parseArgs('success', a, b) }),
     error: (a, b) => toastListener?.({ type: 'error', ...parseArgs('error', a, b) }),
     delete: (a, b) => toastListener?.({ type: 'delete', ...parseArgs('delete', a, b) }),
-    info: (a, b) => toastListener?.({ type: 'info', ...parseArgs('info', a, b) })
+    info: (a, b) => toastListener?.({ type: 'info', ...parseArgs('info', a, b) }),
+    warning: (a, b) => toastListener?.({ type: 'error', ...parseArgs('error', a, b) }),
+    warn: (a, b) => toastListener?.({ type: 'error', ...parseArgs('error', a, b) })
 };
 
 const getToastConfig = (type) => {

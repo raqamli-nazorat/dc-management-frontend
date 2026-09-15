@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { flushSync } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality } from 'livekit-client'
+import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality, setLogLevel, LogLevel } from 'livekit-client'
 import { useAuth } from '../../context/AuthContext'
 import { axiosAPI } from '../../service/axiosAPI'
 import { toast } from '../../Toast/ToastProvider'
+
+// LiveKit ichki statistika va track loglarini to'liq o'chirish (Silent mode)
+try {
+  setLogLevel(LogLevel?.silent ?? 'silent')
+} catch {}
 
 import ParticipantTile from './components/ParticipantTile'
 import ControlBar from './components/ControlBar'
@@ -35,7 +40,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-import { FaExpand, FaCompress, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa6'
+import { FaExpand, FaCompress, FaMicrophone, FaMicrophoneSlash, FaVideo } from 'react-icons/fa6'
 import { RiSignalWifiFill, RiSignalWifiOffFill, RiSignalWifi1Fill, RiInformationLine } from 'react-icons/ri'
 import {
   TbBellFilled,
@@ -340,6 +345,7 @@ export default function MeetingRoom() {
   const [participantTracks, setParticipantTracks] = useState({}) // { [identity]: { videoTrack, audioTrack, isCameraEnabled, isMicEnabled } }
   const [handRaisedMap, setHandRaisedMap] = useState({}) // { [identity]: boolean }
   const [unmuteRequest, setUnmuteRequest] = useState(null)
+  const [turnOnCameraRequest, setTurnOnCameraRequest] = useState(null)
   const isLocalHostRef = useRef(false)
 
   // Local Media State
@@ -767,8 +773,6 @@ export default function MeetingRoom() {
 
   // Handle incoming WebSocket messages
   const handleWsMessage = useCallback((msg) => {
-    console.log("WS Event qabul qilindi:", msg.type, msg)
-
     switch (msg.type) {
       case 'meeting_state': {
         setMeetingState(msg)
@@ -944,7 +948,6 @@ export default function MeetingRoom() {
           try { ws.close() } catch {}
           return
         }
-        console.log("WebSocket ulangan:", wsUrl)
       }
 
       ws.onmessage = (event) => {
@@ -963,7 +966,6 @@ export default function MeetingRoom() {
       }
 
       ws.onclose = (evt) => {
-        console.log("WebSocket yopildi:", evt.code, evt.reason)
       }
     } catch (err) {
       console.error("WebSocket ulanishda xato:", err)
@@ -1210,7 +1212,6 @@ export default function MeetingRoom() {
 
       // Connect to LiveKit Media Server
       await room.connect(serverUrl, token)
-      console.log("LiveKit xonaga ulandi:", room.name)
 
       // Profilimizni va avatarimizni boshqa qatnashchilarga tarqatamiz
       broadcastMyProfile(room)
@@ -1665,13 +1666,28 @@ export default function MeetingRoom() {
             }
           }
         } else if (decoded.type === 'ask_unmute') {
-          const myIdentity = room.localParticipant?.identity
-          if (decoded.targetUserId === myIdentity) {
+          const myIdentity = String(room.localParticipant?.identity || '')
+          const targetId = String(decoded.targetUserId || '')
+          const myUserId = String(user?.id || '')
+          if (targetId && (targetId === myIdentity || targetId === myUserId || myIdentity.startsWith(targetId + '_') || targetId.startsWith(myIdentity + '_') || targetId === 'ALL')) {
             setUnmuteRequest({
               sender: decoded.sender || 'Tashkilotchi',
               timestamp: Date.now()
             })
             playKnockRequestSound()
+            triggerInRoomAlert('bell', `${decoded.sender || 'Tashkilotchi'} mikrofoningizni yoqishingizni so'ramoqda`, 'knock')
+          }
+        } else if (decoded.type === 'ask_turn_on_camera') {
+          const myIdentity = String(room.localParticipant?.identity || '')
+          const targetId = String(decoded.targetUserId || '')
+          const myUserId = String(user?.id || '')
+          if (targetId && (targetId === myIdentity || targetId === myUserId || myIdentity.startsWith(targetId + '_') || targetId.startsWith(myIdentity + '_') || targetId === 'ALL')) {
+            setTurnOnCameraRequest({
+              sender: decoded.sender || 'Tashkilotchi',
+              timestamp: Date.now()
+            })
+            playKnockRequestSound()
+            triggerInRoomAlert('bell', `${decoded.sender || 'Tashkilotchi'} kamerangizni yoqishingizni so'ramoqda`, 'knock')
           }
         } else if (decoded.type === 'user_profile') {
           if (decoded.identity || decoded.userId) {
@@ -1719,7 +1735,6 @@ export default function MeetingRoom() {
 
     // Room disconnected
     room.on(RoomEvent.Disconnected, (reason) => {
-      console.log("Xonadan uzildi:", reason)
       setIsConnectedToLiveKit(false)
       if (waitingState !== 'ended') {
         setWaitingState('ended')
@@ -2143,6 +2158,24 @@ export default function MeetingRoom() {
       toast.info("So'rov yuborildi", "Ishtirokchiga mikrofonni yoqish taklifi yuborildi")
     } catch (err) {
       console.error("Ask to unmute yuborishda xato:", err)
+      toast.error("Xatolik", "Mikrofonni yoqish so'rovini yuborishda muammo yuz berdi")
+    }
+  }
+
+  // Tashkilotchi tomonidan kamerani yoqish so'rovini yuborish (Ask to Turn on Camera)
+  const handleAskTurnOnCamera = async (targetIdentity) => {
+    if (!isLocalHost) return
+    try {
+      const payload = new TextEncoder().encode(JSON.stringify({
+        type: 'ask_turn_on_camera',
+        targetUserId: targetIdentity,
+        sender: currentUserName,
+      }))
+      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      toast.info("So'rov yuborildi", "Ishtirokchiga kamerani yoqish taklifi yuborildi")
+    } catch (err) {
+      console.error("Ask to turn on camera yuborishda xato:", err)
+      toast.error("Xatolik", "Kamerani yoqish so'rovini yuborishda muammo yuz berdi")
     }
   }
 
@@ -3054,6 +3087,7 @@ export default function MeetingRoom() {
           onMuteAll={handleMuteAllParticipants}
           onAskUnmuteParticipant={handleAskUnmuteParticipant}
           onTurnOffCamera={handleTurnOffCamera}
+          onAskTurnOnCamera={handleAskTurnOnCamera}
           onAdmitUser={handleAdmitUser}
           onRejectUser={handleRejectUser}
           currentUserId={roomRef.current?.localParticipant?.identity}
@@ -3193,6 +3227,44 @@ export default function MeetingRoom() {
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-blue-600/30"
               >
                 Mikrofonni yoqish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ask to Turn on Camera Modal (received from Host) */}
+      {turnOnCameraRequest && (
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#202124] border border-white/10 p-6 shadow-2xl text-center flex flex-col items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-2xl border border-blue-500/30 shadow-inner">
+              <FaVideo size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Kamerani yoqish so'rovi</h3>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
+                <span className="font-bold text-white">{turnOnCameraRequest.sender}</span> kamerangizni yoqishingizni so'ramoqda.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 w-full mt-2">
+              <button
+                type="button"
+                onClick={() => setTurnOnCameraRequest(null)}
+                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Hozir emas
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!isCameraEnabled) {
+                    await handleToggleCamera()
+                  }
+                  setTurnOnCameraRequest(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-blue-600/30"
+              >
+                Kamerani yoqish
               </button>
             </div>
           </div>
