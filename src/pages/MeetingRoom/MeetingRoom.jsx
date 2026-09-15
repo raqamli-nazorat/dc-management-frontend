@@ -290,17 +290,14 @@ const parseMeetingStartTimeMs = (startTime) => {
 
 const formatMeetingDuration = (totalSeconds) => {
   if (typeof totalSeconds !== 'number' || isNaN(totalSeconds) || totalSeconds < 0) {
-    return '00:00'
+    return '00:00:00'
   }
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = Math.floor(totalSeconds % 60)
 
   const pad = (n) => String(n).padStart(2, '0')
-  if (hours > 0) {
-    return `${pad(hours)}:${pad(minutes)}`
-  }
-  return `${pad(minutes)}:${pad(seconds)}`
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
 }
 
 
@@ -376,11 +373,21 @@ export default function MeetingRoom() {
 
   // Drawers & UI
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const isChatOpenRef = useRef(false)
+  useEffect(() => {
+    isChatOpenRef.current = isChatOpen
+    if (isChatOpen) {
+      setUnreadChatCount(0)
+    }
+  }, [isChatOpen])
+
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(false)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [copiedHeaderLink, setCopiedHeaderLink] = useState(false)
   const [chatMessages, setChatMessages] = useState(() => getStoredChatMessages(meetingId))
   const [unreadChatCount, setUnreadChatCount] = useState(0)
+  const [typingUsersMap, setTypingUsersMap] = useState({})
+  const typingTimeoutsRef = useRef({})
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [meetingDuration, setMeetingDuration] = useState(0)
   const [endedReason, setEndedReason] = useState("Yig'ilish yakunlandi")
@@ -393,7 +400,7 @@ export default function MeetingRoom() {
       const diffSeconds = Math.max(0, Math.floor((Date.now() - startMs) / 1000))
       return formatMeetingDuration(diffSeconds)
     }
-    return '00:00'
+    return '00:00:00'
   })
 
   useEffect(() => {
@@ -534,6 +541,9 @@ export default function MeetingRoom() {
   useEffect(() => {
     hasClickedJoinRef.current = false
     if (roomRef.current) {
+      try {
+        roomRef.current.removeAllListeners()
+      } catch {}
       roomRef.current.disconnect().catch(() => {})
       roomRef.current = null
       setIsConnectedToLiveKit(false)
@@ -690,15 +700,24 @@ export default function MeetingRoom() {
 
     let isSubscribed = true
 
+    const applyMeetingData = (d) => {
+      if (!isSubscribed || !d || !d.id) return
+      setMeetingDetails(d)
+      setNumericMeetingId(String(d.id))
+      if (d.is_active === false || d.status === 'completed' || d.status === 'closed' || d.is_closed === true) {
+        setWaitingState('ended')
+        setEndedReason("Yig'ilish tashkilotchi tomonidan yakunlangan.")
+      }
+    }
+
     const fetchMeeting = async () => {
       // 1. URL dan kesib olingan ID orqali to'g'ridan-to'g'ri /meetings/<extractedId>/ ga GET so'rov yuboramiz
       if (extractedId && /^\d+$/.test(String(extractedId))) {
         try {
           const res = await axiosAPI.get(`/meetings/${extractedId}/`)
           const d = res.data?.data ?? res.data
-          if (isSubscribed && d && d.id) {
-            setMeetingDetails(d)
-            setNumericMeetingId(String(d.id))
+          if (d && d.id) {
+            applyMeetingData(d)
             return
           }
         } catch (err) {
@@ -710,9 +729,8 @@ export default function MeetingRoom() {
       try {
         const res = await axiosAPI.get(`/meetings/${encodeURIComponent(queryTarget)}/`)
         const d = res.data?.data ?? res.data
-        if (isSubscribed && d && d.id) {
-          setMeetingDetails(d)
-          setNumericMeetingId(String(d.id))
+        if (d && d.id) {
+          applyMeetingData(d)
           return
         }
       } catch (err) {
@@ -723,11 +741,10 @@ export default function MeetingRoom() {
         const searchTerm = rawParamId || queryTarget
         const res = await axiosAPI.get('/meetings/', { params: { search: searchTerm } })
         const results = res.data?.data?.results ?? res.data?.results ?? res.data
-        if (isSubscribed && Array.isArray(results) && results.length > 0) {
+        if (Array.isArray(results) && results.length > 0) {
           const match = results.find(m => String(m.uid).trim() === String(searchTerm).trim() || String(m.id) === String(extractedId)) || results[0]
           if (match && match.id) {
-            setMeetingDetails(match)
-            setNumericMeetingId(String(match.id))
+            applyMeetingData(match)
           }
         }
       } catch (err) {
@@ -1020,6 +1037,21 @@ export default function MeetingRoom() {
 
   // Lobby sahifasidan "Yig'ilishga kirish" tugmasi bosilganda
   const handleJoinFromLobby = useCallback(() => {
+    // Avtomatik to'liq ekran (Full Screen) rejimiga o'tish
+    if (typeof document !== 'undefined' && !document.fullscreenElement) {
+      try {
+        const docEl = document.documentElement
+        const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen
+        if (requestFs) {
+          requestFs.call(docEl).catch((err) => {
+            console.warn("Fullscreen request error:", err)
+          })
+        }
+      } catch (err) {
+        console.warn("Fullscreen error:", err)
+      }
+    }
+
     hasClickedJoinRef.current = true
     setIsJoining(true)
     setWaitingState('connecting')
@@ -1658,15 +1690,61 @@ export default function MeetingRoom() {
       try {
         const decoded = JSON.parse(new TextDecoder().decode(payload))
         if (decoded.type === 'chat') {
+          // Clear typing status for the sender
+          const senderKey = decoded.sender || (participant ? participant.identity : '')
+          if (senderKey) {
+            if (typingTimeoutsRef.current[senderKey]) {
+              clearTimeout(typingTimeoutsRef.current[senderKey])
+              delete typingTimeoutsRef.current[senderKey]
+            }
+            setTypingUsersMap(prev => {
+              const next = { ...prev }
+              delete next[senderKey]
+              return next
+            })
+          }
+
           setChatMessages(prev => {
             const next = [...prev, decoded]
             saveStoredChatMessages(meetingId, next)
             return next
           })
           playChatMessageSound()
-          if (!isChatOpen) {
+          if (!isChatOpenRef.current) {
             setUnreadChatCount(c => c + 1)
             triggerInRoomAlert('chat', `${decoded.sender}: ${decoded.text?.slice(0, 40)}${decoded.text?.length > 40 ? '...' : ''}`, 'chat')
+          }
+        } else if (decoded.type === 'typing') {
+          const senderKey = decoded.sender || (participant ? participant.identity : '')
+          if (senderKey) {
+            if (decoded.isTyping) {
+              if (typingTimeoutsRef.current[senderKey]) {
+                clearTimeout(typingTimeoutsRef.current[senderKey])
+              }
+              typingTimeoutsRef.current[senderKey] = setTimeout(() => {
+                setTypingUsersMap(prev => {
+                  const next = { ...prev }
+                  delete next[senderKey]
+                  return next
+                })
+                delete typingTimeoutsRef.current[senderKey]
+              }, 3500)
+
+              setTypingUsersMap(prev => ({
+                ...prev,
+                [senderKey]: decoded.sender
+              }))
+            } else {
+              if (typingTimeoutsRef.current[senderKey]) {
+                clearTimeout(typingTimeoutsRef.current[senderKey])
+                delete typingTimeoutsRef.current[senderKey]
+              }
+              setTypingUsersMap(prev => {
+                const next = { ...prev }
+                delete next[senderKey]
+                return next
+              })
+            }
           }
         } else if (decoded.type === 'raise_hand') {
           const pIdentity = participant ? participant.identity : decoded.userId
@@ -1796,10 +1874,11 @@ export default function MeetingRoom() {
     // Room disconnected
     room.on(RoomEvent.Disconnected, (reason) => {
       setIsConnectedToLiveKit(false)
-      if (waitingState !== 'ended') {
-        setWaitingState('ended')
-        setEndedReason("Yig'ilishdan uzildingiz.")
-      }
+      setWaitingState(prev => {
+        if (prev === 'ended') return 'ended'
+        if (prev === 'in_room') return 'left'
+        return prev
+      })
     })
   }
 
@@ -1818,6 +1897,9 @@ export default function MeetingRoom() {
         previewStreamRef.current = null
       }
       if (roomRef.current) {
+        try {
+          roomRef.current.removeAllListeners()
+        } catch {}
         // Barcha lokal oqimlarni hardware darajasida to'xtatamiz
         roomRef.current.localParticipant?.trackPublications?.forEach(pub => {
           if (pub.track?.mediaStreamTrack) {
@@ -2072,12 +2154,15 @@ export default function MeetingRoom() {
   }
 
   const handleSendMessage = async (text) => {
+    const now = new Date()
+    const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+
     const messageData = {
       type: 'chat',
       text,
       sender: currentUserName,
       avatar: formatAvatarUrl(user?.avatar) || user?.avatar || '',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      time: formattedTime
     }
 
     playChatMessageSound()
@@ -2092,6 +2177,23 @@ export default function MeetingRoom() {
       await roomRef.current.localParticipant.publishData(payload, { reliable: true })
     }
   }
+
+  const handleSendTypingStatus = useCallback(async (isTyping) => {
+    if (roomRef.current?.localParticipant) {
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'typing',
+          sender: currentUserName,
+          isTyping
+        }))
+        await roomRef.current.localParticipant.publishData(payload, { reliable: true })
+      } catch {}
+    }
+  }, [currentUserName])
+
+  const typingUserNames = useMemo(() => {
+    return Object.values(typingUsersMap).filter(name => name && name !== currentUserName)
+  }, [typingUsersMap, currentUserName])
 
   // 5. Host Actions (Admit / Reject / End for all)
   const handleAdmitUser = async (userId) => {
@@ -2536,6 +2638,19 @@ export default function MeetingRoom() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [screenFocusId])
 
+  // Avtomatik to'liq ekran (Full Screen) rejimiga o'tish (yig'ilishga kirganda)
+  useEffect(() => {
+    if (waitingState === 'in_room' && typeof document !== 'undefined' && !document.fullscreenElement) {
+      try {
+        const docEl = document.documentElement
+        const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen
+        if (requestFs) {
+          requestFs.call(docEl).catch(() => {})
+        }
+      } catch (e) {}
+    }
+  }, [waitingState])
+
   // Global Keyboard Shortcuts (Ctrl+D: Mic, Ctrl+E: Camera, Ctrl+Alt+H: Hand, Ctrl+L: Chat)
   useEffect(() => {
     const handleMeetingShortcuts = (e) => {
@@ -2701,7 +2816,10 @@ export default function MeetingRoom() {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.reload()
+                  hasClickedJoinRef.current = false
+                  setIsJoining(false)
+                  setWaitingState('lobby')
+                  setNetworkStatus('online')
                 }}
                 className="px-5 py-2.5 rounded-xl bg-[#3E5CBA] hover:bg-[#344F9F] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm"
               >
@@ -2734,7 +2852,7 @@ export default function MeetingRoom() {
           roomRef.current.startAudio().catch(() => {})
         }
       }}
-      className="fixed inset-0 w-full h-full bg-white dark:bg-[#16191F] text-slate-900 dark:text-white overflow-hidden flex flex-col select-none z-50 transition-colors"
+      className={`fixed inset-0 w-full h-full ${isScreenFocused ? 'bg-black' : 'bg-white dark:bg-[#16191F]'} text-slate-900 dark:text-white overflow-hidden flex flex-col select-none z-50 transition-colors`}
     >
       {/* Google Meet style Network Status Alerts */}
       {(networkStatus === 'reconnecting' || networkStatus === 'offline') && (
@@ -2976,19 +3094,19 @@ export default function MeetingRoom() {
       )}
 
       {/* Main Conference Body with Outer Rounded Stage Frame */}
-      <div className={`flex-1 flex overflow-hidden relative ${mainStageItem ? 'px-1.5 sm:px-3 pt-0 pb-0.5' : 'px-2 sm:px-4 pt-0.5 pb-1'} min-h-0`}>
+      <div className={`flex-1 flex overflow-hidden relative ${isScreenFocused ? 'p-0 m-0 w-full h-full' : (mainStageItem ? 'px-1.5 sm:px-3 pt-0 pb-0.5' : 'px-2 sm:px-4 pt-0.5 pb-1')} min-h-0`}>
         {/* Large Rounded Container matching Figma screenshots */}
-        <div className={`w-full h-full flex-1 flex overflow-hidden rounded-2xl sm:rounded-3xl bg-[#DFE5EE] dark:bg-[#13161D] ${mainStageItem ? 'p-1 sm:p-1.5' : 'p-2 sm:p-3'} relative transition-colors shadow-inner`}>
+        <div className={`w-full h-full flex-1 flex overflow-hidden ${isScreenFocused ? 'rounded-none bg-black p-0 shadow-none border-0' : 'rounded-2xl sm:rounded-3xl bg-[#DFE5EE] dark:bg-[#13161D] shadow-inner ' + (mainStageItem ? 'p-1 sm:p-1.5' : 'p-2 sm:p-3')} relative transition-colors`}>
 
           {mainStageItem ? (
             /* Google Meet Presentation Stage (Single Full View) + Right Sidebar Filmstrip */
-            <div className="w-full h-full flex flex-col lg:flex-row gap-3 overflow-hidden">
+            <div className={`w-full h-full flex flex-col lg:flex-row ${isScreenFocused ? 'gap-0 p-0' : 'gap-3'} overflow-hidden`}>
               {/* Main Stage (Pinned Item OR Latest Shared Screen) */}
               <div
                 style={{ viewTransitionName: getViewTransitionName(mainStageItem.identity) }}
                 className={`flex-1 h-full min-h-0 min-w-0 flex items-center justify-center relative overflow-hidden transition-all duration-300 ${
                   isScreenFocused
-                    ? 'rounded-none bg-black border-0 shadow-none'
+                    ? 'rounded-none bg-black border-0 shadow-none p-0'
                     : 'rounded-2xl sm:rounded-3xl bg-transparent border-0 shadow-xl'
                 }`}
               >
@@ -3238,6 +3356,8 @@ export default function MeetingRoom() {
           messages={chatMessages}
           onSendMessage={handleSendMessage}
           currentUserName={currentUserName}
+          typingUsers={typingUserNames}
+          onTyping={handleSendTypingStatus}
         />
 
         {/* Participants Drawer */}
@@ -3272,7 +3392,7 @@ export default function MeetingRoom() {
       </div>
 
       {/* Bottom Floating Control Bar */}
-      <footer className={`z-20 shrink-0 ${mainStageItem ? 'py-1 pb-1.5 px-3' : 'py-1.5 pb-2.5 px-4'}`}>
+      <footer className={`transition-all ${isScreenFocused ? 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 p-0 pointer-events-auto' : (mainStageItem ? 'z-20 shrink-0 py-1 pb-1.5 px-3' : 'z-20 shrink-0 py-1.5 pb-2.5 px-4')}`}>
         <ControlBar
           isMicEnabled={isMicEnabled}
           onToggleMic={handleToggleMic}
@@ -3305,11 +3425,9 @@ export default function MeetingRoom() {
               console.warn("Switch videoinput error:", err)
             }
           }}
-          onSelectBackgroundEffect={(mode) => {
-            console.log("Selected background mode:", mode)
-          }}
+          onSelectBackgroundEffect={handleSelectBackgroundEffect}
           isScreenSharing={isScreenSharing}
-          onToggleScreenShare={handleStartScreenShare}
+          onToggleScreenShare={handleToggleScreenShare}
           onStopScreenShare={handleStopScreenShare}
           onChangeScreenShare={handleChangeScreenShare}
           isHandRaised={isHandRaised}
@@ -3357,6 +3475,7 @@ export default function MeetingRoom() {
           onLeave={handleLeaveMeeting}
           isHost={isLocalHost}
           onEndMeetingForAll={handleEndMeetingForAll}
+          isFullScreenFocus={isScreenFocused}
         />
       </footer>
 

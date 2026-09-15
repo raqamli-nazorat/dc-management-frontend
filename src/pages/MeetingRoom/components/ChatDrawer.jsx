@@ -3,25 +3,78 @@ import { FaXmark } from 'react-icons/fa6'
 import { Comment01Icon, Message01Icon, SentIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
+const formatMessageTime = (timeStr) => {
+  if (!timeStr) return ''
+  const str = String(timeStr).trim()
+  if (/^\d{2}:\d{2}$/.test(str)) {
+    return str
+  }
+  if (/^\d{1}:\d{2}$/.test(str)) {
+    return `0${str}`
+  }
+  try {
+    const isAmPm = /am|pm/i.test(str)
+    const baseDateStr = isAmPm ? `1970-01-01 ${str}` : (str.includes('T') ? str : `1970-01-01T${str}`)
+    const parsed = new Date(baseDateStr)
+    if (!isNaN(parsed.getTime())) {
+      const hh = String(parsed.getHours()).padStart(2, '0')
+      const mm = String(parsed.getMinutes()).padStart(2, '0')
+      return `${hh}:${mm}`
+    }
+  } catch {}
+  return str
+}
+
 export default function ChatDrawer({
   isOpen,
   onClose,
   messages = [],
   onSendMessage,
   currentUserName = '',
+  typingUsers = [],
+  onTyping = null,
 }) {
   const [text, setText] = useState('')
   const messagesEndRef = useRef(null)
+  const typingTimeoutRef = useRef(null)
 
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [messages, isOpen])
+  }, [messages, isOpen, typingUsers])
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleInputChange = (e) => {
+    const val = e.target.value
+    setText(val)
+
+    if (onTyping) {
+      if (val.trim()) {
+        onTyping(true)
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = setTimeout(() => {
+          onTyping(false)
+        }, 2500)
+      } else {
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        onTyping(false)
+      }
+    }
+  }
 
   const handleSend = (e) => {
     e?.preventDefault()
     if (!text.trim()) return
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+    onTyping?.(false)
     onSendMessage(text.trim())
     setText('')
   }
@@ -104,8 +157,8 @@ export default function ChatDrawer({
                           {isMe ? 'Siz' : (m.sender || 'Ishtirokchi')}
                         </span>
                         {m.time && (
-                          <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">
-                            {m.time}
+                          <span className="text-xs text-slate-400 dark:text-slate-500 font-normal tabular-nums">
+                            {formatMessageTime(m.time)}
                           </span>
                         )}
                       </div>
@@ -128,13 +181,34 @@ export default function ChatDrawer({
             )}
           </div>
 
+          {/* Typing Indicator (Google Meet style) */}
+          {typingUsers && typingUsers.length > 0 && (
+            <div className="flex items-center gap-2 px-2 pt-2 text-xs text-slate-500 dark:text-slate-400 animate-in fade-in slide-in-from-bottom-1 duration-200 select-none shrink-0">
+              <div className="flex items-center gap-1 bg-[#F0F3F7] dark:bg-[#1C212D] px-2.5 py-1 rounded-full border border-slate-200/80 dark:border-white/10 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3E5CBA] dark:bg-[#5B7BF0] animate-bounce" />
+              </div>
+              <span className="truncate font-medium italic">
+                {typingUsers.length === 1
+                  ? `${typingUsers[0]} yozmoqda...`
+                  : typingUsers.length === 2
+                  ? `${typingUsers[0]} va ${typingUsers[1]} yozmoqdalar...`
+                  : `${typingUsers.length} kishi yozmoqda...`}
+              </span>
+            </div>
+          )}
+
           {/* Message Input matching Figma capsule */}
-          <form onSubmit={handleSend} className="pt-3 mt-auto shrink-0">
+          <form onSubmit={handleSend} className="pt-2 mt-auto shrink-0">
             <div className="flex items-center gap-2 px-4 py-2.5 sm:py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-transparent focus-within:border-blue-500/50 dark:focus-within:border-blue-500/50 transition-all">
               <input
                 type="text"
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={handleInputChange}
+                onBlur={() => {
+                  if (onTyping) onTyping(false)
+                }}
                 placeholder="Xabar yozing"
                 className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
               />

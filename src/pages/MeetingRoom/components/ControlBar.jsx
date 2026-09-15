@@ -51,6 +51,7 @@ export default function ControlBar({
   onLeave,
   isHost = false,
   onEndMeetingForAll,
+  isFullScreenFocus = false,
 }) {
   const [showLeaveModal, setShowLeaveModal] = useState(false)
   const [showEndModal, setShowEndModal] = useState(false)
@@ -221,13 +222,21 @@ export default function ControlBar({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)] max-w-fit mx-auto select-none transition-colors relative">
+      <div
+        className={`flex items-center justify-between gap-2 sm:gap-2.5 ${
+          isFullScreenFocus
+            ? 'bg-transparent border-0 shadow-none p-0'
+            : 'px-3 sm:px-4 py-2 rounded-full bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)]'
+        } max-w-fit mx-auto select-none transition-all relative`}
+      >
         {/* Left: Audio & Video with quick toggle / arrow */}
         <div className="flex items-center gap-2">
           {/* Microphone Pill Container with Dropup */}
           <div className="relative" ref={micMenuRef}>
             <div
               className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
+                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+              }${
                 showMicMenu
                   ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
                   : isMicEnabled
@@ -333,6 +342,8 @@ export default function ControlBar({
           <div className="relative" ref={cameraMenuRef}>
             <div
               className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
+                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+              }${
                 showCameraMenu
                   ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
                   : isCameraEnabled
@@ -414,6 +425,8 @@ export default function ControlBar({
               onClick={handleScreenShareClick}
               title={isScreenSharing ? "Ekran ulashish sozlamalari" : "Ekranni ulashish"}
               className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+              }${
                 isScreenSharing
                   ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
                   : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
@@ -481,6 +494,8 @@ export default function ControlBar({
             onClick={onToggleHandRaise}
             title={isHandRaised ? "Qo'lni tushirish (Ctrl+Alt+H)" : "Qo'l ko'tarish (Ctrl+Alt+H)"}
             className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
               isHandRaised
                 ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
                 : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
@@ -495,6 +510,8 @@ export default function ControlBar({
             onClick={onToggleChat}
             title={isChatOpen ? "Chatni yopish (Ctrl+L)" : "Jonli Chat (Ctrl+L)"}
             className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
               isChatOpen
                 ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
                 : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
@@ -514,6 +531,8 @@ export default function ControlBar({
             onClick={onToggleParticipants}
             title="Qatnashchilar"
             className={`relative h-10 sm:h-11 px-3 sm:px-3.5 rounded-full flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
               isParticipantsOpen
                 ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
                 : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
@@ -530,6 +549,8 @@ export default function ControlBar({
               onClick={onToggleDetails}
               title="Yig'ilish tafsilotlari"
               className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+              }${
                 isDetailsOpen
                   ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
                   : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
@@ -540,7 +561,9 @@ export default function ControlBar({
           )}
         </div>
 
-        <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
+        {!isFullScreenFocus && (
+          <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
+        )}
 
         {/* Right: End (Host) & Leave Buttons */}
         <div className="flex items-center gap-2">
@@ -550,7 +573,9 @@ export default function ControlBar({
               type="button"
               onClick={() => setShowEndModal(true)}
               title="Yig'ilishni hamma uchun yakunlash"
-              className="h-10 sm:h-11 px-4 sm:px-5 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95"
+              className={`h-10 sm:h-11 px-4 sm:px-5 rounded-full border border-[#EA3323] text-[#EA3323] hover:bg-red-50 dark:hover:bg-red-950/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95 ${
+                isFullScreenFocus ? 'bg-black/60 shadow-lg shadow-black/40 backdrop-blur-md' : ''
+              }`}
             >
               <HugeiconsIcon icon={ShutDownIcon} size={16} strokeWidth={2.2} />
               <span className="hidden sm:inline">Tugatish</span>
@@ -562,7 +587,9 @@ export default function ControlBar({
             type="button"
             onClick={() => setShowLeaveModal(true)}
             title="Chiqish"
-            className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95"
+            className={`h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md' : ''
+            }`}
           >
             <HugeiconsIcon icon={CallEnd01Icon} size={17} strokeWidth={2.2} />
             <span>Chiqish</span>
