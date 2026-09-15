@@ -201,7 +201,7 @@ export default function WaitingRoom({
     <div className="fixed inset-0 w-full h-full bg-white dark:bg-[#11141A] text-slate-800 dark:text-white flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-y-auto select-none z-50">
       <div className="w-full flex flex-col md:flex-row items-center justify-center gap-10 lg:gap-16 my-auto">
         {/* Left Column: Camera Preview Box */}
-        <div className="w-[740px] aspect-[16/10] bg-[#181A24] dark:bg-[#E8EDF2] rounded-[28px] overflow-hidden relative flex flex-col items-center justify-center shadow-xl shrink-0">
+        <div className="w-[740px] aspect-[16/10] bg-[#E8EDF2] dark:bg-[#181A24] rounded-[28px] overflow-hidden relative flex flex-col items-center justify-center shadow-xl shrink-0">
           {/* Always maintain video element in DOM so srcObject can be cleanly attached/detached without unmount leaks */}
           <video
             ref={videoRef}
