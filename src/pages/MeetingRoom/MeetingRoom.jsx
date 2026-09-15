@@ -1974,6 +1974,10 @@ export default function MeetingRoom() {
     }
   }
 
+  const handleSelectBackgroundEffect = useCallback((mode) => {
+    // Optional background effect mode (blur, none, office)
+  }, [])
+
   const handleStartScreenShare = async () => {
     try {
       if (roomRef.current?.localParticipant) {
