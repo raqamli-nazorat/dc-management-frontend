@@ -239,7 +239,7 @@ export default function ControlBar({
               <button
                 type="button"
                 onClick={onToggleMic}
-                title={isMicEnabled ? "Mikrofonni o'chirish" : "Mikrofonni yoqish"}
+                title={isMicEnabled ? "Mikrofonni o'chirish (Ctrl+D)" : "Mikrofonni yoqish (Ctrl+D)"}
                 className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
               >
                 <HugeiconsIcon icon={isMicEnabled ? Mic01Icon : MicOff01Icon} size={19} strokeWidth={2} />
@@ -344,7 +344,7 @@ export default function ControlBar({
               <button
                 type="button"
                 onClick={onToggleCamera}
-                title={isCameraEnabled ? "Kamerani o'chirish" : "Kamerani yoqish"}
+                title={isCameraEnabled ? "Kamerani o'chirish (Ctrl+E)" : "Kamerani yoqish (Ctrl+E)"}
                 className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
               >
                 <HugeiconsIcon icon={isCameraEnabled ? Video01Icon : VideoOffIcon} size={19} strokeWidth={2} />
@@ -479,7 +479,7 @@ export default function ControlBar({
           <button
             type="button"
             onClick={onToggleHandRaise}
-            title={isHandRaised ? "Qo'lni tushirish" : "Qo'l ko'tarish"}
+            title={isHandRaised ? "Qo'lni tushirish (Ctrl+Alt+H)" : "Qo'l ko'tarish (Ctrl+Alt+H)"}
             className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
               isHandRaised
                 ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
@@ -493,7 +493,7 @@ export default function ControlBar({
           <button
             type="button"
             onClick={onToggleChat}
-            title="Jonli Chat"
+            title={isChatOpen ? "Chatni yopish (Ctrl+L)" : "Jonli Chat (Ctrl+L)"}
             className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
               isChatOpen
                 ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'

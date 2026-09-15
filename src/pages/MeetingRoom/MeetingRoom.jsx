@@ -2392,6 +2392,80 @@ export default function MeetingRoom() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [screenFocusId])
 
+  // Global Keyboard Shortcuts (Ctrl+D: Mic, Ctrl+E: Camera, Ctrl+Alt+H: Hand, Ctrl+L: Chat)
+  useEffect(() => {
+    const handleMeetingShortcuts = (e) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey
+      if (!isCtrlOrCmd) return
+
+      const key = (e.key || '').toLowerCase()
+
+      // 1. Ctrl + D -> Mikrofonni yoqish / o'chirish
+      if (!e.altKey && !e.shiftKey && key === 'd') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (waitingState === 'in_room') {
+          handleToggleMic()
+        } else if (waitingState === 'lobby') {
+          handleToggleLobbyMic()
+        }
+        return
+      }
+
+      // 2. Ctrl + E -> Kamerani yoqish / o'chirish
+      if (!e.altKey && !e.shiftKey && key === 'e') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (waitingState === 'in_room') {
+          handleToggleCamera()
+        } else if (waitingState === 'lobby') {
+          handleToggleLobbyCamera()
+        }
+        return
+      }
+
+      // 3. Ctrl + Alt + H -> Qo'l ko'tarish / tushirish (faqat in_room da)
+      if (e.altKey && !e.shiftKey && key === 'h') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (waitingState === 'in_room') {
+          handleToggleHandRaise()
+        }
+        return
+      }
+
+      // 4. Ctrl + L -> Chatni ochish / yopish (faqat in_room da)
+      if (!e.altKey && !e.shiftKey && key === 'l') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (waitingState === 'in_room') {
+          if (isScreenFocused) setScreenFocusId(null)
+          setIsChatOpen(prev => {
+            const next = !prev
+            if (next) {
+              setIsParticipantsOpen(false)
+              setIsDetailsOpen(false)
+              setUnreadChatCount(0)
+            }
+            return next
+          })
+        }
+        return
+      }
+    }
+
+    window.addEventListener('keydown', handleMeetingShortcuts)
+    return () => window.removeEventListener('keydown', handleMeetingShortcuts)
+  }, [
+    waitingState,
+    handleToggleMic,
+    handleToggleCamera,
+    handleToggleLobbyMic,
+    handleToggleLobbyCamera,
+    handleToggleHandRaise,
+    isScreenFocused
+  ])
+
   const handleToggleScreenFocus = (identity) => {
     withViewTransition(() => {
       setScreenFocusId(prev => (prev === identity ? null : identity))

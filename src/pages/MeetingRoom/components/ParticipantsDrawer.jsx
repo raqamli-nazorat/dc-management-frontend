@@ -21,6 +21,7 @@ export default function ParticipantsDrawer({
   onMuteAll,
   onAskUnmuteParticipant,
   onTurnOffCamera,
+  onAskTurnOnCamera,
   onAdmitUser,
   onRejectUser,
   currentUserId,
@@ -124,7 +125,7 @@ export default function ParticipantsDrawer({
               title="Barcha ishtirokchilar mikrofonini o'chirish"
               className="text-[10px] font-bold text-red-500 hover:text-red-600 cursor-pointer lowercase"
             >
-              hammasini o'chirish
+              Hammasini o'chirish
             </button>
           )}
         </div>
@@ -218,15 +219,26 @@ export default function ParticipantsDrawer({
                     )}
 
                     {/* Camera control / indicator */}
-                    {isLocalHost && !isMe && p.isCameraEnabled ? (
-                      <button
-                        type="button"
-                        onClick={() => onTurnOffCamera && onTurnOffCamera(p.identity)}
-                        title={`${p.name || 'Ishtirokchi'} kamerasini o'chirish`}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
-                      >
-                        <HugeiconsIcon icon={Video01Icon} size={18} strokeWidth={2} />
-                      </button>
+                    {isLocalHost && !isMe ? (
+                      p.isCameraEnabled ? (
+                        <button
+                          type="button"
+                          onClick={() => onTurnOffCamera && onTurnOffCamera(p.identity)}
+                          title={`${p.name || 'Ishtirokchi'} kamerasini o'chirish`}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
+                        >
+                          <HugeiconsIcon icon={Video01Icon} size={18} strokeWidth={2} />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => onAskTurnOnCamera && onAskTurnOnCamera(p.identity)}
+                          title={`${p.name || 'Ishtirokchi'}dan kamerani yoqishni so'rash`}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-[#EA3323] transition-colors cursor-pointer active:scale-90"
+                        >
+                          <HugeiconsIcon icon={VideoOffIcon} size={18} strokeWidth={2} />
+                        </button>
+                      )
                     ) : (
                       <span
                         className={`w-7 h-7 flex items-center justify-center rounded-lg ${

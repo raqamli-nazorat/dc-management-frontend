@@ -96,7 +96,7 @@ export default function ParticipantTile({
             : 'bg-[#121212] border border-slate-700/60 dark:border-white/10 shadow-2xl'
           : `bg-[#DEE5ED] dark:bg-[#1D2230] ${
               hasHandRaised
-                ? 'border-2 border-[#FDD663] shadow-[0_0_25px_rgba(253,214,99,0.35)]'
+                ? 'border-2 border-[#5B7BF0] shadow-[0_0_25px_rgba(91,123,240,0.35)]'
                 : isSpeaking
                 ? 'border-2 border-[#5B7BF0] shadow-[0_0_25px_rgba(91,123,240,0.35)]'
                 : isPinned
