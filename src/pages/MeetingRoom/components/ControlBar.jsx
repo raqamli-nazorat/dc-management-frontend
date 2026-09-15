@@ -521,11 +521,6 @@ export default function ControlBar({
           >
             <HugeiconsIcon icon={UserGroupIcon} size={19} strokeWidth={2} />
             <span className="text-xs sm:text-sm font-semibold">{participantCount}</span>
-            {knockCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold flex items-center justify-center animate-bounce shadow-md">
-                {knockCount}
-              </span>
-            )}
           </button>
 
           {/* Meeting Info */}
