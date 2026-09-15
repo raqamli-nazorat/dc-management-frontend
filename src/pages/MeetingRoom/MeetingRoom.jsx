@@ -1100,6 +1100,66 @@ export default function MeetingRoom() {
     targetRoom.localParticipant.publishData(data, { reliable: true }).catch(() => {})
   }, [user, currentUserName])
 
+  // Deduplication key finder for any participant
+  const getParticipantDedupKey = useCallback((p) => {
+    if (!p) return null
+
+    // 1. Agar lokal ishtirokchi bo'lsa
+    if (p.isLocal) {
+      if (user?.id) return `user_${user.id}`
+      if (user?.username) return `user_${String(user.username).trim().toLowerCase()}`
+      return 'local_user'
+    }
+
+    const sIdent = String(p.identity || '').trim()
+    const pName = String(p.name || '').trim()
+    const pNameLower = pName.toLowerCase()
+
+    // 2. Peer profiles orqali userId / username
+    const profile = peerProfiles[sIdent] || peerProfiles[pNameLower] || (sIdent ? peerProfiles[sIdent.toLowerCase()] : null)
+    if (profile?.userId) {
+      return `user_${profile.userId}`
+    }
+    if (profile?.username) {
+      return `user_${String(profile.username).trim().toLowerCase()}`
+    }
+
+    // 3. Metadata dagi userId / username
+    if (p.metadata) {
+      try {
+        const parsed = typeof p.metadata === 'string' ? JSON.parse(p.metadata) : p.metadata
+        if (parsed?.userId) return `user_${parsed.userId}`
+        if (parsed?.username) return `user_${String(parsed.username).trim().toLowerCase()}`
+      } catch {}
+    }
+
+    // 4. Identity pattern (masalan: "4", "4_abc", "user_4", "4-device")
+    const idMatch = sIdent.match(/^user_?(\d+)/i) || sIdent.match(/^(\d+)(_|-|$)/)
+    if (idMatch && idMatch[1]) {
+      return `user_${idMatch[1]}`
+    }
+
+    // 5. Directory users / participants_info
+    if (directoryUsers && directoryUsers.length > 0) {
+      const match = directoryUsers.find(u => isUserMatch(u, sIdent, pNameLower))
+      if (match?.id) return `user_${match.id}`
+      if (match?.username) return `user_${String(match.username).trim().toLowerCase()}`
+    }
+
+    if (meetingDetails?.participants_info) {
+      const match = meetingDetails.participants_info.find(u => isUserMatch(u, sIdent, pNameLower))
+      if (match?.id) return `user_${match.id}`
+      if (match?.username) return `user_${String(match.username).trim().toLowerCase()}`
+    }
+
+    // 6. Ism bo'yicha (masalan: "bekmuxtorov")
+    if (pNameLower) {
+      return `user_${pNameLower}`
+    }
+
+    return `ident_${sIdent}`
+  }, [user, peerProfiles, directoryUsers, meetingDetails])
+
   // Resolve avatar for any participant using all available data sources
   const resolveParticipantAvatar = useCallback((participant, pInfo) => {
     if (!participant) return ''
@@ -2385,8 +2445,59 @@ export default function MeetingRoom() {
   })
 
   const screenShareItems = allParticipantItems.filter(p => p.isScreenShare)
-  const cameraItems = allParticipantItems.filter(p => !p.isScreenShare)
-  const handRaisedParticipants = allParticipantItems.filter(p => p.hasHandRaised && !p.isScreenShare)
+  const rawCameraItems = allParticipantItems.filter(p => !p.isScreenShare)
+
+  // 1 ta user bir nechta qurilmadan (yoki tabdan) kirsa, faqat 1 ta card ko'rsatish (deduplication)
+  const dedupedCameraMap = new Map()
+
+  rawCameraItems.forEach(p => {
+    const key = getParticipantDedupKey(p) || p.identity
+    if (!dedupedCameraMap.has(key)) {
+      dedupedCameraMap.set(key, { ...p })
+    } else {
+      const existing = dedupedCameraMap.get(key)
+      // Bitta foydalanuvchining barcha sessiyalarini birlashtirish:
+      // Faol video track (kamera yoniq bo'lgan qurilma) ustunlik qiladi
+      const hasExistingVideo = Boolean(existing.videoTrack && existing.isCameraEnabled)
+      const hasNewVideo = Boolean(p.videoTrack && p.isCameraEnabled)
+      const chosenVideoTrack = hasNewVideo ? p.videoTrack : (hasExistingVideo ? existing.videoTrack : (p.videoTrack || existing.videoTrack))
+      const chosenIsCameraEnabled = hasNewVideo || hasExistingVideo || Boolean(p.isCameraEnabled) || Boolean(existing.isCameraEnabled)
+
+      // Faol audio track
+      const chosenAudioTrack = p.audioTrack || existing.audioTrack
+      const chosenIsMicEnabled = (p.audioTrack ? p.isMicEnabled : false) || (existing.audioTrack ? existing.isMicEnabled : false) || Boolean(p.isMicEnabled) || Boolean(existing.isMicEnabled)
+
+      // Agar bittasi lokal sessiya bo'lsa, lokal saqlanadi
+      const chosenIsLocal = existing.isLocal || p.isLocal
+
+      // Avatar
+      const chosenAvatar = existing.avatar || p.avatar || ''
+
+      // Ism
+      const chosenName = chosenIsLocal
+        ? (existing.isLocal ? existing.name : p.name)
+        : ((existing.name && existing.name.length >= (p.name || '').length) ? existing.name : p.name)
+
+      dedupedCameraMap.set(key, {
+        ...existing,
+        ...p,
+        identity: existing.identity,
+        name: chosenName,
+        avatar: chosenAvatar,
+        isLocal: chosenIsLocal,
+        isHost: existing.isHost || p.isHost,
+        isSpeaking: existing.isSpeaking || p.isSpeaking,
+        hasHandRaised: existing.hasHandRaised || p.hasHandRaised,
+        isCameraEnabled: chosenIsCameraEnabled,
+        isMicEnabled: chosenIsMicEnabled,
+        videoTrack: chosenVideoTrack,
+        audioTrack: chosenAudioTrack,
+      })
+    }
+  })
+
+  const cameraItems = Array.from(dedupedCameraMap.values())
+  const handRaisedParticipants = cameraItems.filter(p => p.hasHandRaised)
   const firstHandRaiser = handRaisedParticipants[0]
   const handRaisedNotificationText = handRaisedParticipants.length > 0
     ? handRaisedParticipants.length > 1
@@ -2858,7 +2969,7 @@ export default function MeetingRoom() {
               className="px-3 py-1.5 rounded-full bg-[#F1F4F9] dark:bg-[#1F242E] hover:bg-slate-200/70 dark:hover:bg-[#282F3D] text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
               <HugeiconsIcon icon={UserGroupIcon} size={16} strokeWidth={2} />
-              <span>{allParticipantItems.filter(p => !p.isScreenShare).length}</span>
+              <span>{cameraItems.length}</span>
             </button>
           </div>
         </header>
@@ -2975,7 +3086,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
+                      className="flex-1 w-full h-full min-h-0 min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}
@@ -3004,7 +3115,7 @@ export default function MeetingRoom() {
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="flex-1 w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
+                      className="flex-1 w-full h-full min-h-0 min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}
@@ -3026,20 +3137,74 @@ export default function MeetingRoom() {
                     </div>
                   ))}
                 </div>
+              ) : cameraItems.length <= 8 ? (
+                /* 4 - 8 People: Google Meet style 2 balanced rows where bottom row cards fill the width */
+                <div className="w-full h-full flex flex-col items-stretch justify-center gap-3 sm:gap-4 p-1">
+                  {/* Row 1 */}
+                  <div className="flex-1 w-full flex flex-row items-stretch justify-center gap-3 sm:gap-4 min-h-0 min-w-0">
+                    {cameraItems.slice(0, Math.ceil(cameraItems.length / 2)).map((item) => (
+                      <div
+                        key={item.identity}
+                        style={{ viewTransitionName: getViewTransitionName(item.identity) }}
+                        className="flex-1 w-full h-full min-h-0 min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
+                      >
+                        <ParticipantTile
+                          participant={item}
+                          isLocal={item.isLocal}
+                          isScreenShare={false}
+                          isSpeaking={item.isSpeaking}
+                          hasHandRaised={item.hasHandRaised}
+                          isHost={item.isHost}
+                          videoTrack={item.videoTrack}
+                          audioTrack={item.audioTrack}
+                          isCameraEnabled={item.isCameraEnabled}
+                          isMicEnabled={item.isMicEnabled}
+                          displayName={item.name}
+                          avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
+                          version={item.version || 0}
+                          isPinned={pinnedId === item.identity}
+                          onTogglePin={() => handleTogglePin(item.identity)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {/* Row 2 */}
+                  <div className="flex-1 w-full flex flex-row items-stretch justify-center gap-3 sm:gap-4 min-h-0 min-w-0">
+                    {cameraItems.slice(Math.ceil(cameraItems.length / 2)).map((item) => (
+                      <div
+                        key={item.identity}
+                        style={{ viewTransitionName: getViewTransitionName(item.identity) }}
+                        className="flex-1 w-full h-full min-h-0 min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
+                      >
+                        <ParticipantTile
+                          participant={item}
+                          isLocal={item.isLocal}
+                          isScreenShare={false}
+                          isSpeaking={item.isSpeaking}
+                          hasHandRaised={item.hasHandRaised}
+                          isHost={item.isHost}
+                          videoTrack={item.videoTrack}
+                          audioTrack={item.audioTrack}
+                          isCameraEnabled={item.isCameraEnabled}
+                          isMicEnabled={item.isMicEnabled}
+                          displayName={item.name}
+                          avatar={item.avatar || (item.isLocal ? (formatAvatarUrl(user?.avatar) || user?.avatar) : '')}
+                          version={item.version || 0}
+                          isPinned={pinnedId === item.identity}
+                          onTogglePin={() => handleTogglePin(item.identity)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ) : (
-                /* 4+ People: Responsive grid filling parent height */
-                <div className={`w-full h-full grid gap-3 sm:gap-4 p-1 items-stretch justify-center ${
-                  cameraItems.length === 4
-                    ? 'grid-cols-1 sm:grid-cols-2 grid-rows-2'
-                    : cameraItems.length <= 6
-                    ? 'grid-cols-2 lg:grid-cols-3 grid-rows-2'
-                    : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-y-auto'
-                }`}>
+                /* 9+ People: Responsive grid */
+                <div className="w-full h-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 p-1 items-stretch justify-center overflow-y-auto">
                   {cameraItems.map((item) => (
                     <div
                       key={item.identity}
                       style={{ viewTransitionName: getViewTransitionName(item.identity) }}
-                      className="w-full h-full min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
+                      className="w-full h-full min-h-0 min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl flex flex-col items-stretch"
                     >
                       <ParticipantTile
                         participant={item}
@@ -3079,7 +3244,7 @@ export default function MeetingRoom() {
         <ParticipantsDrawer
           isOpen={!isScreenFocused && isParticipantsOpen}
           onClose={() => setIsParticipantsOpen(false)}
-          participants={allParticipantItems.filter(p => !p.isScreenShare)}
+          participants={cameraItems}
           knockRequests={activeKnockRequests}
           isHost={canAdmitParticipants}
           isLocalHost={isLocalHost}
@@ -3175,7 +3340,7 @@ export default function MeetingRoom() {
               return next
             })
           }}
-          participantCount={allParticipantItems.filter(p => !p.isScreenShare).length}
+          participantCount={cameraItems.length}
           knockCount={canAdmitParticipants ? activeKnockRequests.length : 0}
           isDetailsOpen={isDetailsOpen}
           onToggleDetails={() => {
