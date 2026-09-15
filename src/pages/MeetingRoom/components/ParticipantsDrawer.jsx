@@ -114,46 +114,6 @@ export default function ParticipantsDrawer({
           </div>
         </div>
 
-        {/* Pending Knock Requests (Host only) */}
-        {isHost && knockRequests.length > 0 && (
-          <div className="mb-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 shrink-0 animate-in fade-in duration-200">
-            <div className="text-xs font-bold text-amber-500 dark:text-amber-400 mb-2 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              Kirishni so'raganlar ({knockRequests.length})
-            </div>
-            <div className="space-y-2">
-              {knockRequests.map((req) => (
-                <div key={req.user_id} className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white dark:bg-[#181C24] shadow-xs">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-full overflow-hidden bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
-                      {req.username?.slice(0, 2).toUpperCase() || 'U'}
-                    </div>
-                    <span className="text-xs font-semibold text-slate-800 dark:text-white truncate">
-                      {req.username || `Foydalanuvchi #${req.user_id}`}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => onAdmitUser(req.user_id)}
-                      className="px-2 py-1 rounded-lg bg-[#5B7BF0] hover:bg-blue-600 text-white text-[11px] font-bold cursor-pointer"
-                    >
-                      <FaCheck size={10} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onRejectUser(req.user_id)}
-                      className="p-1 rounded-lg hover:bg-red-500/20 text-red-500 cursor-pointer"
-                    >
-                      <FaXmark size={11} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Section Header: UCHRASHUVDA */}
         <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase px-1 mb-3 shrink-0">
           <span>Uchrashuvda</span>
