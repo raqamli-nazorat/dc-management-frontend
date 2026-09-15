@@ -2630,7 +2630,7 @@ export default function MeetingRoom() {
 
       {/* Top Header Bar matching Figma screenshots */}
       {!isScreenFocused && (
-        <header className="relative h-14 px-4 sm:px-6 flex items-center justify-between bg-transparent z-20 shrink-0 select-none">
+        <header className={`relative ${mainStageItem ? 'h-11 sm:h-12' : 'h-13 sm:h-14'} px-3 sm:px-6 flex items-center justify-between bg-transparent z-20 shrink-0 select-none`}>
           <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Realtime Elapsed Meeting Duration (e.g. 05:23 or 01:15:30) */}
             <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 select-none tabular-nums font-mono">
@@ -2752,24 +2752,9 @@ export default function MeetingRoom() {
       )}
 
       {/* Main Conference Body with Outer Rounded Stage Frame */}
-      <div className="flex-1 flex overflow-hidden relative px-3 sm:px-4 md:px-6 pt-1 pb-2 min-h-0">
+      <div className={`flex-1 flex overflow-hidden relative ${mainStageItem ? 'px-1.5 sm:px-3 pt-0 pb-0.5' : 'px-2 sm:px-4 pt-0.5 pb-1'} min-h-0`}>
         {/* Large Rounded Container matching Figma screenshots */}
-        <div className="w-full h-full flex-1 flex overflow-hidden rounded-3xl bg-[#DFE5EE] dark:bg-[#13161D] p-3 sm:p-4 md:p-5 relative transition-colors shadow-inner">
-          {/* Floating exit full screen focus button */}
-          {isScreenFocused && (
-            <div className="absolute top-4 right-4 z-40 flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
-              <button
-                type="button"
-                onClick={() => handleToggleScreenFocus(screenFocusId)}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black text-white/90 hover:text-white border border-white/20 backdrop-blur-md shadow-2xl text-xs font-semibold cursor-pointer transition-all hover:scale-105 active:scale-95"
-                title="To'liq ekrandan chiqish (Esc)"
-              >
-                <FaCompress size={13} className="text-amber-400" />
-                <span>To'liq ekrandan chiqish</span>
-                <kbd className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white/10 text-slate-300 border border-white/10">Esc</kbd>
-              </button>
-            </div>
-          )}
+        <div className={`w-full h-full flex-1 flex overflow-hidden rounded-2xl sm:rounded-3xl bg-[#DFE5EE] dark:bg-[#13161D] ${mainStageItem ? 'p-1 sm:p-1.5' : 'p-2 sm:p-3'} relative transition-colors shadow-inner`}>
 
           {mainStageItem ? (
             /* Google Meet Presentation Stage (Single Full View) + Right Sidebar Filmstrip */
@@ -3008,7 +2993,7 @@ export default function MeetingRoom() {
       </div>
 
       {/* Bottom Floating Control Bar */}
-      <footer className="p-4 z-20 shrink-0">
+      <footer className={`z-20 shrink-0 ${mainStageItem ? 'py-1 pb-1.5 px-3' : 'py-1.5 pb-2.5 px-4'}`}>
         <ControlBar
           isMicEnabled={isMicEnabled}
           onToggleMic={handleToggleMic}

@@ -607,12 +607,46 @@ function AddMeetingModal({ onClose, loadMeetings, initialData }) {
 }
 
 /* -- AttendanceItem -- */
-function AttendanceItem({ attendance }) {
-  const [expanded, setExpanded] = useState(false);
-  const participant = attendance?.user_info;
-  const username = participant?.username || 'Noma\'lum';
-  const position = participant?.position || 'Xodim';
-  const initials = username.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
+function AttendanceItem({ attendance, onUpdateAttendance }) {
+  const [expanded, setExpanded] = useState(false)
+  const [savingExcuse, setSavingExcuse] = useState(false)
+  const [currentAttendance, setCurrentAttendance] = useState(attendance)
+
+  useEffect(() => {
+    setCurrentAttendance(attendance)
+  }, [attendance])
+
+  const participant = currentAttendance?.user_info
+  const username = participant?.username || "Noma'lum"
+  const position = participant?.position || 'Xodim'
+  const initials = username.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase()
+
+  const isAttended = !!currentAttendance?.is_attended
+  const lateMinutes = currentAttendance?.late_minutes || 0
+  const isLate = isAttended && typeof lateMinutes === 'number' && lateMinutes > 5
+  const hasReason = !!currentAttendance?.absence_reason
+  const isExcused = currentAttendance?.is_excused
+
+  const handleSetExcuse = async (excused) => {
+    if (!currentAttendance?.id) return
+    setSavingExcuse(true)
+    try {
+      await axiosAPI.patch(`/meeting-attendance/${currentAttendance.id}/`, {
+        is_excused: excused,
+      })
+      setCurrentAttendance(prev => ({ ...prev, is_excused: excused }))
+      onUpdateAttendance?.(currentAttendance.id, { is_excused: excused })
+      if (excused) {
+        toast.success("Sababli deb belgilandi", "Xodimning sababi tasdiqlandi.")
+      } else {
+        toast.error("Sababsiz deb belgilandi", "Xodim sababsiz deb belgilandi.")
+      }
+    } catch (err) {
+      toast.error("Xatolik", "Holatni saqlashda xatolik yuz berdi")
+    } finally {
+      setSavingExcuse(false)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-2 py-1">
@@ -632,38 +666,58 @@ function AttendanceItem({ attendance }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {attendance.is_attended ? (
+          {isAttended && !isLate ? (
             <div className="px-4 py-1.5 rounded-full bg-[#7A8CEB] text-white text-[11px] font-medium">
               Qatnashdi
             </div>
+          ) : isLate ? (
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-white text-[11px] font-medium transition-colors cursor-pointer ${
+                isExcused
+                  ? 'bg-[#22C55E] hover:bg-[#16a34a]'
+                  : 'bg-[#EF4444] hover:bg-[#dc2626]'
+              }`}
+            >
+              <span>{isExcused ? 'Kech qoldi | Sababli' : 'Kech qoldi | Sababsiz'}</span>
+              <FaChevronDown size={10} className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+            </button>
           ) : (
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-white text-[11px] font-medium transition-colors cursor-pointer ${attendance.is_excused ? 'bg-[#22C55E] hover:bg-[#16a34a]' : 'bg-[#EF4444] hover:bg-[#dc2626]'}`}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-white text-[11px] font-medium transition-colors cursor-pointer ${
+                isExcused ? 'bg-[#22C55E] hover:bg-[#16a34a]' : 'bg-[#EF4444] hover:bg-[#dc2626]'
+              }`}
             >
-              {attendance.is_excused ? 'Qatnashmadi | Sababli' : 'Qatnashmadi | Sababsiz'}
+              <span>{isExcused ? 'Qatnashmadi | Sababli' : 'Qatnashmadi | Sababsiz'}</span>
               <FaChevronDown size={10} className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
             </button>
           )}
         </div>
       </div>
 
-      {!attendance.is_attended && (
+      {(!isAttended || isLate) && (
         <div
           className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
         >
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex flex-col gap-2">
+            {isLate && (
+              <div className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                {lateMinutes} daqiqa kechikkan
+              </div>
+            )}
             <textarea
               readOnly
-              value={attendance.absence_reason || ''}
+              value={currentAttendance?.absence_reason || ''}
               placeholder="Sabab ko'rsatilmagan"
-              className={`w-full p-3 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] text-[13px] text-[var(--text-strong)] outline-none min-h-[75px] ${!attendance.absence_reason && attendance?.absence_reason?.length !== 0 ? "resize-none!" : "resize-y!"}`}
+              className={`w-full p-3 rounded-xl border border-[var(--stroke-sub)] dark:border-[var(--stroke-soft)] bg-[var(--bg-base)] text-[13px] text-[var(--text-strong)] outline-none min-h-[75px] ${!currentAttendance?.absence_reason ? "resize-none!" : "resize-y!"}`}
             />
           </div>
         </div>
       )}
-    </div >
+    </div>
   )
 }
 

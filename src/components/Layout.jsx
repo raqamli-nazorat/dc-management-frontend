@@ -346,8 +346,9 @@ export default function Layout() {
     if (extraData?.action === 'open_meeting') {
       const meetingId = extraData.meeting_id
       const projectId = extraData.project_id
+      const lateMinutes = extraData.late_minutes
       if (meetingId) {
-        setActiveOpenMeeting({ meetingId, projectId })
+        setActiveOpenMeeting({ meetingId, projectId, lateMinutes })
         setNotifOpen(false)
         return
       }
@@ -419,14 +420,16 @@ export default function Layout() {
           navigate(`/${prefix}/meetings`)
           setNotifOpen(false)
         }
-      } else if (title.includes("qatnashmadingiz")) {
+      } else if (title.includes("qatnashmadingiz") || title.includes("kechik")) {
         const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
         const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
+        const lateMinutes = extraData?.late_minutes || n.raw?.late_minutes || n.raw?.data?.late_minutes
         if (attendanceId || n.raw?.id) {
           setActiveAbsence({
             attendanceId: attendanceId || n.raw?.id,
             meetingTitle,
-            meetingDate: n.date + ' ' + n.time,
+            meetingDate: n.date && n.time ? `${n.date} ${n.time}` : n.date || '',
+            lateMinutes,
           })
           setNotifOpen(false)
         } else {
@@ -453,14 +456,16 @@ export default function Layout() {
           setActiveAttendanceMeetingId(meetingId || n.raw?.id)
           setNotifOpen(false)
         }
-      } else if (title.includes("qatnashmadingiz")) {
+      } else if (title.includes("qatnashmadingiz") || title.includes("kechik")) {
         const attendanceId = n.raw?.attendance_id || n.raw?.data?.attendance_id || n.raw?.id
         const meetingTitle = n.raw?.meeting_title || n.raw?.data?.meeting_title || "Yig'ilish"
+        const lateMinutes = extraData?.late_minutes || n.raw?.late_minutes || n.raw?.data?.late_minutes
         if (attendanceId || n.raw?.id) {
           setActiveAbsence({
             attendanceId: attendanceId || n.raw?.id,
             meetingTitle,
-            meetingDate: n.date + ' ' + n.time,
+            meetingDate: n.date && n.time ? `${n.date} ${n.time}` : n.date || '',
+            lateMinutes,
           })
           setNotifOpen(false)
         }
@@ -837,6 +842,7 @@ export default function Layout() {
             attendanceId={activeAbsence.attendanceId}
             meetingTitle={activeAbsence.meetingTitle}
             meetingDate={activeAbsence.meetingDate}
+            initialLateMinutes={activeAbsence.lateMinutes}
             onClose={() => setActiveAbsence(null)}
           />
         </>
@@ -847,6 +853,7 @@ export default function Layout() {
           <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setActiveOpenMeeting(null)} />
           <MeetingOpenModal
             meetingId={activeOpenMeeting.meetingId}
+            initialLateMinutes={activeOpenMeeting.lateMinutes}
             userId={user?.id}
             onClose={() => setActiveOpenMeeting(null)}
           />
