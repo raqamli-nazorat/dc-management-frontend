@@ -2465,26 +2465,32 @@ export default function MeetingRoom() {
 
   // Render Meeting Left / Ended state matching Figma Images 3 & 4
   if (waitingState === 'ended' || waitingState === 'left') {
+    const isMeetingEnded = waitingState === 'ended'
+
     return (
       <div className="fixed inset-0 w-full h-full bg-[#F8FAFC] dark:bg-[#0B0D11] text-slate-900 dark:text-white flex flex-col items-center justify-center p-4 select-none z-50 transition-colors animate-in fade-in duration-300">
         <div className="text-center max-w-lg w-full my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-            Siz uchrashuvdan chiqdingiz
+            {isMeetingEnded ? "Yig'ilish yakunlandi" : "Siz uchrashuvdan chiqdingiz"}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 mb-7 text-center">
-            Havola hali ham amal qiladi — istagan vaqtda qaytishingiz mumkin.
+            {isMeetingEnded
+              ? (endedReason || "Yig'ilish tashkilotchi tomonidan yakunlandi.")
+              : "Havola hali ham amal qiladi — istagan vaqtda qaytishingiz mumkin."}
           </p>
           <div className="flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                window.location.reload()
-              }}
-              className="px-5 py-2.5 rounded-xl bg-[#3E5CBA] hover:bg-[#344F9F] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm"
-            >
-              <HugeiconsIcon icon={Refresh04Icon} size={17} strokeWidth={2.2} />
-              <span>Qayta qo'shilish</span>
-            </button>
+            {!isMeetingEnded && (
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.reload()
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#3E5CBA] hover:bg-[#344F9F] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm"
+              >
+                <HugeiconsIcon icon={Refresh04Icon} size={17} strokeWidth={2.2} />
+                <span>Qayta qo'shilish</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {
