@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react'
+import { useEffect } from 'react'
 import { FaArrowLeft } from "react-icons/fa"
 import { FaXmark } from "react-icons/fa6"
 
@@ -13,8 +13,8 @@ export const ConfirmationModal = ({title, description, onClose, onAction, button
     return (
         <>
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-                    <div className="fixed inset-0 bg-black/60" />
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+                    <div className="fixed inset-0 bg-black/60" onClick={onClose} />
                     <div className="relative w-full max-w-[600px] rounded-2xl shadow-2xl bg-[var(--bg-base)] p-7">
                         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F3F9] hover:bg-[var(--stroke-sub)] dark:bg-[var(--bg-elevation-2)] dark:hover:bg-[var(--bg-elevation-2)] text-[var(--text-sub)] dark:text-[var(--text-sub)] cursor-pointer  z-10">
                             <FaXmark size={14} />

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FaXmark, FaPaperclip } from 'react-icons/fa6'
+import { FaXmark, FaPaperclip, FaTrashCan } from 'react-icons/fa6'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { ConfirmationModal } from '../../../components/ConfirmationModal'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
 import { useTheme } from '../../../context/ThemeContext'
@@ -434,6 +435,8 @@ export default function TasksPage() {
   const [copiedUid, setCopiedUid] = useState(null)
   const [dragSourceCol, setDragSourceCol] = useState(null)
   const [rejectionPending, setRejectionPending] = useState(null) // { taskId, draggableId, sourceColId }
+  const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
   const scrollRef = useRef(null)
 
   const hasFilter = filters.projects?.length > 0 ||
@@ -731,6 +734,23 @@ export default function TasksPage() {
     } catch (err) {
       const msg = parseApiError(err, "O'chirishda xatolik")
       toast.error('Xatolik', msg)
+    }
+  }
+
+  const confirmDeleteTask = async () => {
+    if (!confirmDeleteTaskId) return
+    setDeleteLoading(true)
+    try {
+      const id = confirmDeleteTaskId
+      await handleDelete(id)
+      setConfirmDeleteTaskId(null)
+      if (editTask && editTask.id === id) {
+        setEditTask(null)
+        setEditTaskDeadlineOnly(false)
+        setOverdueStatusPending(null)
+      }
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -1119,9 +1139,8 @@ export default function TasksPage() {
               }
               loadKanbanTasks(filters, search)
             }}
-            onDelete={canEdit && !editTaskDeadlineOnly ? async () => {
-              await handleDelete(editTask.id)
-              setEditTask(null)
+            onDelete={canEdit && !editTaskDeadlineOnly ? () => {
+              setConfirmDeleteTaskId(editTask.id)
             } : undefined}
             isEmployee={isEmployee}
             onStatusChange={() => loadKanbanTasks(filters, search, true)}
@@ -1155,6 +1174,16 @@ export default function TasksPage() {
             </svg>
           </div>
         )}
+        <ConfirmationModal
+          showModal={!!confirmDeleteTaskId}
+          title="Vazifani o'chirmoqchimisiz?"
+          description="Tanlangan vazifa o'chiriladi va chiqindi qutisiga yuboriladi."
+          buttonText={deleteLoading ? "O'chirilmoqda..." : "O'chirish"}
+          confirmIcon={<FaTrashCan size={13} />}
+          confirmColor="bg-[var(--error-strong)] hover:bg-red-600"
+          onClose={() => setConfirmDeleteTaskId(null)}
+          onAction={confirmDeleteTask}
+        />
       </DragDropContext>
     )
   }
@@ -1283,14 +1312,14 @@ export default function TasksPage() {
                         onDetail={() => loadTaskDetail(t.id)}
                         onEdit={() => loadTaskDetail(t.id)}
                         onDuplicate={() => handleDuplicate(t.id)}
-                        onDelete={() => handleDelete(t.id)}
+                        onDelete={() => setConfirmDeleteTaskId(t.id)}
                       />
                     )}
                     {!isAuditor && !canEdit && (
                       <TaskRowMenu
                         onDetail={() => loadTaskDetail(t.id)}
                         onDuplicate={() => handleDuplicate(t.id)}
-                        onDelete={() => handleDelete(t.id)}
+                        onDelete={() => setConfirmDeleteTaskId(t.id)}
                       />
                     )}
                   </td>
@@ -1344,9 +1373,8 @@ export default function TasksPage() {
             await handleEdit(id, body)
             loadTasks(filters, search, 1)
           }}
-          onDelete={canEdit && !editTaskDeadlineOnly ? async () => {
-            await handleDelete(editTask.id)
-            setEditTask(null)
+          onDelete={canEdit && !editTaskDeadlineOnly ? () => {
+            setConfirmDeleteTaskId(editTask.id)
           } : undefined}
           isEmployee={isEmployee}
           onStatusChange={(taskId, newStatus) => {
@@ -1354,6 +1382,17 @@ export default function TasksPage() {
           }}
         />
       )}
+
+      <ConfirmationModal
+        showModal={!!confirmDeleteTaskId}
+        title="Vazifani o'chirmoqchimisiz?"
+        description="Tanlangan vazifa o'chiriladi va chiqindi qutisiga yuboriladi."
+        buttonText={deleteLoading ? "O'chirilmoqda..." : "O'chirish"}
+        confirmIcon={<FaTrashCan size={13} />}
+        confirmColor="bg-[var(--error-strong)] hover:bg-red-600"
+        onClose={() => setConfirmDeleteTaskId(null)}
+        onAction={confirmDeleteTask}
+      />
 
       {taskLoading && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/30">
