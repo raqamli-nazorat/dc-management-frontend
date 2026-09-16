@@ -27,6 +27,7 @@ export default function ParticipantsDrawer({
   currentUserId,
   pinnedId,
   onTogglePin,
+  requestedParticipantIds = {},
 }) {
   const [search, setSearch] = useState('')
 
@@ -123,7 +124,7 @@ export default function ParticipantsDrawer({
               type="button"
               onClick={onMuteAll}
               title="Barcha ishtirokchilar mikrofonini o'chirish"
-              className="text-[10px] font-bold text-red-500 hover:text-red-600 cursor-pointer lowercase"
+              className="text-[10px] font-bold text-red-500 hover:text-red-600 cursor-pointer"
             >
               Hammasini o'chirish
             </button>
@@ -147,6 +148,20 @@ export default function ParticipantsDrawer({
               const initials = p.name
                 ? p.name.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
                 : 'U'
+              const req = requestedParticipantIds[p.identity]
+              const reqTime = typeof req === 'object' ? req.timestamp : req
+              const reqType = typeof req === 'object' ? req.type : null
+
+              // If mic was requested and mic is enabled, or camera was requested and camera is enabled, request is fulfilled!
+              const isFulfilled = reqType === 'mic'
+                ? Boolean(p.isMicEnabled)
+                : reqType === 'camera'
+                ? Boolean(p.isCameraEnabled)
+                : Boolean(p.isMicEnabled || p.isCameraEnabled)
+
+              const hasPendingRequest = Boolean(
+                req && !isFulfilled && reqTime && (Date.now() - reqTime < 45000)
+              )
 
               return (
                 <div
@@ -182,76 +197,85 @@ export default function ParticipantsDrawer({
                     </div>
                   </div>
 
-                  {/* Right: Controls & Status (Mic & Camera) */}
-                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                    {/* Microphone control / indicator */}
-                    {isLocalHost && !isMe ? (
-                      p.isMicEnabled ? (
-                        <button
-                          type="button"
-                          onClick={() => onMuteParticipant && onMuteParticipant(p.identity)}
-                          title={`${p.name || 'Ishtirokchi'} ovozini o'chirish`}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
-                        >
-                          <HugeiconsIcon icon={Mic01Icon} size={18} strokeWidth={2} />
-                        </button>
+                  {/* Right: Controls & Status OR "So'rov yuborildi" Badge (matching Image 3) */}
+                  {isLocalHost && !isMe && hasPendingRequest ? (
+                    <span
+                      title="Ishtirokchiga so'rov yuborildi"
+                      className="px-3.5 py-1.5 rounded-full bg-[#E8EDFB] dark:bg-[#1E273D] text-[#3B59BA] dark:text-[#7A98F7] text-xs font-semibold select-none shrink-0 animate-in fade-in duration-200"
+                    >
+                      So'rov yuborildi
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                      {/* Microphone control / indicator */}
+                      {isLocalHost && !isMe ? (
+                        p.isMicEnabled ? (
+                          <button
+                            type="button"
+                            onClick={() => onMuteParticipant && onMuteParticipant(p.identity)}
+                            title={`${p.name || 'Ishtirokchi'} ovozini o'chirish`}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
+                          >
+                            <HugeiconsIcon icon={Mic01Icon} size={18} strokeWidth={2} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onAskUnmuteParticipant && onAskUnmuteParticipant(p.identity)}
+                            title={`${p.name || 'Ishtirokchi'}dan mikrofonni yoqishni so'rash`}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-[#EA3323] transition-colors cursor-pointer active:scale-90"
+                          >
+                            <HugeiconsIcon icon={MicOff01Icon} size={18} strokeWidth={2} />
+                          </button>
+                        )
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => onAskUnmuteParticipant && onAskUnmuteParticipant(p.identity)}
-                          title={`${p.name || 'Ishtirokchi'}dan mikrofonni yoqishni so'rash`}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-[#EA3323] transition-colors cursor-pointer active:scale-90"
+                        <span
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg ${
+                            p.isMicEnabled
+                              ? 'text-slate-400 dark:text-slate-500'
+                              : 'text-[#EA3323]'
+                          }`}
+                          title={p.isMicEnabled ? 'Mikrofon yoniq' : "Mikrofon o'chiq"}
                         >
-                          <HugeiconsIcon icon={MicOff01Icon} size={18} strokeWidth={2} />
-                        </button>
-                      )
-                    ) : (
-                      <span
-                        className={`w-7 h-7 flex items-center justify-center rounded-lg ${
-                          p.isMicEnabled
-                            ? 'text-slate-400 dark:text-slate-500'
-                            : 'text-[#EA3323]'
-                        }`}
-                        title={p.isMicEnabled ? 'Mikrofon yoniq' : "Mikrofon o'chiq"}
-                      >
-                        <HugeiconsIcon icon={p.isMicEnabled ? Mic01Icon : MicOff01Icon} size={18} strokeWidth={2} />
-                      </span>
-                    )}
+                          <HugeiconsIcon icon={p.isMicEnabled ? Mic01Icon : MicOff01Icon} size={18} strokeWidth={2} />
+                        </span>
+                      )}
 
-                    {/* Camera control / indicator */}
-                    {isLocalHost && !isMe ? (
-                      p.isCameraEnabled ? (
-                        <button
-                          type="button"
-                          onClick={() => onTurnOffCamera && onTurnOffCamera(p.identity)}
-                          title={`${p.name || 'Ishtirokchi'} kamerasini o'chirish`}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
-                        >
-                          <HugeiconsIcon icon={Video01Icon} size={18} strokeWidth={2} />
-                        </button>
+                      {/* Camera control / indicator */}
+                      {isLocalHost && !isMe ? (
+                        p.isCameraEnabled ? (
+                          <button
+                            type="button"
+                            onClick={() => onTurnOffCamera && onTurnOffCamera(p.identity)}
+                            title={`${p.name || 'Ishtirokchi'} kamerasini o'chirish`}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/15 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors cursor-pointer active:scale-90"
+                          >
+                            <HugeiconsIcon icon={Video01Icon} size={18} strokeWidth={2} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onAskTurnOnCamera && onAskTurnOnCamera(p.identity)}
+                            title={`${p.name || 'Ishtirokchi'}dan kamerani yoqishni so'rash`}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-[#EA3323] transition-colors cursor-pointer active:scale-90"
+                          >
+                            <HugeiconsIcon icon={VideoOffIcon} size={18} strokeWidth={2} />
+                          </button>
+                        )
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => onAskTurnOnCamera && onAskTurnOnCamera(p.identity)}
-                          title={`${p.name || 'Ishtirokchi'}dan kamerani yoqishni so'rash`}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-[#EA3323] transition-colors cursor-pointer active:scale-90"
+                        <span
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg ${
+                            p.isCameraEnabled
+                              ? 'text-slate-400 dark:text-slate-500'
+                              : 'text-[#EA3323]'
+                          }`}
+                          title={p.isCameraEnabled ? 'Kamera yoniq' : "Kamera o'chiq"}
                         >
-                          <HugeiconsIcon icon={VideoOffIcon} size={18} strokeWidth={2} />
-                        </button>
-                      )
-                    ) : (
-                      <span
-                        className={`w-7 h-7 flex items-center justify-center rounded-lg ${
-                          p.isCameraEnabled
-                            ? 'text-slate-400 dark:text-slate-500'
-                            : 'text-[#EA3323]'
-                        }`}
-                        title={p.isCameraEnabled ? 'Kamera yoniq' : "Kamera o'chiq"}
-                      >
-                        <HugeiconsIcon icon={p.isCameraEnabled ? Video01Icon : VideoOffIcon} size={18} strokeWidth={2} />
-                      </span>
-                    )}
-                  </div>
+                          <HugeiconsIcon icon={p.isCameraEnabled ? Video01Icon : VideoOffIcon} size={18} strokeWidth={2} />
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })

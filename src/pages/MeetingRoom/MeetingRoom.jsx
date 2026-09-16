@@ -39,6 +39,8 @@ import {
   Home04Icon,
   ShutDownIcon,
   CallEnd01Icon,
+  Mic01Icon,
+  Video01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
@@ -251,6 +253,22 @@ const formatAvatarUrl = (url) => {
   return cleanBase ? `${cleanBase}${cleanPath}` : cleanPath
 }
 
+const getAvatarGradient = (name = '') => {
+  const gradients = [
+    'bg-[#1a73e8]',
+    'bg-[#1e8e3e]',
+    'bg-[#9334e6]',
+    'bg-[#007b83]',
+    'bg-[#e37400]',
+    'bg-[#d93025]',
+    'bg-[#d01884]',
+    'bg-[#3949ab]',
+  ]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return gradients[Math.abs(hash) % gradients.length]
+}
+
 const isUserMatch = (u, identity, pNameLower) => {
   if (!u) return false
   const sId = String(u.id || '').trim()
@@ -345,6 +363,7 @@ export default function MeetingRoom() {
   const [handRaisedMap, setHandRaisedMap] = useState({}) // { [identity]: boolean }
   const [unmuteRequest, setUnmuteRequest] = useState(null)
   const [turnOnCameraRequest, setTurnOnCameraRequest] = useState(null)
+  const [requestedParticipantIds, setRequestedParticipantIds] = useState({})
   const isLocalHostRef = useRef(false)
 
   // Local Media State (Default is muted / off)
@@ -1795,6 +1814,7 @@ export default function MeetingRoom() {
           if (targetId && (targetId === myIdentity || targetId === myUserId || myIdentity.startsWith(targetId + '_') || targetId.startsWith(myIdentity + '_') || targetId === 'ALL')) {
             setUnmuteRequest({
               sender: decoded.sender || 'Tashkilotchi',
+              senderAvatar: decoded.senderAvatar || null,
               timestamp: Date.now()
             })
             playKnockRequestSound()
@@ -1807,10 +1827,21 @@ export default function MeetingRoom() {
           if (targetId && (targetId === myIdentity || targetId === myUserId || myIdentity.startsWith(targetId + '_') || targetId.startsWith(myIdentity + '_') || targetId === 'ALL')) {
             setTurnOnCameraRequest({
               sender: decoded.sender || 'Tashkilotchi',
+              senderAvatar: decoded.senderAvatar || null,
               timestamp: Date.now()
             })
             playKnockRequestSound()
             triggerInRoomAlert('bell', `${decoded.sender || 'Tashkilotchi'} kamerangizni yoqishingizni so'ramoqda`, 'knock')
+          }
+        } else if (decoded.type === 'ask_response') {
+          const pIdent = decoded.senderIdentity
+          if (pIdent) {
+            setRequestedParticipantIds(prev => {
+              if (!prev[pIdent]) return prev
+              const next = { ...prev }
+              delete next[pIdent]
+              return next
+            })
           }
         } else if (decoded.type === 'user_profile') {
           if (decoded.identity || decoded.userId) {
@@ -2304,9 +2335,10 @@ export default function MeetingRoom() {
         type: 'ask_unmute',
         targetUserId: targetIdentity,
         sender: currentUserName,
+        senderAvatar: user?.avatar || null,
       }))
       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-      toast.info("So'rov yuborildi", "Ishtirokchiga mikrofonni yoqish taklifi yuborildi")
+      setRequestedParticipantIds(prev => ({ ...prev, [targetIdentity]: { type: 'mic', timestamp: Date.now() } }))
     } catch (err) {
       console.error("Ask to unmute yuborishda xato:", err)
       toast.error("Xatolik", "Mikrofonni yoqish so'rovini yuborishda muammo yuz berdi")
@@ -2321,9 +2353,10 @@ export default function MeetingRoom() {
         type: 'ask_turn_on_camera',
         targetUserId: targetIdentity,
         sender: currentUserName,
+        senderAvatar: user?.avatar || null,
       }))
       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-      toast.info("So'rov yuborildi", "Ishtirokchiga kamerani yoqish taklifi yuborildi")
+      setRequestedParticipantIds(prev => ({ ...prev, [targetIdentity]: { type: 'camera', timestamp: Date.now() } }))
     } catch (err) {
       console.error("Ask to turn on camera yuborishda xato:", err)
       toast.error("Xatolik", "Kamerani yoqish so'rovini yuborishda muammo yuz berdi")
@@ -3379,6 +3412,7 @@ export default function MeetingRoom() {
           currentUserId={roomRef.current?.localParticipant?.identity}
           pinnedId={pinnedId}
           onTogglePin={handleTogglePin}
+          requestedParticipantIds={requestedParticipantIds}
         />
 
         {/* Meeting Details Drawer (Google Meet Style) */}
@@ -3478,81 +3512,197 @@ export default function MeetingRoom() {
         />
       </footer>
 
-      {/* Ask to Unmute Modal (received from Host) */}
-      {unmuteRequest && (
-        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="w-full max-w-sm rounded-3xl bg-[#202124] border border-white/10 p-6 shadow-2xl text-center flex flex-col items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-2xl border border-blue-500/30 shadow-inner">
-              <FaMicrophone size={24} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Mikrofonni yoqish so'rovi</h3>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
-                <span className="font-bold text-white">{unmuteRequest.sender}</span> mikrofoningizni yoqishingizni so'ramoqda.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 w-full mt-2">
-              <button
-                type="button"
-                onClick={() => setUnmuteRequest(null)}
-                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
-              >
-                Hozir emas
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!isMicEnabled) {
-                    await handleToggleMic()
-                  }
-                  setUnmuteRequest(null)
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-blue-600/30"
-              >
-                Mikrofonni yoqish
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Ask to Unmute Modal (matching Figma Image 1) */}
+      {unmuteRequest && (() => {
+        const cleanSender = (unmuteRequest.sender || '').trim().toLowerCase()
+        const senderProfile = peerProfiles[cleanSender] ||
+          Object.values(peerProfiles).find(p => (p.name && p.name.trim().toLowerCase() === cleanSender) || (p.username && p.username.trim().toLowerCase() === cleanSender)) || {}
+        const avatarUrl = unmuteRequest.senderAvatar || senderProfile?.avatar || null
+        const senderInitials = unmuteRequest.sender
+          ? unmuteRequest.sender.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+          : 'T'
 
-      {/* Ask to Turn on Camera Modal (received from Host) */}
-      {turnOnCameraRequest && (
-        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="w-full max-w-sm rounded-3xl bg-[#202124] border border-white/10 p-6 shadow-2xl text-center flex flex-col items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-2xl border border-blue-500/30 shadow-inner">
-              <FaVideo size={24} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Kamerani yoqish so'rovi</h3>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
-                <span className="font-bold text-white">{turnOnCameraRequest.sender}</span> kamerangizni yoqishingizni so'ramoqda.
+        return (
+          <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 select-none">
+            <div className="w-full max-w-[440px] rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] text-left flex flex-col gap-4 animate-in zoom-in-95 duration-200 overflow-hidden">
+              {/* Blue Mic Icon at top left */}
+              <div className="text-[#3B59BA]">
+                <HugeiconsIcon icon={Mic01Icon} size={28} strokeWidth={2.2} />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white -mt-1">
+                Mikrofonni yoqasizmi?
+              </h3>
+
+              {/* Sender Card */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#F8FAFC] dark:bg-white/5 border border-slate-100/80 dark:border-white/5 w-full">
+                <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-white text-sm shadow-xs ${getAvatarGradient(unmuteRequest.sender)}`}>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.target.style.display = 'none' }} />
+                  ) : (
+                    <span>{senderInitials}</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {unmuteRequest.sender}
+                  </h4>
+                  <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
+                    Tashkilotchi, hozir so'radi
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Qaror sizniki. Tayyor bo'lmasangiz, keyinroq o'zingiz yoqishingiz mumkin.
               </p>
-            </div>
-            <div className="flex items-center gap-3 w-full mt-2">
-              <button
-                type="button"
-                onClick={() => setTurnOnCameraRequest(null)}
-                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
-              >
-                Hozir emas
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!isCameraEnabled) {
-                    await handleToggleCamera()
-                  }
-                  setTurnOnCameraRequest(null)
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-blue-600/30"
-              >
-                Kamerani yoqish
-              </button>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 w-full mt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const payload = new TextEncoder().encode(JSON.stringify({
+                        type: 'ask_response',
+                        action: 'declined',
+                        mediaType: 'mic',
+                        senderIdentity: roomRef.current?.localParticipant?.identity
+                      }))
+                      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+                    } catch (e) {}
+                    setUnmuteRequest(null)
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#F1F5F9] dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
+                >
+                  <FaXmark size={12} />
+                  <span>Hozircha yo'q</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      if (!isMicEnabled) {
+                        await handleToggleMic()
+                      }
+                      const payload = new TextEncoder().encode(JSON.stringify({
+                        type: 'ask_response',
+                        action: 'accepted',
+                        mediaType: 'mic',
+                        senderIdentity: roomRef.current?.localParticipant?.identity
+                      }))
+                      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+                    } catch (e) {}
+                    setUnmuteRequest(null)
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#3B59BA] hover:bg-[#324DAE] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/25 transition-all active:scale-95"
+                >
+                  <HugeiconsIcon icon={Mic01Icon} size={16} strokeWidth={2.2} />
+                  <span>Mikrofonni yoqish</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
+
+      {/* Ask to Turn on Camera Modal (matching Figma Image 2) */}
+      {turnOnCameraRequest && (() => {
+        const cleanSender = (turnOnCameraRequest.sender || '').trim().toLowerCase()
+        const senderProfile = peerProfiles[cleanSender] ||
+          Object.values(peerProfiles).find(p => (p.name && p.name.trim().toLowerCase() === cleanSender) || (p.username && p.username.trim().toLowerCase() === cleanSender)) || {}
+        const avatarUrl = turnOnCameraRequest.senderAvatar || senderProfile?.avatar || null
+        const senderInitials = turnOnCameraRequest.sender
+          ? turnOnCameraRequest.sender.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+          : 'T'
+
+        return (
+          <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 select-none">
+            <div className="w-full max-w-[440px] rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] text-left flex flex-col gap-4 animate-in zoom-in-95 duration-200 overflow-hidden">
+              {/* Blue Camera Icon at top left */}
+              <div className="text-[#3B59BA]">
+                <HugeiconsIcon icon={Video01Icon} size={28} strokeWidth={2.2} />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white -mt-1">
+                Kamerani yoqasizmi?
+              </h3>
+
+              {/* Sender Card */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#F8FAFC] dark:bg-white/5 border border-slate-100/80 dark:border-white/5 w-full">
+                <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-white text-sm shadow-xs ${getAvatarGradient(turnOnCameraRequest.sender)}`}>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.target.style.display = 'none' }} />
+                  ) : (
+                    <span>{senderInitials}</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {turnOnCameraRequest.sender}
+                  </h4>
+                  <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
+                    Tashkilotchi, hozir so'radi
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Qaror sizniki. Istamasangiz, kamerani o'chiq qoldiring.
+              </p>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 w-full mt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const payload = new TextEncoder().encode(JSON.stringify({
+                        type: 'ask_response',
+                        action: 'declined',
+                        mediaType: 'camera',
+                        senderIdentity: roomRef.current?.localParticipant?.identity
+                      }))
+                      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+                    } catch (e) {}
+                    setTurnOnCameraRequest(null)
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#F1F5F9] dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
+                >
+                  <FaXmark size={12} />
+                  <span>Hozircha yo'q</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      if (!isCameraEnabled) {
+                        await handleToggleCamera()
+                      }
+                      const payload = new TextEncoder().encode(JSON.stringify({
+                        type: 'ask_response',
+                        action: 'accepted',
+                        mediaType: 'camera',
+                        senderIdentity: roomRef.current?.localParticipant?.identity
+                      }))
+                      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+                    } catch (e) {}
+                    setTurnOnCameraRequest(null)
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#3B59BA] hover:bg-[#324DAE] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/25 transition-all active:scale-95"
+                >
+                  <HugeiconsIcon icon={Video01Icon} size={16} strokeWidth={2.2} />
+                  <span>Kamerani yoqish</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Confirmation Modal for Ending Meeting for All (Host) */}
       {showEndModal && typeof document !== 'undefined' && createPortal(

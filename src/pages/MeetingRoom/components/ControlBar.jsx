@@ -218,362 +218,356 @@ export default function ControlBar({
   return (
     <>
       <div
-        className={`flex items-center justify-between gap-2 sm:gap-2.5 ${
+        className={`flex items-center gap-2 sm:gap-2.5 ${
           isFullScreenFocus
             ? 'bg-transparent border-0 shadow-none p-0'
-            : 'px-3 sm:px-4 py-2 rounded-full bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)]'
+            : 'p-2 sm:p-2.5 rounded-full glass-droplet-bar'
         } max-w-fit mx-auto select-none transition-all relative`}
       >
-        {/* Left: Audio & Video with quick toggle / arrow */}
-        <div className="flex items-center gap-2">
-          {/* Microphone Pill Container with Dropup */}
-          <div className="relative" ref={micMenuRef}>
-            <div
-              className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
-                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-              }${
-                showMicMenu
-                  ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
-                  : isMicEnabled
-                  ? 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-                  : 'bg-[#EA3323] text-white hover:bg-red-600 shadow-md shadow-red-500/25'
-              }`}
-            >
-              {/* Mic Icon toggle */}
-              <button
-                type="button"
-                onClick={onToggleMic}
-                title={isMicEnabled ? "Mikrofonni o'chirish (Ctrl+D)" : "Mikrofonni yoqish (Ctrl+D)"}
-                className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
-              >
-                <HugeiconsIcon icon={isMicEnabled ? Mic01Icon : MicOff01Icon} size={19} strokeWidth={2} />
-              </button>
-
-              {/* Dropup toggle arrow */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowMicMenu(prev => !prev)
-                  setShowCameraMenu(false)
-                  setShowScreenShareMenu(false)
-                }}
-                title="Mikrofon va dinamik sozlamalari"
-                className="flex items-center justify-center p-1 cursor-pointer opacity-70 hover:opacity-100 active:scale-90"
-              >
-                <HugeiconsIcon
-                  icon={showMicMenu ? ArrowUp01Icon : ArrowDown01Icon}
-                  size={12}
-                  strokeWidth={2.5}
-                />
-              </button>
-            </div>
-
-            {/* Microphone & Speaker Dropup Menu (matching Figma) */}
-            {showMicMenu && (
-              <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                {/* MIKROFON Section */}
-                <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Mikrofon
-                </div>
-                <div className="space-y-0.5">
-                  {audioInputs.map((device) => {
-                    const isSelected = selectedAudioInput === device.deviceId
-                    return (
-                      <button
-                        key={device.deviceId}
-                        type="button"
-                        onClick={() => handleSelectAudio(device.deviceId)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
-                          isSelected
-                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <HugeiconsIcon icon={Mic01Icon} size={16} className="shrink-0 opacity-80" />
-                          <span className="truncate">{device.label}</span>
-                        </div>
-                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
-                      </button>
-                    )
-                  })}
-                </div>
-
-                <div className="border-t border-slate-200 dark:border-white/10 my-2" />
-
-                {/* DINAMIK Section */}
-                <div className="px-3 pt-1 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Dinamik
-                </div>
-                <div className="space-y-0.5">
-                  {audioOutputs.map((device) => {
-                    const isSelected = selectedAudioOutput === device.deviceId
-                    return (
-                      <button
-                        key={device.deviceId}
-                        type="button"
-                        onClick={() => handleSelectSpeaker(device.deviceId)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
-                          isSelected
-                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <FaVolumeHigh size={14} className="shrink-0 opacity-80" />
-                          <span className="truncate">{device.label}</span>
-                        </div>
-                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Camera Pill Container with Dropup */}
-          <div className="relative" ref={cameraMenuRef}>
-            <div
-              className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-full flex items-center gap-1 transition-all duration-200 ${
-                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-              }${
-                showCameraMenu
-                  ? 'ring-2 ring-[#5B7BF0] border border-[#5B7BF0] bg-[#F0F3F7] dark:bg-[#202530]'
-                  : isCameraEnabled
-                  ? 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-                  : 'bg-[#EA3323] text-white hover:bg-red-600 shadow-md shadow-red-500/25'
-              }`}
-            >
-              {/* Camera Icon toggle */}
-              <button
-                type="button"
-                onClick={onToggleCamera}
-                title={isCameraEnabled ? "Kamerani o'chirish (Ctrl+E)" : "Kamerani yoqish (Ctrl+E)"}
-                className="flex items-center justify-center p-1 cursor-pointer active:scale-95"
-              >
-                <HugeiconsIcon icon={isCameraEnabled ? Video01Icon : VideoOffIcon} size={19} strokeWidth={2} />
-              </button>
-
-              {/* Dropup toggle arrow */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowCameraMenu(prev => !prev)
-                  setShowMicMenu(false)
-                  setShowScreenShareMenu(false)
-                }}
-                title="Kamera va fon sozlamalari"
-                className="flex items-center justify-center p-1 cursor-pointer opacity-70 hover:opacity-100 active:scale-90"
-              >
-                <HugeiconsIcon
-                  icon={showCameraMenu ? ArrowUp01Icon : ArrowDown01Icon}
-                  size={12}
-                  strokeWidth={2.5}
-                />
-              </button>
-            </div>
-
-            {/* Camera & Background Dropup Menu (matching Figma) */}
-            {showCameraMenu && (
-              <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                {/* KAMERA Section */}
-                <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Kamera
-                </div>
-                <div className="space-y-0.5">
-                  {videoInputs.map((device) => {
-                    const isSelected = selectedVideoInput === device.deviceId
-                    return (
-                      <button
-                        key={device.deviceId}
-                        type="button"
-                        onClick={() => handleSelectVideo(device.deviceId)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
-                          isSelected
-                            ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <HugeiconsIcon icon={Video01Icon} size={16} className="shrink-0 opacity-80" />
-                          <span className="truncate">{device.label}</span>
-                        </div>
-                        {isSelected && <FaCheck size={12} className="text-[#5B7BF0] shrink-0 ml-2" />}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Center: Collaboration Tools */}
-        <div className="flex items-center gap-2">
-          {/* Screen share with dropdown */}
-          <div className="relative" ref={screenShareMenuRef}>
+        {/* 1. Microphone Pill Container with Dropup */}
+        <div className="relative" ref={micMenuRef}>
+          <div
+            className={`h-11 sm:h-12 px-3 sm:px-3.5 rounded-full flex items-center gap-2 transition-all duration-200 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
+              showMicMenu
+                ? 'ring-2 ring-[#3B59BA] border border-[#3B59BA] glass-droplet-btn'
+                : isMicEnabled
+                ? 'glass-droplet-btn'
+                : 'glass-droplet-btn-danger'
+            }`}
+          >
+            {/* Mic Icon toggle */}
             <button
               type="button"
-              onClick={handleScreenShareClick}
-              title={isScreenSharing ? "Ekran ulashish sozlamalari" : "Ekranni ulashish"}
-              className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-              }${
-                isScreenSharing
-                  ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
-                  : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-              }`}
+              onClick={onToggleMic}
+              title={isMicEnabled ? "Mikrofonni o'chirish (Ctrl+D)" : "Mikrofonni yoqish (Ctrl+D)"}
+              className="flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
             >
-              <HugeiconsIcon icon={ScreenShareIcon} size={19} strokeWidth={2} />
-
-              {/* Up badge when screen sharing */}
-              {isScreenSharing && (
-                <span
-                  className="absolute -top-1.5 -right-0.5 w-5 h-5 rounded-full bg-white dark:bg-[#121620] border border-slate-200/80 dark:border-white/10 shadow-xs flex items-center justify-center text-slate-700 dark:text-slate-200 text-[10px] pointer-events-none z-10"
-                >
-                  <HugeiconsIcon icon={ArrowUp01Icon} size={11} strokeWidth={2.5} />
-                </span>
-              )}
+              <HugeiconsIcon icon={isMicEnabled ? Mic01Icon : MicOff01Icon} size={20} strokeWidth={2} />
             </button>
 
-            {/* Dropdown Menu when Screen Sharing is active */}
-            {isScreenSharing && showScreenShareMenu && (
-              <div className="absolute bottom-full mb-3.5 left-1/2 -translate-x-1/2 w-[285px] sm:w-[310px] p-3 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex flex-col gap-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-                {/* Pointer arrow at bottom */}
-                <div className="w-3.5 h-3.5 bg-white dark:bg-[#0B0D11] border-b border-r border-slate-100 dark:border-white/10 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2 shadow-xs" />
+            {/* Subtle divider */}
+            <div className={`w-[1px] h-4 shrink-0 ${isMicEnabled ? 'bg-slate-400/40 dark:bg-white/20' : 'bg-white/30'}`} />
 
-                {/* Option 1: Stop Sharing */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowScreenShareMenu(false)
-                    if (onStopScreenShare) onStopScreenShare()
-                    else onToggleScreenShare?.()
-                  }}
-                  className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-red-500/5 dark:hover:bg-red-500/10 cursor-pointer transition-colors group text-left relative z-10"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-[#FFF0F0] text-[#EA3323] flex items-center justify-center shrink-0 shadow-xs">
-                    <HugeiconsIcon icon={CancelCircleIcon} size={18} strokeWidth={2.2} />
-                  </div>
-                  <span className="text-sm font-bold text-[#EA3323] leading-snug">
-                    Ulashishni to'xtatish
-                  </span>
-                </button>
-
-                {/* Option 2: Select other screen */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowScreenShareMenu(false)
-                    onChangeScreenShare?.()
-                  }}
-                  className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-slate-100/70 dark:hover:bg-white/5 cursor-pointer transition-colors group text-left relative z-10"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#52688F] flex items-center justify-center shrink-0 shadow-xs">
-                    <HugeiconsIcon icon={RefreshIcon} size={18} strokeWidth={2.2} />
-                  </div>
-                  <span className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
-                    Boshqa ekranni tanlash
-                  </span>
-                </button>
-              </div>
-            )}
+            {/* Dropup toggle arrow */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowMicMenu(prev => !prev)
+                setShowCameraMenu(false)
+                setShowScreenShareMenu(false)
+              }}
+              title="Mikrofon va dinamik sozlamalari"
+              className="flex items-center justify-center cursor-pointer opacity-70 hover:opacity-100 active:scale-90 transition-all"
+            >
+              <HugeiconsIcon
+                icon={showMicMenu ? ArrowDown01Icon : ArrowUp01Icon}
+                size={13}
+                strokeWidth={2.5}
+              />
+            </button>
           </div>
 
-          {/* Raise Hand */}
-          <button
-            type="button"
-            onClick={onToggleHandRaise}
-            title={isHandRaised ? "Qo'lni tushirish (Ctrl+Alt+H)" : "Qo'l ko'tarish (Ctrl+Alt+H)"}
-            className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-            }${
-              isHandRaised
-                ? 'bg-[#3F57B3]! dark:bg-[#2B3553]! text-white shadow-md shadow-blue-500/30'
-                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-            }`}
-          >
-            <HugeiconsIcon icon={HandIcon} size={19} strokeWidth={2} />
-          </button>
+          {/* Microphone & Speaker Dropup Menu */}
+          {showMicMenu && (
+            <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white/95 dark:bg-[#0B0D11] backdrop-blur-2xl border border-white/80 dark:border-white/10 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] z-50 animate-in fade-in zoom-in-95 duration-150">
+              {/* MIKROFON Section */}
+              <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Mikrofon
+              </div>
+              <div className="space-y-0.5">
+                {audioInputs.map((device) => {
+                  const isSelected = selectedAudioInput === device.deviceId
+                  return (
+                    <button
+                      key={device.deviceId}
+                      type="button"
+                      onClick={() => handleSelectAudio(device.deviceId)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                        isSelected
+                          ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <HugeiconsIcon icon={Mic01Icon} size={16} className="shrink-0 opacity-80" />
+                        <span className="truncate">{device.label}</span>
+                      </div>
+                      {isSelected && <FaCheck size={12} className="text-[#3B59BA] shrink-0 ml-2" />}
+                    </button>
+                  )
+                })}
+              </div>
 
-          {/* Chat */}
-          <button
-            type="button"
-            onClick={onToggleChat}
-            title={isChatOpen ? "Chatni yopish (Ctrl+L)" : "Jonli Chat (Ctrl+L)"}
-            className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              <div className="border-t border-slate-200 dark:border-white/10 my-2" />
+
+              {/* DINAMIK Section */}
+              <div className="px-3 pt-1 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Dinamik
+              </div>
+              <div className="space-y-0.5">
+                {audioOutputs.map((device) => {
+                  const isSelected = selectedAudioOutput === device.deviceId
+                  return (
+                    <button
+                      key={device.deviceId}
+                      type="button"
+                      onClick={() => handleSelectSpeaker(device.deviceId)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                        isSelected
+                          ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <FaVolumeHigh size={14} className="shrink-0 opacity-80" />
+                        <span className="truncate">{device.label}</span>
+                      </div>
+                      {isSelected && <FaCheck size={12} className="text-[#3B59BA] shrink-0 ml-2" />}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Camera Pill Container with Dropup */}
+        <div className="relative" ref={cameraMenuRef}>
+          <div
+            className={`h-11 sm:h-12 px-3 sm:px-3.5 rounded-full flex items-center gap-2 transition-all duration-200 ${
               isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
             }${
-              isChatOpen
-                ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
-                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
+              showCameraMenu
+                ? 'ring-2 ring-[#3B59BA] border border-[#3B59BA] glass-droplet-btn'
+                : isCameraEnabled
+                ? 'glass-droplet-btn'
+                : 'glass-droplet-btn-danger'
             }`}
           >
-            <HugeiconsIcon icon={Message01Icon} size={19} strokeWidth={2} />
-            {unreadChatCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EA3323] text-white text-[10px] font-extrabold flex items-center justify-center shadow-md animate-pulse">
-                {unreadChatCount > 9 ? '9+' : unreadChatCount}
+            {/* Camera Icon toggle */}
+            <button
+              type="button"
+              onClick={onToggleCamera}
+              title={isCameraEnabled ? "Kamerani o'chirish (Ctrl+E)" : "Kamerani yoqish (Ctrl+E)"}
+              className="flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+            >
+              <HugeiconsIcon icon={isCameraEnabled ? Video01Icon : VideoOffIcon} size={20} strokeWidth={2} />
+            </button>
+
+            {/* Subtle divider */}
+            <div className={`w-[1px] h-4 shrink-0 ${isCameraEnabled ? 'bg-slate-300/80 dark:bg-white/20' : 'bg-white/30'}`} />
+
+            {/* Dropup toggle arrow */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowCameraMenu(prev => !prev)
+                setShowMicMenu(false)
+                setShowScreenShareMenu(false)
+              }}
+              title="Kamera va fon sozlamalari"
+              className="flex items-center justify-center cursor-pointer opacity-70 hover:opacity-100 active:scale-90 transition-all"
+            >
+              <HugeiconsIcon
+                icon={showCameraMenu ? ArrowDown01Icon : ArrowUp01Icon}
+                size={13}
+                strokeWidth={2.5}
+              />
+            </button>
+          </div>
+
+          {/* Camera & Background Dropup Menu */}
+          {showCameraMenu && (
+            <div className="absolute bottom-full mb-3 left-0 w-72 sm:w-80 rounded-2xl bg-white/95 dark:bg-[#0B0D11] backdrop-blur-2xl border border-white/80 dark:border-white/10 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] z-50 animate-in fade-in zoom-in-95 duration-150">
+              {/* KAMERA Section */}
+              <div className="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Kamera
+              </div>
+              <div className="space-y-0.5">
+                {videoInputs.map((device) => {
+                  const isSelected = selectedVideoInput === device.deviceId
+                  return (
+                    <button
+                      key={device.deviceId}
+                      type="button"
+                      onClick={() => handleSelectVideo(device.deviceId)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer text-left ${
+                        isSelected
+                          ? 'bg-[#F0F3F7] dark:bg-[#1C212D] text-slate-900 dark:text-white font-semibold'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <HugeiconsIcon icon={Video01Icon} size={16} className="shrink-0 opacity-80" />
+                        <span className="truncate">{device.label}</span>
+                      </div>
+                      {isSelected && <FaCheck size={12} className="text-[#3B59BA] shrink-0 ml-2" />}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3. Screen share with dropdown */}
+        <div className="relative" ref={screenShareMenuRef}>
+          <button
+            type="button"
+            onClick={handleScreenShareClick}
+            title={isScreenSharing ? "Ekran ulashish sozlamalari" : "Ekranni ulashish"}
+            className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
+              isScreenSharing
+                ? 'glass-droplet-btn-active'
+                : 'glass-droplet-btn'
+            }`}
+          >
+            <HugeiconsIcon icon={ScreenShareIcon} size={20} strokeWidth={2} />
+
+            {/* Up badge when screen sharing */}
+            {isScreenSharing && (
+              <span
+                className="absolute -top-1 -right-0.5 w-4.5 h-4.5 rounded-full bg-white dark:bg-[#202530] border border-slate-200/80 dark:border-white/10 shadow-xs flex items-center justify-center text-slate-700 dark:text-slate-200 text-[9px] pointer-events-none z-10 font-bold"
+              >
+                <HugeiconsIcon icon={ArrowUp01Icon} size={10} strokeWidth={2.5} />
               </span>
             )}
           </button>
 
-          {/* Participants badge */}
-          <button
-            type="button"
-            onClick={onToggleParticipants}
-            title="Qatnashchilar"
-            className={`relative h-10 sm:h-11 px-3 sm:px-3.5 rounded-full flex items-center gap-1.5 cursor-pointer transition-all duration-200 active:scale-95 ${
-              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-            }${
-              isParticipantsOpen
-                ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
-                : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-            }`}
-          >
-            <HugeiconsIcon icon={UserGroupIcon} size={19} strokeWidth={2} />
-            <span className="text-xs sm:text-sm font-semibold">{participantCount}</span>
-          </button>
+          {/* Dropdown Menu when Screen Sharing is active */}
+          {isScreenSharing && showScreenShareMenu && (
+            <div className="absolute bottom-full mb-3.5 left-1/2 -translate-x-1/2 w-[285px] sm:w-[310px] p-3 rounded-2xl bg-white/95 dark:bg-[#0B0D11] backdrop-blur-2xl border border-white/80 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex flex-col gap-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+              {/* Pointer arrow at bottom */}
+              <div className="w-3.5 h-3.5 bg-white dark:bg-[#0B0D11] border-b border-r border-slate-100 dark:border-white/10 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2 shadow-xs" />
 
-          {/* Meeting Info */}
-          {onToggleDetails && (
-            <button
-              type="button"
-              onClick={onToggleDetails}
-              title="Yig'ilish tafsilotlari"
-              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-                isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
-              }${
-                isDetailsOpen
-                  ? 'bg-[#3F57B3] dark:bg-[#2B3553] text-white shadow-md shadow-blue-500/30'
-                  : 'bg-[#F0F3F7] dark:bg-[#202530] text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-[#2a303e]'
-              }`}
-            >
-              <HugeiconsIcon icon={InformationCircleIcon} size={20} strokeWidth={2} />
-            </button>
+              {/* Option 1: Stop Sharing */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowScreenShareMenu(false)
+                  if (onStopScreenShare) onStopScreenShare()
+                  else onToggleScreenShare?.()
+                }}
+                className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-red-500/5 dark:hover:bg-red-500/10 cursor-pointer transition-colors group text-left relative z-10"
+              >
+                <div className="w-8 h-8 rounded-xl bg-[#FFF0F0] text-[#EA3323] flex items-center justify-center shrink-0 shadow-xs">
+                  <HugeiconsIcon icon={CancelCircleIcon} size={18} strokeWidth={2.2} />
+                </div>
+                <span className="text-sm font-bold text-[#EA3323] leading-snug">
+                  Ulashishni to'xtatish
+                </span>
+              </button>
+
+              {/* Option 2: Select other screen */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowScreenShareMenu(false)
+                  onChangeScreenShare?.()
+                }}
+                className="flex items-center gap-3.5 w-full p-1.5 rounded-2xl hover:bg-slate-100/70 dark:hover:bg-white/5 cursor-pointer transition-colors group text-left relative z-10"
+              >
+                <div className="w-8 h-8 rounded-xl bg-[#EAF0F8] dark:bg-[#18202D] text-[#3E5CBA] dark:text-[#52688F] flex items-center justify-center shrink-0 shadow-xs">
+                  <HugeiconsIcon icon={RefreshIcon} size={18} strokeWidth={2.2} />
+                </div>
+                <span className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                  Boshqa ekranni tanlash
+                </span>
+              </button>
+            </div>
           )}
         </div>
 
-        {!isFullScreenFocus && (
-          <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
-        )}
+        {/* 4. Raise Hand */}
+        <button
+          type="button"
+          onClick={onToggleHandRaise}
+          title={isHandRaised ? "Qo'lni tushirish (Ctrl+Alt+H)" : "Qo'l ko'tarish (Ctrl+Alt+H)"}
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+            isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+          }${
+            isHandRaised
+              ? 'glass-droplet-btn-active'
+              : 'glass-droplet-btn'
+          }`}
+        >
+          <HugeiconsIcon icon={HandIcon} size={20} strokeWidth={2} />
+        </button>
 
-        {/* Right: Leave Button */}
-        <div className="flex items-center gap-2">
-          {/* Leave meeting - Red solid pill button */}
+        {/* 5. Chat */}
+        <button
+          type="button"
+          onClick={onToggleChat}
+          title={isChatOpen ? "Chatni yopish (Ctrl+L)" : "Jonli Chat (Ctrl+L)"}
+          className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+            isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+          }${
+            isChatOpen
+              ? 'glass-droplet-btn-active'
+              : 'glass-droplet-btn'
+          }`}
+        >
+          <HugeiconsIcon icon={Comment01Icon} size={20} strokeWidth={2} />
+          {unreadChatCount > 0 && !isChatOpen && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EA3323] text-white text-[10px] font-extrabold flex items-center justify-center shadow-md animate-pulse">
+              {unreadChatCount > 9 ? '9+' : unreadChatCount}
+            </span>
+          )}
+        </button>
+
+        {/* 6. Participants badge */}
+        <button
+          type="button"
+          onClick={onToggleParticipants}
+          title="Qatnashchilar"
+          className={`relative h-11 sm:h-12 px-3.5 sm:px-4 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-200 active:scale-95 ${
+            isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+          }${
+            isParticipantsOpen
+              ? 'glass-droplet-btn-active'
+              : 'glass-droplet-btn'
+          }`}
+        >
+          <HugeiconsIcon icon={UserGroupIcon} size={20} strokeWidth={2} />
+          <span className="text-sm font-bold">{participantCount}</span>
+        </button>
+
+        {/* 7. Meeting Info */}
+        {onToggleDetails && (
           <button
             type="button"
-            onClick={() => setShowLeaveModal(true)}
-            title="Chiqish"
-            className={`h-10 sm:h-11 px-4 rounded-full bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md shadow-red-500/25 cursor-pointer transition-all duration-200 active:scale-95 ${
-              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md' : ''
+            onClick={onToggleDetails}
+            title="Yig'ilish tafsilotlari"
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
+              isDetailsOpen
+                ? 'glass-droplet-btn-active'
+                : 'glass-droplet-btn'
             }`}
           >
-            <HugeiconsIcon icon={CallEnd01Icon} size={17} strokeWidth={2.2} />
+            <HugeiconsIcon icon={InformationCircleIcon} size={21} strokeWidth={2} />
           </button>
-        </div>
+        )}
+
+        {/* Subtle divider before Chiqish matching screenshot */}
+        <div className="w-[1px] h-6 bg-slate-400/40 dark:bg-white/10 mx-0.5" />
+
+        {/* 8. Leave meeting - Red solid pill button with Chiqish text matching screenshot */}
+        <button
+          type="button"
+          onClick={() => setShowLeaveModal(true)}
+          title="Chiqish"
+          className="h-11 sm:h-12 px-4 rounded-full glass-droplet-btn-danger text-white text-sm sm:text-base font-bold flex items-center gap-2.5 cursor-pointer active:scale-95"
+        >
+          <HugeiconsIcon icon={CallEnd01Icon} size={18} strokeWidth={2.2} />
+        </button>
       </div>
 
       {/* Confirmation Modal for Leaving Meeting (matching Figma Image 1 & 2) */}
@@ -610,7 +604,7 @@ export default function ControlBar({
                   setShowLeaveModal(false)
                   onLeave?.()
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
+                className="px-4 py-2.5 rounded-xl bg-[#EA3323] hover:bg-red-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25 transition-all active:scale-95"
               >
                 <HugeiconsIcon icon={CallEnd01Icon} size={15} strokeWidth={2.2} />
                 <span>Chiqish</span>
