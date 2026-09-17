@@ -20,8 +20,22 @@ import {
   RefreshIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { FaXmark, FaCheck, FaVolumeHigh } from 'react-icons/fa6'
+import { FaXmark, FaCheck, FaVolumeHigh, FaRegFaceSmile } from 'react-icons/fa6'
 import { MdSwapHoriz } from 'react-icons/md'
+import { getAppleEmojiUrl } from '../data/stickerData'
+
+const REACTION_ITEMS = [
+  { char: '👍', code: '1f44d', name: 'Thumbs Up' },
+  { char: '👏', code: '1f44f', name: 'Clapping' },
+  { char: '❤️', code: '2764-fe0f', name: 'Heart' },
+  { char: '🎉', code: '1f389', name: 'Party Popper' },
+  { char: '😊', code: '1f60a', name: 'Smile' },
+  { char: '😂', code: '1f602', name: 'Joy' },
+  { char: '😮', code: '1f62e', name: 'Surprised' },
+  { char: '🤔', code: '1f914', name: 'Thinking' },
+  { char: '🙌', code: '1f64c', name: 'Raising Hands' },
+  { char: '✅', code: '2705', name: 'Check Mark' },
+]
 
 export default function ControlBar({
   isMicEnabled,
@@ -41,6 +55,7 @@ export default function ControlBar({
   isChatOpen,
   onToggleChat,
   unreadChatCount = 0,
+  onSendReaction = null,
   isParticipantsOpen,
   onToggleParticipants,
   participantCount = 1,
@@ -53,6 +68,24 @@ export default function ControlBar({
   const [showLeaveModal, setShowLeaveModal] = useState(false)
   const [showScreenShareMenu, setShowScreenShareMenu] = useState(false)
   const screenShareMenuRef = useRef(null)
+
+  // Reactions Popover
+  const [showReactions, setShowReactions] = useState(false)
+  const reactionsRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (reactionsRef.current && !reactionsRef.current.contains(e.target)) {
+        setShowReactions(false)
+      }
+    }
+    if (showReactions) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showReactions])
 
   // Mic & Camera Dropup Menus
   const [showMicMenu, setShowMicMenu] = useState(false)
@@ -513,7 +546,7 @@ export default function ControlBar({
               : 'glass-droplet-btn'
           }`}
         >
-          <HugeiconsIcon icon={Comment01Icon} size={20} strokeWidth={2} />
+          <HugeiconsIcon icon={Message01Icon} size={20} strokeWidth={2} />
           {unreadChatCount > 0 && !isChatOpen && (
             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EA3323] text-white text-[10px] font-extrabold flex items-center justify-center shadow-md animate-pulse">
               {unreadChatCount > 9 ? '9+' : unreadChatCount}
@@ -521,7 +554,68 @@ export default function ControlBar({
           )}
         </button>
 
-        {/* 6. Participants badge */}
+        {/* 5.5 Reactions Button + Popup matching Image 1 & 2 */}
+        <div className="relative" ref={reactionsRef}>
+          <button
+            type="button"
+            onClick={() => setShowReactions(prev => !prev)}
+            title="Reaksiya bildirish"
+            className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+              isFullScreenFocus ? 'shadow-lg shadow-black/40 backdrop-blur-md ' : ''
+            }${
+              showReactions
+                ? 'glass-droplet-btn-active'
+                : 'glass-droplet-btn'
+            }`}
+          >
+            <FaRegFaceSmile size={20} />
+          </button>
+
+          {/* Reactions Popover */}
+          {showReactions && (
+            <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-50 w-[310px] sm:w-[350px] p-4 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-200/90 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] animate-in fade-in zoom-in-95 duration-200 select-none">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-2.5 px-0.5">
+                <span className="font-bold text-sm text-slate-900 dark:text-white">
+                  Stikerlar
+                </span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">
+                  3 soniya ko'rinadi
+                </span>
+              </div>
+
+              {/* Grid 2x5 */}
+              <div className="grid grid-cols-5 gap-2 pt-0.5">
+                {REACTION_ITEMS.map((item) => (
+                  <button
+                    key={item.char}
+                    type="button"
+                    onClick={() => {
+                      onSendReaction?.(item)
+                    }}
+                    className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-[#F0F3F7] dark:bg-[#181C24] hover:bg-slate-200 dark:hover:bg-[#222834] flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-90 cursor-pointer shadow-2xs select-none p-2"
+                    title={item.name}
+                  >
+                    <img
+                      src={getAppleEmojiUrl(item.code)}
+                      alt={item.char}
+                      className="w-7 h-7 sm:w-8 sm:h-8 object-contain pointer-events-none select-none"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        if (e.currentTarget.nextElementSibling) {
+                          e.currentTarget.nextElementSibling.style.display = 'inline'
+                        }
+                      }}
+                    />
+                    <span style={{ display: 'none' }} className="text-2xl leading-none">
+                      {item.char}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         <button
           type="button"
           onClick={onToggleParticipants}

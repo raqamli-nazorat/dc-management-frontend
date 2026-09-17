@@ -37,7 +37,7 @@ const getAppleCodeFromChar = (char) => {
   return points.join('-')
 }
 
-const renderMessageContent = (text) => {
+export const renderMessageContent = (text) => {
   if (!text || typeof text !== 'string') return text
 
   let segments = []

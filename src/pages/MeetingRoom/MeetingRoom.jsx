@@ -13,11 +13,12 @@ try {
 
 import ParticipantTile from './components/ParticipantTile'
 import ControlBar from './components/ControlBar'
-import ChatDrawer from './components/ChatDrawer'
+import ChatDrawer, { renderMessageContent } from './components/ChatDrawer'
 import ParticipantsDrawer from './components/ParticipantsDrawer'
 import MeetingDetailsDrawer from './components/MeetingDetailsDrawer'
 import WaitingRoom from './components/WaitingRoom'
 import KnockBanner from './components/KnockBanner'
+import LiveReactionsOverlay from './components/LiveReactionsOverlay'
 import {
   playScreenShareStartSound,
   playScreenShareStopSound,
@@ -458,6 +459,10 @@ export default function MeetingRoom() {
   const [meetingDuration, setMeetingDuration] = useState(0)
   const [endedReason, setEndedReason] = useState("Yig'ilish yakunlandi")
 
+  // Live Floating Reactions (Google Meet style)
+  const [activeReactions, setActiveReactions] = useState([])
+  const reactionTimeoutsRef = useRef({})
+
   // Live meeting duration counter (calculates elapsed time since start_time from API)
   const rawStartTime = meetingDetails?.start_time || meetingState?.start_time || meetingDetails?.started_at
   const [currentTime, setCurrentTime] = useState(() => {
@@ -545,6 +550,48 @@ export default function MeetingRoom() {
   const wsRef = useRef(null)
   const previewStreamRef = useRef(null)
   const currentUserName = user?.username || user?.first_name || 'Foydalanuvchi'
+
+  const triggerReaction = useCallback((emoji, emojiCode, senderName) => {
+    const reactionId = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
+
+    const newReaction = {
+      id: reactionId,
+      emoji: emoji || '👍',
+      emojiCode: emojiCode || null,
+      senderName,
+      driftX: Math.round((Math.random() - 0.5) * 50),
+      duration: 1.8,
+    }
+
+    setActiveReactions(prev => [...prev, newReaction])
+
+    const tId = setTimeout(() => {
+      setActiveReactions(prev => prev.filter(r => r.id !== reactionId))
+      delete reactionTimeoutsRef.current[reactionId]
+    }, 1900)
+
+    reactionTimeoutsRef.current[reactionId] = tId
+  }, [])
+
+  const handleSendReaction = useCallback(async (item) => {
+    if (!item) return
+    triggerReaction(item.char, item.code, currentUserName)
+
+    if (roomRef.current?.localParticipant) {
+      try {
+        const data = {
+          type: 'reaction',
+          emoji: item.char,
+          emojiCode: item.code,
+          sender: currentUserName,
+        }
+        const payload = new TextEncoder().encode(JSON.stringify(data))
+        await roomRef.current.localParticipant.publishData(payload, { reliable: false })
+      } catch (err) {
+        console.warn("Reaction yuborishda xatolik:", err)
+      }
+    }
+  }, [currentUserName, triggerReaction])
 
   // 1. Initial Local Camera / Mic Preview Cleanup for Waiting Room
   useEffect(() => {
@@ -1763,7 +1810,7 @@ export default function MeetingRoom() {
           playChatMessageSound()
           if (!isChatOpenRef.current) {
             setUnreadChatCount(c => c + 1)
-            const snippet = decoded.isSticker ? '🎨 Stiker yubordi' : `${decoded.text?.slice(0, 40) || ''}${decoded.text?.length > 40 ? '...' : ''}`
+            const snippet = decoded.isSticker ? (decoded.sticker?.char ? `${decoded.sticker.char} stiker yubordi` : '🎨 Stiker yubordi') : `${decoded.text?.slice(0, 40) || ''}${decoded.text?.length > 40 ? '...' : ''}`
             triggerInRoomAlert('chat', `${decoded.sender}: ${snippet}`, 'chat')
           }
         } else if (decoded.type === 'typing') {
@@ -1798,6 +1845,8 @@ export default function MeetingRoom() {
               })
             }
           }
+        } else if (decoded.type === 'reaction') {
+          triggerReaction(decoded.emoji, decoded.emojiCode, decoded.sender || 'Qatnashchi')
         } else if (decoded.type === 'raise_hand') {
           const pIdentity = participant ? participant.identity : decoded.userId
           setHandRaisedMap(prev => ({
@@ -2990,7 +3039,7 @@ export default function MeetingRoom() {
             <span className="flex items-center justify-center shrink-0">
               {renderAlertIcon(inRoomAlert.icon, inRoomAlert.type)}
             </span>
-            <span>{inRoomAlert.text}</span>
+            <span className="inline-flex items-center flex-wrap gap-1 leading-snug">{renderMessageContent(inRoomAlert.text)}</span>
           </div>
         </div>
       )}
@@ -3467,6 +3516,9 @@ export default function MeetingRoom() {
           meetingId={meetingId}
           projectData={projectData}
         />
+
+        {/* Live Floating Reactions Overlay (Google Meet Style) */}
+        <LiveReactionsOverlay activeReactions={activeReactions} />
       </div>
 
       {/* Bottom Floating Control Bar */}
@@ -3524,6 +3576,7 @@ export default function MeetingRoom() {
             })
           }}
           unreadChatCount={unreadChatCount}
+          onSendReaction={handleSendReaction}
           isParticipantsOpen={isParticipantsOpen}
           onToggleParticipants={() => {
             if (isScreenFocused) setScreenFocusId(null)
