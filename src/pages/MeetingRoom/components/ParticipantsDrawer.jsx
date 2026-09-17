@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaXmark, FaCheck } from 'react-icons/fa6'
 import {
   UserGroupIcon,
@@ -9,6 +9,40 @@ import {
   VideoOffIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { getAvatarGradient, formatAvatarUrl } from '../utils/meetingCode'
+
+function DrawerParticipantAvatar({ avatar, name }) {
+  const [imgError, setImgError] = useState(false)
+  const formattedAvatar = formatAvatarUrl(avatar)
+
+  useEffect(() => {
+    setImgError(false)
+  }, [formattedAvatar])
+
+  const initials = name
+    ? name.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+    : 'U'
+
+  return (
+    <div
+      className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ${getAvatarGradient(
+        name || ''
+      )} text-white font-bold flex items-center justify-center text-sm shadow-xs`}
+    >
+      {formattedAvatar && !imgError ? (
+        <img
+          src={formattedAvatar}
+          alt={name || ''}
+          className="w-full h-full object-cover rounded-full"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <span>{initials}</span>
+      )}
+    </div>
+  )
+}
+
 
 export default function ParticipantsDrawer({
   isOpen,
@@ -31,21 +65,6 @@ export default function ParticipantsDrawer({
 }) {
   const [search, setSearch] = useState('')
 
-  const getAvatarGradient = (name = '') => {
-    const gradients = [
-      'bg-[#1a73e8]',
-      'bg-[#1e8e3e]',
-      'bg-[#9334e6]',
-      'bg-[#007b83]',
-      'bg-[#e37400]',
-      'bg-[#d93025]',
-      'bg-[#d01884]',
-      'bg-[#3949ab]',
-    ]
-    let hash = 0
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-    return gradients[Math.abs(hash) % gradients.length]
-  }
 
   const filteredParticipants = participants.filter((p) => {
     const name = p.name || p.identity || ''
@@ -118,7 +137,7 @@ export default function ParticipantsDrawer({
 
         {/* Section Header: UCHRASHUVDA */}
         <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase px-1 mb-3 shrink-0">
-          <span>Uchrashuvda</span>
+          <span>Yig'ilishda</span>
           {isLocalHost && hasUnmutedGuests && onMuteAll && (
             <button
               type="button"
@@ -170,22 +189,7 @@ export default function ParticipantsDrawer({
                 >
                   {/* Left: Avatar + Name and Role */}
                   <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ${getAvatarGradient(
-                        p.name || ''
-                      )} text-white font-bold flex items-center justify-center text-sm shadow-xs`}
-                    >
-                      {p.avatar ? (
-                        <img
-                          src={p.avatar}
-                          alt={p.name || ''}
-                          className="w-full h-full object-cover rounded-full"
-                          onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                      ) : (
-                        <span>{initials}</span>
-                      )}
-                    </div>
+                    <DrawerParticipantAvatar avatar={p.avatar} name={p.name} />
 
                     <div className="min-w-0">
                       <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">

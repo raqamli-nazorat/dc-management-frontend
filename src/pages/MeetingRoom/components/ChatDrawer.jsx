@@ -1,7 +1,89 @@
 import { useState, useRef, useEffect } from 'react'
-import { FaXmark } from 'react-icons/fa6'
-import { Comment01Icon, Message01Icon, SentIcon } from '@hugeicons/core-free-icons'
+import { FaRegFaceSmile, FaXmark } from 'react-icons/fa6'
+import { Message01Icon, SentIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import StickerPicker from './StickerPicker'
+
+import { ALL_EMOJIS, getAppleEmojiUrl } from '../data/stickerData'
+
+const EMOJI_MAP = new Map()
+ALL_EMOJIS.forEach((item) => {
+  if (item.char && item.code) {
+    EMOJI_MAP.set(item.char, item.code)
+    const cleanChar = item.char.replace(/\uFE0F/g, '')
+    if (cleanChar !== item.char) {
+      EMOJI_MAP.set(cleanChar, item.code)
+    }
+  }
+})
+
+const IS_EMOJI_REGEX = /\p{Extended_Pictographic}|\p{Emoji_Presentation}/u
+
+const getAppleCodeFromChar = (char) => {
+  if (EMOJI_MAP.has(char)) return EMOJI_MAP.get(char)
+  const clean = char.replace(/\uFE0F/g, '')
+  if (EMOJI_MAP.has(clean)) return EMOJI_MAP.get(clean)
+
+  const points = []
+  for (let i = 0; i < char.length; i++) {
+    const cp = char.codePointAt(i)
+    if (cp) {
+      if (cp > 0xffff) i++
+      if (cp !== 0xfe0f && cp !== 0xfe0e) {
+        points.push(cp.toString(16))
+      }
+    }
+  }
+  return points.join('-')
+}
+
+const renderMessageContent = (text) => {
+  if (!text || typeof text !== 'string') return text
+
+  let segments = []
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' })
+    segments = Array.from(segmenter.segment(text), (s) => s.segment)
+  } else {
+    segments = Array.from(text)
+  }
+
+  const result = []
+  let buffer = ''
+
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i]
+    if (IS_EMOJI_REGEX.test(seg) || EMOJI_MAP.has(seg)) {
+      if (buffer) {
+        result.push(buffer)
+        buffer = ''
+      }
+      const code = getAppleCodeFromChar(seg)
+      result.push(
+        <img
+          key={`emoji-${i}`}
+          src={getAppleEmojiUrl(code)}
+          alt={seg}
+          loading="lazy"
+          className="inline-block w-[1.3em] h-[1.3em] align-[-0.22em] mx-0.5 object-contain select-none"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      )
+    } else {
+      buffer += seg
+    }
+  }
+
+  if (buffer) {
+    result.push(buffer)
+  }
+
+  return result
+}
+
+
 
 const formatMessageTime = (timeStr) => {
   if (!timeStr) return ''
@@ -35,6 +117,7 @@ export default function ChatDrawer({
   onTyping = null,
 }) {
   const [text, setText] = useState('')
+  const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
   const messagesEndRef = useRef(null)
   const typingTimeoutRef = useRef(null)
 
@@ -52,12 +135,38 @@ export default function ChatDrawer({
     }
   }, [])
 
-  const handleInputChange = (e) => {
-    const val = e.target.value
-    setText(val)
+  const editorRef = useRef(null)
+
+  const getEditorText = () => {
+    const el = editorRef.current
+    if (!el) return ''
+    let result = ''
+    const walk = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        result += node.textContent
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName === 'IMG' && node.dataset?.emoji) {
+          result += node.dataset.emoji
+        } else if (node.tagName === 'BR') {
+          result += '\n'
+        } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+          if (result.length > 0 && !result.endsWith('\n')) result += '\n'
+          node.childNodes.forEach(walk)
+        } else {
+          node.childNodes.forEach(walk)
+        }
+      }
+    }
+    walk(el)
+    return result
+  }
+
+  const handleEditorInput = () => {
+    const currentText = getEditorText()
+    setText(currentText)
 
     if (onTyping) {
-      if (val.trim()) {
+      if (currentText.trim()) {
         onTyping(true)
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
         typingTimeoutRef.current = setTimeout(() => {
@@ -70,13 +179,62 @@ export default function ChatDrawer({
     }
   }
 
+  const handleEditorKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
   const handleSend = (e) => {
     e?.preventDefault()
-    if (!text.trim()) return
+    const msgText = getEditorText().trim()
+    if (!msgText) return
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
     onTyping?.(false)
-    onSendMessage(text.trim())
+    onSendMessage(msgText)
+    if (editorRef.current) editorRef.current.innerHTML = ''
     setText('')
+    setIsStickerPickerOpen(false)
+  }
+
+  const handleSelectEmoji = (item) => {
+    const el = editorRef.current
+    if (!el) return
+
+    el.focus()
+    const sel = window.getSelection()
+    let range
+    if (sel && sel.rangeCount > 0 && el.contains(sel.anchorNode)) {
+      range = sel.getRangeAt(0)
+    } else {
+      range = document.createRange()
+      range.selectNodeContents(el)
+      range.collapse(false)
+    }
+
+    const emojiChar = typeof item === 'object' ? item.char : item
+    const emojiCode =
+      typeof item === 'object'
+        ? item.code
+        : EMOJI_MAP.get(item) || (item?.codePointAt(0) ? item.codePointAt(0).toString(16) : '1f600')
+
+    const img = document.createElement('img')
+    img.src = getAppleEmojiUrl(emojiCode)
+    img.alt = emojiChar
+    img.dataset.emoji = emojiChar
+    img.className = 'inline-block w-5 h-5 align-[-3px] mx-0.5 select-none pointer-events-none drop-shadow-xs'
+
+    range.deleteContents()
+    range.insertNode(img)
+
+    // Position caret immediately after the inserted image
+    range.setStartAfter(img)
+    range.setEndAfter(img)
+    sel.removeAllRanges()
+    sel.addRange(range)
+
+    handleEditorInput()
   }
 
   return (
@@ -97,12 +255,17 @@ export default function ChatDrawer({
             : 'w-0 opacity-0 pointer-events-none sm:ml-0 p-0 translate-x-full sm:translate-x-0 border-0'
         }`}
       >
-        <div className="w-full sm:w-[308px] md:w-[320px] h-full flex flex-col shrink-0">
+        <div className="w-full sm:w-[308px] md:w-[320px] h-full flex flex-col shrink-0 relative">
           {/* Header */}
           <div className="flex items-center justify-between shrink-0 pb-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white select-none">
-              Chat
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white select-none">
+                Chat
+              </h3>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[#3E5CBA] dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/30">
+                Jonli
+              </span>
+            </div>
             <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
               <button
                 type="button"
@@ -137,7 +300,7 @@ export default function ChatDrawer({
                   Hali xabar yo'q
                 </h4>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                  Uchrashuv davomida yozishingiz mumkin
+                  Uchrashuv davomida stiker va xabarlar yozishingiz mumkin
                 </p>
               </div>
             ) : (
@@ -145,6 +308,9 @@ export default function ChatDrawer({
               <div className="space-y-3.5 py-1">
                 {messages.map((m, idx) => {
                   const isMe = m.sender === currentUserName || m.isMe
+                  const isStickerMsg = m.isSticker || !!m.sticker
+                  const stickerData = typeof m.sticker === 'object' ? m.sticker : { url: m.sticker, name: 'Stiker' }
+
                   return (
                     <div
                       key={idx}
@@ -162,16 +328,42 @@ export default function ChatDrawer({
                         )}
                       </div>
 
-                      {/* Bubble */}
-                      <div
-                        className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm break-words leading-relaxed ${
-                          isMe
-                            ? 'bg-[#3E5CBA] dark:bg-[#2D3958] text-white rounded-tr-xs shadow-xs'
-                            : 'bg-[#F0F3F7] dark:bg-[#181C24] text-slate-900 dark:text-white rounded-tl-xs'
-                        }`}
-                      >
-                        {m.text}
-                      </div>
+                      {/* Message Content: Sticker or Text Bubble */}
+                      {isStickerMsg ? (
+                        <div className="p-1 flex flex-col items-center">
+                          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center">
+                            <img
+                              src={stickerData.url}
+                              alt={stickerData.name || 'Stiker'}
+                              loading="lazy"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none'
+                                if (e.currentTarget.nextElementSibling) {
+                                  e.currentTarget.nextElementSibling.style.display = 'flex'
+                                }
+                              }}
+                            />
+                            <span
+                              style={{ display: 'none' }}
+                              className="text-4xl items-center justify-center"
+                            >
+                              {stickerData.fallback || '✨'}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Standard Text Bubble — for all text including single emojis */
+                        <div
+                          className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm break-words leading-relaxed ${
+                            isMe
+                              ? 'bg-[#3E5CBA] dark:bg-[#2D3958] text-white rounded-tr-xs shadow-xs'
+                              : 'bg-[#F0F3F7] dark:bg-[#181C24] text-slate-900 dark:text-white rounded-tl-xs'
+                          }`}
+                        >
+                          {renderMessageContent(m.text)}
+                        </div>
+                      )}
                     </div>
                   )
                 })}
@@ -203,23 +395,46 @@ export default function ChatDrawer({
             )}
           </div>
 
+          {/* Emoji Picker Popup */}
+          <StickerPicker
+            isOpen={isStickerPickerOpen}
+            onClose={() => setIsStickerPickerOpen(false)}
+            onSelectEmoji={handleSelectEmoji}
+          />
+
           {/* Message Input matching Figma capsule */}
-          <form onSubmit={handleSend} className="pt-2 mt-auto shrink-0">
-            <div className="flex items-center gap-2 px-4 py-2.5 sm:py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-transparent focus-within:border-blue-500/50 dark:focus-within:border-blue-500/50 transition-all">
-              <input
-                type="text"
-                value={text}
-                onChange={handleInputChange}
+          <form onSubmit={handleSend} className="pt-2 mt-auto shrink-0 relative">
+            <div className="flex items-center gap-2 px-3 py-2 sm:py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-transparent focus-within:border-blue-500/50 dark:focus-within:border-blue-500/50 transition-all">
+              {/* iPhone Sticker / Emoji Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsStickerPickerOpen((prev) => !prev)}
+                className={`p-1.5 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0 ${
+                  isStickerPickerOpen
+                    ? 'bg-blue-100 dark:bg-[#2D3958] scale-110 shadow-xs ring-2 ring-blue-500/30'
+                    : 'hover:bg-slate-100 dark:hover:bg-white/10 opacity-80 hover:opacity-100 hover:scale-105'
+                }`}
+              >
+                <FaRegFaceSmile />
+              </button>
+
+              <div
+                ref={editorRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleEditorInput}
+                onKeyDown={handleEditorKeyDown}
                 onBlur={() => {
                   if (onTyping) onTyping(false)
                 }}
-                placeholder="Xabar yozing"
-                className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                data-placeholder="Xabar yozing..."
+                className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white outline-none min-w-0 max-h-24 overflow-y-auto leading-relaxed empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 empty:before:dark:text-slate-500 empty:before:pointer-events-none"
               />
+
               <button
                 type="submit"
                 disabled={!text.trim()}
-                className="flex items-center justify-center text-[#4C6EF5] hover:text-blue-600 dark:text-[#5B7BF0] dark:hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-90 shrink-0"
+                className="flex items-center justify-center text-[#4C6EF5] hover:text-blue-600 dark:text-[#5B7BF0] dark:hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-90 shrink-0 p-1"
                 title="Yuborish"
               >
                 <HugeiconsIcon icon={SentIcon} size={20} strokeWidth={2} />
@@ -231,3 +446,4 @@ export default function ChatDrawer({
     </>
   )
 }
+

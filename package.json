@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
     "@hello-pangea/dnd": "^18.0.1",
     "@hugeicons/core-free-icons": "^4.3.3",
     "@hugeicons/react": "^1.1.10",
@@ -17,6 +18,7 @@
     "antd": "^6.3.7",
     "axios": "^1.15.2",
     "dayjs": "^1.11.20",
+    "emoji-mart": "^5.6.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^12.13.0",

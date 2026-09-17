@@ -23,8 +23,8 @@ export default function MeetingDetailsDrawer({
   const [copiedLink, setCopiedLink] = useState(false)
   const [copiedUid, setCopiedUid] = useState(false)
 
-  const fullUrl = getFullMeetingUrl(meetingId)
-  const displayUrl = fullUrl ? fullUrl.replace(/^https?:\/\//, '') : `raqamli-boshqaruv.uz/meetings/${meetingId}`
+  const fullUrl = getFullMeetingUrl(meetingId, meetingDetails?.uid)
+  const displayUrl = fullUrl ? fullUrl.replace(/^https?:\/\//, '') : `raqamli-boshqaruv.uz/meetings/${meetingDetails?.uid ? String(meetingDetails.uid).toLowerCase() : meetingId}`
 
   const uid = meetingDetails?.uid || (meetingId ? `MT-${String(meetingId).padStart(4, '0')}` : 'MT-0005')
   const title = meetingDetails?.title || meetingState?.title || projectData?.title || "Yig'ilish"
@@ -146,7 +146,7 @@ export default function MeetingDetailsDrawer({
 
               {/* URL Box */}
               <div className="mt-3 p-3 rounded-2xl bg-white dark:bg-[#0B0D11] border border-slate-200/80 dark:border-white/5 flex items-start gap-2.5 shadow-xs">
-                <HugeiconsIcon icon={Copy01Icon} size={17} onClick={handleCopyLink} strokeWidth={2} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5 cursor-pointer hover:scale-110" />
+                <HugeiconsIcon icon={copiedLink ? CheckmarkCircle01Icon : Copy01Icon} size={17} onClick={handleCopyLink} strokeWidth={2} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5 cursor-pointer hover:scale-110" />
                 <span className="text-xs sm:text-[13px] font-bold text-[#2D56B3] dark:text-[#3E6EC6] break-all leading-snug select-all">
                   {displayUrl}
                 </span>

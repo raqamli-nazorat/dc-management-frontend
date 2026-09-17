@@ -583,7 +583,7 @@ export default function ControlBar({
             className="relative w-full max-w-[450px] p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#0B0D11] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-200 overflow-hidden"
           >
             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
-              Uchrashuvdan chiqasizmi?
+              Yig'ilishdan chiqasizmi?
             </h3>
             <p className="mt-2.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Siz uchrashuvni tark etasiz. Havola orqali qayta kirishingiz mumkin.

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FaXmark, FaArrowLeft, FaChevronDown, FaCheck, FaPlus, FaCopy, FaVideo } from 'react-icons/fa6'
 import { usePageAction } from '../../../context/PageActionContext'
 import { useAuth } from '../../../context/AuthContext'
@@ -723,6 +724,7 @@ function AttendanceItem({ attendance, onUpdateAttendance }) {
 
 /* -- EditMeetingModal -- */
 function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved }) {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [showParticipants, setShowParticipants] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -1093,7 +1095,12 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
                 return isParticipant ? (
                   <button
                     type="button"
-                    onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
+                    onClick={() => {
+                      const slug = getMeetingCode(meeting.id, meeting.uid)
+                      sessionStorage.setItem(`meeting_id_${slug}`, String(meeting.id))
+                      sessionStorage.setItem(`meeting_id_${String(meeting.uid || '').toLowerCase()}`, String(meeting.id))
+                      navigate(`/meetings/${slug}`, { state: { meetingId: meeting.id } })
+                    }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold cursor-pointer bg-[#3b5998] hover:bg-[#314a80] text-white shadow-sm transition-all"
                   >
                     <FaVideo size={13} />
@@ -1122,6 +1129,7 @@ function EditMeetingModal({ meeting, onClose, canEdit = true, onFinish, onSaved 
 
 /* -- MeetingDetailModal -- */
 function MeetingDetailModal({ meeting, onClose }) {
+  const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const { user } = useAuth()
   const { val: durVal, unit: durUnit } = minutesToDisplay(meeting.duration_minutes)
@@ -1301,7 +1309,12 @@ function MeetingDetailModal({ meeting, onClose }) {
             {!meeting.is_completed && isParticipant && (
               <button
                 type="button"
-                onClick={() => window.open(`/meetings/${getMeetingCode(meeting.id)}`, '_blank')}
+                onClick={() => {
+                  const slug = getMeetingCode(meeting.id, meeting.uid)
+                  sessionStorage.setItem(`meeting_id_${slug}`, String(meeting.id))
+                  sessionStorage.setItem(`meeting_id_${String(meeting.uid || '').toLowerCase()}`, String(meeting.id))
+                  navigate(`/meetings/${slug}`, { state: { meetingId: meeting.id } })
+                }}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold cursor-pointer bg-[#3b5998] hover:bg-[#314a80] text-white shadow-sm transition-all"
               >
                 <FaVideo size={13} />

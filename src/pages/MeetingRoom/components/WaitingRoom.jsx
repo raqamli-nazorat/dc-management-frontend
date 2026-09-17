@@ -12,6 +12,7 @@ import {
   FaCircleXmark,
 } from 'react-icons/fa6'
 import { IoCopyOutline } from 'react-icons/io5'
+import { formatAvatarUrl } from '../utils/meetingCode'
 
 export default function WaitingRoom({
   title = "Yig'ilish",
@@ -35,6 +36,7 @@ export default function WaitingRoom({
   const videoRef = useRef(null)
   const [audioLevel, setAudioLevel] = useState(0)
   const [copied, setCopied] = useState(false)
+  const [lobbyImgError, setLobbyImgError] = useState(false)
 
   // Attach or cleanly detach local camera stream from video element
   useEffect(() => {
@@ -216,8 +218,13 @@ export default function WaitingRoom({
           {!hasLiveVideo && (
             <div className="flex flex-col items-center justify-center gap-2">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 dark:from-slate-300 dark:to-slate-400 border border-white/10 dark:border-black/5 flex items-center justify-center text-white dark:text-slate-800 text-2xl font-bold overflow-hidden shadow-lg">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                {user?.avatar && !lobbyImgError ? (
+                  <img
+                    src={formatAvatarUrl(user.avatar)}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                    onError={() => setLobbyImgError(true)}
+                  />
                 ) : (
                   initials
                 )}

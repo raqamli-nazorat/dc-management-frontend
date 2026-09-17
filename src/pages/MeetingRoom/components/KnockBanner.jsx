@@ -1,24 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
 import { playKnockRequestSound } from '../utils/meetingSounds'
-
-const formatAvatarUrl = (url) => {
-  if (!url || typeof url !== 'string') return ''
-  const trimmed = url.trim()
-  if (!trimmed) return ''
-  if (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('blob:') ||
-    trimmed.startsWith('data:')
-  ) {
-    return trimmed
-  }
-  const rawBase = import.meta.env.VITE_BASE_URL || ''
-  const cleanBase = rawBase.replace(/\/+$/, '')
-  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
-  return cleanBase ? `${cleanBase}${cleanPath}` : cleanPath
-}
+import { formatAvatarUrl, getAvatarGradient } from '../utils/meetingCode'
 
 export default function KnockBanner({ requests = [], onAdmit, onReject }) {
   const current = requests && requests.length > 0 ? requests[0] : null
@@ -39,22 +22,6 @@ export default function KnockBanner({ requests = [], onAdmit, onReject }) {
 
   const avatarUrl = formatAvatarUrl(current.avatar)
   const showImg = Boolean(avatarUrl && !imgError)
-
-  const getAvatarGradient = (name = '') => {
-    const gradients = [
-      'bg-[#1a73e8]',
-      'bg-[#1e8e3e]',
-      'bg-[#9334e6]',
-      'bg-[#007b83]',
-      'bg-[#e37400]',
-      'bg-[#d93025]',
-      'bg-[#d01884]',
-      'bg-[#3949ab]',
-    ]
-    let hash = 0
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-    return gradients[Math.abs(hash) % gradients.length]
-  }
 
   return (
     <div className="fixed top-16 right-4 sm:right-6 z-50 animate-in slide-in-from-top-3 fade-in duration-200">

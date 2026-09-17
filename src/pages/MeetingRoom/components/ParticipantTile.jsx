@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   MicOff01Icon,
   HandIcon,
@@ -9,6 +9,7 @@ import {
   ArrowExpandDiagonal01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { getAvatarGradient, formatAvatarUrl } from '../utils/meetingCode'
 
 export default function ParticipantTile({
   participant,
@@ -30,6 +31,12 @@ export default function ParticipantTile({
   onToggleFullScreenFocus = null,
 }) {
   const videoRef = useRef(null)
+  const [imgError, setImgError] = useState(false)
+  const formattedAvatar = formatAvatarUrl(avatar)
+
+  useEffect(() => {
+    setImgError(false)
+  }, [formattedAvatar])
 
   // Attach video track to <video> element
   useEffect(() => {
@@ -59,22 +66,6 @@ export default function ParticipantTile({
   const initials = displayName
     ? displayName.trim().split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
     : 'U'
-
-  const getAvatarGradient = (name = '') => {
-    const gradients = [
-      'bg-[#1a73e8]',
-      'bg-[#1e8e3e]',
-      'bg-[#9334e6]',
-      'bg-[#007b83]',
-      'bg-[#e37400]',
-      'bg-[#d93025]',
-      'bg-[#d01884]',
-      'bg-[#3949ab]',
-    ]
-    let hash = 0
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-    return gradients[Math.abs(hash) % gradients.length]
-  }
 
   return (
     <div
@@ -133,12 +124,12 @@ export default function ParticipantTile({
               ${isSpeaking ? 'ring-4 ring-[#5B7BF0]/60 scale-105' : 'ring-2 ring-white/20'}
               w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 ${getAvatarGradient(displayName)} text-white`}
           >
-            {avatar ? (
+            {formattedAvatar && !imgError ? (
               <img
-                src={avatar}
+                src={formattedAvatar}
                 alt={displayName}
                 className="w-full h-full rounded-full object-cover"
-                onError={(e) => { e.target.style.display = 'none' }}
+                onError={() => setImgError(true)}
               />
             ) : (
               <span className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider">{initials}</span>

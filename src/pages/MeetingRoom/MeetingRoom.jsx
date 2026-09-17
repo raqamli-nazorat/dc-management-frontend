@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { flushSync, createPortal } from 'react-dom'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Room, RoomEvent, VideoPresets, Track, ConnectionQuality, setLogLevel, LogLevel } from 'livekit-client'
 import { useAuth } from '../../context/AuthContext'
 import { axiosAPI } from '../../service/axiosAPI'
@@ -9,7 +9,7 @@ import { toast } from '../../Toast/ToastProvider'
 // LiveKit ichki statistika va track loglarini to'liq o'chirish (Silent mode)
 try {
   setLogLevel(LogLevel?.silent ?? 'silent')
-} catch {}
+} catch { }
 
 import ParticipantTile from './components/ParticipantTile'
 import ControlBar from './components/ControlBar'
@@ -26,7 +26,7 @@ import {
   playKnockRequestSound,
   playHandRaisedSound,
 } from './utils/meetingSounds'
-import { getMeetingCode, parseMeetingId, getFullMeetingUrl } from './utils/meetingCode'
+import { getMeetingCode, parseMeetingId, getFullMeetingUrl, formatAvatarUrl, getAvatarGradient } from './utils/meetingCode'
 import {
   UserGroupIcon,
   InformationCircleIcon,
@@ -124,7 +124,7 @@ function RemoteAudioPlayer({ audioTrack, isMicEnabled }) {
       return () => {
         try {
           audioTrack.detach(el)
-        } catch (e) {}
+        } catch (e) { }
         if (el) {
           el.srcObject = null
         }
@@ -132,7 +132,7 @@ function RemoteAudioPlayer({ audioTrack, isMicEnabled }) {
     } else {
       try {
         audioTrack.detach(el)
-      } catch (e) {}
+      } catch (e) { }
       if (el) {
         el.srcObject = null
       }
@@ -235,39 +235,6 @@ const isParticipantInRoom = (req, remotes) => {
   })
 }
 
-const formatAvatarUrl = (url) => {
-  if (!url || typeof url !== 'string') return ''
-  const trimmed = url.trim()
-  if (!trimmed) return ''
-  if (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('blob:') ||
-    trimmed.startsWith('data:')
-  ) {
-    return trimmed
-  }
-  const rawBase = import.meta.env.VITE_BASE_URL || ''
-  const cleanBase = rawBase.replace(/\/+$/, '')
-  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
-  return cleanBase ? `${cleanBase}${cleanPath}` : cleanPath
-}
-
-const getAvatarGradient = (name = '') => {
-  const gradients = [
-    'bg-[#1a73e8]',
-    'bg-[#1e8e3e]',
-    'bg-[#9334e6]',
-    'bg-[#007b83]',
-    'bg-[#e37400]',
-    'bg-[#d93025]',
-    'bg-[#d01884]',
-    'bg-[#3949ab]',
-  ]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return gradients[Math.abs(hash) % gradients.length]
-}
 
 const isUserMatch = (u, identity, pNameLower) => {
   if (!u) return false
@@ -324,6 +291,7 @@ const formatMeetingDuration = (totalSeconds) => {
 export default function MeetingRoom() {
   const { id: rawParamId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
 
   // Meeting & State Machine
@@ -335,9 +303,85 @@ export default function MeetingRoom() {
   const [directoryUsers, setDirectoryUsers] = useState([])
   const [peerProfiles, setPeerProfiles] = useState({})
 
+  // Numeric meeting id: priority = navigate state > sessionStorage / localStorage > parsed from URL param
   const [numericMeetingId, setNumericMeetingId] = useState(() => {
+    // 1. React Router navigate state (same-tab navigation)
+    const stateId = location.state?.meetingId
+    if (stateId) {
+      if (rawParamId) {
+        try {
+          sessionStorage.setItem(`meeting_id_${rawParamId}`, String(stateId))
+          sessionStorage.setItem(`meeting_id_${String(rawParamId).toLowerCase()}`, String(stateId))
+          localStorage.setItem(`meeting_id_${rawParamId}`, String(stateId))
+          localStorage.setItem(`meeting_id_${String(rawParamId).toLowerCase()}`, String(stateId))
+        } catch {}
+      }
+      return String(stateId)
+    }
+    // 2. sessionStorage / localStorage
+    if (rawParamId) {
+      const keyExact = `meeting_id_${rawParamId}`
+      const keyLower = `meeting_id_${String(rawParamId).toLowerCase()}`
+      const stored = sessionStorage.getItem(keyExact) || sessionStorage.getItem(keyLower) || localStorage.getItem(keyExact) || localStorage.getItem(keyLower)
+      if (stored) {
+        return stored
+      }
+    }
+    // 3. Fallback: parse numeric id from URL param
     return parseMeetingId(rawParamId)
   })
+
+  useEffect(() => {
+    if (location.state?.meetingId) {
+      const sId = String(location.state.meetingId)
+      setNumericMeetingId(sId)
+      if (rawParamId) {
+        try {
+          sessionStorage.setItem(`meeting_id_${rawParamId}`, sId)
+          sessionStorage.setItem(`meeting_id_${String(rawParamId).toLowerCase()}`, sId)
+          localStorage.setItem(`meeting_id_${rawParamId}`, sId)
+          localStorage.setItem(`meeting_id_${String(rawParamId).toLowerCase()}`, sId)
+        } catch {}
+      }
+    }
+  }, [location.state?.meetingId, rawParamId])
+
+  useEffect(() => {
+    let wakeLock = null;
+
+    // Wake Lock-ni faollashtirish funksiyasi
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {
+        console.error(`Wake Lock xatosi: ${err.name}, ${err.message}`);
+      }
+    };
+
+    requestWakeLock();
+
+    // Vkladka/oyna qayta faollashganda (visibilitychange) Wake Lock-ni qayta tiklash
+    const handleVisibilityChange = () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Sahifadan chiqib ketganda Wake Lock-ni tozalash va o'chirish
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+          wakeLock = null;
+        });
+      }
+    };
+  }, []);
+
   const meetingId = numericMeetingId || parseMeetingId(rawParamId) || (meetingDetails?.id ? String(meetingDetails.id) : null)
   const [waitingState, setWaitingState] = useState('lobby') // 'lobby' | 'connecting' | 'waiting_organizer' | 'waiting_approval' | 'rejected' | 'in_room' | 'ended'
   const hasClickedJoinRef = useRef(false)
@@ -473,18 +517,19 @@ export default function MeetingRoom() {
     }, 4000)
   }, [])
 
-  // Auto-sync address bar to /meetings/<id>
+  // Auto-sync address bar to /meetings/<uid-lowercase> (fallback to numeric id)
   useEffect(() => {
-    const code = getMeetingCode(meetingId)
+    const uid = meetingDetails?.uid
+    const code = getMeetingCode(meetingId, uid)
     if (!code) return
     const targetPath = `/meetings/${code}`
     if (typeof window !== 'undefined' && decodeURIComponent(window.location.pathname) !== targetPath && window.location.pathname !== targetPath) {
       window.history.replaceState(null, '', targetPath)
     }
-  }, [meetingId])
+  }, [meetingId, meetingDetails])
 
-  const currentMeetingCode = getMeetingCode(meetingId)
-  const currentMeetingUrl = getFullMeetingUrl(meetingId)
+  const currentMeetingCode = getMeetingCode(meetingId, meetingDetails?.uid)
+  const currentMeetingUrl = getFullMeetingUrl(meetingId, meetingDetails?.uid)
 
   const handleCopyMeetingLink = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -492,7 +537,7 @@ export default function MeetingRoom() {
         setCopiedHeaderLink(true)
         toast.success('Nusxa olindi', 'Yig\'ilish havolasi nusxalandi')
         setTimeout(() => setCopiedHeaderLink(false), 2000)
-      }).catch(() => {})
+      }).catch(() => { })
     }
   }
 
@@ -547,8 +592,8 @@ export default function MeetingRoom() {
     if (roomRef.current) {
       try {
         roomRef.current.removeAllListeners()
-      } catch {}
-      roomRef.current.disconnect().catch(() => {})
+      } catch { }
+      roomRef.current.disconnect().catch(() => { })
       roomRef.current = null
       setIsConnectedToLiveKit(false)
     }
@@ -591,7 +636,7 @@ export default function MeetingRoom() {
           try {
             t.stop()
             t.enabled = false
-          } catch (e) {}
+          } catch (e) { }
         })
       }
       if (previewStreamRef.current) {
@@ -599,7 +644,7 @@ export default function MeetingRoom() {
           try {
             t.stop()
             t.enabled = false
-          } catch (e) {}
+          } catch (e) { }
         })
       }
       const remainingAudioTracks = stream ? stream.getAudioTracks() : []
@@ -647,7 +692,7 @@ export default function MeetingRoom() {
           try {
             t.stop()
             t.enabled = false
-          } catch (e) {}
+          } catch (e) { }
         })
       }
       if (previewStreamRef.current) {
@@ -655,7 +700,7 @@ export default function MeetingRoom() {
           try {
             t.stop()
             t.enabled = false
-          } catch (e) {}
+          } catch (e) { }
         })
       }
       const remainingVideoTracks = stream ? stream.getVideoTracks() : []
@@ -695,12 +740,12 @@ export default function MeetingRoom() {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
-  // Load meeting metadata from REST API by extracting numeric ID from URL
+  // Load meeting metadata from REST API using numeric ID (from navigate state, storage, or lookup)
   useEffect(() => {
-    // URL dan (masalan "12-54sa-asq4" dan) id ni ("12") kesib olamiz
-    const extractedId = parseMeetingId(rawParamId) || meetingId
-    const queryTarget = extractedId || rawParamId
-    if (!queryTarget) return
+    const rawTarget = rawParamId ? String(rawParamId).trim() : ''
+    const idToFetch = location.state?.meetingId
+      ? String(location.state.meetingId)
+      : (numericMeetingId || parseMeetingId(rawTarget) || (rawTarget && (sessionStorage.getItem(`meeting_id_${rawTarget}`) || localStorage.getItem(`meeting_id_${rawTarget}`) || sessionStorage.getItem(`meeting_id_${rawTarget.toLowerCase()}`) || localStorage.getItem(`meeting_id_${rawTarget.toLowerCase()}`))))
 
     let isSubscribed = true
 
@@ -708,6 +753,14 @@ export default function MeetingRoom() {
       if (!isSubscribed || !d || !d.id) return
       setMeetingDetails(d)
       setNumericMeetingId(String(d.id))
+      if (rawTarget) {
+        try {
+          sessionStorage.setItem(`meeting_id_${rawTarget}`, String(d.id))
+          sessionStorage.setItem(`meeting_id_${rawTarget.toLowerCase()}`, String(d.id))
+          localStorage.setItem(`meeting_id_${rawTarget}`, String(d.id))
+          localStorage.setItem(`meeting_id_${rawTarget.toLowerCase()}`, String(d.id))
+        } catch {}
+      }
       if (d.is_active === false || d.status === 'completed' || d.status === 'closed' || d.is_closed === true) {
         setWaitingState('ended')
         setEndedReason("Yig'ilish tashkilotchi tomonidan yakunlangan.")
@@ -715,10 +768,10 @@ export default function MeetingRoom() {
     }
 
     const fetchMeeting = async () => {
-      // 1. URL dan kesib olingan ID orqali to'g'ridan-to'g'ri /meetings/<extractedId>/ ga GET so'rov yuboramiz
-      if (extractedId && /^\d+$/.test(String(extractedId))) {
+      // 1. Agar numeric ID mavjud bo'lsa (navigate state, storage yoki numeric param), to'g'ridan-to'g'ri /meetings/<id>/ ga so'rov qilamiz
+      if (idToFetch && /^\d+$/.test(String(idToFetch))) {
         try {
-          const res = await axiosAPI.get(`/meetings/${extractedId}/`)
+          const res = await axiosAPI.get(`/meetings/${idToFetch}/`)
           const d = res.data?.data ?? res.data
           if (d && d.id) {
             applyMeetingData(d)
@@ -729,30 +782,24 @@ export default function MeetingRoom() {
         }
       }
 
-      // 2. Agar ID orqali olinmasa yoki URL da faqat UID bo'lsa, to'g'ridan-to'g'ri yoki /meetings/?search= orqali qidiramiz
-      try {
-        const res = await axiosAPI.get(`/meetings/${encodeURIComponent(queryTarget)}/`)
-        const d = res.data?.data ?? res.data
-        if (d && d.id) {
-          applyMeetingData(d)
-          return
-        }
-      } catch (err) {
-        // Fallback search
-      }
-
-      try {
-        const searchTerm = rawParamId || queryTarget
-        const res = await axiosAPI.get('/meetings/', { params: { search: searchTerm } })
-        const results = res.data?.data?.results ?? res.data?.results ?? res.data
-        if (Array.isArray(results) && results.length > 0) {
-          const match = results.find(m => String(m.uid).trim() === String(searchTerm).trim() || String(m.id) === String(extractedId)) || results[0]
-          if (match && match.id) {
-            applyMeetingData(match)
+      // 2. Agar sahifa to'g'ridan-to'g'ri URL orqali ochilgan bo'lsa va numeric ID topilmagan bo'lsa,
+      // qidiruv orqali ID ni aniqlab olamiz
+      if (rawTarget) {
+        try {
+          const res = await axiosAPI.get('/meetings/', { params: { search: rawTarget } })
+          const results = res.data?.data?.results ?? res.data?.results ?? res.data
+          if (Array.isArray(results) && results.length > 0) {
+            const match = results.find(m =>
+              String(m.uid || '').trim().toLowerCase() === rawTarget.toLowerCase() ||
+              String(m.id) === rawTarget
+            ) || results[0]
+            if (match && match.id) {
+              applyMeetingData(match)
+            }
           }
+        } catch (err) {
+          console.warn("Yig'ilishni qidirishda xato:", err)
         }
-      } catch (err) {
-        console.warn("Yig'ilishni qidirishda xato:", err)
       }
     }
 
@@ -761,7 +808,7 @@ export default function MeetingRoom() {
     return () => {
       isSubscribed = false
     }
-  }, [rawParamId, meetingId])
+  }, [rawParamId, numericMeetingId, location.state?.meetingId])
 
   // Load project details if meeting is associated with a project (for project manager detection)
   useEffect(() => {
@@ -782,7 +829,7 @@ export default function MeetingRoom() {
         const p = res.data?.data ?? res.data
         setProjectData(p)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [meetingDetails])
 
   // Send message over WebSocket helper
@@ -966,7 +1013,7 @@ export default function MeetingRoom() {
 
       ws.onopen = () => {
         if (!hasClickedJoinRef.current) {
-          try { ws.close() } catch {}
+          try { ws.close() } catch { }
           return
         }
       }
@@ -1095,7 +1142,7 @@ export default function MeetingRoom() {
         if (wsRef.current.readyState === WebSocket.OPEN) {
           wsRef.current.send(JSON.stringify({ action: 'cancel_join' }))
         }
-      } catch {}
+      } catch { }
       wsRef.current.close()
       wsRef.current = null
     }
@@ -1114,7 +1161,7 @@ export default function MeetingRoom() {
           setDirectoryUsers(list)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
     return () => { isSub = false }
   }, [])
 
@@ -1133,7 +1180,7 @@ export default function MeetingRoom() {
     }
     const encoder = new TextEncoder()
     const data = encoder.encode(JSON.stringify(myProfilePayload))
-    targetRoom.localParticipant.publishData(data, { reliable: true }).catch(() => {})
+    targetRoom.localParticipant.publishData(data, { reliable: true }).catch(() => { })
   }, [user, currentUserName])
 
   // Deduplication key finder for any participant
@@ -1166,7 +1213,7 @@ export default function MeetingRoom() {
         const parsed = typeof p.metadata === 'string' ? JSON.parse(p.metadata) : p.metadata
         if (parsed?.userId) return `user_${parsed.userId}`
         if (parsed?.username) return `user_${String(parsed.username).trim().toLowerCase()}`
-      } catch {}
+      } catch { }
     }
 
     // 4. Identity pattern (masalan: "4", "4_abc", "user_4", "4-device")
@@ -1316,7 +1363,7 @@ export default function MeetingRoom() {
           avatar: formatAvatarUrl(user.avatar) || user.avatar,
           name: currentUserName,
           userId: user.id
-        })).catch(() => {})
+        })).catch(() => { })
       }
 
       // Release preview stream from waiting room immediately so camera/mic are freed
@@ -1423,7 +1470,7 @@ export default function MeetingRoom() {
 
       // 3. Audio playback permission check
       if (room.canPlaybackAudio) {
-        room.startAudio().catch(() => {})
+        room.startAudio().catch(() => { })
       }
 
       setIsConnectedToLiveKit(true)
@@ -1486,7 +1533,7 @@ export default function MeetingRoom() {
               ...(parsed.userId ? { [String(parsed.userId)]: parsed } : {})
             }))
           }
-        } catch {}
+        } catch { }
       }
     })
 
@@ -1716,7 +1763,8 @@ export default function MeetingRoom() {
           playChatMessageSound()
           if (!isChatOpenRef.current) {
             setUnreadChatCount(c => c + 1)
-            triggerInRoomAlert('chat', `${decoded.sender}: ${decoded.text?.slice(0, 40)}${decoded.text?.length > 40 ? '...' : ''}`, 'chat')
+            const snippet = decoded.isSticker ? '🎨 Stiker yubordi' : `${decoded.text?.slice(0, 40) || ''}${decoded.text?.length > 40 ? '...' : ''}`
+            triggerInRoomAlert('chat', `${decoded.sender}: ${snippet}`, 'chat')
           }
         } else if (decoded.type === 'typing') {
           const senderKey = decoded.sender || (participant ? participant.identity : '')
@@ -1771,9 +1819,9 @@ export default function MeetingRoom() {
                 const micPub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
                 if (micPub?.track) {
                   micPub.track.mediaStreamTrack?.stop()
-                  room.localParticipant.unpublishTrack(micPub.track, true).catch(() => {})
+                  room.localParticipant.unpublishTrack(micPub.track, true).catch(() => { })
                 }
-                room.localParticipant.setMicrophoneEnabled(false).catch(() => {})
+                room.localParticipant.setMicrophoneEnabled(false).catch(() => { })
                 updateParticipantTrack(room.localParticipant.identity, { isMicEnabled: false })
               }
               setIsMicEnabled(false)
@@ -1793,9 +1841,9 @@ export default function MeetingRoom() {
                 const camPub = room.localParticipant.getTrackPublication(Track.Source.Camera)
                 if (camPub?.track) {
                   camPub.track.mediaStreamTrack?.stop()
-                  room.localParticipant.unpublishTrack(camPub.track, true).catch(() => {})
+                  room.localParticipant.unpublishTrack(camPub.track, true).catch(() => { })
                 }
-                room.localParticipant.setCameraEnabled(false).catch(() => {})
+                room.localParticipant.setCameraEnabled(false).catch(() => { })
                 updateParticipantTrack(room.localParticipant.identity, {
                   isCameraEnabled: false,
                   videoTrack: null
@@ -1915,14 +1963,14 @@ export default function MeetingRoom() {
       if (roomRef.current) {
         try {
           roomRef.current.removeAllListeners()
-        } catch {}
+        } catch { }
         // Barcha lokal oqimlarni hardware darajasida to'xtatamiz
         roomRef.current.localParticipant?.trackPublications?.forEach(pub => {
           if (pub.track?.mediaStreamTrack) {
             try {
               pub.track.mediaStreamTrack.stop()
               pub.track.stop()
-            } catch {}
+            } catch { }
           }
         })
         await roomRef.current.disconnect()
@@ -2109,7 +2157,7 @@ export default function MeetingRoom() {
         if (oldMediaStreamTrack) {
           try {
             oldMediaStreamTrack.stop()
-          } catch (e) {}
+          } catch (e) { }
         }
         if (currentTrack) {
           await roomRef.current.localParticipant.unpublishTrack(currentTrack, true)
@@ -2134,7 +2182,7 @@ export default function MeetingRoom() {
       console.error("Ekranni almashtirishda xatolik:", err)
       try {
         newMediaStreamTrack.stop()
-      } catch (e) {}
+      } catch (e) { }
     } finally {
       // 1 soniya kutib, so'ng flagni false qilamiz, shunda eski trackning qoldiq hodisalari xalaqit bermaydi
       setTimeout(() => {
@@ -2173,13 +2221,15 @@ export default function MeetingRoom() {
     }
   }
 
-  const handleSendMessage = async (text) => {
+  const handleSendMessage = async (text, sticker = null) => {
     const now = new Date()
     const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 
     const messageData = {
       type: 'chat',
-      text,
+      text: text || '',
+      sticker: sticker || null,
+      isSticker: !!sticker,
       sender: currentUserName,
       avatar: formatAvatarUrl(user?.avatar) || user?.avatar || '',
       time: formattedTime
@@ -2207,7 +2257,7 @@ export default function MeetingRoom() {
           isTyping
         }))
         await roomRef.current.localParticipant.publishData(payload, { reliable: true })
-      } catch {}
+      } catch { }
     }
   }, [currentUserName])
 
@@ -2389,9 +2439,9 @@ export default function MeetingRoom() {
   // Toggle fullscreen
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {})
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => { })
     } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {})
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => { })
     }
   }
 
@@ -2424,24 +2474,24 @@ export default function MeetingRoom() {
   remoteParticipants
     .filter(rp => rp.identity !== roomRef.current?.localParticipant?.identity)
     .forEach(rp => {
-    const rInfo = participantTracks[rp.identity] || {}
-    if (rInfo.screenShareTrack) {
-      allParticipantItems.push({
-        identity: `${rp.identity}-screen-${rInfo.screenShareTrack.sid || rInfo.screenShareTrack.id || 'remote'}`,
-        name: `${rp.name || rp.identity} (Ekran)`,
-        isLocal: false,
-        isScreenShare: true,
-        videoTrack: rInfo.screenShareTrack,
-        audioTrack: null,
-        isCameraEnabled: true,
-        isMicEnabled: false,
-        isSpeaking: false,
-        hasHandRaised: false,
-        isHost: false,
-        shareTime: screenShareTimesRef.current[rp.identity] || 0,
-      })
-    }
-  })
+      const rInfo = participantTracks[rp.identity] || {}
+      if (rInfo.screenShareTrack) {
+        allParticipantItems.push({
+          identity: `${rp.identity}-screen-${rInfo.screenShareTrack.sid || rInfo.screenShareTrack.id || 'remote'}`,
+          name: `${rp.name || rp.identity} (Ekran)`,
+          isLocal: false,
+          isScreenShare: true,
+          videoTrack: rInfo.screenShareTrack,
+          audioTrack: null,
+          isCameraEnabled: true,
+          isMicEnabled: false,
+          isSpeaking: false,
+          hasHandRaised: false,
+          isHost: false,
+          shareTime: screenShareTimesRef.current[rp.identity] || 0,
+        })
+      }
+    })
 
   const meetingOrganizerId = getMeetingOrganizerId(meetingDetails, meetingState)
   // Faqat va faqat yig'ilishni yaratgan foydalanuvchi (organizer) host bo'ladi.
@@ -2549,24 +2599,24 @@ export default function MeetingRoom() {
   remoteParticipants
     .filter(rp => rp.identity !== roomRef.current?.localParticipant?.identity)
     .forEach(rp => {
-    const rInfo = participantTracks[rp.identity] || {}
-    const rpIsHost = checkIsHost(rp, rp.identity, rp.name || rInfo.name)
-    const rpAvatar = formatAvatarUrl(resolveParticipantAvatar(rp, rInfo))
-    allParticipantItems.push({
-      identity: rp.identity,
-      name: rp.name || rp.identity,
-      avatar: rpAvatar,
-      isLocal: false,
-      isScreenShare: false,
-      isHost: rpIsHost,
-      isSpeaking: activeSpeakers.includes(rp.identity),
-      hasHandRaised: !!handRaisedMap[rp.identity],
-      isCameraEnabled: rInfo.isCameraEnabled ?? rp.isCameraEnabled,
-      isMicEnabled: rInfo.isMicEnabled ?? rp.isMicrophoneEnabled,
-      videoTrack: rInfo.videoTrack,
-      audioTrack: rInfo.audioTrack,
+      const rInfo = participantTracks[rp.identity] || {}
+      const rpIsHost = checkIsHost(rp, rp.identity, rp.name || rInfo.name)
+      const rpAvatar = formatAvatarUrl(resolveParticipantAvatar(rp, rInfo))
+      allParticipantItems.push({
+        identity: rp.identity,
+        name: rp.name || rp.identity,
+        avatar: rpAvatar,
+        isLocal: false,
+        isScreenShare: false,
+        isHost: rpIsHost,
+        isSpeaking: activeSpeakers.includes(rp.identity),
+        hasHandRaised: !!handRaisedMap[rp.identity],
+        isCameraEnabled: rInfo.isCameraEnabled ?? rp.isCameraEnabled,
+        isMicEnabled: rInfo.isMicEnabled ?? rp.isMicrophoneEnabled,
+        videoTrack: rInfo.videoTrack,
+        audioTrack: rInfo.audioTrack,
+      })
     })
-  })
 
   const screenShareItems = allParticipantItems.filter(p => p.isScreenShare)
   const rawCameraItems = allParticipantItems.filter(p => !p.isScreenShare)
@@ -2667,9 +2717,9 @@ export default function MeetingRoom() {
         const docEl = document.documentElement
         const requestFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen
         if (requestFs) {
-          requestFs.call(docEl).catch(() => {})
+          requestFs.call(docEl).catch(() => { })
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   }, [waitingState])
 
@@ -2826,7 +2876,7 @@ export default function MeetingRoom() {
       <div className="fixed inset-0 w-full h-full bg-[#F8FAFC] dark:bg-[#0B0D11] text-slate-900 dark:text-white flex flex-col items-center justify-center p-4 select-none z-50 transition-colors animate-in fade-in duration-300">
         <div className="text-center max-w-lg w-full my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-            {isMeetingEnded ? "Yig'ilish yakunlandi" : "Siz uchrashuvdan chiqdingiz"}
+            {isMeetingEnded ? "Yig'ilish yakunlandi" : "Siz yig'ilishdan chiqdingiz"}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 mb-7 text-center">
             {isMeetingEnded
@@ -2871,7 +2921,7 @@ export default function MeetingRoom() {
     <div
       onClick={() => {
         if (roomRef.current && !roomRef.current.canPlaybackAudio) {
-          roomRef.current.startAudio().catch(() => {})
+          roomRef.current.startAudio().catch(() => { })
         }
       }}
       className={`fixed inset-0 w-full h-full ${isScreenFocused ? 'bg-black' : 'bg-white dark:bg-[#16191F]'} text-slate-900 dark:text-white overflow-hidden flex flex-col select-none z-50 transition-colors`}
@@ -2921,23 +2971,22 @@ export default function MeetingRoom() {
       {/* In-Room Dynamic Alert Banner with smooth slide/fade animations */}
       {inRoomAlert && inRoomAlert.type !== 'hand' && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl backdrop-blur-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 ${
-            inRoomAlert.type === 'hand'
+          <div className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl backdrop-blur-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 ${inRoomAlert.type === 'hand'
               ? 'bg-amber-950/90 border-amber-500/50 text-amber-200 shadow-amber-500/20'
               : inRoomAlert.type === 'join'
-              ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200 shadow-emerald-500/20'
-              : inRoomAlert.type === 'screen'
-              ? 'bg-blue-950/90 border-blue-500/50 text-blue-200 shadow-blue-500/20'
-              : inRoomAlert.type === 'screen_stop'
-              ? 'bg-slate-900/95 border-slate-700 text-slate-200 shadow-black/50'
-              : inRoomAlert.type === 'knock'
-              ? 'bg-orange-950/90 border-orange-500/50 text-orange-200 shadow-orange-500/20'
-              : inRoomAlert.type === 'chat'
-              ? 'bg-purple-950/90 border-purple-500/50 text-purple-200 shadow-purple-500/20'
-              : inRoomAlert.type === 'mute'
-              ? 'bg-red-950/90 border-red-500/50 text-red-200 shadow-red-500/20'
-              : 'bg-[#1C1F26]/95 border-white/15 text-white shadow-black/50'
-          }`}>
+                ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200 shadow-emerald-500/20'
+                : inRoomAlert.type === 'screen'
+                  ? 'bg-blue-950/90 border-blue-500/50 text-blue-200 shadow-blue-500/20'
+                  : inRoomAlert.type === 'screen_stop'
+                    ? 'bg-slate-900/95 border-slate-700 text-slate-200 shadow-black/50'
+                    : inRoomAlert.type === 'knock'
+                      ? 'bg-orange-950/90 border-orange-500/50 text-orange-200 shadow-orange-500/20'
+                      : inRoomAlert.type === 'chat'
+                        ? 'bg-purple-950/90 border-purple-500/50 text-purple-200 shadow-purple-500/20'
+                        : inRoomAlert.type === 'mute'
+                          ? 'bg-red-950/90 border-red-500/50 text-red-200 shadow-red-500/20'
+                          : 'bg-[#1C1F26]/95 border-white/15 text-white shadow-black/50'
+            }`}>
             <span className="flex items-center justify-center shrink-0">
               {renderAlertIcon(inRoomAlert.icon, inRoomAlert.type)}
             </span>
@@ -3020,65 +3069,60 @@ export default function MeetingRoom() {
                 })
               }}
               title="Yig'ilish tafsilotlari"
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                isDetailsOpen
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${isDetailsOpen
                   ? 'text-blue-600 dark:text-blue-400 scale-110'
                   : 'text-slate-400 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
-              }`}
+                }`}
             >
               <HugeiconsIcon icon={InformationCircleIcon} size={18} strokeWidth={2} />
             </button>
 
             {/* Network Quality Indicator (specifically kept as requested with Barqaror / Past) */}
             <div
-              className={`flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-medium transition-all select-none shadow-2xs ${
-                networkStatus === 'reconnecting' || networkStatus === 'offline'
+              className={`flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-medium transition-all select-none shadow-2xs ${networkStatus === 'reconnecting' || networkStatus === 'offline'
                   ? 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400'
                   : networkStatus === 'poor'
-                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400'
-                  : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400'
-              }`}
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400'
+                    : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400'
+                }`}
               title={
                 networkStatus === 'offline'
                   ? "Internet aloqasi: Uzildi (Tarmoq mavjud emas)"
                   : networkStatus === 'reconnecting'
-                  ? "Internet aloqasi: Qayta ulanmoqda..."
-                  : networkStatus === 'poor'
-                  ? "Internet aloqasi: Past (Zaif aloqa)"
-                  : "Internet aloqasi: Barqaror (A'lo darajada)"
+                    ? "Internet aloqasi: Qayta ulanmoqda..."
+                    : networkStatus === 'poor'
+                      ? "Internet aloqasi: Past (Zaif aloqa)"
+                      : "Internet aloqasi: Barqaror (A'lo darajada)"
               }
             >
               {/* Mini signal strength bars */}
               <div className="flex items-end gap-[2px] h-3">
-                <span className={`w-[3px] rounded-full transition-colors ${
-                  networkStatus === 'reconnecting' || networkStatus === 'offline'
+                <span className={`w-[3px] rounded-full transition-colors ${networkStatus === 'reconnecting' || networkStatus === 'offline'
                     ? 'h-1.5 bg-red-500 animate-pulse'
                     : networkStatus === 'poor'
-                    ? 'h-1.5 bg-amber-500'
-                    : 'h-1.5 bg-emerald-500'
-                }`} />
-                <span className={`w-[3px] rounded-full transition-colors ${
-                  networkStatus === 'reconnecting' || networkStatus === 'offline'
+                      ? 'h-1.5 bg-amber-500'
+                      : 'h-1.5 bg-emerald-500'
+                  }`} />
+                <span className={`w-[3px] rounded-full transition-colors ${networkStatus === 'reconnecting' || networkStatus === 'offline'
                     ? 'h-2 bg-slate-300 dark:bg-slate-700'
                     : networkStatus === 'poor'
-                    ? 'h-2 bg-amber-500'
-                    : 'h-2 bg-emerald-500'
-                }`} />
-                <span className={`w-[3px] rounded-full transition-colors ${
-                  networkStatus === 'online'
+                      ? 'h-2 bg-amber-500'
+                      : 'h-2 bg-emerald-500'
+                  }`} />
+                <span className={`w-[3px] rounded-full transition-colors ${networkStatus === 'online'
                     ? 'h-3 bg-emerald-500'
                     : 'h-3 bg-slate-300 dark:bg-slate-700'
-                }`} />
+                  }`} />
               </div>
 
               <span className="text-[11px] font-semibold tracking-tight">
                 {networkStatus === 'offline'
                   ? 'Uzildi'
                   : networkStatus === 'reconnecting'
-                  ? 'Ulanmoqda'
-                  : networkStatus === 'poor'
-                  ? 'Past'
-                  : 'Barqaror'}
+                    ? 'Ulanmoqda'
+                    : networkStatus === 'poor'
+                      ? 'Past'
+                      : 'Barqaror'}
               </span>
             </div>
           </div>
@@ -3138,11 +3182,10 @@ export default function MeetingRoom() {
               {/* Main Stage (Pinned Item OR Latest Shared Screen) */}
               <div
                 style={{ viewTransitionName: getViewTransitionName(mainStageItem.identity) }}
-                className={`flex-1 h-full min-h-0 min-w-0 flex items-center justify-center relative overflow-hidden transition-all duration-300 ${
-                  isScreenFocused
+                className={`flex-1 h-full min-h-0 min-w-0 flex items-center justify-center relative overflow-hidden transition-all duration-300 ${isScreenFocused
                     ? 'rounded-none bg-black border-0 shadow-none p-0'
                     : 'rounded-2xl sm:rounded-3xl bg-transparent border-0 shadow-xl'
-                }`}
+                  }`}
               >
                 <div className="w-full h-full flex items-center justify-center">
                   <ParticipantTile
@@ -3517,7 +3560,7 @@ export default function MeetingRoom() {
         const cleanSender = (unmuteRequest.sender || '').trim().toLowerCase()
         const senderProfile = peerProfiles[cleanSender] ||
           Object.values(peerProfiles).find(p => (p.name && p.name.trim().toLowerCase() === cleanSender) || (p.username && p.username.trim().toLowerCase() === cleanSender)) || {}
-        const avatarUrl = unmuteRequest.senderAvatar || senderProfile?.avatar || null
+        const avatarUrl = formatAvatarUrl(unmuteRequest.senderAvatar || senderProfile?.avatar) || null
         const senderInitials = unmuteRequest.sender
           ? unmuteRequest.sender.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
           : 'T'
@@ -3539,10 +3582,9 @@ export default function MeetingRoom() {
               <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#F8FAFC] dark:bg-white/5 border border-slate-100/80 dark:border-white/5 w-full">
                 <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-white text-sm shadow-xs ${getAvatarGradient(unmuteRequest.sender)}`}>
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.target.style.display = 'none' }} />
-                  ) : (
-                    <span>{senderInitials}</span>
-                  )}
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'inline' }} />
+                  ) : null}
+                  <span style={{ display: avatarUrl ? 'none' : 'inline' }}>{senderInitials}</span>
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
@@ -3572,7 +3614,7 @@ export default function MeetingRoom() {
                         senderIdentity: roomRef.current?.localParticipant?.identity
                       }))
                       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-                    } catch (e) {}
+                    } catch (e) { }
                     setUnmuteRequest(null)
                   }}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-[#F1F5F9] dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
@@ -3594,7 +3636,7 @@ export default function MeetingRoom() {
                         senderIdentity: roomRef.current?.localParticipant?.identity
                       }))
                       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-                    } catch (e) {}
+                    } catch (e) { }
                     setUnmuteRequest(null)
                   }}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-[#3B59BA] hover:bg-[#324DAE] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/25 transition-all active:scale-95"
@@ -3613,7 +3655,7 @@ export default function MeetingRoom() {
         const cleanSender = (turnOnCameraRequest.sender || '').trim().toLowerCase()
         const senderProfile = peerProfiles[cleanSender] ||
           Object.values(peerProfiles).find(p => (p.name && p.name.trim().toLowerCase() === cleanSender) || (p.username && p.username.trim().toLowerCase() === cleanSender)) || {}
-        const avatarUrl = turnOnCameraRequest.senderAvatar || senderProfile?.avatar || null
+        const avatarUrl = formatAvatarUrl(turnOnCameraRequest.senderAvatar || senderProfile?.avatar) || null
         const senderInitials = turnOnCameraRequest.sender
           ? turnOnCameraRequest.sender.trim().split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
           : 'T'
@@ -3635,10 +3677,9 @@ export default function MeetingRoom() {
               <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#F8FAFC] dark:bg-white/5 border border-slate-100/80 dark:border-white/5 w-full">
                 <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-white text-sm shadow-xs ${getAvatarGradient(turnOnCameraRequest.sender)}`}>
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.target.style.display = 'none' }} />
-                  ) : (
-                    <span>{senderInitials}</span>
-                  )}
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover rounded-full" onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'inline' }} />
+                  ) : null}
+                  <span style={{ display: avatarUrl ? 'none' : 'inline' }}>{senderInitials}</span>
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
@@ -3668,7 +3709,7 @@ export default function MeetingRoom() {
                         senderIdentity: roomRef.current?.localParticipant?.identity
                       }))
                       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-                    } catch (e) {}
+                    } catch (e) { }
                     setTurnOnCameraRequest(null)
                   }}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-[#F1F5F9] dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
@@ -3690,7 +3731,7 @@ export default function MeetingRoom() {
                         senderIdentity: roomRef.current?.localParticipant?.identity
                       }))
                       await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
-                    } catch (e) {}
+                    } catch (e) { }
                     setTurnOnCameraRequest(null)
                   }}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-[#3B59BA] hover:bg-[#324DAE] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/25 transition-all active:scale-95"
