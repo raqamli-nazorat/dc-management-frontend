@@ -514,9 +514,6 @@ export default function AuditLogPage() {
 
       {/* Sticky header */}
       <div className="shrink-0 pb-3">
-        <h1 className="text-2xl font-bold text-[var(--text-strong)] dark:text-[var(--text-strong)] mb-3">
-          Umumiy tarix
-        </h1>
         <div className="flex items-center gap-2">
           {/* Search */}
           <div className="relative">
