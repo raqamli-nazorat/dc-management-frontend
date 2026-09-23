@@ -19,6 +19,7 @@ import MeetingDetailsDrawer from './components/MeetingDetailsDrawer'
 import WaitingRoom from './components/WaitingRoom'
 import KnockBanner from './components/KnockBanner'
 import LiveReactionsOverlay from './components/LiveReactionsOverlay'
+import { getAppleCodeFromChar } from './data/stickerData'
 import {
   playScreenShareStartSound,
   playScreenShareStopSound,
@@ -573,25 +574,14 @@ export default function MeetingRoom() {
     reactionTimeoutsRef.current[reactionId] = tId
   }, [])
 
-  const handleSendReaction = useCallback(async (item) => {
+  const handleSendReaction = useCallback((item) => {
     if (!item) return
-    triggerReaction(item.char, item.code, currentUserName)
-
-    if (roomRef.current?.localParticipant) {
-      try {
-        const data = {
-          type: 'reaction',
-          emoji: item.char,
-          emojiCode: item.code,
-          sender: currentUserName,
-        }
-        const payload = new TextEncoder().encode(JSON.stringify(data))
-        await roomRef.current.localParticipant.publishData(payload, { reliable: false })
-      } catch (err) {
-        console.warn("Reaction yuborishda xatolik:", err)
-      }
-    }
-  }, [currentUserName, triggerReaction])
+    // Faqat WebSocket orqali yuboriladi (meetings.md 7-bo'lim)
+    sendWs({
+      action: 'send_reaction',
+      reaction: item.char
+    })
+  }, [])
 
   // 1. Initial Local Camera / Mic Preview Cleanup for Waiting Room
   useEffect(() => {
@@ -892,10 +882,37 @@ export default function MeetingRoom() {
       case 'meeting_state': {
         setMeetingState(msg)
 
+        // Sync initial raised hands if provided by backend (meetings.md section 4)
+        if (Array.isArray(msg.raised_hands) && msg.raised_hands.length > 0) {
+          setHandRaisedMap(prev => {
+            const next = { ...prev }
+            msg.raised_hands.forEach(h => {
+              if (h.user_id) {
+                next[h.user_id] = true
+                next[String(h.user_id)] = true
+              }
+              if (h.username) {
+                next[h.username] = true
+              }
+              if (String(h.user_id) === String(user?.id)) {
+                setIsHandRaised(true)
+              }
+            })
+            return next
+          })
+        }
+
         // Agar foydalanuvchi hali Lobby (tayyorgarlik) sahifasida bo'lsa va "Yig'ilishga kirish" tugmasini bosmagan bo'lsa,
         // avtomatik token yoki ask_to_join so'rovini yubormaymiz!
         if (!hasClickedJoinRef.current) {
           return
+        }
+
+        // Direct token provision in meeting_state (meetings.md section 4)
+        if (msg.token && msg.server_url && (msg.is_host || msg.is_approved || !msg.requires_approval)) {
+          setIsJoining(false)
+          connectToLiveKit(msg.server_url, msg.token)
+          break
         }
 
         if (msg.is_host) {
@@ -943,13 +960,14 @@ export default function MeetingRoom() {
         // Faqat qabul qilish huquqiga ega bo'lganlar (host, admin, superadmin, loyiha menejeri) ga signal beriladi
         if (canAdmitParticipantsRef.current) {
           playKnockRequestSound()
-          triggerInRoomAlert('bell', `${msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
+          triggerInRoomAlert('bell', `${msg.full_name || msg.username || 'Foydalanuvchi'} yig'ilishga kirishni so'ramoqda`, 'knock')
         }
         setKnockRequests(prev => {
           if (prev.some(k => k.user_id === msg.user_id)) return prev
           return [...prev, {
             user_id: msg.user_id,
             username: msg.username,
+            full_name: msg.full_name,
             avatar: msg.avatar
           }]
         })
@@ -998,12 +1016,106 @@ export default function MeetingRoom() {
         break
       }
 
+      case 'hand_raise_updated': {
+        const isRaised = Boolean(msg.raised)
+        const isMe = String(msg.user_id) === String(user?.id)
+
+        setHandRaisedMap(prev => ({
+          ...prev,
+          [msg.user_id]: isRaised,
+          [String(msg.user_id)]: isRaised,
+          ...(msg.username ? { [msg.username]: isRaised } : {})
+        }))
+
+        if (isMe) {
+          setIsHandRaised(isRaised)
+        } else if (isRaised) {
+          playHandRaisedSound()
+          const raiserName = msg.full_name || msg.username || "Ishtirokchi"
+          triggerInRoomAlert('hand', `${raiserName} qo'l ko'tardi`, 'hand')
+        }
+        break
+      }
+
+      case 'reaction_received': {
+        if (msg.reaction) {
+          const emojiCode = getAppleCodeFromChar(msg.reaction)
+          triggerReaction(msg.reaction, emojiCode, msg.full_name || msg.username || "Ishtirokchi")
+        }
+        break
+      }
+
+      case 'track_moderation_changed': {
+        const isMe = String(msg.user_id) === String(user?.id) ||
+          (roomRef.current?.localParticipant && String(msg.target_identity) === String(roomRef.current.localParticipant.identity))
+
+        if (isMe) {
+          if (msg.track_source === 'microphone' && msg.muted) {
+            try {
+              roomRef.current?.localParticipant?.setMicrophoneEnabled(false)
+            } catch {}
+            setIsMicEnabled(false)
+            toast.info("Ovoz o'chirildi", "Tashkilotchi mikrofoningizni o'chirdi")
+            triggerInRoomAlert('mute', "Tashkilotchi mikrofoningizni o'chirdi", 'mute')
+          } else if (msg.track_source === 'camera' && msg.muted) {
+            try {
+              roomRef.current?.localParticipant?.setCameraEnabled(false)
+            } catch {}
+            setIsCameraEnabled(false)
+            toast.info("Kamera o'chirildi", "Tashkilotchi kamerangizni o'chirdi")
+          }
+        } else if (msg.target_identity) {
+          setParticipantTracks(prev => {
+            if (!prev[msg.target_identity]) return prev
+            return {
+              ...prev,
+              [msg.target_identity]: {
+                ...prev[msg.target_identity],
+                ...(msg.track_source === 'microphone' ? { isMicEnabled: !msg.muted } : {}),
+                ...(msg.track_source === 'camera' ? { isCameraEnabled: !msg.muted, ...(msg.muted ? { videoTrack: null } : {}) } : {}),
+              }
+            }
+          })
+        }
+        break
+      }
+
+      case 'track_unmute_requested': {
+        playKnockRequestSound()
+        const fromName = msg.from_name || "Tashkilotchi"
+
+        if (msg.track_source === 'microphone') {
+          setUnmuteRequest({
+            requestId: msg.request_id,
+            sender: fromName,
+            targetIdentity: msg.target_identity,
+            trackSource: 'microphone',
+            fromUserId: msg.from_user_id
+          })
+          triggerInRoomAlert('bell', `${fromName} mikrofoningizni yoqishingizni so'ramoqda`, 'bell')
+        } else if (msg.track_source === 'camera') {
+          setTurnOnCameraRequest({
+            requestId: msg.request_id,
+            sender: fromName,
+            targetIdentity: msg.target_identity,
+            trackSource: 'camera',
+            fromUserId: msg.from_user_id
+          })
+          triggerInRoomAlert('bell', `${fromName} kamerangizni yoqishingizni so'ramoqda`, 'bell')
+        }
+        break
+      }
+
       case 'meeting_ended': {
         clearStoredChatMessages(meetingId)
         setChatMessages([])
         setWaitingState('ended')
         setEndedReason(msg.message || "Yig'ilish tashkilotchi tomonidan yakunlandi.")
         leaveLiveKit()
+        if (wsRef.current) {
+          try { wsRef.current.close() } catch {}
+          wsRef.current = null
+        }
         break
       }
 
@@ -1021,7 +1133,7 @@ export default function MeetingRoom() {
       default:
         break
     }
-  }, [waitingState, meetingState])
+  }, [waitingState, meetingState, user, triggerReaction, triggerInRoomAlert])
 
   const handleWsMessageRef = useRef(null)
   handleWsMessageRef.current = handleWsMessage
@@ -1845,8 +1957,6 @@ export default function MeetingRoom() {
               })
             }
           }
-        } else if (decoded.type === 'reaction') {
-          triggerReaction(decoded.emoji, decoded.emojiCode, decoded.sender || 'Qatnashchi')
         } else if (decoded.type === 'raise_hand') {
           const pIdentity = participant ? participant.identity : decoded.userId
           setHandRaisedMap(prev => ({
@@ -2254,6 +2364,14 @@ export default function MeetingRoom() {
     if (next) {
       playHandRaisedSound()
     }
+
+    // 1. Send over WebSocket (meetings.md section 6)
+    sendWs({
+      action: 'hand_raise',
+      raised: next
+    })
+
+    // 2. Backup over LiveKit data channel
     if (roomRef.current?.localParticipant) {
       const data = {
         type: 'raise_hand',
@@ -2261,11 +2379,16 @@ export default function MeetingRoom() {
         sender: currentUserName,
         userId: roomRef.current.localParticipant.identity
       }
-      const payload = new TextEncoder().encode(JSON.stringify(data))
-      await roomRef.current.localParticipant.publishData(payload, { reliable: true })
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify(data))
+        await roomRef.current.localParticipant.publishData(payload, { reliable: true })
+      } catch {}
+
       setHandRaisedMap(prev => ({
         ...prev,
-        [roomRef.current.localParticipant.identity]: next
+        [roomRef.current.localParticipant.identity]: next,
+        [user?.id]: next,
+        [String(user?.id)]: next
       }))
     }
   }
@@ -2316,38 +2439,24 @@ export default function MeetingRoom() {
 
   // 5. Host Actions (Admit / Reject / End for all)
   const handleAdmitUser = async (userId) => {
-    // Send over WebSocket
+    // Send over WebSocket (meetings.md section 5)
     sendWs({
       action: 'admit',
       user_id: userId,
       decision: 'approve'
     })
 
-    // REST fallback
-    try {
-      await axiosAPI.post(`/meetings/${meetingId}/admit/`, {
-        user_id: userId,
-        decision: 'approve'
-      })
-    } catch { }
-
     setKnockRequests(prev => prev.filter(k => k.user_id !== userId))
     toast.success("Tasdiqlandi", "Foydalanuvchiga yig'ilishga kirishga ruxsat berildi")
   }
 
   const handleRejectUser = async (userId) => {
+    // Send over WebSocket (meetings.md section 5)
     sendWs({
       action: 'admit',
       user_id: userId,
       decision: 'reject'
     })
-
-    try {
-      await axiosAPI.post(`/meetings/${meetingId}/admit/`, {
-        user_id: userId,
-        decision: 'reject'
-      })
-    } catch { }
 
     setKnockRequests(prev => prev.filter(k => k.user_id !== userId))
     toast.error("Rad etildi", "Foydalanuvchining kirish so'rovi rad etildi")
@@ -2357,12 +2466,24 @@ export default function MeetingRoom() {
   const handleMuteParticipant = async (targetIdentity) => {
     if (!isLocalHost) return
     try {
-      const payload = new TextEncoder().encode(JSON.stringify({
-        type: 'mute_participant',
-        targetUserId: targetIdentity,
-        sender: currentUserName,
-      }))
-      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      // 1. Send over WebSocket (meetings.md section 8 A)
+      sendWs({
+        action: 'moderate_track',
+        target_identity: targetIdentity,
+        track_source: 'microphone',
+        operation: 'mute'
+      })
+
+      // 2. Backup over LiveKit data channel
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'mute_participant',
+          targetUserId: targetIdentity,
+          sender: currentUserName,
+        }))
+        await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      } catch {}
+
       toast.success("Ovoz o'chirildi", "Ishtirokchi mikrofoni o'chirildi")
       setParticipantTracks(prev => {
         if (!prev[targetIdentity]) return prev
@@ -2381,12 +2502,24 @@ export default function MeetingRoom() {
   const handleTurnOffCamera = async (targetIdentity) => {
     if (!isLocalHost) return
     try {
-      const payload = new TextEncoder().encode(JSON.stringify({
-        type: 'turn_off_camera',
-        targetUserId: targetIdentity,
-        sender: currentUserName,
-      }))
-      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      // 1. Send over WebSocket (meetings.md section 8 A)
+      sendWs({
+        action: 'moderate_track',
+        target_identity: targetIdentity,
+        track_source: 'camera',
+        operation: 'mute'
+      })
+
+      // 2. Backup over LiveKit data channel
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'turn_off_camera',
+          targetUserId: targetIdentity,
+          sender: currentUserName,
+        }))
+        await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      } catch {}
+
       toast.success("Kamera o'chirildi", "Ishtirokchi kamerasi o'chirildi")
       setParticipantTracks(prev => {
         if (!prev[targetIdentity]) return prev
@@ -2405,12 +2538,26 @@ export default function MeetingRoom() {
   const handleMuteAllParticipants = async () => {
     if (!isLocalHost) return
     try {
-      const payload = new TextEncoder().encode(JSON.stringify({
-        type: 'mute_participant',
-        targetUserId: 'ALL',
-        sender: currentUserName,
-      }))
-      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      // 1. Send moderation for all remote participants over WebSocket
+      remoteParticipants.forEach(rp => {
+        sendWs({
+          action: 'moderate_track',
+          target_identity: rp.identity,
+          track_source: 'microphone',
+          operation: 'mute'
+        })
+      })
+
+      // 2. Backup over LiveKit data channel
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'mute_participant',
+          targetUserId: 'ALL',
+          sender: currentUserName,
+        }))
+        await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      } catch {}
+
       toast.success("Barchasi o'chirildi", "Barcha ishtirokchilar mikrofoni o'chirildi")
       setParticipantTracks(prev => {
         const next = { ...prev }
@@ -2430,14 +2577,28 @@ export default function MeetingRoom() {
   const handleAskUnmuteParticipant = async (targetIdentity) => {
     if (!isLocalHost) return
     try {
-      const payload = new TextEncoder().encode(JSON.stringify({
-        type: 'ask_unmute',
-        targetUserId: targetIdentity,
-        sender: currentUserName,
-        senderAvatar: user?.avatar || null,
-      }))
-      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      const numericTargetId = parseInt(String(targetIdentity).split('_')[0], 10) || null
+      // 1. Send over WebSocket (meetings.md section 8 B)
+      sendWs({
+        action: 'request_track_unmute',
+        target_identity: targetIdentity,
+        target_user_id: numericTargetId,
+        track_source: 'microphone'
+      })
+
+      // 2. Backup over LiveKit data channel
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'ask_unmute',
+          targetUserId: targetIdentity,
+          sender: currentUserName,
+          senderAvatar: user?.avatar || null,
+        }))
+        await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      } catch {}
+
       setRequestedParticipantIds(prev => ({ ...prev, [targetIdentity]: { type: 'mic', timestamp: Date.now() } }))
+      toast.info("So'rov yuborildi", "Ishtirokchiga mikrofonni yoqish so'rovi yuborildi")
     } catch (err) {
       console.error("Ask to unmute yuborishda xato:", err)
       toast.error("Xatolik", "Mikrofonni yoqish so'rovini yuborishda muammo yuz berdi")
@@ -2448,14 +2609,28 @@ export default function MeetingRoom() {
   const handleAskTurnOnCamera = async (targetIdentity) => {
     if (!isLocalHost) return
     try {
-      const payload = new TextEncoder().encode(JSON.stringify({
-        type: 'ask_turn_on_camera',
-        targetUserId: targetIdentity,
-        sender: currentUserName,
-        senderAvatar: user?.avatar || null,
-      }))
-      await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      const numericTargetId = parseInt(String(targetIdentity).split('_')[0], 10) || null
+      // 1. Send over WebSocket (meetings.md section 8 B)
+      sendWs({
+        action: 'request_track_unmute',
+        target_identity: targetIdentity,
+        target_user_id: numericTargetId,
+        track_source: 'camera'
+      })
+
+      // 2. Backup over LiveKit data channel
+      try {
+        const payload = new TextEncoder().encode(JSON.stringify({
+          type: 'ask_turn_on_camera',
+          targetUserId: targetIdentity,
+          sender: currentUserName,
+          senderAvatar: user?.avatar || null,
+        }))
+        await roomRef.current?.localParticipant?.publishData(payload, { reliable: true })
+      } catch {}
+
       setRequestedParticipantIds(prev => ({ ...prev, [targetIdentity]: { type: 'camera', timestamp: Date.now() } }))
+      toast.info("So'rov yuborildi", "Ishtirokchiga kamerani yoqish so'rovi yuborildi")
     } catch (err) {
       console.error("Ask to turn on camera yuborishda xato:", err)
       toast.error("Xatolik", "Kamerani yoqish so'rovini yuborishda muammo yuz berdi")
@@ -3660,6 +3835,18 @@ export default function MeetingRoom() {
                   type="button"
                   onClick={async () => {
                     try {
+                      // 1. Send over WebSocket (meetings.md section 8 B)
+                      if (unmuteRequest?.requestId) {
+                        sendWs({
+                          action: 'respond_track_unmute_request',
+                          request_id: unmuteRequest.requestId,
+                          decision: 'reject',
+                          target_identity: unmuteRequest.targetIdentity || roomRef.current?.localParticipant?.identity,
+                          track_source: 'microphone'
+                        })
+                      }
+
+                      // 2. Backup over LiveKit data channel
                       const payload = new TextEncoder().encode(JSON.stringify({
                         type: 'ask_response',
                         action: 'declined',
@@ -3682,6 +3869,19 @@ export default function MeetingRoom() {
                       if (!isMicEnabled) {
                         await handleToggleMic()
                       }
+
+                      // 1. Send over WebSocket (meetings.md section 8 B)
+                      if (unmuteRequest?.requestId) {
+                        sendWs({
+                          action: 'respond_track_unmute_request',
+                          request_id: unmuteRequest.requestId,
+                          decision: 'accept',
+                          target_identity: unmuteRequest.targetIdentity || roomRef.current?.localParticipant?.identity,
+                          track_source: 'microphone'
+                        })
+                      }
+
+                      // 2. Backup over LiveKit data channel
                       const payload = new TextEncoder().encode(JSON.stringify({
                         type: 'ask_response',
                         action: 'accepted',
@@ -3755,6 +3955,18 @@ export default function MeetingRoom() {
                   type="button"
                   onClick={async () => {
                     try {
+                      // 1. Send over WebSocket (meetings.md section 8 B)
+                      if (turnOnCameraRequest?.requestId) {
+                        sendWs({
+                          action: 'respond_track_unmute_request',
+                          request_id: turnOnCameraRequest.requestId,
+                          decision: 'reject',
+                          target_identity: turnOnCameraRequest.targetIdentity || roomRef.current?.localParticipant?.identity,
+                          track_source: 'camera'
+                        })
+                      }
+
+                      // 2. Backup over LiveKit data channel
                       const payload = new TextEncoder().encode(JSON.stringify({
                         type: 'ask_response',
                         action: 'declined',
@@ -3777,6 +3989,19 @@ export default function MeetingRoom() {
                       if (!isCameraEnabled) {
                         await handleToggleCamera()
                       }
+
+                      // 1. Send over WebSocket (meetings.md section 8 B)
+                      if (turnOnCameraRequest?.requestId) {
+                        sendWs({
+                          action: 'respond_track_unmute_request',
+                          request_id: turnOnCameraRequest.requestId,
+                          decision: 'accept',
+                          target_identity: turnOnCameraRequest.targetIdentity || roomRef.current?.localParticipant?.identity,
+                          track_source: 'camera'
+                        })
+                      }
+
+                      // 2. Backup over LiveKit data channel
                       const payload = new TextEncoder().encode(JSON.stringify({
                         type: 'ask_response',
                         action: 'accepted',

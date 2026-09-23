@@ -5,6 +5,49 @@ export const getAppleEmojiUrl = (hex) => `${APPLE_CDN_BASE}${hex}.png`
 
 export const TG_ANIMATED_BASE = 'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/'
 
+const EMOJI_CHAR_TO_CODE = new Map()
+
+export const getAppleCodeFromChar = (char) => {
+  if (!char) return ''
+  if (EMOJI_CHAR_TO_CODE.size === 0) {
+    ALL_EMOJIS.forEach(item => {
+      if (item.char && item.code) {
+        EMOJI_CHAR_TO_CODE.set(item.char, item.code)
+        const clean = item.char.replace(/\uFE0F/g, '')
+        if (clean !== item.char) {
+          EMOJI_CHAR_TO_CODE.set(clean, item.code)
+        }
+      }
+    })
+  }
+
+  if (EMOJI_CHAR_TO_CODE.has(char)) return EMOJI_CHAR_TO_CODE.get(char)
+  const clean = char.replace(/\uFE0F/g, '')
+  if (EMOJI_CHAR_TO_CODE.has(clean)) return EMOJI_CHAR_TO_CODE.get(clean)
+
+  // Unicode codepoints fallback
+  const points = []
+  for (let i = 0; i < char.length; i++) {
+    const cp = char.codePointAt(i)
+    if (cp) {
+      if (cp > 0xffff) i++
+      if (cp !== 0xfe0f && cp !== 0xfe0e) {
+        points.push(cp.toString(16))
+      }
+    }
+  }
+  return points.join('-')
+}
+
+export const getAppleEmojiUrlFromChar = (charOrCode) => {
+  if (!charOrCode) return ''
+  if (/^[0-9a-fA-F-]+$/.test(charOrCode) && charOrCode.length >= 2 && !/\s/.test(charOrCode)) {
+    return getAppleEmojiUrl(charOrCode.toLowerCase())
+  }
+  const code = getAppleCodeFromChar(charOrCode)
+  return getAppleEmojiUrl(code)
+}
+
 // Map of hex codes to Telegram animated .webp files (real live moving emojis)
 export const TELEGRAM_ANIMATED_MAP = {
   '2705': `${TG_ANIMATED_BASE}Symbols/Check%20Mark%20Button.webp`,

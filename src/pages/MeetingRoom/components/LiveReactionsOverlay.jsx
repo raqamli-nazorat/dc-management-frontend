@@ -1,5 +1,5 @@
 import React from 'react'
-import { getAppleEmojiUrl } from '../data/stickerData'
+import { getAppleEmojiUrlFromChar } from '../data/stickerData'
 
 export default function LiveReactionsOverlay({ activeReactions = [] }) {
   if (!activeReactions || activeReactions.length === 0) return null
@@ -9,7 +9,7 @@ export default function LiveReactionsOverlay({ activeReactions = [] }) {
       {/* Floating Emojis Container at bottom-left */}
       <div className="absolute bottom-24 sm:bottom-28 left-8 sm:left-14 pointer-events-none">
         {activeReactions.map((reaction) => {
-          const emojiUrl = reaction.emojiCode ? getAppleEmojiUrl(reaction.emojiCode) : null
+          const emojiUrl = getAppleEmojiUrlFromChar(reaction.emojiCode || reaction.emoji)
           const dx = reaction.driftX || 25
           const altDx = -Math.round(dx * 0.7)
 
