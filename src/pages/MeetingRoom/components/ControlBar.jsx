@@ -27,9 +27,9 @@ import { getAppleEmojiUrl } from '../data/stickerData'
 const REACTION_ITEMS = [
   { char: '👍', code: '1f44d', name: 'Thumbs Up' },
   { char: '👏', code: '1f44f', name: 'Clapping' },
-  { char: '❤️', code: '2764-fe0f', name: 'Heart' },
+  { char: '🤝', code: '1f91d', name: 'Hand Shake' },
   { char: '🎉', code: '1f389', name: 'Party Popper' },
-  { char: '😊', code: '1f60a', name: 'Smile' },
+  { char: '😁', code: '1f601', name: 'Grinning' },
   { char: '😂', code: '1f602', name: 'Joy' },
   { char: '😮', code: '1f62e', name: 'Surprised' },
   { char: '🤔', code: '1f914', name: 'Thinking' },

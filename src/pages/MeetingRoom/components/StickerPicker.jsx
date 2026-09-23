@@ -87,10 +87,10 @@ export default function StickerPicker({
           {filteredEmojis.length > 0 ? (
             filteredEmojis.map((item) => (
               <button
-                key={item.code}
+                key={`${item.code}-${item.char}`}
                 type="button"
                 onClick={() => onSelectEmoji?.(item)}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center p-1 hover:bg-blue-50 dark:hover:bg-white/10 hover:scale-125 active:scale-95 cursor-pointer transition-all duration-150"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center p-1 hover:bg-blue-50 dark:hover:bg-white/10 hover:scale-125 active:scale-95 cursor-pointer transition-all duration-150 text-xl"
                 title={item.name}
               >
                 <img
@@ -98,7 +98,16 @@ export default function StickerPicker({
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-contain pointer-events-none drop-shadow-xs"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    if (e.currentTarget.nextElementSibling) {
+                      e.currentTarget.nextElementSibling.style.display = 'inline-block'
+                    }
+                  }}
                 />
+                <span style={{ display: 'none' }} className="select-none pointer-events-none text-xl leading-none">
+                  {item.char}
+                </span>
               </button>
             ))
           ) : (

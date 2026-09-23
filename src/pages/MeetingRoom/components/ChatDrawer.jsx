@@ -60,16 +60,23 @@ export const renderMessageContent = (text) => {
       }
       const code = getAppleCodeFromChar(seg)
       result.push(
-        <img
-          key={`emoji-${i}`}
-          src={getAppleEmojiUrl(code)}
-          alt={seg}
-          loading="lazy"
-          className="inline-block w-[1.3em] h-[1.3em] align-[-0.22em] mx-0.5 object-contain select-none"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none'
-          }}
-        />
+        <span key={`emoji-${i}`} className="inline-block align-[-0.22em] mx-0.5 select-none leading-none">
+          <img
+            src={getAppleEmojiUrl(code)}
+            alt={seg}
+            loading="lazy"
+            className="inline-block w-[1.3em] h-[1.3em] object-contain select-none"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+              if (e.currentTarget.nextElementSibling) {
+                e.currentTarget.nextElementSibling.style.display = 'inline'
+              }
+            }}
+          />
+          <span style={{ display: 'none' }} className="select-none leading-none text-[1.1em]">
+            {seg}
+          </span>
+        </span>
       )
     } else {
       buffer += seg
