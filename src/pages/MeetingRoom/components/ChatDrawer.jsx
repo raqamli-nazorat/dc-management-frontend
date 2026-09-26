@@ -317,6 +317,7 @@ export default function ChatDrawer({
                   const isMe = m.sender === currentUserName || m.isMe
                   const isStickerMsg = m.isSticker || !!m.sticker
                   const stickerData = typeof m.sticker === 'object' ? m.sticker : { url: m.sticker, name: 'Stiker' }
+                  const senderDisplayName = isMe ? 'Siz' : (m.sender || m.senderName || m.sender_name || m.name || m.fullName || m.full_name || m.username || m.userName || 'Ishtirokchi')
 
                   return (
                     <div
@@ -326,7 +327,7 @@ export default function ChatDrawer({
                       {/* Name + Time */}
                       <div className="flex items-center gap-1.5 px-1 mb-1">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">
-                          {isMe ? 'Siz' : (m.sender || 'Ishtirokchi')}
+                          {senderDisplayName}
                         </span>
                         {m.time && (
                           <span className="text-xs text-slate-400 dark:text-slate-500 font-normal tabular-nums">
@@ -381,10 +382,10 @@ export default function ChatDrawer({
                     <div className="flex items-center gap-1.5 px-1">
                       <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                         {typingUsers.length === 1
-                          ? typingUsers[0]
+                          ? `${typingUsers[0]} yozmoqda...`
                           : typingUsers.length === 2
-                          ? `${typingUsers[0]}, ${typingUsers[1]}`
-                          : `${typingUsers.length} ishtirokchi`}
+                          ? `${typingUsers[0]} va ${typingUsers[1]} yozmoqda...`
+                          : `${typingUsers.length} ishtirokchi yozmoqda...`}
                       </span>
                     </div>
 

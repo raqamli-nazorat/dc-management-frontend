@@ -1020,19 +1020,108 @@ export default function MeetingRoom() {
         const isRaised = Boolean(msg.raised)
         const isMe = String(msg.user_id) === String(user?.id)
 
-        setHandRaisedMap(prev => ({
-          ...prev,
+        const newUpdates = {
           [msg.user_id]: isRaised,
           [String(msg.user_id)]: isRaised,
-          ...(msg.username ? { [msg.username]: isRaised } : {})
+        }
+        if (msg.username) {
+          newUpdates[msg.username] = isRaised
+          newUpdates[String(msg.username).toLowerCase()] = isRaised
+        }
+        if (msg.full_name) {
+          newUpdates[msg.full_name] = isRaised
+          newUpdates[String(msg.full_name).toLowerCase()] = isRaised
+        }
+
+        // LiveKit roomdagi mos keladigan barcha remote participantlarning identity larini ham xaritaga qo'shamiz
+        if (roomRef.current) {
+          const sUid = String(msg.user_id || '')
+          const uName = String(msg.username || '').toLowerCase()
+          const fName = String(msg.full_name || '').toLowerCase()
+
+          roomRef.current.remoteParticipants.forEach(rp => {
+            const rIdent = String(rp.identity || '').toLowerCase()
+            const rpName = String(rp.name || '').toLowerCase()
+            const isMatch = (
+              (sUid && (rIdent === sUid || rIdent.startsWith(sUid + '_') || rIdent.startsWith(sUid + '-') || rIdent.endsWith('_' + sUid) || rIdent.endsWith('-' + sUid) || rIdent === `user_${sUid}` || rIdent.includes(`_${sUid}_`))) ||
+              (uName && (rIdent === uName || rpName === uName || rIdent.startsWith(uName + '_') || rIdent.endsWith('_' + uName))) ||
+              (fName && (rpName === fName || rIdent === fName))
+            )
+            if (isMatch) {
+              newUpdates[rp.identity] = isRaised
+            }
+          })
+        }
+
+        setHandRaisedMap(prev => ({
+          ...prev,
+          ...newUpdates
         }))
 
         if (isMe) {
           setIsHandRaised(isRaised)
         } else if (isRaised) {
           playHandRaisedSound()
-          const raiserName = msg.full_name || msg.username || "Ishtirokchi"
-          triggerInRoomAlert('hand', `${raiserName} qo'l ko'tardi`, 'hand')
+        }
+        break
+      }
+
+      case 'typing':
+      case 'chat_typing':
+      case 'user_typing': {
+        const isTyping = Boolean(msg.is_typing ?? msg.isTyping ?? msg.typing ?? true)
+        const isMe = String(msg.user_id) === String(user?.id)
+        if (isMe) break
+
+        const uId = String(msg.user_id || '')
+        let senderDisplayName = (msg.full_name || msg.username || '').trim()
+
+        if (!senderDisplayName && uId) {
+          const found = directoryUsers?.find(u => String(u.id) === uId) ||
+                        meetingDetails?.participants_info?.find(u => String(u.id) === uId)
+          if (found) {
+            senderDisplayName = `${found.first_name || ''} ${found.last_name || ''}`.trim() || found.username
+          }
+        }
+        if (!senderDisplayName && msg.identity && roomRef.current) {
+          const rp = roomRef.current.remoteParticipants.get(msg.identity)
+          if (rp) {
+            senderDisplayName = resolveParticipantName(rp, participantTracks[rp.identity])
+          }
+        }
+        if (!senderDisplayName) {
+          senderDisplayName = 'Ishtirokchi'
+        }
+
+        const senderKey = uId || msg.username || senderDisplayName
+
+        if (isTyping) {
+          if (typingTimeoutsRef.current[senderKey]) {
+            clearTimeout(typingTimeoutsRef.current[senderKey])
+          }
+          typingTimeoutsRef.current[senderKey] = setTimeout(() => {
+            setTypingUsersMap(prev => {
+              const next = { ...prev }
+              delete next[senderKey]
+              return next
+            })
+            delete typingTimeoutsRef.current[senderKey]
+          }, 3500)
+
+          setTypingUsersMap(prev => ({
+            ...prev,
+            [senderKey]: senderDisplayName
+          }))
+        } else {
+          if (typingTimeoutsRef.current[senderKey]) {
+            clearTimeout(typingTimeoutsRef.current[senderKey])
+            delete typingTimeoutsRef.current[senderKey]
+          }
+          setTypingUsersMap(prev => {
+            const next = { ...prev }
+            delete next[senderKey]
+            return next
+          })
         }
         break
       }
@@ -1471,6 +1560,174 @@ export default function MeetingRoom() {
     return ''
   }, [meetingDetails, meetingState, projectData, directoryUsers, peerProfiles, knockRequests, user])
 
+  // Resolve display name for any participant using all available data sources (Web & Mobile)
+  const resolveParticipantName = useCallback((participant, pInfo, fallbackName = '') => {
+    if (!participant) return fallbackName || 'Ishtirokchi'
+    if (participant.isLocal) return currentUserName
+
+    const identity = String(participant.identity || '').trim()
+    const pName = (participant.name || pInfo?.name || fallbackName || '').trim()
+    const pNameLower = pName.toLowerCase()
+
+    // 1. Agar pName mavjud bo'lsa va u identity ga teng bo'lmasa hamda texnik id (user_12 yoki 12) bo'lmasa
+    if (pName && pName !== identity && !pName.startsWith('user_') && !/^\d+$/.test(pName)) {
+      return pName
+    }
+
+    // 2. LiveKit metadata tekshirish
+    if (participant.metadata) {
+      try {
+        const parsed = typeof participant.metadata === 'string' ? JSON.parse(participant.metadata) : participant.metadata
+        const metaName = parsed?.name || parsed?.full_name || parsed?.fullName || parsed?.username
+        if (metaName) return metaName
+      } catch { }
+    }
+
+    // 3. Peer profiles (DataChannel orqali almashilgan)
+    const profile = peerProfiles[identity] || (identity ? peerProfiles[identity.toLowerCase()] : null) || (pNameLower ? peerProfiles[pNameLower] : null)
+    if (profile?.name) return profile.name
+    if (profile?.username) return profile.username
+
+    // 4. meetingDetails - organizer
+    const orgId = getMeetingOrganizerId(meetingDetails, meetingState)
+    const orgUser = getMeetingOrganizerUser(meetingDetails, orgId)
+    if (orgUser && isUserMatch(orgUser, identity, pNameLower)) {
+      const orgFullName = `${orgUser.first_name || ''} ${orgUser.last_name || ''}`.trim()
+      return orgFullName || orgUser.username || orgUser.first_name || 'Tashkilotchi'
+    }
+
+    // 5. meetingDetails - participants_info
+    if (Array.isArray(meetingDetails?.participants_info)) {
+      const match = meetingDetails.participants_info.find(u => isUserMatch(u, identity, pNameLower))
+      if (match) {
+        const fullName = `${match.first_name || ''} ${match.last_name || ''}`.trim()
+        return fullName || match.username || match.first_name || pName
+      }
+    }
+
+    // 6. projectData (employees_info, testers_info, manager_info)
+    const allProjectMembers = [
+      ...(projectData?.employees_info || []),
+      ...(projectData?.testers_info || []),
+      ...(projectData?.manager_info ? [projectData.manager_info] : [])
+    ]
+    if (allProjectMembers.length > 0) {
+      const match = allProjectMembers.find(u => isUserMatch(u, identity, pNameLower))
+      if (match) {
+        const fullName = `${match.first_name || ''} ${match.last_name || ''}`.trim()
+        return fullName || match.username || match.first_name || pName
+      }
+    }
+
+    // 7. Directory users (/users/all/)
+    if (Array.isArray(directoryUsers) && directoryUsers.length > 0) {
+      const match = directoryUsers.find(u => isUserMatch(u, identity, pNameLower))
+      if (match) {
+        const fullName = `${match.first_name || ''} ${match.last_name || ''}`.trim()
+        return fullName || match.username || match.first_name || pName
+      }
+    }
+
+    // 8. Knock requests
+    if (Array.isArray(knockRequests) && knockRequests.length > 0) {
+      const match = knockRequests.find(k => {
+        const kId = String(k.user_id || '')
+        if (kId && (identity === kId || identity.startsWith(kId + '_') || identity.endsWith('_' + kId))) return true
+        if (k.username && (identity.toLowerCase() === k.username.toLowerCase() || pNameLower === k.username.toLowerCase())) return true
+        return false
+      })
+      if (match) {
+        return match.full_name || match.username || pName
+      }
+    }
+
+    return pName || identity || 'Ishtirokchi'
+  }, [currentUserName, peerProfiles, meetingDetails, meetingState, projectData, directoryUsers, knockRequests])
+
+  // Check if a participant has hand raised using identity, id, username, or peer profiles
+  const isParticipantHandRaised = useCallback((p, pInfo) => {
+    if (!p) return false
+    if (p.isLocal) {
+      const localId = roomRef.current?.localParticipant?.identity
+      return Boolean(
+        isHandRaised ||
+        (localId && handRaisedMap[localId]) ||
+        (user?.id && (handRaisedMap[user.id] || handRaisedMap[String(user.id)])) ||
+        (user?.username && (handRaisedMap[user.username] || handRaisedMap[String(user.username).toLowerCase()]))
+      )
+    }
+
+    const identity = String(p.identity || '').trim()
+    const pName = String(p.name || pInfo?.name || '').trim()
+    const pNameLower = pName.toLowerCase()
+
+    // 1. Direct identity check
+    if (handRaisedMap[identity]) return true
+
+    // 2. Numeric / user_ ID in identity (e.g., "14", "14_abc", "user_14")
+    const idMatch = identity.match(/^user_?(\d+)/i) || identity.match(/^(\d+)(_|-|$)/)
+    if (idMatch && idMatch[1]) {
+      if (handRaisedMap[idMatch[1]] || handRaisedMap[String(idMatch[1])]) return true
+    }
+
+    // 3. Name check
+    if (pName && (handRaisedMap[pName] || handRaisedMap[pNameLower])) return true
+
+    // 4. LiveKit metadata
+    if (p.metadata) {
+      try {
+        const parsed = typeof p.metadata === 'string' ? JSON.parse(p.metadata) : p.metadata
+        const mUid = parsed?.userId || parsed?.id || parsed?.user_id
+        if (mUid && (handRaisedMap[mUid] || handRaisedMap[String(mUid)])) return true
+        const mUname = parsed?.username
+        if (mUname && (handRaisedMap[mUname] || handRaisedMap[String(mUname).toLowerCase()])) return true
+      } catch {}
+    }
+
+    // 5. Peer profiles
+    const profile = peerProfiles[identity] || (identity ? peerProfiles[identity.toLowerCase()] : null) || (pNameLower ? peerProfiles[pNameLower] : null)
+    if (profile) {
+      if (profile.userId && (handRaisedMap[profile.userId] || handRaisedMap[String(profile.userId)])) return true
+      if (profile.username && (handRaisedMap[profile.username] || handRaisedMap[String(profile.username).toLowerCase()])) return true
+    }
+
+    // 6. Check against all active entries in handRaisedMap
+    for (const [key, raised] of Object.entries(handRaisedMap)) {
+      if (!raised) continue
+      const sKey = String(key).trim()
+      // If key is a user ID
+      if (/^\d+$/.test(sKey)) {
+        if (
+          identity === sKey ||
+          identity.startsWith(sKey + '_') ||
+          identity.startsWith(sKey + '-') ||
+          identity.endsWith('_' + sKey) ||
+          identity.endsWith('-' + sKey) ||
+          identity.startsWith(`user_${sKey}`)
+        ) {
+          return true
+        }
+        const u = directoryUsers?.find(item => String(item.id) === sKey) ||
+                  meetingDetails?.participants_info?.find(item => String(item.id) === sKey)
+        if (u && isUserMatch(u, identity, pNameLower)) {
+          return true
+        }
+      }
+      // If key is username or string
+      if (sKey) {
+        const sKeyLower = sKey.toLowerCase()
+        if (sKeyLower === pNameLower || sKeyLower === identity.toLowerCase()) {
+          return true
+        }
+        if (identity.toLowerCase().startsWith(sKeyLower + '_') || identity.toLowerCase().endsWith('_' + sKeyLower)) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }, [handRaisedMap, isHandRaised, user, peerProfiles, directoryUsers, meetingDetails])
+
   // 3. LiveKit Connection
   const connectToLiveKit = async (serverUrl, token) => {
     try {
@@ -1900,8 +2157,42 @@ export default function MeetingRoom() {
       try {
         const decoded = JSON.parse(new TextDecoder().decode(payload))
         if (decoded.type === 'chat') {
+          // 1. Sender ismini aniqlash (Web hamda Mobile ilovalar uchun)
+          let senderDisplayName = (
+            decoded.sender ||
+            decoded.senderName ||
+            decoded.sender_name ||
+            decoded.userName ||
+            decoded.username ||
+            decoded.name ||
+            decoded.fullName ||
+            decoded.full_name ||
+            decoded.user?.name ||
+            decoded.user?.username ||
+            decoded.user?.full_name ||
+            ''
+          ).trim()
+
+          // Agar decoded ichida ism topilmasa yoki faqat texnik ID bo'lsa
+          if (!senderDisplayName || senderDisplayName.startsWith('user_') || /^\d+$/.test(senderDisplayName)) {
+            if (participant) {
+              senderDisplayName = resolveParticipantName(participant, participantTracks[participant.identity], senderDisplayName)
+            } else if (decoded.userId || decoded.user_id) {
+              const uId = String(decoded.userId || decoded.user_id)
+              const found = directoryUsers?.find(u => String(u.id) === uId) ||
+                            meetingDetails?.participants_info?.find(u => String(u.id) === uId)
+              if (found) {
+                senderDisplayName = `${found.first_name || ''} ${found.last_name || ''}`.trim() || found.username
+              }
+            }
+          }
+
+          if (!senderDisplayName) {
+            senderDisplayName = 'Ishtirokchi'
+          }
+
           // Clear typing status for the sender
-          const senderKey = decoded.sender || (participant ? participant.identity : '')
+          const senderKey = decoded.sender || senderDisplayName || (participant ? participant.identity : '')
           if (senderKey) {
             if (typingTimeoutsRef.current[senderKey]) {
               clearTimeout(typingTimeoutsRef.current[senderKey])
@@ -1914,21 +2205,70 @@ export default function MeetingRoom() {
             })
           }
 
+          // Current time fallback
+          const now = new Date()
+          const fallbackTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+
+          const normalizedMessage = {
+            ...decoded,
+            sender: senderDisplayName,
+            text: decoded.text ?? decoded.message ?? decoded.content ?? '',
+            time: decoded.time || fallbackTime,
+            avatar: decoded.avatar || (participant ? resolveParticipantAvatar(participant, participantTracks[participant?.identity]) : '')
+          }
+
           setChatMessages(prev => {
-            const next = [...prev, decoded]
+            const next = [...prev, normalizedMessage]
             saveStoredChatMessages(meetingId, next)
             return next
           })
           playChatMessageSound()
           if (!isChatOpenRef.current) {
             setUnreadChatCount(c => c + 1)
-            const snippet = decoded.isSticker ? (decoded.sticker?.char ? `${decoded.sticker.char} stiker yubordi` : '🎨 Stiker yubordi') : `${decoded.text?.slice(0, 40) || ''}${decoded.text?.length > 40 ? '...' : ''}`
-            triggerInRoomAlert('chat', `${decoded.sender}: ${snippet}`, 'chat')
+            const snippet = normalizedMessage.isSticker
+              ? (normalizedMessage.sticker?.char ? `${normalizedMessage.sticker.char} stiker yubordi` : '🎨 Stiker yubordi')
+              : `${normalizedMessage.text?.slice(0, 40) || ''}${normalizedMessage.text?.length > 40 ? '...' : ''}`
+            triggerInRoomAlert('chat', `${senderDisplayName}: ${snippet}`, 'chat')
           }
-        } else if (decoded.type === 'typing') {
-          const senderKey = decoded.sender || (participant ? participant.identity : '')
+        } else if (decoded.type === 'typing' || decoded.type === 'chat_typing' || decoded.type === 'user_typing' || decoded.action === 'typing') {
+          // Sender ismini aniqlash
+          let senderDisplayName = (
+            decoded.sender ||
+            decoded.senderName ||
+            decoded.sender_name ||
+            decoded.userName ||
+            decoded.username ||
+            decoded.name ||
+            decoded.fullName ||
+            decoded.full_name ||
+            decoded.user?.name ||
+            decoded.user?.username ||
+            decoded.user?.full_name ||
+            ''
+          ).trim()
+
+          if (!senderDisplayName || senderDisplayName.startsWith('user_') || /^\d+$/.test(senderDisplayName)) {
+            if (participant) {
+              senderDisplayName = resolveParticipantName(participant, participantTracks[participant.identity], senderDisplayName)
+            } else if (decoded.userId || decoded.user_id) {
+              const uId = String(decoded.userId || decoded.user_id)
+              const found = directoryUsers?.find(u => String(u.id) === uId) ||
+                            meetingDetails?.participants_info?.find(u => String(u.id) === uId)
+              if (found) {
+                senderDisplayName = `${found.first_name || ''} ${found.last_name || ''}`.trim() || found.username
+              }
+            }
+          }
+
+          if (!senderDisplayName) {
+            senderDisplayName = 'Ishtirokchi'
+          }
+
+          const isTyping = Boolean(decoded.isTyping ?? decoded.typing ?? decoded.is_typing ?? (decoded.status === 'typing') ?? true)
+          const senderKey = String(decoded.userId || decoded.user_id || (participant ? participant.identity : '') || senderDisplayName)
+
           if (senderKey) {
-            if (decoded.isTyping) {
+            if (isTyping) {
               if (typingTimeoutsRef.current[senderKey]) {
                 clearTimeout(typingTimeoutsRef.current[senderKey])
               }
@@ -1943,7 +2283,7 @@ export default function MeetingRoom() {
 
               setTypingUsersMap(prev => ({
                 ...prev,
-                [senderKey]: decoded.sender
+                [senderKey]: senderDisplayName
               }))
             } else {
               if (typingTimeoutsRef.current[senderKey]) {
@@ -1958,12 +2298,32 @@ export default function MeetingRoom() {
             }
           }
         } else if (decoded.type === 'raise_hand') {
-          const pIdentity = participant ? participant.identity : decoded.userId
+          const isRaised = Boolean(decoded.isRaised ?? decoded.raised ?? true)
+          const pIdentity = participant ? participant.identity : (decoded.userId || decoded.identity)
+          const uid = decoded.userId || decoded.user_id
+          const uname = decoded.username || decoded.sender
+
+          const newUpdates = {}
+          if (pIdentity) newUpdates[pIdentity] = isRaised
+          if (uid) {
+            newUpdates[uid] = isRaised
+            newUpdates[String(uid)] = isRaised
+          }
+          if (uname) {
+            newUpdates[uname] = isRaised
+            newUpdates[String(uname).toLowerCase()] = isRaised
+          }
+          if (participant?.name) {
+            newUpdates[participant.name] = isRaised
+            newUpdates[String(participant.name).toLowerCase()] = isRaised
+          }
+
           setHandRaisedMap(prev => ({
             ...prev,
-            [pIdentity]: decoded.isRaised
+            ...newUpdates
           }))
-          if (decoded.isRaised) {
+
+          if (isRaised) {
             playHandRaisedSound()
           }
         } else if (decoded.type === 'mute_participant') {
@@ -2811,7 +3171,7 @@ export default function MeetingRoom() {
       isScreenShare: false,
       isHost: isLocalHost,
       isSpeaking: activeSpeakers.includes(localId),
-      hasHandRaised: !!handRaisedMap[localId] || isHandRaised,
+      hasHandRaised: isParticipantHandRaised(roomRef.current.localParticipant, localInfo),
       isCameraEnabled: isCameraEnabled,
       isMicEnabled: isMicEnabled,
       videoTrack: localInfo.videoTrack || roomRef.current.localParticipant.getTrackPublication(Track.Source.Camera)?.videoTrack,
@@ -2826,15 +3186,16 @@ export default function MeetingRoom() {
       const rInfo = participantTracks[rp.identity] || {}
       const rpIsHost = checkIsHost(rp, rp.identity, rp.name || rInfo.name)
       const rpAvatar = formatAvatarUrl(resolveParticipantAvatar(rp, rInfo))
+      const rpName = resolveParticipantName(rp, rInfo)
       allParticipantItems.push({
         identity: rp.identity,
-        name: rp.name || rp.identity,
+        name: rpName,
         avatar: rpAvatar,
         isLocal: false,
         isScreenShare: false,
         isHost: rpIsHost,
         isSpeaking: activeSpeakers.includes(rp.identity),
-        hasHandRaised: !!handRaisedMap[rp.identity],
+        hasHandRaised: isParticipantHandRaised(rp, rInfo),
         isCameraEnabled: rInfo.isCameraEnabled ?? rp.isCameraEnabled,
         isMicEnabled: rInfo.isMicEnabled ?? rp.isMicrophoneEnabled,
         videoTrack: rInfo.videoTrack,
@@ -3680,6 +4041,8 @@ export default function MeetingRoom() {
           pinnedId={pinnedId}
           onTogglePin={handleTogglePin}
           requestedParticipantIds={requestedParticipantIds}
+          onToggleSelfMic={handleToggleMic}
+          onToggleSelfCamera={handleToggleCamera}
         />
 
         {/* Meeting Details Drawer (Google Meet Style) */}

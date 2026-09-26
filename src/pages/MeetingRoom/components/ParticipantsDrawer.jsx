@@ -7,6 +7,7 @@ import {
   MicOff01Icon,
   Video01Icon,
   VideoOffIcon,
+  HandIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { getAvatarGradient, formatAvatarUrl } from '../utils/meetingCode'
@@ -62,6 +63,8 @@ export default function ParticipantsDrawer({
   pinnedId,
   onTogglePin,
   requestedParticipantIds = {},
+  onToggleSelfMic,
+  onToggleSelfCamera,
 }) {
   const [search, setSearch] = useState('')
 
@@ -211,8 +214,31 @@ export default function ParticipantsDrawer({
                     </span>
                   ) : (
                     <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                      {/* Hand Raised indicator */}
+                      {p.hasHandRaised && (
+                        <span
+                          className="w-7 h-7 flex items-center justify-center rounded-full bg-[#3B59BA] dark:bg-[#344879] text-white shadow-xs animate-in zoom-in-75 duration-200"
+                          title="Qo'l ko'targan"
+                        >
+                          <HugeiconsIcon icon={HandIcon} size={15} strokeWidth={2} />
+                        </span>
+                      )}
+
                       {/* Microphone control / indicator */}
-                      {isLocalHost && !isMe ? (
+                      {isMe ? (
+                        <button
+                          type="button"
+                          onClick={() => onToggleSelfMic && onToggleSelfMic()}
+                          title={p.isMicEnabled ? "Mikrofoningizni o'chirish" : "Mikrofoningizni yoqish"}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all cursor-pointer active:scale-90 ${
+                            p.isMicEnabled
+                              ? 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-white'
+                              : 'text-[#EA3323] hover:bg-red-500/10'
+                          }`}
+                        >
+                          <HugeiconsIcon icon={p.isMicEnabled ? Mic01Icon : MicOff01Icon} size={18} strokeWidth={2} />
+                        </button>
+                      ) : isLocalHost ? (
                         p.isMicEnabled ? (
                           <button
                             type="button"
@@ -246,7 +272,20 @@ export default function ParticipantsDrawer({
                       )}
 
                       {/* Camera control / indicator */}
-                      {isLocalHost && !isMe ? (
+                      {isMe ? (
+                        <button
+                          type="button"
+                          onClick={() => onToggleSelfCamera && onToggleSelfCamera()}
+                          title={p.isCameraEnabled ? "Kamerangizni o'chirish" : "Kamerangizni yoqish"}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all cursor-pointer active:scale-90 ${
+                            p.isCameraEnabled
+                              ? 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-white'
+                              : 'text-[#EA3323] hover:bg-red-500/10'
+                          }`}
+                        >
+                          <HugeiconsIcon icon={p.isCameraEnabled ? Video01Icon : VideoOffIcon} size={18} strokeWidth={2} />
+                        </button>
+                      ) : isLocalHost ? (
                         p.isCameraEnabled ? (
                           <button
                             type="button"
