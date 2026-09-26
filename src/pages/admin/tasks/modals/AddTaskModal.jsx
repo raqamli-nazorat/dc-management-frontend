@@ -331,12 +331,35 @@ export default function AddTaskModal({ onClose, onAdd, isEmployee, initialData }
       }
     }
     return {
-      project: "", title: "", description: "", priority: "low", type: "bug",
+      project: "", title: "", description: "", priority: "low", type: "feature",
       assignees: [], position: "", sprint: "", task_price: "", penalty_percentage: "",
       deadline: "", deadline_time: "00:00", estimated_hours: "", estimated_minutes: "",
     }
   })
   const [errors, setErrors] = useState({})
+
+  // Yangi vazifada oxirgi qo'shilgan loyihani default tanlash
+  const defaultProjectApplied = useRef(false)
+  useEffect(() => {
+    if (defaultProjectApplied.current || initialData || projects.length === 0) return
+    defaultProjectApplied.current = true
+    const latest = projects.reduce((a, b) => {
+      const ta = a.created_at ? new Date(a.created_at).getTime() : 0
+      const tb = b.created_at ? new Date(b.created_at).getTime() : 0
+      if (ta !== tb) return tb > ta ? b : a
+      return Number(b.id) > Number(a.id) ? b : a
+    })
+    const projectId = String(latest.id)
+    setForm(p => p.project ? p : { ...p, project: projectId })
+    axiosAPI.get(`/projects/${projectId}/`)
+      .then(res => {
+        const proj = res.data?.data ?? res.data
+        const emps = proj?.employees_info ?? []
+        setProjectEmployees(Array.isArray(emps) ? emps : [])
+      })
+      .catch(() => setProjectEmployees([]))
+  }, [projects, initialData])
+
   const [attachments, setAttachments] = useState(() => {
     if (Array.isArray(initialData?.attachments)) {
       return initialData.attachments
