@@ -156,13 +156,9 @@ export default function Login() {
           style={{ width: 440, padding: 40, fontFamily: '"Manrope", sans-serif' }}
         >
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-[var(--accent-sub)] flex items-center justify-center shrink-0">
-              <img src="/imgs/Logo.png" alt="logo" className="w-6 h-6 object-contain" />
-            </div>
-            <span className="font-semibold text-base text-[#1a1a2e] dark:text-[var(--text-strong)]" style={{ fontFamily: '"Manrope", sans-serif' }}>
-              Raqamli Nazorat
-            </span>
+          <div className="flex items-center mb-8">
+            <img src="/imgs/MainLogo.svg" alt="Raqamli Nazorat" className="h-10 w-auto dark:hidden" />
+            <img src="/imgs/MainLogoDark.svg" alt="Raqamli Nazorat" className="h-10 w-auto hidden dark:block" />
           </div>
 
           {/* Sarlavha */}

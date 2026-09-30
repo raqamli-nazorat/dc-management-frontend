@@ -591,7 +591,7 @@ export default function Layout() {
     if (shouldShowPageNotification && Notification.permission === "granted") {
       const notification = new Notification(title, {
         body: body,
-        icon: "/imgs/Logo.png",
+        icon: "/imgs/logo-192.png",
         tag: notificationTag,
         data: { url: window.location.origin }
       });
