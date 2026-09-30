@@ -570,25 +570,18 @@ export default function Sidebar({ forceCollapsed = false, onForceClick }) {
           /* Yopilgan: logo shakli o'zgarmaydi — rounded-lg kvadrat */
           <button
             onClick={handleDashboard}
-            className="w-8 h-8 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+            className="w-8 h-8 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity shrink-0"
           >
-            <img src="/imgs/Logo.png" alt="logo" className="w-5 h-5 object-contain" />
+            <img src="/imgs/logo.svg" alt="Raqamli Nazorat" className="w-8 h-8 object-contain" />
           </button>
         ) : (
           <>
             <button
               onClick={handleDashboard}
-              className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
+              className="flex items-center flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent-sub)] flex items-center justify-center shrink-0">
-                <img src="/imgs/Logo.png" alt="logo" className="w-5 h-5 object-contain" />
-              </div>
-              <span
-                className="truncate text-[var(--text-sub)] dark:text-[var(--text-strong)]"
-                style={{ fontWeight: 400, fontSize: 15 }}
-              >
-                Raqamli Nazorat
-              </span>
+              <img src="/imgs/MainLogo.svg" alt="Raqamli Nazorat" className="h-8 w-auto shrink-0 dark:hidden" />
+              <img src="/imgs/MainLogoDark.svg" alt="Raqamli Nazorat" className="h-8 w-auto shrink-0 hidden dark:block" />
             </button>
             <button
               onClick={() => setCollapsed(true)}

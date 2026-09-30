@@ -33,10 +33,10 @@ self.registration.showNotification = function (title, options = {}) {
 
     // Har doim o'zimizning chiroyli logotipimizni qo'yamiz (Chrome "B" ko'rsatmasligi uchun)
     if (!notifOptions.icon || notifOptions.icon.includes('undefined')) {
-        notifOptions.icon = '/imgs/Logo.png';
+        notifOptions.icon = '/imgs/logo-192.png';
     }
     if (!notifOptions.badge) {
-        notifOptions.badge = '/imgs/Logo.png';
+        notifOptions.badge = '/imgs/logo-192.png';
     }
 
     const key = getNotificationKey(title, notifOptions.body);
@@ -86,8 +86,8 @@ messaging.onBackgroundMessage((payload) => {
 
     const notificationOptions = {
         body: body,
-        icon: "/imgs/Logo.png",
-        badge: "/imgs/Logo.png",
+        icon: "/imgs/logo-192.png",
+        badge: "/imgs/logo-192.png",
         tag: data.id ? `notif_${data.id}` : `sw_${key.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40)}`,
         data: {
             url: data.url || "/"
